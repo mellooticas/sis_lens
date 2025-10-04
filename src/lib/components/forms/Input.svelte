@@ -25,77 +25,19 @@
     </div>
   {/if}
   
-  {#if type === 'text'}
-    <input
-      type="text"
-      {placeholder}
-      {disabled}
-      bind:value
-      class={inputClasses}
-      on:input
-      on:change
-      on:focus
-      on:blur
-      on:keydown
-      {...$$restProps}
-    />
-  {:else if type === 'email'}
-    <input
-      type="email"
-      {placeholder}
-      {disabled}
-      bind:value
-      class={inputClasses}
-      on:input
-      on:change
-      on:focus
-      on:blur
-      on:keydown
-      {...$$restProps}
-    />
-  {:else if type === 'password'}
-    <input
-      type="password"
-      {placeholder}
-      {disabled}
-      bind:value
-      class={inputClasses}
-      on:input
-      on:change
-      on:focus
-      on:blur
-      on:keydown
-      {...$$restProps}
-    />
-  {:else if type === 'number'}
-    <input
-      type="number"
-      {placeholder}
-      {disabled}
-      bind:value
-      class={inputClasses}
-      on:input
-      on:change
-      on:focus
-      on:blur
-      on:keydown
-      {...$$restProps}
-    />
-  {:else}
-    <input
-      type="text"
-      {placeholder}
-      {disabled}
-      bind:value
-      class={inputClasses}
-      on:input
-      on:change
-      on:focus
-      on:blur
-      on:keydown
-      {...$$restProps}
-    />
-  {/if}
+  <input
+    {type}
+    {placeholder}
+    {disabled}
+    bind:value
+    class={inputClasses}
+    on:input
+    on:change
+    on:focus
+    on:blur
+    on:keydown
+    {...$$restProps}
+  />
   
   {#if error}
     <p class="mt-1 text-xs text-error">{error}</p>
