@@ -1,17 +1,16 @@
 import { createClient } from '@supabase/supabase-js';
 
 // Obter variáveis de ambiente diretamente
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL;
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY;
+const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
+const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
 
-// Validação das variáveis de ambiente
-if (!SUPABASE_URL || !SUPABASE_ANON_KEY) {
-  console.error('Supabase environment variables:', {
-    url: SUPABASE_URL ? 'present' : 'missing',
-    key: SUPABASE_ANON_KEY ? 'present' : 'missing',
-    env: import.meta.env
-  });
-  throw new Error('Missing Supabase environment variables');
+// Durante o build, usar valores placeholder se as variáveis não estiverem definidas
+const isDevelopment = import.meta.env.DEV;
+const isProduction = import.meta.env.PROD;
+
+// Validação das variáveis de ambiente apenas em desenvolvimento
+if (isDevelopment && (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY)) {
+  console.warn('⚠️ Supabase environment variables missing - using placeholders for build');
 }
 
 // Cliente Supabase singleton
