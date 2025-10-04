@@ -1,0 +1,310 @@
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    /* ============================================ */
+    /* BRAND COLORS */
+    /* ============================================ */
+    --color-brand-blue-50: #f0f4f8;
+    --color-brand-blue-100: #d9e6f2;
+    --color-brand-blue-200: #b3cce5;
+    --color-brand-blue-300: #8db3d8;
+    --color-brand-blue-400: #6799cb;
+    --color-brand-blue-500: #1C3B5A; /* Primary */
+    --color-brand-blue-600: #162f48;
+    --color-brand-blue-700: #112336;
+    --color-brand-blue-800: #0b1724;
+    --color-brand-blue-900: #060c12;
+
+    --color-brand-orange-50: #fef5f0;
+    --color-brand-orange-100: #fde6d9;
+    --color-brand-orange-200: #fbcdb3;
+    --color-brand-orange-300: #f9b48d;
+    --color-brand-orange-400: #f79b67;
+    --color-brand-orange-500: #CC6B2F; /* Accent */
+    --color-brand-orange-600: #a35626;
+    --color-brand-orange-700: #7a401c;
+    --color-brand-orange-800: #522b13;
+    --color-brand-orange-900: #291509;
+
+    --color-brand-gold-50: #fdfaf2;
+    --color-brand-gold-100: #fbf4e0;
+    --color-brand-gold-200: #f7e9c1;
+    --color-brand-gold-300: #f3dea2;
+    --color-brand-gold-400: #efd383;
+    --color-brand-gold-500: #DEA742; /* Value */
+    --color-brand-gold-600: #b28635;
+    --color-brand-gold-700: #856428;
+    --color-brand-gold-800: #59431a;
+    --color-brand-gold-900: #2c210d;
+
+    --color-neutral-50: #fafaf9;
+    --color-neutral-100: #f5f5f4;
+    --color-neutral-200: #e7e5e4;
+    --color-neutral-300: #d6d3d1;
+    --color-neutral-400: #a8a29e;
+    --color-neutral-500: #E8E0D5; /* Base */
+    --color-neutral-600: #78716c;
+    --color-neutral-700: #57534e;
+    --color-neutral-800: #44403c;
+    --color-neutral-900: #292524;
+
+    /* ============================================ */
+    /* SEMANTIC COLORS */
+    /* ============================================ */
+    --color-success: #22c55e;
+    --color-success-light: #dcfce7;
+    --color-success-dark: #15803d;
+    
+    --color-warning: #f59e0b;
+    --color-warning-light: #fef3c7;
+    --color-warning-dark: #b45309;
+    
+    --color-error: #ef4444;
+    --color-error-light: #fee2e2;
+    --color-error-dark: #b91c1c;
+    
+    --color-info: #3b82f6;
+    --color-info-light: #dbeafe;
+    --color-info-dark: #1d4ed8;
+
+    /* ============================================ */
+    /* RANKING COLORS (Semáforo) */
+    /* ============================================ */
+    --color-prazo-rapido: #22c55e;    /* Verde */
+    --color-prazo-medio: #f59e0b;     /* Amarelo */
+    --color-prazo-longo: #ef4444;     /* Vermelho */
+
+    --color-preco-otimo: #22c55e;
+    --color-preco-bom: #f59e0b;
+    --color-preco-alto: #ef4444;
+
+    /* ============================================ */
+    /* SHADOWS */
+    /* ============================================ */
+    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
+    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-card: 0 2px 8px rgba(28, 59, 90, 0.08);
+    --shadow-card-hover: 0 4px 16px rgba(28, 59, 90, 0.12);
+    --shadow-elevated: 0 8px 32px rgba(28, 59, 90, 0.16);
+  }
+
+  /* Dark mode variables */
+  .dark {
+    --color-neutral-50: #292524;
+    --color-neutral-100: #44403c;
+    --color-neutral-200: #57534e;
+    --color-neutral-300: #78716c;
+    --color-neutral-400: #a8a29e;
+    --color-neutral-500: #44403c; /* Base dark */
+    --color-neutral-600: #d6d3d1;
+    --color-neutral-700: #e7e5e4;
+    --color-neutral-800: #f5f5f4;
+    --color-neutral-900: #fafaf9;
+
+    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
+    --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
+    --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5);
+  }
+
+  /* ============================================ */
+  /* BASE STYLES */
+  /* ============================================ */
+  * {
+    @apply border-neutral-200;
+  }
+
+  body {
+    @apply bg-neutral-50 text-neutral-900;
+    @apply font-sans antialiased;
+  }
+
+  .dark body {
+    @apply bg-neutral-900 text-neutral-100;
+  }
+}
+
+@layer components {
+  /* ============================================ */
+  /* TYPOGRAPHY UTILITIES */
+  /* ============================================ */
+  .heading {
+    @apply font-headline font-bold tracking-tight;
+  }
+
+  .text-balance {
+    text-wrap: balance;
+  }
+
+  /* ============================================ */
+  /* BADGE STYLES */
+  /* ============================================ */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium;
+  }
+
+  .badge-primary {
+    @apply bg-brand-blue-100 text-brand-blue-700;
+  }
+
+  .badge-success {
+    @apply bg-success/10 text-success-dark;
+  }
+
+  .badge-warning {
+    @apply bg-warning/10 text-warning-dark;
+  }
+
+  .badge-error {
+    @apply bg-error/10 text-error-dark;
+  }
+
+  .badge-gold {
+    @apply bg-brand-gold-100 text-brand-gold-700;
+  }
+
+  /* ============================================ */
+  /* RANKING BADGES */
+  /* ============================================ */
+  .badge-melhor-opcao {
+    @apply badge bg-brand-gold-500 text-white font-semibold;
+    @apply shadow-md;
+  }
+
+  .badge-promocao {
+    @apply badge bg-brand-orange-500 text-white;
+  }
+
+  .badge-entrega-expressa {
+    @apply badge bg-success text-white;
+  }
+
+  /* ============================================ */
+  /* CARD STYLES */
+  /* ============================================ */
+  .card {
+    @apply rounded-xl bg-white p-6 shadow-card;
+    @apply transition-shadow duration-200;
+  }
+
+  .card:hover {
+    @apply shadow-card-hover;
+  }
+
+  .dark .card {
+    @apply bg-neutral-800;
+  }
+
+  .card-fornecedor {
+    @apply card relative;
+    @apply border-2 border-transparent;
+  }
+
+  .card-fornecedor.destaque {
+    @apply border-brand-gold-500 shadow-elevated;
+  }
+
+  /* ============================================ */
+  /* BUTTON UTILITIES */
+  /* ============================================ */
+  .btn {
+    @apply inline-flex items-center justify-center gap-2;
+    @apply rounded-lg px-4 py-2 text-sm font-medium;
+    @apply transition-all duration-200;
+    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
+    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+  }
+
+  .btn-primary {
+    @apply btn bg-brand-blue-500 text-white;
+    @apply hover:bg-brand-blue-600;
+    @apply focus:ring-brand-blue-500;
+  }
+
+  .btn-secondary {
+    @apply btn bg-neutral-200 text-neutral-900;
+    @apply hover:bg-neutral-300;
+    @apply focus:ring-neutral-400;
+  }
+
+  .btn-ghost {
+    @apply btn bg-transparent text-neutral-700;
+    @apply hover:bg-neutral-100;
+  }
+
+  .btn-success {
+    @apply btn bg-success text-white;
+    @apply hover:bg-success-dark;
+    @apply focus:ring-success;
+  }
+
+  /* ============================================ */
+  /* INPUT UTILITIES */
+  /* ============================================ */
+  .input {
+    @apply w-full rounded-lg border border-neutral-300 bg-white;
+    @apply px-4 py-2 text-sm;
+    @apply focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-500/20;
+    @apply transition-all duration-200;
+  }
+
+  .dark .input {
+    @apply bg-neutral-800 border-neutral-700;
+  }
+
+  /* ============================================ */
+  /* SCORE INDICATOR */
+  /* ============================================ */
+  .score-indicator {
+    @apply inline-flex items-center gap-1 text-sm font-medium;
+  }
+
+  .score-high {
+    @apply text-success;
+  }
+
+  .score-medium {
+    @apply text-warning;
+  }
+
+  .score-low {
+    @apply text-error;
+  }
+}
+
+@layer utilities {
+  /* Animações customizadas */
+  .animate-fade-in {
+    animation: fadeIn 0.3s ease-in;
+  }
+
+  .animate-slide-up {
+    animation: slideUp 0.4s ease-out;
+  }
+
+  @keyframes fadeIn {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes slideUp {
+    from {
+      transform: translateY(10px);
+      opacity: 0;
+    }
+    to {
+      transform: translateY(0); 
+      opacity: 1;
+    }
+  }
+}

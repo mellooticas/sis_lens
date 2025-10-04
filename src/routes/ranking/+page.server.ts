@@ -1,0 +1,347 @@
+/**
+ * 🔧 Servidor da Página de Ranking - VERSÃO CORRIGIDA
+ * Tratamento robusto de erros e estados vazios
+ */
+
+import type { PageServerLoad } from './$types';
+import { error, redirect } from '@sveltejs/kit';
+import { supabase } from '$lib/supabase';
+
+// ============================================================================
+// TIPOS
+// ============================================================================
+
+interface RankingOpcao {
+  laboratorio_id: string;
+  laboratorio_nome: string;
+  sku_fantasia: string;
+  preco_final: number;
+  prazo_dias: number;
+  custo_frete: number;
+  score_qualidade: number;
+  score_ponderado: number;
+  rank_posicao: number;
+  justificativa: string;
+}
+
+interface LenteInfo {
+  lente_id: string;
+  sku_canonico: string;
+  familia: string;
+  design: string;
+  material: string;
+  indice_refracao: string;
+  tratamentos: string[];
+  tipo_lente: string;
+  marca_nome: string;
+  descricao_completa: string;
+}
+
+// ============================================================================
+// FUNÇÃO DE LOAD COM TRATAMENTO DE ERRO ROBUSTO
+// ============================================================================
+
+export const load: PageServerLoad = async ({ url, locals }) => {
+  try {
+    // === 1. EXTRAIR PARÂMETROS ===
+    const lenteId = url.searchParams.get('lente_id');
+    const criterio = (url.searchParams.get('criterio') || 'NORMAL').toUpperCase();
+    
+    // === IMPORTANTE: Se não tem lente_id, redirecionar em vez de erro ===
+    if (!lenteId) {
+      console.warn('⚠️ Acesso ao ranking sem lente_id - redirecionando para buscar');
+      
+      // Durante preload, retornar estado vazio em vez de redirect
+      if (url.searchParams.get('__sveltekit_preload') === 'true') {
+        return {
+          ranking: [],
+          top3: [],
+          outros: [],
+          criterio: 'NORMAL',
+          lente_info: null,
+          estatisticas: null,
+          filtros: {},
+          dados_reais: {},
+          total_resultados: 0,
+          tem_resultados: false,
+          tem_filtros_ativos: false,
+          data_atualizacao: new Date().toISOString(),
+          sistema_info: {
+            tipo: 'MISSING_LENTE_ID',
+            motivo: 'Ranking requer uma lente específica para comparação'
+          },
+          precisa_redirecionar: true
+        };
+      }
+      
+      // Navegação normal: redirecionar para buscar com mensagem informativa
+      throw redirect(302, '/buscar?info=ranking_needs_lens');
+    }
+    
+    // Validar critério
+    if (!['NORMAL', 'URGENCIA', 'ESPECIAL'].includes(criterio)) {
+      console.warn(`Critério inválido: ${criterio}, usando NORMAL`);
+    }
+
+    // === 2. MONTAR FILTROS ===
+    const filtros: Record<string, any> = {};
+    
+    const precoMaximo = url.searchParams.get('preco_maximo');
+    if (precoMaximo) {
+      filtros.preco_maximo = parseFloat(precoMaximo);
+    }
+    
+    const prazoMaximo = url.searchParams.get('prazo_maximo');
+    if (prazoMaximo) {
+      filtros.prazo_maximo_dias = parseInt(prazoMaximo);
+    }
+
+    console.log('🔍 Buscando ranking:', { lenteId, criterio, filtros });
+
+    // === 3. BUSCAR INFORMAÇÕES DA LENTE ===
+    let lente_info: LenteInfo | null = null;
+    
+    try {
+      const { data: lenteData, error: lenteError } = await supabase
+        .from('vw_lentes_catalogo')
+        .select('*')
+        .eq('lente_id', lenteId)
+        .single();
+
+      if (lenteData && !lenteError) {
+        lente_info = {
+          lente_id: lenteData.lente_id || lenteData.id,
+          sku_canonico: lenteData.sku_canonico || '',
+          familia: lenteData.familia || '',
+          design: lenteData.design || '',
+          material: lenteData.material || '',
+          indice_refracao: lenteData.indice_refracao || '',
+          tratamentos: lenteData.tratamentos || [],
+          tipo_lente: lenteData.tipo_lente || '',
+          marca_nome: lenteData.marca_nome || '',
+          descricao_completa: lenteData.descricao_completa || ''
+        };
+      } else {
+        console.warn('Lente não encontrada ou erro:', lenteError);
+      }
+    } catch (err) {
+      console.error('Erro ao buscar lente:', err);
+    }
+
+    // === 4. CHAMAR RPC DE RANKING ===
+    let ranking: RankingOpcao[] = [];
+    
+    try {
+      const { data: rankingData, error: rankingError } = await supabase
+        .rpc('rpc_rank_opcoes', {
+          p_lente_id: lenteId,
+          p_criterio: criterio,
+          p_filtros: filtros
+        });
+
+      if (rankingError) {
+        console.error('Erro ao buscar ranking:', rankingError);
+        // Não quebrar, continuar com array vazio
+      } else {
+        ranking = rankingData || [];
+        console.log(`✅ Ranking calculado: ${ranking.length} opções`);
+      }
+    } catch (err) {
+      console.error('Erro ao chamar RPC:', err);
+      // Continuar com array vazio
+    }
+
+    // === 5. CALCULAR ESTATÍSTICAS ===
+    const estatisticas = calcularEstatisticas(ranking);
+
+    // === 6. SEPARAR TOP 3 E OUTROS ===
+    const top3 = ranking.slice(0, 3);
+    const outros = ranking.slice(3);
+
+    // === 7. ENRIQUECER DADOS COM BADGES ===
+    const rankingEnriquecido = ranking.map(opcao => ({
+      ...opcao,
+      badges: gerarBadges(opcao, ranking),
+      preco_base: opcao.preco_final,
+      desconto_percentual: 0,
+      economia: 0,
+      margem_percentual: 0,
+      laboratorio_regiao: null,
+      laboratorio_uf: null,
+      laboratorio_cidade: null,
+      laboratorio_avaliacao: null,
+      score_preco: Math.round(opcao.score_ponderado * 0.6),
+      score_prazo: Math.round(opcao.score_ponderado * 0.3),
+      score_total: Math.round(opcao.score_ponderado),
+      criterio_usado: criterio,
+      data_calculo: new Date().toISOString(),
+      id: `${opcao.laboratorio_id}_${Date.now()}`,
+      posicao: opcao.rank_posicao,
+      lente_id: parseInt(lenteId),
+      laboratorio_nome: opcao.laboratorio_nome,
+      prazo_entrega: opcao.prazo_dias
+    }));
+
+    const top3Enriquecido = rankingEnriquecido.slice(0, 3);
+    const outrosEnriquecidos = rankingEnriquecido.slice(3);
+
+    // === 8. BUSCAR DADOS COMPLEMENTARES ===
+    let dadosComplementares: {
+      ranking_economia: any[] | null;
+      vouchers: any[] | null;
+    } = {
+      ranking_economia: null,
+      vouchers: null
+    };
+
+    try {
+      const { data: rankingEconomia } = await supabase
+        .from('v_ranking_economia')
+        .select('*')
+        .limit(5);
+
+      const { data: vouchers } = await supabase
+        .from('v_vouchers_disponiveis')
+        .select('*')
+        .limit(3);
+
+      dadosComplementares = {
+        ranking_economia: rankingEconomia || null,
+        vouchers: vouchers || null
+      };
+    } catch (err) {
+      console.warn('Erro ao buscar dados complementares:', err);
+    }
+
+    // === 9. RETORNO FINAL ===
+    return {
+      ranking: rankingEnriquecido,
+      top3: top3Enriquecido,
+      outros: outrosEnriquecidos,
+      criterio: criterio,
+      lente_info: lente_info,
+      estatisticas: estatisticas,
+      
+      filtros: {
+        lente_id: lenteId,
+        criterio: criterio,
+        uf: url.searchParams.get('uf'),
+        cidade: url.searchParams.get('cidade'),
+        prazo_maximo: prazoMaximo,
+        preco_maximo: precoMaximo
+      },
+      
+      dados_reais: dadosComplementares,
+      
+      total_resultados: ranking.length,
+      tem_resultados: ranking.length > 0,
+      tem_filtros_ativos: !!(precoMaximo || prazoMaximo),
+      data_atualizacao: new Date().toISOString(),
+      precisa_redirecionar: false,
+      
+      sistema_info: {
+        tipo: 'REAL_DATA',
+        fonte: 'rpc_rank_opcoes',
+        ranking_economia_disponivel: !!dadosComplementares.ranking_economia,
+        vouchers_disponiveis: (dadosComplementares.vouchers?.length ?? 0)
+      }
+    };
+
+  } catch (err: any) {
+    console.error('❌ Erro no servidor de ranking:', err);
+    
+    // Se for redirect, propagar
+    if (err.status === 302) {
+      throw err;
+    }
+    
+    // Para outros erros, retornar estado de erro amigável
+    return {
+      ranking: [],
+      top3: [],
+      outros: [],
+      criterio: 'NORMAL',
+      lente_info: null,
+      estatisticas: null,
+      filtros: {},
+      dados_reais: {},
+      total_resultados: 0,
+      tem_resultados: false,
+      tem_filtros_ativos: false,
+      data_atualizacao: new Date().toISOString(),
+      precisa_redirecionar: false,
+      sistema_info: {
+        tipo: 'ERROR_STATE',
+        erro: err.message || 'Erro desconhecido',
+        detalhes: err
+      }
+    };
+  }
+};
+
+// ============================================================================
+// FUNÇÕES AUXILIARES (Mesmas de antes)
+// ============================================================================
+
+function calcularEstatisticas(ranking: RankingOpcao[]) {
+  if (ranking.length === 0) {
+    return {
+      total_fornecedores: 0,
+      melhor_preco: 0,
+      pior_preco: 0,
+      menor_prazo: 0,
+      maior_prazo: 0,
+      economia_maxima: 0,
+      economia_media: 0,
+      preco_medio: 0,
+      prazo_medio: 0,
+      score_medio: 0
+    };
+  }
+
+  const precos = ranking.map(r => r.preco_final);
+  const prazos = ranking.map(r => r.prazo_dias);
+  const scores = ranking.map(r => r.score_ponderado);
+
+  return {
+    total_fornecedores: ranking.length,
+    melhor_preco: Math.min(...precos),
+    pior_preco: Math.max(...precos),
+    menor_prazo: Math.min(...prazos),
+    maior_prazo: Math.max(...prazos),
+    economia_maxima: 0,
+    economia_media: 0,
+    preco_medio: precos.reduce((a, b) => a + b, 0) / precos.length,
+    prazo_medio: prazos.reduce((a, b) => a + b, 0) / prazos.length,
+    score_medio: scores.reduce((a, b) => a + b, 0) / scores.length
+  };
+}
+
+function gerarBadges(opcao: RankingOpcao, todosRanking: RankingOpcao[]): string[] {
+  const badges: string[] = [];
+  
+  const precos = todosRanking.map(r => r.preco_final);
+  const prazos = todosRanking.map(r => r.prazo_dias);
+  
+  if (opcao.preco_final === Math.min(...precos)) {
+    badges.push('Melhor Preço');
+  }
+  
+  if (opcao.prazo_dias === Math.min(...prazos)) {
+    badges.push('Entrega Expressa');
+  }
+  
+  if (opcao.score_qualidade >= 90) {
+    badges.push('Alta Qualidade');
+  }
+  
+  if (opcao.custo_frete === 0) {
+    badges.push('Frete Grátis');
+  }
+  
+  if (opcao.rank_posicao <= 3) {
+    badges.push(`Top ${opcao.rank_posicao}`);
+  }
+  
+  return badges;
+}

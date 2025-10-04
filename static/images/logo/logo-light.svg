@@ -1,0 +1,17 @@
+<svg width="320" height="100" viewBox="0 0 320 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <!-- Ícone: Círculo com Check -->
+  <g id="icon">
+    <circle cx="50" cy="50" r="45" stroke="#1C3B5A" stroke-width="6"/>
+    <path d="M30 50 L45 65 L75 35" stroke="#1C3B5A" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/>
+  </g>
+  
+  <!-- Texto: BestLens -->
+  <text x="115" y="60" font-family="Montserrat, sans-serif" font-size="42" font-weight="800" fill="#1C3B5A">
+    BestLens
+  </text>
+  
+  <!-- Tagline -->
+  <text x="115" y="82" font-family="Inter, sans-serif" font-size="14" font-weight="500" fill="#57534e">
+    Compare. Decide. Gain.
+  </text>
+</svg>
