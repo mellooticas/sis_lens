@@ -9,11 +9,7 @@ const config = {
 
 	kit: {
 		// Configuração específica para Netlify
-		adapter: adapter({
-			// Configurações do Netlify
-			edge: false,
-			split: false
-		})
+		adapter: adapter()
 	}
 };
 
