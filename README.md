@@ -1,52 +1,46 @@
-# 🔍 BestLens - Sistema Decisor de Lentes Híbrido# 🔍 BestLens - Sistema Decisor de Lentes Híbrido# 🌟 BestLens - Sistema Decisor de Lentes
-
-
+# 🔍 BestLens - Sistema Decisor de Lentes
 
 > **Sistema inteligente para tomada de decisões na compra de lentes oftálmicas com sistema integrado de vouchers e descontos.**
 
-
-
-## 🎯 **Sobre o Projeto**> **Sistema inteligente para tomada de decisões na compra de lentes oftálmicas com sistema integrado de vouchers e descontos.**Sistema inteligente para comparar e decidir a melhor opção de lentes oftálmicas entre laboratórios parceiros.
-
-
+## 🎯 **Sobre o Projeto**
 
 O BestLens é um sistema híbrido que combina:
 
 - **🔍 Decisor de Lentes**: Análise inteligente de fornecedores, preços e prazos
-
-- **🎫 Sistema de Vouchers**: Gestão de descontos e promoções para lojas## 🎯 **Sobre o Projeto**## 🚀 Tecnologias
-
+- **🎫 Sistema de Vouchers**: Gestão de descontos e promoções para lojas
 - **📊 Analytics**: Dashboard com métricas de economia e performance
 
+## 🚀 Tecnologias
 
+- **Frontend:** SvelteKit + TypeScript + TailwindCSS
+- **Backend:** Supabase (PostgreSQL + Auth + APIs)
+- **Autenticação:** 4 níveis de usuários com controles específicos
+- **Vouchers:** Sistema avançado de descontos com limites mensais
 
 ## ⚡ **Quick Start**
 
-O BestLens é um sistema híbrido que combina:- **Frontend:** SvelteKit + TypeScript + TailwindCSS
-
 ```bash
-
-# 1. Instalar dependências- **🔍 Decisor de Lentes**: Análise inteligente de fornecedores, preços e prazos- **Backend:** Supabase (PostgreSQL + Auth + APIs)
-
+# 1. Instalar dependências
 npm install
 
-- **🎫 Sistema de Vouchers**: Gestão de descontos e promoções para lojas- **Autenticação:** 4 níveis de usuários com controles específicos
-
 # 2. Configurar variáveis de ambiente
-
-cp .env.example .env- **📊 Analytics**: Dashboard com métricas de economia e performance- **Vouchers:** Sistema avançado de descontos com limites mensais
-
+cp .env.example .env
 # Edite .env com suas credenciais do Supabase
 
+# 3. Configurar banco de dados
+# Execute as migrations primeiro, depois popule com dados iniciais
+cd database/seeds
+chmod +x executar_populacao.sh
+./executar_populacao.sh dev
 
+# 4. Executar em desenvolvimento
+npm run dev
 
-# 3. Executar em desenvolvimento
+# 5. Acessar aplicação
+# http://localhost:5173
+```
 
-npm run dev## ⚡ **Quick Start**## 📋 Funcionalidades
-
-
-
-# 4. Acessar aplicação
+## 📋 Funcionalidades
 
 # Frontend: http://localhost:5173
 
