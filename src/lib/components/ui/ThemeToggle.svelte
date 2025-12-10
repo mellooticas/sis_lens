@@ -3,7 +3,7 @@
    * ThemeToggle - Botão de alternar tema
    */
   
-  import { theme } from '$lib/contexts/theme';
+  import { theme } from '$lib/stores/theme';
   import { onMount } from 'svelte';
   
   export let size: 'sm' | 'md' = 'md';

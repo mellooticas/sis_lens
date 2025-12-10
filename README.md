@@ -1,10 +1,10 @@
-# 🔍 BestLens - Sistema Decisor de Lentes
+# 🔍 SIS Lens - Sistema Decisor de Lentes
 
 > **Sistema inteligente para tomada de decisões na compra de lentes oftálmicas com sistema integrado de vouchers e descontos.**
 
 ## 🎯 **Sobre o Projeto**
 
-O BestLens é um sistema híbrido que combina:
+O SIS Lens é um sistema híbrido que combina:
 
 - **🔍 Decisor de Lentes**: Análise inteligente de fornecedores, preços e prazos
 - **🎫 Sistema de Vouchers**: Gestão de descontos e promoções para lojas

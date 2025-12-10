@@ -1,13 +1,15 @@
 <script lang="ts">
   /**
    * Layout Raiz
-   * Inclui providers globais e componentes persistentes
+   * Inclui providers globais, layout sidebar e componentes persistentes
    */
   
   import '../app.css';
   import ToastContainer from '$lib/components/feedback/ToastContainer.svelte';
+  import MainLayout from '$lib/components/layout/MainLayout.svelte';
   import { onMount } from 'svelte';
-  import { theme } from '$lib/contexts/theme';
+  import { theme } from '$lib/stores/theme'; // Updated path
+  import { page } from '$app/stores';
   
   // Inicializar tema
   onMount(() => {
@@ -15,8 +17,10 @@
   });
 </script>
 
-<!-- Conteúdo das páginas -->
-<slot />
+<!-- Layout Principal (Sidebar + Header + Content) -->
+<MainLayout currentPage={$page.url.pathname}>
+  <slot />
+</MainLayout>
 
 <!-- Toast Container (global) -->
 <ToastContainer /> 

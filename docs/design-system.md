@@ -1,4 +1,4 @@
-# 🎨 BestLens Design System
+# 🎨 SIS Lens Design System
 
 ## 📋 Índice
 - [Cores](#cores)
@@ -628,4 +628,4 @@ A: Inter. Montserrat apenas para headlines e logo.
 
 **Versão**: 1.0.0  
 **Última atualização**: Outubro 2025  
-**Mantido por**: Equipe BestLens
+**Mantido por**: Equipe SIS Lens

@@ -17,30 +17,27 @@ export const load: PageServerLoad = async ({ url }) => {
 
     // 1. Métricas gerais de performance
     const { data: decisoes, error: decisoesError } = await supabase
-      .from('decisoes')
+      .from('decisoes_compra')
       .select(`
         id,
-        data_decisao,
+        decidido_em,
         status,
         preco_final,
-        economia_valor,
-        criterio,
-        laboratorio_nome
+        criterio
       `)
-      .gte('data_decisao', dataInicio)
-      .lte('data_decisao', dataFim)
-      .order('data_decisao', { ascending: false });
+      .gte('decidido_em', dataInicio)
+      .lte('decidido_em', dataFim)
+      .order('decidido_em', { ascending: false });
 
     if (decisoesError) {
       console.error('❌ Erro ao buscar decisões:', decisoesError);
     }
 
-    // 2. Economia por fornecedor
+    // 2. Economia por fornecedor (View em vez de RPC inexistente)
     const { data: economiaFornecedores, error: economiaError } = await supabase
-      .rpc('calcular_economia_fornecedores', {
-        data_inicio: dataInicio,
-        data_fim: dataFim
-      });
+      .from('mv_economia_por_fornecedor')
+      .select('*')
+      .limit(10);
 
     if (economiaError) {
       console.error('❌ Erro ao calcular economia por fornecedor:', economiaError);
@@ -48,17 +45,13 @@ export const load: PageServerLoad = async ({ url }) => {
 
     // 3. Top fornecedores
     const { data: topFornecedores, error: topError } = await supabase
-      .from('laboratorios')
+      .from('vw_fornecedores')
       .select(`
         id,
         nome,
-        regiao,
-        score_qualidade,
-        prazo_medio,
-        total_pedidos,
-        volume_total
+        credibilidade_score,
+        total_produtos
       `)
-      .order('volume_total', { ascending: false })
       .limit(10);
 
     if (topError) {

@@ -1,13 +1,17 @@
 import { createClient } from '@supabase/supabase-js';
 import type { PageServerLoad } from './$types';
 
-const supabaseUrl = 'https://syhpqosuucxonbvfagzc.supabase.co';
-const supabaseKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6InN5aHBxb3N1dWN4b25idmZhZ3pjIiwicm9sZSI6ImFub24iLCJpYXQiOjE3MzE3ODM0OTEsImV4cCI6MjA0NzM1OTQ5MX0.wNdO0jVKjKxNzJL_RbWBg2hJyKKsxMgoBzKwbOLKTYQ';
 
 export const load: PageServerLoad = async ({ url, cookies, fetch }) => {
-  const supabase = createClient(supabaseUrl, supabaseKey);
-
   try {
+    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
+      throw new Error('Missing Supabase environment variables');
+    }
+
+    const supabase = createClient(supabaseUrl, supabaseKey);
     // Estatísticas gerais do sistema
     const [
       lentesCount,

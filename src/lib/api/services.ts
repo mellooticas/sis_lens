@@ -246,7 +246,7 @@ export class DecisaoService {
   static async listarDecisoes(filtros: FiltrosDecisoes = {}, page = 1, limit = 20) {
     try {
       let query = supabase
-        .from('decisoes_lentes')
+        .from('decisoes_compra')
         .select('*', { count: 'exact' });
 
       // Aplicar filtros
@@ -257,17 +257,17 @@ export class DecisaoService {
         query = query.eq('usuario_id', filtros.usuario_id);
       }
       if (filtros.data_inicio) {
-        query = query.gte('criado_em', filtros.data_inicio);
+        query = query.gte('created_at', filtros.data_inicio);
       }
       if (filtros.data_fim) {
-        query = query.lte('criado_em', filtros.data_fim);
+        query = query.lte('created_at', filtros.data_fim);
       }
 
       // Paginação
       const start = (page - 1) * limit;
       query = query
         .range(start, start + limit - 1)
-        .order('criado_em', { ascending: false });
+        .order('created_at', { ascending: false });
 
       const { data, error, count } = await query;
 
@@ -376,7 +376,7 @@ export class AnalyticsService {
         query = query.eq('periodo', periodo);
       }
 
-      query = query.order('economia_total_gerada', { ascending: false });
+      query = query.order('economia_total', { ascending: false });
 
       const { data, error } = await query;
 
