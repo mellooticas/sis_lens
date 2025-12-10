@@ -66,13 +66,6 @@
     });
   }
 
-  function getTimeGreeting(): string {
-    const hour = currentTime.getHours();
-    if (hour < 12) return "🌅 Bom dia";
-    if (hour < 18) return "☀️ Boa tarde";
-    return "🌙 Boa noite";
-  }
-
   function getMarcaColor(marca: string): string {
     const cores = {
       essilor: "primary",
@@ -163,26 +156,6 @@
 
 <Container maxWidth="xl" padding="md">
   <!-- Hero Section -->
-  <div class="text-center py-8">
-    <div class="space-y-4">
-      <h1
-        class="text-4xl font-bold text-neutral-900 dark:text-neutral-100 font-headline"
-      >
-        {getTimeGreeting()}! 👋
-      </h1>
-      <p class="text-xl text-neutral-600 dark:text-neutral-400">
-        Bem-vindo ao BestLens Dashboard
-      </p>
-      <p class="text-sm text-neutral-500 dark:text-neutral-500">
-        {currentTime.toLocaleDateString("pt-BR", {
-          weekday: "long",
-          year: "numeric",
-          month: "long",
-          day: "numeric",
-        })} • {currentTime.toLocaleTimeString("pt-BR")}
-      </p>
-    </div>
-  </div>
 
   <!-- Estatísticas Principais -->
   <section class="mt-8">
@@ -334,9 +307,7 @@
     <div class="space-y-8">
       <!-- Decisões Recentes -->
       <section>
-        <div
-          class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm"
-        >
+        <div class="glass-panel rounded-xl p-6 shadow-xl">
           <SectionHeader
             title="🕒 Decisões Recentes"
             subtitle="Últimas recomendações do sistema"
@@ -415,9 +386,7 @@
 
       <!-- Top Marcas -->
       <section>
-        <div
-          class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm"
-        >
+        <div class="glass-panel rounded-xl p-6 shadow-xl">
           <SectionHeader
             title="🏆 Top Marcas"
             subtitle="Marcas mais recomendadas"
@@ -472,9 +441,7 @@
     <div class="space-y-8">
       <!-- Top Lentes -->
       <section>
-        <div
-          class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm"
-        >
+        <div class="glass-panel rounded-xl p-6 shadow-xl">
           <SectionHeader
             title="🌟 Lentes Mais Recomendadas"
             subtitle="Top 5 produtos do mês"
@@ -543,9 +510,7 @@
       <!-- Alertas -->
       {#if alertas.length > 0}
         <section>
-          <div
-            class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm"
-          >
+          <div class="glass-panel rounded-xl p-6 shadow-xl">
             <SectionHeader
               title="🔔 Alertas e Notificações"
               subtitle="Informações importantes do sistema"

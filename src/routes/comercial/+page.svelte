@@ -5,107 +5,110 @@
 	Gestão de preços, descontos, margens e políticas comerciais
 -->
 <script lang="ts">
-	import type { PageData } from './$types';
-	
+	import type { PageData } from "./$types";
+
 	export let data: PageData;
-	
+
+	import Header from "$lib/components/layout/Header.svelte";
+	import Container from "$lib/components/layout/Container.svelte";
+	import PageHero from "$lib/components/layout/PageHero.svelte";
+	import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
+	import StatsCard from "$lib/components/cards/StatsCard.svelte";
+	import Button from "$lib/components/ui/Button.svelte";
+	import Input from "$lib/components/forms/Input.svelte";
+	import Select from "$lib/components/forms/Select.svelte";
+	import Badge from "$lib/components/ui/Badge.svelte";
+
 	// Filtros
-	let laboratorioLocal = data.filtros?.laboratorio || '';
-	let marcaLocal = data.filtros?.marca || '';
-	let statusLocal = data.filtros?.status || 'ativo';
-	let tipoLocal = data.filtros?.tipo || 'todos';
-	
+	let laboratorioLocal = data.filtros?.laboratorio || "";
+	let marcaLocal = data.filtros?.marca || "";
+	let statusLocal = data.filtros?.status || "ativo";
+	let tipoLocal = data.filtros?.tipo || "todos";
+
 	// Estado local
 	let carregando = false;
 	let modoEdicao = false;
 	let itemEditando: any = null;
-	
+
 	function aplicarFiltros() {
 		const params = new URLSearchParams();
-		if (laboratorioLocal) params.set('laboratorio', laboratorioLocal);
-		if (marcaLocal) params.set('marca', marcaLocal);
-		if (statusLocal) params.set('status', statusLocal);
-		if (tipoLocal) params.set('tipo', tipoLocal);
-		
+		if (laboratorioLocal) params.set("laboratorio", laboratorioLocal);
+		if (marcaLocal) params.set("marca", marcaLocal);
+		if (statusLocal) params.set("status", statusLocal);
+		if (tipoLocal) params.set("tipo", tipoLocal);
 		window.location.href = `/comercial?${params.toString()}`;
 	}
-	
+
 	function limparFiltros() {
-		laboratorioLocal = '';
-		marcaLocal = '';
-		statusLocal = 'ativo';
-		tipoLocal = 'todos';
-		window.location.href = '/comercial';
+		laboratorioLocal = "";
+		marcaLocal = "";
+		statusLocal = "ativo";
+		tipoLocal = "todos";
+		window.location.href = "/comercial";
 	}
-	
+
 	function formatarMoeda(valor: number) {
-		return valor.toLocaleString('pt-BR', {
-			style: 'currency',
-			currency: 'BRL'
+		return valor.toLocaleString("pt-BR", {
+			style: "currency",
+			currency: "BRL",
 		});
 	}
-	
+
 	function formatarData(data: string) {
-		return new Date(data).toLocaleDateString('pt-BR');
+		return new Date(data).toLocaleDateString("pt-BR");
 	}
-	
-	function editarItem(item: any, tipo: 'preco' | 'desconto') {
+
+	function editarItem(item: any, tipo: "preco" | "desconto") {
 		itemEditando = { ...item, tipo };
 		modoEdicao = true;
 	}
-	
+
 	function cancelarEdicao() {
 		itemEditando = null;
 		modoEdicao = false;
 	}
-	
+
 	async function salvarItem() {
 		if (!itemEditando) return;
-		
 		try {
 			carregando = true;
-			// TODO: Implementar API de salvamento
-			console.log('Salvando item:', itemEditando);
-			
-			// Simular delay
-			await new Promise(resolve => setTimeout(resolve, 1000));
-			
-			// Recarregar página
+			console.log("Salvando item:", itemEditando);
+			await new Promise((resolve) => setTimeout(resolve, 1000));
 			window.location.reload();
 		} catch (error) {
-			console.error('Erro ao salvar:', error);
+			console.error("Erro ao salvar:", error);
 		} finally {
 			carregando = false;
 		}
 	}
-	
+
 	function novoPreco() {
 		itemEditando = {
-			tipo: 'preco',
-			laboratorio_id: '',
-			produto_id: '',
+			tipo: "preco",
+			laboratorio_id: "",
+			produto_id: "",
 			preco_base: 0,
 			margem_pct: 0,
-			vigencia_inicio: new Date().toISOString().split('T')[0],
-			vigencia_fim: '',
-			ativo: true
+			vigencia_inicio: new Date().toISOString().split("T")[0],
+			vigencia_fim: "",
+			ativo: true,
 		};
 		modoEdicao = true;
 	}
-	
+
 	function novoDesconto() {
 		itemEditando = {
-			tipo: 'desconto',
-			nome: '',
-			tipo_desconto: 'PERCENTUAL',
+			tipo: "desconto",
+			nome: "",
+			tipo_desconto: "PERCENTUAL",
 			valor: 0,
-			escopo: 'PRODUTO',
-			laboratorio_id: '',
-			marca_id: '',
-			produto_id: '',
-			vigencia_inicio: new Date().toISOString().split('T')[0],
-			vigencia_fim: '',
-			ativo: true
+			escopo: "PRODUTO",
+			laboratorio_id: "",
+			marca_id: "",
+			produto_id: "",
+			vigencia_inicio: new Date().toISOString().split("T")[0],
+			vigencia_fim: "",
+			ativo: true,
 		};
 		modoEdicao = true;
 	}
@@ -113,475 +116,402 @@
 
 <svelte:head>
 	<title>Gestão Comercial - BestLens</title>
-	<meta name="description" content="Gestão de preços, descontos e políticas comerciais" />
 </svelte:head>
 
-<div class="container mx-auto px-4 py-8">
-	<!-- Header -->
-	<div class="mb-8">
-		<nav class="text-sm breadcrumbs mb-4">
-			<a href="/" class="text-blue-600 hover:text-blue-800">Dashboard</a>
-			<span class="mx-2 text-gray-500">></span>
-			<span class="text-gray-700">Comercial</span>
-		</nav>
-		
-		<div class="flex items-center justify-between">
-			<div>
-				<h1 class="text-3xl font-bold text-gray-900 mb-2">
-					💰 Gestão Comercial
-				</h1>
-				<p class="text-gray-600">
-					Preços, descontos, margens e políticas comerciais
-				</p>
-			</div>
-			<div class="flex gap-2">
-				<button
-					type="button"
-					class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-					on:click={novoPreco}
-				>
-					💲 Novo Preço
-				</button>
-				<button
-					type="button"
-					class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition-colors"
-					on:click={novoDesconto}
-				>
-					🏷️ Novo Desconto
-				</button>
-			</div>
-		</div>
-	</div>
-	
-	<!-- Estatísticas Comerciais -->
-	{#if data.estatisticas}
-		<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8">
-			<div class="bg-white rounded-lg shadow-lg p-6">
-				<div class="flex items-center">
-					<div class="text-3xl mr-4">💲</div>
-					<div>
-						<div class="text-2xl font-bold text-gray-900">
-							{data.estatisticas.total_precos_ativos || 0}
-						</div>
-						<div class="text-sm text-gray-600">Preços Ativos</div>
-					</div>
-				</div>
-			</div>
-			
-			<div class="bg-white rounded-lg shadow-lg p-6">
-				<div class="flex items-center">
-					<div class="text-3xl mr-4">🏷️</div>
-					<div>
-						<div class="text-2xl font-bold text-gray-900">
-							{data.estatisticas.total_descontos_ativos || 0}
-						</div>
-						<div class="text-sm text-gray-600">Descontos Ativos</div>
-					</div>
-				</div>
-			</div>
-			
-			<div class="bg-white rounded-lg shadow-lg p-6">
-				<div class="flex items-center">
-					<div class="text-3xl mr-4">📊</div>
-					<div>
-						<div class="text-2xl font-bold text-gray-900">
-							{data.estatisticas.margem_media_pct?.toFixed(1) || '0.0'}%
-						</div>
-						<div class="text-sm text-gray-600">Margem Média</div>
-					</div>
-				</div>
-			</div>
-			
-			<div class="bg-white rounded-lg shadow-lg p-6">
-				<div class="flex items-center">
-					<div class="text-3xl mr-4">💰</div>
-					<div>
-						<div class="text-2xl font-bold text-gray-900">
-							{formatarMoeda(data.estatisticas.economia_desconto_mes || 0)}
-						</div>
-						<div class="text-sm text-gray-600">Economia Mensal</div>
-					</div>
-				</div>
-			</div>
-		</div>
-	{/if}
-	
-	<!-- Filtros -->
-	<div class="bg-white rounded-lg shadow-lg p-6 mb-6">
-		<h2 class="text-lg font-semibold text-gray-900 mb-4">
-			🔍 Filtros
-		</h2>
-		
-		<div class="grid grid-cols-1 md:grid-cols-4 gap-4 mb-4">
-			<div>
-				<label for="tipo" class="block text-sm font-medium text-gray-700 mb-1">
-					Tipo
-				</label>
-				<select
-					id="tipo"
-					bind:value={tipoLocal}
-					class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-				>
-					<option value="todos">Todos</option>
-					<option value="precos">Preços</option>
-					<option value="descontos">Descontos</option>
-				</select>
-			</div>
-			
-			<div>
-				<label for="laboratorio" class="block text-sm font-medium text-gray-700 mb-1">
-					Laboratório
-				</label>
-				<select
-					id="laboratorio"
-					bind:value={laboratorioLocal}
-					class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-				>
-					<option value="">Todos</option>
-					{#each data.laboratorios || [] as lab}
-						<option value={lab.id}>{lab.nome}</option>
-					{/each}
-				</select>
-			</div>
-			
-			<div>
-				<label for="marca" class="block text-sm font-medium text-gray-700 mb-1">
-					Marca
-				</label>
-				<select
-					id="marca"
-					bind:value={marcaLocal}
-					class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-				>
-					<option value="">Todas</option>
-					{#each data.marcas || [] as marca}
-						<option value={marca.id}>{marca.nome}</option>
-					{/each}
-				</select>
-			</div>
-			
-			<div>
-				<label for="status" class="block text-sm font-medium text-gray-700 mb-1">
-					Status
-				</label>
-				<select
-					id="status"
-					bind:value={statusLocal}
-					class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-				>
-					<option value="ativo">Ativos</option>
-					<option value="inativo">Inativos</option>
-					<option value="todos">Todos</option>
-				</select>
-			</div>
-		</div>
-		
-		<div class="flex gap-2">
-			<button
-				type="button"
-				class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition-colors"
-				on:click={aplicarFiltros}
-			>
-				🔍 Filtrar
-			</button>
-			<button
-				type="button"
-				class="bg-gray-500 hover:bg-gray-600 text-white px-4 py-2 rounded-lg transition-colors"
-				on:click={limparFiltros}
-			>
-				🗑️ Limpar
-			</button>
-		</div>
-	</div>
-	
-	<!-- Tabs de Conteúdo -->
-	<div class="bg-white rounded-lg shadow-lg overflow-hidden">
-		<div class="border-b border-gray-200">
-			<nav class="flex space-x-8 px-6 py-3">
-				<button
-					type="button"
-					class="py-2 px-1 border-b-2 font-medium text-sm
-						{tipoLocal === 'todos' || tipoLocal === 'precos' 
-							? 'border-blue-500 text-blue-600' 
-							: 'border-transparent text-gray-500 hover:text-gray-700'}"
-					on:click={() => { tipoLocal = 'precos'; aplicarFiltros(); }}
-				>
-					💲 Preços ({data.precos?.length || 0})
-				</button>
-				<button
-					type="button"
-					class="py-2 px-1 border-b-2 font-medium text-sm
-						{tipoLocal === 'todos' || tipoLocal === 'descontos' 
-							? 'border-blue-500 text-blue-600' 
-							: 'border-transparent text-gray-500 hover:text-gray-700'}"
-					on:click={() => { tipoLocal = 'descontos'; aplicarFiltros(); }}
-				>
-					🏷️ Descontos ({data.descontos?.length || 0})
-				</button>
-			</nav>
-		</div>
-		
-		<!-- Tabela de Preços -->
-		{#if tipoLocal === 'todos' || tipoLocal === 'precos'}
-			<div class="p-6">
-				<h3 class="text-lg font-semibold text-gray-900 mb-4">
-					💲 Tabela de Preços
-				</h3>
-				
-				<div class="overflow-x-auto">
-					<table class="min-w-full divide-y divide-gray-200">
-						<thead class="bg-gray-50">
-							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Produto
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Laboratório
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Preço Base
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Margem
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Vigência
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Status
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Ações
-								</th>
-							</tr>
-						</thead>
-						<tbody class="bg-white divide-y divide-gray-200">
-							{#each data.precos || [] as preco}
-								<tr class="hover:bg-gray-50">
-									<td class="px-6 py-4 text-sm">
-										<div class="font-medium text-gray-900">
-											{preco.produto_nome}
-										</div>
-										<div class="text-gray-500">
-											{preco.sku_fantasia}
-										</div>
-									</td>
-									<td class="px-6 py-4 text-sm text-gray-900">
-										{preco.laboratorio_nome}
-									</td>
-									<td class="px-6 py-4 text-sm font-medium text-gray-900">
-										{formatarMoeda(preco.preco_base || 0)}
-									</td>
-									<td class="px-6 py-4 text-sm text-gray-900">
-										{preco.margem_pct || 0}%
-									</td>
-									<td class="px-6 py-4 text-sm text-gray-900">
-										{formatarData(preco.vigencia_inicio)}
-										{#if preco.vigencia_fim}
-											<br/>até {formatarData(preco.vigencia_fim)}
-										{/if}
-									</td>
-									<td class="px-6 py-4 text-sm">
-										{#if preco.ativo}
-											<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-												✅ Ativo
-											</span>
-										{:else}
-											<span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">
-												❌ Inativo
-											</span>
-										{/if}
-									</td>
-									<td class="px-6 py-4 text-sm">
-										<button
-											type="button"
-											class="text-blue-600 hover:text-blue-800 mr-2"
-											on:click={() => editarItem(preco, 'preco')}
-										>
-											✏️ Editar
-										</button>
-									</td>
-								</tr>
-							{:else}
-								<tr>
-									<td colspan="7" class="px-6 py-12 text-center text-gray-500">
-										<span class="text-4xl block mb-4">💲</span>
-										<p>Nenhum preço encontrado</p>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		{/if}
-		
-		<!-- Tabela de Descontos -->
-		{#if tipoLocal === 'todos' || tipoLocal === 'descontos'}
-			<div class="p-6 {tipoLocal === 'todos' ? 'border-t border-gray-200' : ''}">
-				<h3 class="text-lg font-semibold text-gray-900 mb-4">
-					🏷️ Descontos Ativos
-				</h3>
-				
-				<div class="overflow-x-auto">
-					<table class="min-w-full divide-y divide-gray-200">
-						<thead class="bg-gray-50">
-							<tr>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Nome
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Tipo
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Valor
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Escopo
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Vigência
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Status
-								</th>
-								<th class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase">
-									Ações
-								</th>
-							</tr>
-						</thead>
-						<tbody class="bg-white divide-y divide-gray-200">
-							{#each data.descontos || [] as desconto}
-								<tr class="hover:bg-gray-50">
-									<td class="px-6 py-4 text-sm font-medium text-gray-900">
-										{desconto.nome}
-									</td>
-									<td class="px-6 py-4 text-sm text-gray-900">
-										{desconto.tipo_desconto === 'PERCENTUAL' ? '📊 Percentual' : '💰 Valor Fixo'}
-									</td>
-									<td class="px-6 py-4 text-sm font-medium text-green-600">
-										{#if desconto.tipo_desconto === 'PERCENTUAL'}
-											{desconto.valor}%
-										{:else}
-											{formatarMoeda(desconto.valor)}
-										{/if}
-									</td>
-									<td class="px-6 py-4 text-sm text-gray-900">
-										{#if desconto.escopo === 'LABORATORIO'}
-											🏢 Laboratório
-										{:else if desconto.escopo === 'MARCA'}
-											🏷️ Marca
-										{:else}
-											📦 Produto
-										{/if}
-									</td>
-									<td class="px-6 py-4 text-sm text-gray-900">
-										{formatarData(desconto.vigencia_inicio)}
-										{#if desconto.vigencia_fim}
-											<br/>até {formatarData(desconto.vigencia_fim)}
-										{/if}
-									</td>
-									<td class="px-6 py-4 text-sm">
-										{#if desconto.ativo}
-											<span class="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs">
-												✅ Ativo
-											</span>
-										{:else}
-											<span class="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs">
-												❌ Inativo
-											</span>
-										{/if}
-									</td>
-									<td class="px-6 py-4 text-sm">
-										<button
-											type="button"
-											class="text-blue-600 hover:text-blue-800 mr-2"
-											on:click={() => editarItem(desconto, 'desconto')}
-										>
-											✏️ Editar
-										</button>
-									</td>
-								</tr>
-							{:else}
-								<tr>
-									<td colspan="7" class="px-6 py-12 text-center text-gray-500">
-										<span class="text-4xl block mb-4">🏷️</span>
-										<p>Nenhum desconto encontrado</p>
-									</td>
-								</tr>
-							{/each}
-						</tbody>
-					</table>
-				</div>
-			</div>
-		{/if}
-	</div>
-</div>
+<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
+	<Header />
 
-<!-- Modal de Edição -->
-{#if modoEdicao && itemEditando}
-	<div class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50">
-		<div class="bg-white rounded-lg shadow-xl max-w-2xl w-full mx-4 max-h-screen overflow-y-auto">
-			<div class="px-6 py-4 border-b border-gray-200">
-				<h3 class="text-lg font-semibold text-gray-900">
-					{itemEditando.tipo === 'preco' ? '💲 Editar Preço' : '🏷️ Editar Desconto'}
-				</h3>
+	<main>
+		<Container maxWidth="xl" padding="md">
+			<!-- Hero -->
+			<div
+				class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
+			>
+				<PageHero
+					badge="💰 Negócio"
+					title="Gestão Comercial"
+					subtitle="Preços, descontos, margens e políticas"
+				/>
+				<div class="flex gap-2 mt-4 md:mt-0">
+					<Button variant="primary" on:click={novoPreco}
+						>💲 Novo Preço</Button
+					>
+					<Button variant="success" on:click={novoDesconto}
+						>🏷️ Novo Desconto</Button
+					>
+				</div>
 			</div>
-			
-			<div class="p-6">
-				<!-- Formulário será implementado aqui -->
-				<div class="grid grid-cols-2 gap-4">
-					<div>
-						<label for="item-nome" class="block text-sm font-medium text-gray-700 mb-1">
-							Nome/Produto
-						</label>
-						<input
-							id="item-nome"
-							type="text"
-							bind:value={itemEditando.nome}
-							class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+
+			<!-- Stats -->
+			{#if data.estatisticas}
+				<section class="mb-12">
+					<div
+						class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6"
+					>
+						<StatsCard
+							title="Preços Ativos"
+							value={data.estatisticas.total_precos_ativos?.toString() ||
+								"0"}
+							icon="💲"
+							color="blue"
+						/>
+						<StatsCard
+							title="Descontos Ativos"
+							value={data.estatisticas.total_descontos_ativos?.toString() ||
+								"0"}
+							icon="🏷️"
+							color="green"
+						/>
+						<StatsCard
+							title="Margem Média"
+							value={`${data.estatisticas.margem_media_pct?.toFixed(1) || "0.0"}%`}
+							icon="📊"
+							color="orange"
+						/>
+						<StatsCard
+							title="Economia Mensal"
+							value={formatarMoeda(
+								data.estatisticas.economia_desconto_mes || 0,
+							)}
+							icon="💰"
+							color="purple"
 						/>
 					</div>
-					
-					<div>
-						<label for="item-valor" class="block text-sm font-medium text-gray-700 mb-1">
-							{itemEditando.tipo === 'preco' ? 'Preço Base' : 'Valor Desconto'}
+				</section>
+			{/if}
+
+			<!-- Filters -->
+			<section class="glass-panel p-6 rounded-xl shadow-lg mb-8">
+				<SectionHeader
+					title="🔍 Filtros de Busca"
+					subtitle="Refine sua visualização"
+				/>
+				<div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+					<Select
+						label="Tipo"
+						bind:value={tipoLocal}
+						options={[
+							{ value: "todos", label: "Todos" },
+							{ value: "precos", label: "Preços" },
+							{ value: "descontos", label: "Descontos" },
+						]}
+					/>
+					<Select
+						label="Laboratório"
+						bind:value={laboratorioLocal}
+						options={[
+							{ value: "", label: "Todos" },
+							...(data.laboratorios || []).map((l) => ({
+								value: l.id,
+								label: l.nome,
+							})),
+						]}
+					/>
+					<Select
+						label="Marca"
+						bind:value={marcaLocal}
+						options={[
+							{ value: "", label: "Todas" },
+							...(data.marcas || []).map((m) => ({
+								value: m.id,
+								label: m.nome,
+							})),
+						]}
+					/>
+					<Select
+						label="Status"
+						bind:value={statusLocal}
+						options={[
+							{ value: "ativo", label: "Ativos" },
+							{ value: "inativo", label: "Inativos" },
+							{ value: "todos", label: "Todos" },
+						]}
+					/>
+				</div>
+				<div class="flex justify-end gap-3 mt-4">
+					<Button variant="ghost" on:click={limparFiltros}
+						>Limpar</Button
+					>
+					<Button variant="primary" on:click={aplicarFiltros}
+						>Filtrar</Button
+					>
+				</div>
+			</section>
+
+			<!-- Content Tabs -->
+			<div class="space-y-8">
+				<!-- Preços -->
+				{#if tipoLocal === "todos" || tipoLocal === "precos"}
+					<section class="glass-panel p-6 rounded-xl shadow-lg">
+						<SectionHeader
+							title="💲 Tabela de Preços"
+							subtitle="Preços base cadastrados"
+						/>
+						<div class="overflow-x-auto mt-6">
+							<table class="w-full text-sm text-left">
+								<thead
+									class="bg-neutral-100 dark:bg-neutral-800 uppercase text-xs text-neutral-500"
+								>
+									<tr>
+										<th class="px-4 py-3">Produto</th>
+										<th class="px-4 py-3">Laboratório</th>
+										<th class="px-4 py-3">Preço Base</th>
+										<th class="px-4 py-3">Margem</th>
+										<th class="px-4 py-3">Vigência</th>
+										<th class="px-4 py-3">Status</th>
+										<th class="px-4 py-3 text-right"
+											>Ações</th
+										>
+									</tr>
+								</thead>
+								<tbody
+									class="divide-y divide-neutral-200 dark:divide-neutral-700"
+								>
+									{#each data.precos || [] as preco}
+										<tr
+											class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+										>
+											<td class="px-4 py-3">
+												<div class="font-bold">
+													{preco.produto_nome}
+												</div>
+												<div
+													class="text-xs text-neutral-500"
+												>
+													{preco.sku_fantasia}
+												</div>
+											</td>
+											<td class="px-4 py-3"
+												>{preco.laboratorio_nome}</td
+											>
+											<td class="px-4 py-3 font-medium"
+												>{formatarMoeda(
+													preco.preco_base || 0,
+												)}</td
+											>
+											<td class="px-4 py-3"
+												>{preco.margem_pct || 0}%</td
+											>
+											<td class="px-4 py-3">
+												{formatarData(
+													preco.vigencia_inicio,
+												)}
+												{#if preco.vigencia_fim}
+													<span
+														class="text-xs text-neutral-400"
+														>até {formatarData(
+															preco.vigencia_fim,
+														)}</span
+													>{/if}
+											</td>
+											<td class="px-4 py-3">
+												{#if preco.ativo}
+													<Badge
+														variant="success"
+														size="sm">Ativo</Badge
+													>
+												{:else}
+													<Badge
+														variant="neutral"
+														size="sm">Inativo</Badge
+													>
+												{/if}
+											</td>
+											<td class="px-4 py-3 text-right">
+												<Button
+													variant="ghost"
+													size="sm"
+													on:click={() =>
+														editarItem(
+															preco,
+															"preco",
+														)}>✏️</Button
+												>
+											</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					</section>
+				{/if}
+
+				<!-- Descontos -->
+				{#if tipoLocal === "todos" || tipoLocal === "descontos"}
+					<section class="glass-panel p-6 rounded-xl shadow-lg">
+						<SectionHeader
+							title="🏷️ Descontos Ativos"
+							subtitle="Políticas de desconto vigentes"
+						/>
+						<div class="overflow-x-auto mt-6">
+							<table class="w-full text-sm text-left">
+								<thead
+									class="bg-neutral-100 dark:bg-neutral-800 uppercase text-xs text-neutral-500"
+								>
+									<tr>
+										<th class="px-4 py-3">Nome</th>
+										<th class="px-4 py-3">Tipo</th>
+										<th class="px-4 py-3">Valor</th>
+										<th class="px-4 py-3">Escopo</th>
+										<th class="px-4 py-3">Vigência</th>
+										<th class="px-4 py-3">Status</th>
+										<th class="px-4 py-3 text-right"
+											>Ações</th
+										>
+									</tr>
+								</thead>
+								<tbody
+									class="divide-y divide-neutral-200 dark:divide-neutral-700"
+								>
+									{#each data.descontos || [] as desconto}
+										<tr
+											class="hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors"
+										>
+											<td class="px-4 py-3 font-medium"
+												>{desconto.nome}</td
+											>
+											<td class="px-4 py-3">
+												{#if desconto.tipo_desconto === "PERCENTUAL"}
+													📊 Percentual
+												{:else}
+													💰 Fixo
+												{/if}
+											</td>
+											<td
+												class="px-4 py-3 font-bold text-green-600"
+											>
+												{#if desconto.tipo_desconto === "PERCENTUAL"}
+													{desconto.valor}%
+												{:else}
+													{formatarMoeda(
+														desconto.valor,
+													)}
+												{/if}
+											</td>
+											<td class="px-4 py-3">
+												{#if desconto.escopo === "LABORATORIO"}
+													🏢 Laboratório
+												{:else if desconto.escopo === "MARCA"}
+													🏷️ Marca
+												{:else}
+													📦 Produto
+												{/if}
+											</td>
+											<td class="px-4 py-3">
+												{formatarData(
+													desconto.vigencia_inicio,
+												)}
+												{#if desconto.vigencia_fim}
+													<span
+														class="text-xs text-neutral-400"
+														>até {formatarData(
+															desconto.vigencia_fim,
+														)}</span
+													>{/if}
+											</td>
+											<td class="px-4 py-3">
+												{#if desconto.ativo}
+													<Badge
+														variant="success"
+														size="sm">Ativo</Badge
+													>
+												{:else}
+													<Badge
+														variant="neutral"
+														size="sm">Inativo</Badge
+													>
+												{/if}
+											</td>
+											<td class="px-4 py-3 text-right">
+												<Button
+													variant="ghost"
+													size="sm"
+													on:click={() =>
+														editarItem(
+															desconto,
+															"desconto",
+														)}>✏️</Button
+												>
+											</td>
+										</tr>
+									{/each}
+								</tbody>
+							</table>
+						</div>
+					</section>
+				{/if}
+			</div>
+		</Container>
+	</main>
+</div>
+
+<!-- Modal de Edição (Legacy styled with Tailwind classes) -->
+{#if modoEdicao && itemEditando}
+	<div
+		class="fixed inset-0 bg-black/50 backdrop-blur-sm flex items-center justify-center z-50 p-4"
+	>
+		<div
+			class="bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl max-w-2xl w-full max-h-[90vh] overflow-y-auto border border-neutral-200 dark:border-neutral-700"
+		>
+			<div
+				class="px-6 py-4 border-b border-neutral-200 dark:border-neutral-700"
+			>
+				<h3 class="text-xl font-bold text-neutral-900 dark:text-white">
+					{#if itemEditando.tipo === "preco"}
+						💲 Editar Preço
+					{:else}
+						🏷️ Editar Desconto
+					{/if}
+				</h3>
+			</div>
+
+			<div class="p-6 space-y-6">
+				<div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+					<div class="space-y-1">
+						<label
+							class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+							>Nome/Produto</label
+						>
+						<input
+							type="text"
+							bind:value={itemEditando.nome}
+							class="input w-full"
+							placeholder="Nome"
+						/>
+					</div>
+
+					<div class="space-y-1">
+						<label
+							class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+						>
+							{itemEditando.tipo === "preco"
+								? "Preço Base"
+								: "Valor Desconto"}
 						</label>
 						<input
-							id="item-valor"
 							type="number"
 							bind:value={itemEditando.valor}
 							step="0.01"
-							class="w-full px-3 py-2 border border-gray-300 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
+							class="input w-full"
 						/>
 					</div>
 				</div>
 			</div>
-			
-			<div class="px-6 py-4 border-t border-gray-200 flex justify-end gap-2">
-				<button
-					type="button"
-					class="px-4 py-2 text-gray-700 bg-gray-200 rounded-lg hover:bg-gray-300 transition-colors"
-					on:click={cancelarEdicao}
+
+			<div
+				class="px-6 py-4 border-t border-neutral-200 dark:border-neutral-700 flex justify-end gap-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-b-2xl"
+			>
+				<Button variant="ghost" on:click={cancelarEdicao}
+					>Cancelar</Button
 				>
-					Cancelar
-				</button>
-				<button
-					type="button"
-					class="px-4 py-2 text-white bg-blue-600 rounded-lg hover:bg-blue-700 transition-colors"
+				<Button
+					variant="primary"
 					on:click={salvarItem}
 					disabled={carregando}
 				>
-					{carregando ? 'Salvando...' : 'Salvar'}
-				</button>
+					{carregando ? "Salvando..." : "Salvar"}
+				</Button>
 			</div>
 		</div>
 	</div>
 {/if}
-
-<style>
-	.breadcrumbs {
-		display: flex;
-		align-items: center;
-	}
-</style>

@@ -7,110 +7,124 @@
 @layer base {
   :root {
     /* ============================================ */
-    /* BRAND COLORS */
+    /* BRAND COLORS (Vibrant & Premium) */
     /* ============================================ */
-    --color-brand-blue-50: #f0f4f8;
-    --color-brand-blue-100: #d9e6f2;
-    --color-brand-blue-200: #b3cce5;
-    --color-brand-blue-300: #8db3d8;
-    --color-brand-blue-400: #6799cb;
-    --color-brand-blue-500: #1C3B5A; /* Primary */
-    --color-brand-blue-600: #162f48;
-    --color-brand-blue-700: #112336;
-    --color-brand-blue-800: #0b1724;
-    --color-brand-blue-900: #060c12;
+    --color-brand-blue-50: #f0f7ff;
+    --color-brand-blue-100: #e0f0fe;
+    --color-brand-blue-200: #bae0fd;
+    --color-brand-blue-300: #7cc2fb;
+    --color-brand-blue-400: #36a2f7;
+    --color-brand-blue-500: #0b80e3;
+    --color-brand-blue-600: #0162c8;
+    --color-brand-blue-700: #024ea2;
+    --color-brand-blue-800: #064287;
+    --color-brand-blue-900: #0a376e;
 
-    --color-brand-orange-50: #fef5f0;
-    --color-brand-orange-100: #fde6d9;
-    --color-brand-orange-200: #fbcdb3;
-    --color-brand-orange-300: #f9b48d;
-    --color-brand-orange-400: #f79b67;
-    --color-brand-orange-500: #CC6B2F; /* Accent */
-    --color-brand-orange-600: #a35626;
-    --color-brand-orange-700: #7a401c;
-    --color-brand-orange-800: #522b13;
-    --color-brand-orange-900: #291509;
+    --color-brand-orange-50: #fff6ed;
+    --color-brand-orange-100: #ffecd6;
+    --color-brand-orange-200: #ffd8ae;
+    --color-brand-orange-300: #ffbc7d;
+    --color-brand-orange-400: #fe954a;
+    --color-brand-orange-500: #fc7422;
+    --color-brand-orange-600: #ed5814;
+    --color-brand-orange-700: #c54011;
+    --color-brand-orange-800: #9c3315;
+    --color-brand-orange-900: #7d2d16;
 
-    --color-brand-gold-50: #fdfaf2;
-    --color-brand-gold-100: #fbf4e0;
-    --color-brand-gold-200: #f7e9c1;
-    --color-brand-gold-300: #f3dea2;
-    --color-brand-gold-400: #efd383;
-    --color-brand-gold-500: #DEA742; /* Value */
-    --color-brand-gold-600: #b28635;
-    --color-brand-gold-700: #856428;
-    --color-brand-gold-800: #59431a;
-    --color-brand-gold-900: #2c210d;
+    /* GOLD / PREMIUM ACCENTS */
+    --color-brand-gold-50: #fefce8;
+    --color-brand-gold-100: #fef9c3;
+    --color-brand-gold-200: #fef08a;
+    --color-brand-gold-300: #fde047;
+    --color-brand-gold-400: #facc15;
+    --color-brand-gold-500: #eab308;
+    --color-brand-gold-600: #ca8a04;
+    --color-brand-gold-700: #a16207;
+    --color-brand-gold-800: #854d0e;
+    --color-brand-gold-900: #713f12;
 
-    --color-neutral-50: #fafaf9;
-    --color-neutral-100: #f5f5f4;
-    --color-neutral-200: #e7e5e4;
-    --color-neutral-300: #d6d3d1;
-    --color-neutral-400: #a8a29e;
-    --color-neutral-500: #E8E0D5; /* Base */
-    --color-neutral-600: #78716c;
-    --color-neutral-700: #57534e;
-    --color-neutral-800: #44403c;
-    --color-neutral-900: #292524;
+    /* NEUTRALS (Clean & Sharp) */
+    --color-neutral-50: #f8fafc;
+    --color-neutral-100: #f1f5f9;
+    --color-neutral-200: #e2e8f0;
+    --color-neutral-300: #cbd5e1;
+    --color-neutral-400: #94a3b8;
+    --color-neutral-500: #64748b;
+    --color-neutral-600: #475569;
+    --color-neutral-700: #334155;
+    --color-neutral-800: #1e293b;
+    --color-neutral-900: #0f172a;
 
     /* ============================================ */
-    /* SEMANTIC COLORS */
+    /* SEMANTIC COLORS (High Visibility) */
     /* ============================================ */
-    --color-success: #22c55e;
-    --color-success-light: #dcfce7;
-    --color-success-dark: #15803d;
-    
+    --color-success: #10b981;
+    --color-success-light: #d1fae5;
+    --color-success-dark: #047857;
+
     --color-warning: #f59e0b;
     --color-warning-light: #fef3c7;
     --color-warning-dark: #b45309;
-    
+
     --color-error: #ef4444;
     --color-error-light: #fee2e2;
     --color-error-dark: #b91c1c;
-    
-    --color-info: #3b82f6;
-    --color-info-light: #dbeafe;
-    --color-info-dark: #1d4ed8;
 
     /* ============================================ */
-    /* RANKING COLORS (Semáforo) */
-    /* ============================================ */
-    --color-prazo-rapido: #22c55e;    /* Verde */
-    --color-prazo-medio: #f59e0b;     /* Amarelo */
-    --color-prazo-longo: #ef4444;     /* Vermelho */
-
-    --color-preco-otimo: #22c55e;
-    --color-preco-bom: #f59e0b;
-    --color-preco-alto: #ef4444;
-
-    /* ============================================ */
-    /* SHADOWS */
+    /* SHADOWS & GLASS */
     /* ============================================ */
     --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-base: 0 1px 3px 0 rgba(0, 0, 0, 0.1), 0 1px 2px 0 rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-card: 0 2px 8px rgba(28, 59, 90, 0.08);
-    --shadow-card-hover: 0 4px 16px rgba(28, 59, 90, 0.12);
-    --shadow-elevated: 0 8px 32px rgba(28, 59, 90, 0.16);
+    --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
+
+    --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.04);
+    --shadow-card-hover: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 8px 16px rgba(0, 0, 0, 0.08);
+    --shadow-elevated: 0 20px 40px rgba(0, 0, 0, 0.12);
+
+    /* Glass Light */
+    --glass-border: rgba(255, 255, 255, 0.5);
+    --glass-surface: rgba(255, 255, 255, 0.7);
+    --glass-shadow: 0 8px 32px 0 rgba(100, 100, 111, 0.1);
+    --glass-blur: 12px;
   }
 
-  /* Dark mode variables */
+  /* Dark mode variables (High Contrast, Deep Blacks) */
   .dark {
-    --color-neutral-50: #292524;
-    --color-neutral-100: #44403c;
-    --color-neutral-200: #57534e;
-    --color-neutral-300: #78716c;
-    --color-neutral-400: #a8a29e;
-    --color-neutral-500: #44403c; /* Base dark */
-    --color-neutral-600: #d6d3d1;
-    --color-neutral-700: #e7e5e4;
-    --color-neutral-800: #f5f5f4;
-    --color-neutral-900: #fafaf9;
+    /* Main Background: Almost Pure Black for modern OLED feel */
+    --color-neutral-50: #020617;
+    /* Very deep blue/black */
+    --color-neutral-100: #0f172a;
+    /* Card bg */
+    --color-neutral-200: #1e293b;
+    /* Borders */
+    --color-neutral-300: #334155;
+    --color-neutral-400: #64748b;
+    --color-neutral-500: #94a3b8;
+    /* Text muted */
+    --color-neutral-600: #cbd5e1;
+    --color-neutral-700: #e2e8f0;
+    --color-neutral-800: #f1f5f9;
+    /* Text main (inverted logic in tailwind classes needs care, but here we map specific vars) */
+    --color-neutral-900: #f8fafc;
+    /* Title text */
 
-    --shadow-card: 0 2px 8px rgba(0, 0, 0, 0.3);
-    --shadow-card-hover: 0 4px 16px rgba(0, 0, 0, 0.4);
-    --shadow-elevated: 0 8px 32px rgba(0, 0, 0, 0.5);
+    /* Make semantic colors pop on dark */
+    --color-success: #34d399;
+    --color-warning: #fbbf24;
+    --color-error: #f87171;
+
+    /* Glass Dark */
+    --glass-border: rgba(255, 255, 255, 0.12);
+    /* Sharper border */
+    --glass-surface: rgba(15, 23, 42, 0.7);
+    /* Dark blue-ish surface */
+    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
+
+    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 6px -1px rgba(0, 0, 0, 0.4);
+    --shadow-card-hover: 0 0 0 1px rgba(6, 182, 212, 0.3), 0 10px 15px -3px rgba(0, 0, 0, 0.5);
+    /* Subtle cyber glow on hover */
+    --shadow-glow: 0 0 30px rgba(56, 189, 248, 0.15);
   }
 
   /* ============================================ */
@@ -120,17 +134,34 @@
     @apply border-neutral-200;
   }
 
+  .dark * {
+    @apply border-neutral-200/20;
+  }
+
   body {
-    @apply bg-neutral-50 text-neutral-900;
+    @apply text-neutral-900;
     @apply font-sans antialiased;
+    /* Clean Light Mode Gradient */
+    background:
+      radial-gradient(circle at 15% 5%, rgba(6, 95, 236, 0.05) 0%, transparent 40%),
+      radial-gradient(circle at 85% 30%, rgba(246, 174, 45, 0.08) 0%, transparent 40%),
+      #f8fafc;
+    background-attachment: fixed;
   }
 
   .dark body {
-    @apply bg-neutral-900 text-neutral-100;
+    @apply text-neutral-100;
+    /* Deep Modern Dark Mode Gradient */
+    background:
+      radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
+      radial-gradient(circle at 0% 100%, rgba(15, 23, 42, 1) 0%, transparent 50%),
+      #020617;
+    background-attachment: fixed;
   }
 }
 
 @layer components {
+
   /* ============================================ */
   /* TYPOGRAPHY UTILITIES */
   /* ============================================ */
@@ -279,6 +310,7 @@
 }
 
 @layer utilities {
+
   /* Animações customizadas */
   .animate-fade-in {
     animation: fadeIn 0.3s ease-in;
@@ -292,6 +324,7 @@
     from {
       opacity: 0;
     }
+
     to {
       opacity: 1;
     }
@@ -299,12 +332,39 @@
 
   @keyframes slideUp {
     from {
-      transform: translateY(10px);
+      transform: translateY(20px);
       opacity: 0;
     }
+
     to {
-      transform: translateY(0); 
+      transform: translateY(0);
       opacity: 1;
     }
+  }
+
+  /* Glassmorphism Utilities */
+  .glass-panel {
+    @apply backdrop-blur-md bg-white/70 dark:bg-neutral-900/70 border border-white/20 dark:border-white/5 shadow-xl;
+  }
+
+  .glass-sidebar {
+    @apply backdrop-blur-xl bg-white/80 dark:bg-neutral-900/80 border-r border-white/20 dark:border-white/5;
+  }
+
+  .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
+  }
+
+  .dark .text-glow {
+    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
+  }
+
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-neutral-300) transparent;
+  }
+
+  .dark .custom-scrollbar {
+    scrollbar-color: var(--color-neutral-700) transparent;
   }
 }
