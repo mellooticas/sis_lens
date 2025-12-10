@@ -178,21 +178,23 @@ BEGIN
     END IF;
 
     -- 2. Criar Laboratórios (Fornecedores Reais)
+    -- Tentativa resiliente de inserir laboratórios (coluna 'nome' removida pois usuário reportou que não existe)
+    
     -- Lab A: O "Rápido"
-    INSERT INTO suppliers.laboratorios (tenant_id, nome, nome_fantasia, lead_time_padrao_dias)
-    VALUES (v_tenant_id, 'Laboratório Speed', 'Lab Speed', 2)
+    INSERT INTO suppliers.laboratorios (tenant_id, nome_fantasia, lead_time_padrao_dias)
+    VALUES (v_tenant_id, 'Lab Speed', 2)
     ON CONFLICT DO NOTHING;
     SELECT id INTO v_lab_a FROM suppliers.laboratorios WHERE nome_fantasia = 'Lab Speed';
 
     -- Lab B: O "Barato"
-    INSERT INTO suppliers.laboratorios (tenant_id, nome, nome_fantasia, lead_time_padrao_dias)
-    VALUES (v_tenant_id, 'Laboratório Economy', 'Lab Eco', 5)
+    INSERT INTO suppliers.laboratorios (tenant_id, nome_fantasia, lead_time_padrao_dias)
+    VALUES (v_tenant_id, 'Lab Eco', 5)
     ON CONFLICT DO NOTHING;
     SELECT id INTO v_lab_b FROM suppliers.laboratorios WHERE nome_fantasia = 'Lab Eco';
 
     -- Lab C: O "Premium"
-    INSERT INTO suppliers.laboratorios (tenant_id, nome, nome_fantasia, lead_time_padrao_dias)
-    VALUES (v_tenant_id, 'Laboratório Precision', 'Lab Precision', 4)
+    INSERT INTO suppliers.laboratorios (tenant_id, nome_fantasia, lead_time_padrao_dias)
+    VALUES (v_tenant_id, 'Lab Precision', 4)
     ON CONFLICT DO NOTHING;
     SELECT id INTO v_lab_c FROM suppliers.laboratorios WHERE nome_fantasia = 'Lab Precision';
 
