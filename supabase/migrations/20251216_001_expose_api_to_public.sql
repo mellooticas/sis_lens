@@ -21,6 +21,7 @@ BEGIN;
 DO $$
 DECLARE
     rec RECORD;
+    v_count INTEGER;
 BEGIN
     -- Verificar schemas
     IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'suppliers') THEN
