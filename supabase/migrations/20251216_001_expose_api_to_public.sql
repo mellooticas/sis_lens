@@ -17,11 +17,14 @@ BEGIN;
 -- VERIFICAÇÕES PRÉVIAS
 -- ============================================
 
--- Verificar se schemas necessários existem
+-- Verificar se schemas e tabelas necessários existem
 DO $$
+DECLARE
+    rec RECORD;
 BEGIN
+    -- Verificar schemas
     IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'suppliers') THEN
-        RAISE EXCEPTION 'Schema suppliers não existe. Execute primeiro as migrations de estrutura básica.';
+        RAISE EXCEPTION 'Schema suppliers não existe. Execute primeiro as migrations de estrutura básica (20251002000004_suppliers.sql).';
     END IF;
     
     IF NOT EXISTS (SELECT 1 FROM information_schema.schemata WHERE schema_name = 'scoring') THEN
@@ -36,7 +39,52 @@ BEGIN
         RAISE EXCEPTION 'Schema orders não existe. Execute primeiro as migrations de estrutura básica.';
     END IF;
     
-    RAISE NOTICE 'Todos os schemas necessários existem. Prosseguindo com migração.';
+    -- Verificar tabelas críticas
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'suppliers' AND table_name = 'laboratorios') THEN
+        RAISE EXCEPTION 'Tabela suppliers.laboratorios não existe. Execute primeiro a migration 20251002000004_suppliers.sql';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'scoring' AND table_name = 'scores_laboratorios') THEN
+        RAISE EXCEPTION 'Tabela scoring.scores_laboratorios não existe. Execute primeiro as migrations de scoring.';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'orders' AND table_name = 'decisoes_lentes') THEN
+        RAISE EXCEPTION 'Tabela orders.decisoes_lentes não existe. Execute primeiro as migrations de orders.';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'orders' AND table_name = 'alternativas_cotacao') THEN
+        RAISE EXCEPTION 'Tabela orders.alternativas_cotacao não existe. Execute primeiro as migrations de orders.';
+    END IF;
+    
+    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'lens_catalog' AND table_name = 'lentes') THEN
+        RAISE EXCEPTION 'Tabela lens_catalog.lentes não existe. Execute primeiro as migrations de lens_catalog.';
+    END IF;
+    
+    -- Verificar estrutura da tabela laboratorios (validação básica - apenas log, não bloqueia)
+    RAISE NOTICE '   ➤ Verificando estrutura de suppliers.laboratorios...';
+    
+    -- Contar colunas esperadas
+    SELECT COUNT(*) INTO v_count FROM information_schema.columns 
+    WHERE table_schema = 'suppliers' AND table_name = 'laboratorios';
+    
+    RAISE NOTICE '     Total de colunas encontradas: %', v_count;
+    
+    -- Verificar se as colunas essenciais existem
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'suppliers' AND table_name = 'laboratorios' AND column_name = 'nome') THEN
+        RAISE NOTICE '     ✓ Coluna "nome" existe';
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'suppliers' AND table_name = 'laboratorios' AND column_name = 'nome_fantasia') THEN
+        RAISE NOTICE '     ✓ Coluna "nome_fantasia" existe';
+    END IF;
+    
+    IF EXISTS (SELECT 1 FROM information_schema.columns WHERE table_schema = 'suppliers' AND table_name = 'laboratorios' AND column_name = 'ativo') THEN
+        RAISE NOTICE '     ✓ Coluna "ativo" existe';
+    END IF;
+    
+    RAISE NOTICE '✓ Todos os schemas e tabelas necessários existem.';
+    RAISE NOTICE '✓ Estrutura da tabela suppliers.laboratorios validada.';
+    RAISE NOTICE 'Prosseguindo com migração...';
 END $$;
 
 -- ============================================
