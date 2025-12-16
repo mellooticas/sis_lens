@@ -211,21 +211,18 @@ WHERE l.ativo = true;
 COMMENT ON VIEW public.vw_laboratorios_completo IS 
 '🏅 View enriquecida com scores e badges - RESOLVE GAP #2 (Laboratórios com Alma)';
 
--- 2.2 View de Histórico de Decisões (SIMPLIFICADA - apenas colunas básicas)
+-- 2.2 View de Histórico de Decisões (MÍNIMA - apenas IDs básicos)
 CREATE OR REPLACE VIEW public.vw_historico_decisoes AS
 SELECT 
     d.id,
     d.tenant_id,
-    d.status,
-    d.criado_em,
     -- Total de alternativas geradas
     (
         SELECT COUNT(*)
         FROM orders.alternativas_cotacao ac
         WHERE ac.decisao_id = d.id
     ) as total_alternativas
-FROM orders.decisoes_lentes d
-ORDER BY d.criado_em DESC;
+FROM orders.decisoes_lentes d;
 
 COMMENT ON VIEW public.vw_historico_decisoes IS 
 'Histórico de decisões com alternativas - Facilita dashboard e relatórios';
@@ -347,8 +344,7 @@ GRANT SELECT ON public.vw_ranking_atual TO authenticated;
 -- 5. CRIAR ÍNDICES PARA PERFORMANCE
 -- ============================================
 
-CREATE INDEX IF NOT EXISTS idx_decisoes_tenant_criado 
-ON orders.decisoes_lentes(tenant_id, criado_em DESC);
+-- Removido índice que usa criado_em pois pode não existir
 
 CREATE INDEX IF NOT EXISTS idx_alternativas_decisao 
 ON orders.alternativas_cotacao(decisao_id, ranking_posicao);
