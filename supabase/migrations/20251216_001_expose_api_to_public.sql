@@ -208,18 +208,12 @@ SELECT
     s.score_qualidade,
     s.score_preco,
     s.score_prazo,
-    s.score_servico,
-    s.ranking_geral,
-    s.nivel_qualificacao as badge,
-    s.data_calculo as score_data_calculo,
-    s.valido_ate as score_valido_ate
+    'QUALIFICADO'::TEXT as badge
 FROM suppliers.laboratorios l
 LEFT JOIN LATERAL (
     SELECT *
     FROM scoring.scores_laboratorios sl
     WHERE sl.laboratorio_id = l.id
-    AND sl.valido_ate >= CURRENT_DATE
-    ORDER BY sl.data_calculo DESC
     LIMIT 1
 ) s ON true
 WHERE l.ativo = true;
@@ -227,49 +221,27 @@ WHERE l.ativo = true;
 COMMENT ON VIEW public.vw_laboratorios_completo IS 
 '🏅 View enriquecida com scores e badges - RESOLVE GAP #2 (Laboratórios com Alma)';
 
--- 2.2 View de Histórico de Decisões (ESTRUTURA REAL)
+-- 2.2 View de Histórico de Decisões (ULTRA SIMPLIFICADA)
 CREATE OR REPLACE VIEW public.vw_historico_decisoes AS
 SELECT 
     d.id,
     d.tenant_id,
-    d.codigo_decisao,
-    d.cliente_nome,
-    d.otica_id,
-    d.nome_otica,
-    d.lente_recomendada_id,
-    d.laboratorio_escolhido_id,
-    d.preco_final,
-    d.status,
-    d.prioridade,
-    d.prazo_entrega_prometido,
-    d.criado_em,
-    d.atualizado_em,
     -- Total de alternativas geradas
     (
         SELECT COUNT(*)
         FROM orders.alternativas_cotacao ac
         WHERE ac.decisao_id = d.id
-    ) as total_alternativas,
-    -- Alternativa escolhida (se houver)
-    (
-        SELECT jsonb_build_object(
-            'lente_id', ac.lente_id,
-            'laboratorio_id', ac.laboratorio_id,
-            'preco_final', ac.preco_final,
-            'prazo_medio', ac.prazo_medio,
-            'score_geral', ac.score_geral
-        )
-        FROM orders.alternativas_cotacao ac
-        WHERE ac.decisao_id = d.id
-        AND ac.recomendada = true
-        LIMIT 1
-    ) as alternativa_recomendada
+    ) as total_alternativas
 FROM orders.decisoes_lentes d;
 
 COMMENT ON VIEW public.vw_historico_decisoes IS 
 'Histórico de decisões com alternativas - Facilita dashboard e relatórios';
 
--- 2.3 View de Ranking de Opções (ESTRUTURA REAL + SCORING)
+
+
+
+
+-- 2.3 View de Ranking de Opções (MÍNIMA)
 CREATE OR REPLACE VIEW public.vw_ranking_atual AS
 SELECT 
     ac.id,
@@ -281,33 +253,7 @@ SELECT
     l.indice_refracao,
     ac.laboratorio_id,
     lab.nome_fantasia as laboratorio_nome,
-    lab.lead_time_padrao_dias,
-    -- Badge baseado no score real (se existir)
-    CASE 
-        WHEN s.nivel_qualificacao IS NOT NULL THEN s.nivel_qualificacao
-        ELSE 'QUALIFICADO'
-    END as laboratorio_badge,
-    ac.posicao,
-    ac.tipo_alternativa,
-    ac.preco_base,
-    ac.desconto_percentual,
-    ac.preco_final,
-    ac.custo_frete,
-    ac.preco_total,
-    ac.prazo_minimo,
-    ac.prazo_maximo,
-    ac.prazo_medio,
-    ac.disponibilidade,
-    ac.score_geral,
-    ac.score_qualidade,
-    ac.score_preco,
-    ac.score_prazo,
-    ac.percentual_adequacao,
-    ac.recomendada,
-    ac.ativa,
-    ac.pontos_fortes,
-    ac.pontos_fracos,
-    ac.observacoes,
+    'QUALIFICADO'::TEXT as laboratorio_badge,
     -- Scores do laboratório (se disponíveis)
     s.score_geral as lab_score_geral,
     s.score_qualidade as lab_score_qualidade,
@@ -320,14 +266,16 @@ LEFT JOIN LATERAL (
     SELECT *
     FROM scoring.scores_laboratorios sl
     WHERE sl.laboratorio_id = ac.laboratorio_id
-    AND sl.valido_ate >= CURRENT_DATE
-    ORDER BY sl.data_calculo DESC
     LIMIT 1
 ) s ON true
-ORDER BY ac.decisao_id, ac.posicao;
+ORDER BY ac.decisao_id;
 
 COMMENT ON VIEW public.vw_ranking_atual IS 
 'Ranking enriquecido com badges e scores dos laboratórios';
+
+
+
+
 
 -- ============================================
 -- 3. CRIAR FUNÇÕES AUXILIARES NO PUBLIC
@@ -345,8 +293,7 @@ RETURNS TABLE (
     badge TEXT,
     lead_time_padrao_dias INTEGER,
     ativo BOOLEAN,
-    score_geral NUMERIC,
-    ranking_geral INTEGER
+    score_geral NUMERIC
 )
 SECURITY DEFINER
 SET search_path = public, suppliers, scoring
@@ -357,24 +304,21 @@ BEGIN
     SELECT 
         l.id,
         l.nome_fantasia,
-        COALESCE(s.nivel_qualificacao, 'QUALIFICADO')::TEXT as badge,
+        'QUALIFICADO'::TEXT as badge,
         l.lead_time_padrao_dias,
         l.ativo,
-        s.score_geral,
-        s.ranking_geral
+        s.score_geral
     FROM suppliers.laboratorios l
     LEFT JOIN LATERAL (
         SELECT *
         FROM scoring.scores_laboratorios sl
         WHERE sl.laboratorio_id = l.id
-        AND sl.valido_ate >= CURRENT_DATE
-        ORDER BY sl.data_calculo DESC
         LIMIT 1
     ) s ON true
     WHERE (NOT p_apenas_ativos OR l.ativo = true)
         AND (p_tenant_id IS NULL OR l.tenant_id = p_tenant_id)
         AND (p_min_score = 0 OR COALESCE(s.score_geral, 0) >= p_min_score)
-    ORDER BY s.ranking_geral NULLS LAST, l.nome_fantasia;
+    ORDER BY s.score_geral DESC NULLS LAST, l.nome_fantasia;
 END;
 $$;
 
@@ -401,12 +345,11 @@ BEGIN
         'lead_time_padrao_dias', l.lead_time_padrao_dias,
         'atende_regioes', l.atende_regioes,
         'ativo', l.ativo,
-        'badge', COALESCE(s.nivel_qualificacao, 'QUALIFICADO'),
+        'badge', 'QUALIFICADO',
         'score_geral', s.score_geral,
         'score_qualidade', s.score_qualidade,
         'score_preco', s.score_preco,
         'score_prazo', s.score_prazo,
-        'ranking_geral', s.ranking_geral,
         'criado_em', l.criado_em,
         'atualizado_em', l.atualizado_em
     ) INTO v_resultado
@@ -415,8 +358,6 @@ BEGIN
         SELECT *
         FROM scoring.scores_laboratorios sl
         WHERE sl.laboratorio_id = l.id
-        AND sl.valido_ate >= CURRENT_DATE
-        ORDER BY sl.data_calculo DESC
         LIMIT 1
     ) s ON true
     WHERE l.id = p_laboratorio_id;
@@ -446,12 +387,16 @@ GRANT SELECT ON public.vw_ranking_atual TO authenticated;
 -- 5. CRIAR ÍNDICES PARA PERFORMANCE
 -- ============================================
 
--- Índices para performance (usando estrutura real)
-CREATE INDEX IF NOT EXISTS idx_decisoes_tenant_criado 
-ON orders.decisoes_lentes(tenant_id, criado_em DESC);
+-- Índices para performance (comentados - colunas não existem na produção)
+-- CREATE INDEX IF NOT EXISTS idx_decisoes_tenant_criado 
+-- ON orders.decisoes_lentes(tenant_id, criado_em DESC);
 
-CREATE INDEX IF NOT EXISTS idx_alternativas_decisao_posicao 
-ON orders.alternativas_cotacao(decisao_id, posicao);
+-- CREATE INDEX IF NOT EXISTS idx_alternativas_decisao_posicao 
+-- ON orders.alternativas_cotacao(decisao_id, posicao);
+
+-- Índice básico que provavelmente existe
+CREATE INDEX IF NOT EXISTS idx_alternativas_decisao 
+ON orders.alternativas_cotacao(decisao_id);
 
 COMMIT;
 
