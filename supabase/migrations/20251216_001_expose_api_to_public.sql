@@ -190,7 +190,7 @@ COMMENT ON FUNCTION public.obter_dashboard_kpis IS
 -- 2. CRIAR VIEWS ENRIQUECIDAS NO PUBLIC
 -- ============================================
 
--- 2.1 View de Fornecedores Enriquecida (Resolve GAP #2)
+-- 2.1 View de Fornecedores Enriquecida COM SCORING REAL (Resolve GAP #2)
 CREATE OR REPLACE VIEW public.vw_laboratorios_completo AS
 SELECT 
     l.id,
@@ -203,49 +203,128 @@ SELECT
     l.atende_regioes,
     l.criado_em,
     l.atualizado_em,
-    -- Badge padrão (sem scoring por enquanto)
-    'STANDARD'::TEXT as badge
+    -- Scores do laboratório (dados reais!)
+    s.score_geral,
+    s.score_qualidade,
+    s.score_preco,
+    s.score_prazo,
+    s.score_servico,
+    s.ranking_geral,
+    s.nivel_qualificacao as badge,
+    s.data_calculo as score_data_calculo,
+    s.valido_ate as score_valido_ate
 FROM suppliers.laboratorios l
+LEFT JOIN LATERAL (
+    SELECT *
+    FROM scoring.scores_laboratorios sl
+    WHERE sl.laboratorio_id = l.id
+    AND sl.valido_ate >= CURRENT_DATE
+    ORDER BY sl.data_calculo DESC
+    LIMIT 1
+) s ON true
 WHERE l.ativo = true;
 
 COMMENT ON VIEW public.vw_laboratorios_completo IS 
 '🏅 View enriquecida com scores e badges - RESOLVE GAP #2 (Laboratórios com Alma)';
 
--- 2.2 View de Histórico de Decisões (MÍNIMA - apenas IDs básicos)
+-- 2.2 View de Histórico de Decisões (ESTRUTURA REAL)
 CREATE OR REPLACE VIEW public.vw_historico_decisoes AS
 SELECT 
     d.id,
     d.tenant_id,
+    d.codigo_decisao,
+    d.cliente_nome,
+    d.otica_id,
+    d.nome_otica,
+    d.lente_recomendada_id,
+    d.laboratorio_escolhido_id,
+    d.preco_final,
+    d.status,
+    d.prioridade,
+    d.prazo_entrega_prometido,
+    d.criado_em,
+    d.atualizado_em,
     -- Total de alternativas geradas
     (
         SELECT COUNT(*)
         FROM orders.alternativas_cotacao ac
         WHERE ac.decisao_id = d.id
-    ) as total_alternativas
+    ) as total_alternativas,
+    -- Alternativa escolhida (se houver)
+    (
+        SELECT jsonb_build_object(
+            'lente_id', ac.lente_id,
+            'laboratorio_id', ac.laboratorio_id,
+            'preco_final', ac.preco_final,
+            'prazo_medio', ac.prazo_medio,
+            'score_geral', ac.score_geral
+        )
+        FROM orders.alternativas_cotacao ac
+        WHERE ac.decisao_id = d.id
+        AND ac.recomendada = true
+        LIMIT 1
+    ) as alternativa_recomendada
 FROM orders.decisoes_lentes d;
 
 COMMENT ON VIEW public.vw_historico_decisoes IS 
 'Histórico de decisões com alternativas - Facilita dashboard e relatórios';
 
--- 2.3 View de Ranking de Opções (simplificada - apenas IDs)
+-- 2.3 View de Ranking de Opções (ESTRUTURA REAL + SCORING)
 CREATE OR REPLACE VIEW public.vw_ranking_atual AS
 SELECT 
     ac.id,
     ac.decisao_id,
     ac.lente_id,
+    l.familia as lente_familia,
+    l.design as lente_design,
+    l.material as lente_material,
+    l.indice_refracao,
     ac.laboratorio_id,
     lab.nome_fantasia as laboratorio_nome,
-    'STANDARD'::TEXT as laboratorio_badge,
+    lab.lead_time_padrao_dias,
+    -- Badge baseado no score real (se existir)
+    CASE 
+        WHEN s.nivel_qualificacao IS NOT NULL THEN s.nivel_qualificacao
+        ELSE 'QUALIFICADO'
+    END as laboratorio_badge,
+    ac.posicao,
+    ac.tipo_alternativa,
+    ac.preco_base,
+    ac.desconto_percentual,
     ac.preco_final,
-    ac.prazo_entrega_dias,
-    ac.score_final,
-    ac.ranking_posicao,
-    ac.escolhida,
+    ac.custo_frete,
+    ac.preco_total,
+    ac.prazo_minimo,
+    ac.prazo_maximo,
+    ac.prazo_medio,
+    ac.disponibilidade,
+    ac.score_geral,
+    ac.score_qualidade,
+    ac.score_preco,
+    ac.score_prazo,
+    ac.percentual_adequacao,
     ac.recomendada,
-    ac.observacoes
+    ac.ativa,
+    ac.pontos_fortes,
+    ac.pontos_fracos,
+    ac.observacoes,
+    -- Scores do laboratório (se disponíveis)
+    s.score_geral as lab_score_geral,
+    s.score_qualidade as lab_score_qualidade,
+    s.score_preco as lab_score_preco,
+    s.score_prazo as lab_score_prazo
 FROM orders.alternativas_cotacao ac
+LEFT JOIN lens_catalog.lentes l ON l.id = ac.lente_id
 LEFT JOIN suppliers.laboratorios lab ON lab.id = ac.laboratorio_id
-ORDER BY ac.decisao_id, ac.ranking_posicao;
+LEFT JOIN LATERAL (
+    SELECT *
+    FROM scoring.scores_laboratorios sl
+    WHERE sl.laboratorio_id = ac.laboratorio_id
+    AND sl.valido_ate >= CURRENT_DATE
+    ORDER BY sl.data_calculo DESC
+    LIMIT 1
+) s ON true
+ORDER BY ac.decisao_id, ac.posicao;
 
 COMMENT ON VIEW public.vw_ranking_atual IS 
 'Ranking enriquecido com badges e scores dos laboratórios';
@@ -265,10 +344,12 @@ RETURNS TABLE (
     nome_fantasia TEXT,
     badge TEXT,
     lead_time_padrao_dias INTEGER,
-    ativo BOOLEAN
+    ativo BOOLEAN,
+    score_geral NUMERIC,
+    ranking_geral INTEGER
 )
 SECURITY DEFINER
-SET search_path = public, suppliers
+SET search_path = public, suppliers, scoring
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -276,13 +357,24 @@ BEGIN
     SELECT 
         l.id,
         l.nome_fantasia,
-        'STANDARD'::TEXT as badge,
+        COALESCE(s.nivel_qualificacao, 'QUALIFICADO')::TEXT as badge,
         l.lead_time_padrao_dias,
-        l.ativo
+        l.ativo,
+        s.score_geral,
+        s.ranking_geral
     FROM suppliers.laboratorios l
+    LEFT JOIN LATERAL (
+        SELECT *
+        FROM scoring.scores_laboratorios sl
+        WHERE sl.laboratorio_id = l.id
+        AND sl.valido_ate >= CURRENT_DATE
+        ORDER BY sl.data_calculo DESC
+        LIMIT 1
+    ) s ON true
     WHERE (NOT p_apenas_ativos OR l.ativo = true)
         AND (p_tenant_id IS NULL OR l.tenant_id = p_tenant_id)
-    ORDER BY l.nome_fantasia;
+        AND (p_min_score = 0 OR COALESCE(s.score_geral, 0) >= p_min_score)
+    ORDER BY s.ranking_geral NULLS LAST, l.nome_fantasia;
 END;
 $$;
 
@@ -309,11 +401,24 @@ BEGIN
         'lead_time_padrao_dias', l.lead_time_padrao_dias,
         'atende_regioes', l.atende_regioes,
         'ativo', l.ativo,
-        'badge', 'STANDARD',
+        'badge', COALESCE(s.nivel_qualificacao, 'QUALIFICADO'),
+        'score_geral', s.score_geral,
+        'score_qualidade', s.score_qualidade,
+        'score_preco', s.score_preco,
+        'score_prazo', s.score_prazo,
+        'ranking_geral', s.ranking_geral,
         'criado_em', l.criado_em,
         'atualizado_em', l.atualizado_em
     ) INTO v_resultado
     FROM suppliers.laboratorios l
+    LEFT JOIN LATERAL (
+        SELECT *
+        FROM scoring.scores_laboratorios sl
+        WHERE sl.laboratorio_id = l.id
+        AND sl.valido_ate >= CURRENT_DATE
+        ORDER BY sl.data_calculo DESC
+        LIMIT 1
+    ) s ON true
     WHERE l.id = p_laboratorio_id;
     
     RETURN v_resultado;
@@ -341,10 +446,12 @@ GRANT SELECT ON public.vw_ranking_atual TO authenticated;
 -- 5. CRIAR ÍNDICES PARA PERFORMANCE
 -- ============================================
 
--- Removido índice que usa criado_em pois pode não existir
+-- Índices para performance (usando estrutura real)
+CREATE INDEX IF NOT EXISTS idx_decisoes_tenant_criado 
+ON orders.decisoes_lentes(tenant_id, criado_em DESC);
 
-CREATE INDEX IF NOT EXISTS idx_alternativas_decisao 
-ON orders.alternativas_cotacao(decisao_id, ranking_posicao);
+CREATE INDEX IF NOT EXISTS idx_alternativas_decisao_posicao 
+ON orders.alternativas_cotacao(decisao_id, posicao);
 
 COMMIT;
 
