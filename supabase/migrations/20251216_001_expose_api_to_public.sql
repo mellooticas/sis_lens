@@ -45,10 +45,6 @@ BEGIN
         RAISE EXCEPTION 'Tabela suppliers.laboratorios não existe. Execute primeiro a migration 20251002000004_suppliers.sql';
     END IF;
     
-    IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'scoring' AND table_name = 'scores_laboratorios') THEN
-        RAISE EXCEPTION 'Tabela scoring.scores_laboratorios não existe. Execute primeiro as migrations de scoring.';
-    END IF;
-    
     IF NOT EXISTS (SELECT 1 FROM information_schema.tables WHERE table_schema = 'orders' AND table_name = 'decisoes_lentes') THEN
         RAISE EXCEPTION 'Tabela orders.decisoes_lentes não existe. Execute primeiro as migrations de orders.';
     END IF;
@@ -204,23 +200,12 @@ SELECT
     l.lead_time_padrao_dias,
     l.ativo,
     l.tenant_id,
-    -- SCORING (antes oculto)
-    COALESCE(sl.score_geral, 0) as score_geral,
-    COALESCE(sl.score_preco, 0) as score_preco,
-    COALESCE(sl.score_prazo, 0) as score_prazo,
-    COALESCE(sl.score_qualidade, 0) as score_qualidade,
-    -- BADGE (baseado no score)
-    CASE 
-        WHEN sl.score_geral >= 9.0 THEN 'GOLD'
-        WHEN sl.score_geral >= 7.5 THEN 'SILVER'
-        WHEN sl.score_geral >= 6.0 THEN 'BRONZE'
-        ELSE 'STANDARD'
-    END as badge,
-    -- INFORMAÇÕES DO SCORE
-    sl.data_calculo as score_calculado_em,
-    sl.valido_ate as score_valido_ate
+    l.atende_regioes,
+    l.criado_em,
+    l.atualizado_em,
+    -- Badge padrão (sem scoring por enquanto)
+    'STANDARD'::TEXT as badge
 FROM suppliers.laboratorios l
-LEFT JOIN scoring.scores_laboratorios sl ON l.id = sl.laboratorio_id
 WHERE l.ativo = true;
 
 COMMENT ON VIEW public.vw_laboratorios_completo IS 
@@ -278,13 +263,7 @@ SELECT
     l.marca as lente_marca,
     ac.laboratorio_id,
     lab.nome_fantasia as laboratorio_nome,
-    -- BADGE do laboratório
-    CASE 
-        WHEN sl.score_geral >= 9.0 THEN 'GOLD'
-        WHEN sl.score_geral >= 7.5 THEN 'SILVER'
-        WHEN sl.score_geral >= 6.0 THEN 'BRONZE'
-        ELSE 'STANDARD'
-    END as laboratorio_badge,
+    'STANDARD'::TEXT as laboratorio_badge,
     ac.preco_final,
     ac.prazo_entrega_dias,
     ac.score_final,
@@ -295,7 +274,6 @@ SELECT
 FROM orders.alternativas_cotacao ac
 LEFT JOIN lens_catalog.lentes l ON l.id = ac.lente_id
 LEFT JOIN suppliers.laboratorios lab ON lab.id = ac.laboratorio_id
-LEFT JOIN scoring.scores_laboratorios sl ON sl.laboratorio_id = ac.laboratorio_id
 ORDER BY ac.decisao_id, ac.ranking_posicao;
 
 COMMENT ON VIEW public.vw_ranking_atual IS 
@@ -315,11 +293,11 @@ RETURNS TABLE (
     id UUID,
     nome_fantasia TEXT,
     badge TEXT,
-    score_geral NUMERIC,
+    lead_time_padrao_dias INTEGER,
     ativo BOOLEAN
 )
 SECURITY DEFINER
-SET search_path = public, suppliers, scoring
+SET search_path = public, suppliers
 LANGUAGE plpgsql
 AS $$
 BEGIN
@@ -327,20 +305,13 @@ BEGIN
     SELECT 
         l.id,
         l.nome_fantasia,
-        CASE 
-            WHEN COALESCE(sl.score_geral, 0) >= 9.0 THEN 'GOLD'::TEXT
-            WHEN COALESCE(sl.score_geral, 0) >= 7.5 THEN 'SILVER'::TEXT
-            WHEN COALESCE(sl.score_geral, 0) >= 6.0 THEN 'BRONZE'::TEXT
-            ELSE 'STANDARD'::TEXT
-        END,
-        COALESCE(sl.score_geral, 0),
+        'STANDARD'::TEXT as badge,
+        l.lead_time_padrao_dias,
         l.ativo
     FROM suppliers.laboratorios l
-    LEFT JOIN scoring.scores_laboratorios sl ON l.id = sl.laboratorio_id
     WHERE (NOT p_apenas_ativos OR l.ativo = true)
         AND (p_tenant_id IS NULL OR l.tenant_id = p_tenant_id)
-        AND COALESCE(sl.score_geral, 0) >= p_min_score
-    ORDER BY sl.score_geral DESC NULLS LAST;
+    ORDER BY l.nome_fantasia;
 END;
 $$;
 
@@ -367,27 +338,11 @@ BEGIN
         'lead_time_padrao_dias', l.lead_time_padrao_dias,
         'atende_regioes', l.atende_regioes,
         'ativo', l.ativo,
-        'badge', CASE 
-            WHEN COALESCE(sl.score_geral, 0) >= 9.0 THEN 'GOLD'
-            WHEN COALESCE(sl.score_geral, 0) >= 7.5 THEN 'SILVER'
-            WHEN COALESCE(sl.score_geral, 0) >= 6.0 THEN 'BRONZE'
-            ELSE 'STANDARD'
-        END,
-        'scores', jsonb_build_object(
-            'geral', COALESCE(sl.score_geral, 0),
-            'preco', COALESCE(sl.score_preco, 0),
-            'prazo', COALESCE(sl.score_prazo, 0),
-            'qualidade', COALESCE(sl.score_qualidade, 0),
-            'servico', COALESCE(sl.score_servico, 0)
-        ),
-        'info_score', jsonb_build_object(
-            'data_calculo', sl.data_calculo,
-            'valido_ate', sl.valido_ate,
-            'nivel_qualificacao', sl.nivel_qualificacao
-        )
+        'badge', 'STANDARD',
+        'criado_em', l.criado_em,
+        'atualizado_em', l.atualizado_em
     ) INTO v_resultado
     FROM suppliers.laboratorios l
-    LEFT JOIN scoring.scores_laboratorios sl ON l.id = sl.laboratorio_id
     WHERE l.id = p_laboratorio_id;
     
     RETURN v_resultado;
@@ -414,9 +369,6 @@ GRANT SELECT ON public.vw_ranking_atual TO authenticated;
 -- ============================================
 -- 5. CRIAR ÍNDICES PARA PERFORMANCE
 -- ============================================
-
-CREATE INDEX IF NOT EXISTS idx_scores_laboratorios_score_geral 
-ON scoring.scores_laboratorios(score_geral DESC);
 
 CREATE INDEX IF NOT EXISTS idx_decisoes_tenant_criado 
 ON orders.decisoes_lentes(tenant_id, criado_em DESC);
