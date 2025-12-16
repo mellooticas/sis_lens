@@ -227,14 +227,12 @@ FROM orders.decisoes_lentes d;
 COMMENT ON VIEW public.vw_historico_decisoes IS 
 'Histórico de decisões com alternativas - Facilita dashboard e relatórios';
 
--- 2.3 View de Ranking de Opções (melhorada)
+-- 2.3 View de Ranking de Opções (simplificada - apenas IDs)
 CREATE OR REPLACE VIEW public.vw_ranking_atual AS
 SELECT 
     ac.id,
     ac.decisao_id,
     ac.lente_id,
-    l.nome_comercial as lente_nome,
-    l.marca as lente_marca,
     ac.laboratorio_id,
     lab.nome_fantasia as laboratorio_nome,
     'STANDARD'::TEXT as laboratorio_badge,
@@ -246,7 +244,6 @@ SELECT
     ac.recomendada,
     ac.observacoes
 FROM orders.alternativas_cotacao ac
-LEFT JOIN lens_catalog.lentes l ON l.id = ac.lente_id
 LEFT JOIN suppliers.laboratorios lab ON lab.id = ac.laboratorio_id
 ORDER BY ac.decisao_id, ac.ranking_posicao;
 
