@@ -211,41 +211,13 @@ WHERE l.ativo = true;
 COMMENT ON VIEW public.vw_laboratorios_completo IS 
 '🏅 View enriquecida com scores e badges - RESOLVE GAP #2 (Laboratórios com Alma)';
 
--- 2.2 View de Histórico de Decisões
+-- 2.2 View de Histórico de Decisões (SIMPLIFICADA - apenas colunas básicas)
 CREATE OR REPLACE VIEW public.vw_historico_decisoes AS
 SELECT 
     d.id,
     d.tenant_id,
-    d.codigo_decisao,
-    d.cliente_nome,
-    d.otica_id,
-    d.nome_otica,
-    d.receita,
-    d.tipo_receita,
     d.status,
-    d.prioridade,
-    d.preco_final,
-    d.prazo_entrega_prometido,
     d.criado_em,
-    d.atualizado_em,
-    -- Alternativa escolhida
-    (
-        SELECT jsonb_build_object(
-            'laboratorio_id', ac.laboratorio_id,
-            'laboratorio_nome', l.nome_fantasia,
-            'lente_id', ac.lente_id,
-            'lente_nome', le.nome_comercial,
-            'preco_final', ac.preco_final,
-            'prazo_dias', ac.prazo_entrega_dias,
-            'ranking_posicao', ac.ranking_posicao
-        )
-        FROM orders.alternativas_cotacao ac
-        LEFT JOIN suppliers.laboratorios l ON l.id = ac.laboratorio_id
-        LEFT JOIN lens_catalog.lentes le ON le.id = ac.lente_id
-        WHERE ac.decisao_id = d.id 
-            AND ac.escolhida = true
-        LIMIT 1
-    ) as alternativa_escolhida,
     -- Total de alternativas geradas
     (
         SELECT COUNT(*)
