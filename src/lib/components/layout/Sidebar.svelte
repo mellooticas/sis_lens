@@ -26,6 +26,27 @@
       color: "text-indigo-500",
     },
     {
+      id: "catalogo",
+      label: "Catálogo",
+      href: "/catalogo",
+      icon: "box",
+      color: "text-violet-500",
+    },
+    {
+      id: "catalogo-premium",
+      label: "Premium",
+      href: "/catalogo/premium",
+      icon: "sparkles",
+      color: "text-amber-500",
+    },
+    {
+      id: "catalogo-comparar",
+      label: "Comparar Labs",
+      href: "/catalogo/comparar",
+      icon: "arrow-left-right",
+      color: "text-cyan-500",
+    },
+    {
       id: "ranking",
       label: "Ranking",
       href: "/ranking",
@@ -177,6 +198,58 @@
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                /></svg
+              >
+            {:else if item.icon === "box"}
+              <svg
+                class="w-5 h-5 {item.color}"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"
+                /><polyline
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  points="3.27 6.96 12 12.01 20.73 6.96"
+                /><line
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  x1="12"
+                  y1="22.08"
+                  x2="12"
+                  y2="12"
+                /></svg
+              >
+            {:else if item.icon === "sparkles"}
+              <svg
+                class="w-5 h-5 {item.color}"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                /></svg
+              >
+            {:else if item.icon === "arrow-left-right"}
+              <svg
+                class="w-5 h-5 {item.color}"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3"
                 /></svg
               >
             {:else if item.icon === "trophy"}
