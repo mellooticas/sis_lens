@@ -198,8 +198,7 @@ COMMENT ON FUNCTION public.obter_dashboard_kpis IS
 CREATE OR REPLACE VIEW public.vw_laboratorios_completo AS
 SELECT 
     l.id,
-    l.nome,
-    l.nome_fantasia,
+    l.nome_fantasia as nome,
     l.cnpj,
     l.contato_comercial,
     l.lead_time_padrao_dias,
@@ -245,7 +244,7 @@ SELECT
     (
         SELECT jsonb_build_object(
             'laboratorio_id', ac.laboratorio_id,
-            'laboratorio_nome', l.nome,
+            'laboratorio_nome', l.nome_fantasia,
             'lente_id', ac.lente_id,
             'lente_nome', le.nome_comercial,
             'preco_final', ac.preco_final,
@@ -281,7 +280,7 @@ SELECT
     l.nome_comercial as lente_nome,
     l.marca as lente_marca,
     ac.laboratorio_id,
-    lab.nome as laboratorio_nome,
+    lab.nome_fantasia as laboratorio_nome,
     -- BADGE do laboratório
     CASE 
         WHEN sl.score_geral >= 9.0 THEN 'GOLD'
@@ -317,7 +316,6 @@ CREATE OR REPLACE FUNCTION public.listar_laboratorios(
 )
 RETURNS TABLE (
     id UUID,
-    nome TEXT,
     nome_fantasia TEXT,
     badge TEXT,
     score_geral NUMERIC,
@@ -334,7 +332,6 @@ BEGIN
     RETURN QUERY
     SELECT 
         l.id,
-        l.nome,
         l.nome_fantasia,
         CASE 
             WHEN COALESCE(sl.score_geral, 0) >= 9.0 THEN 'GOLD'::TEXT
@@ -373,7 +370,6 @@ DECLARE
 BEGIN
     SELECT jsonb_build_object(
         'id', l.id,
-        'nome', l.nome,
         'nome_fantasia', l.nome_fantasia,
         'cnpj', l.cnpj,
         'contato_comercial', l.contato_comercial,
