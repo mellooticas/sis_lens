@@ -45,7 +45,7 @@ export const POST: RequestHandler = async ({ request }) => {
 		const db = new DatabaseClient();
 
 		// Chamar RPC para confirmar decisão
-		const { data, error } = await supabase.rpc('rpc_confirmar_decisao', {
+		const { data, error } = await supabase.rpc('criar_decisao_lente', {
 			p_lente_id: lente_id,
 			p_laboratorio_id: laboratorio_id,
 			p_criterio: criterio,

@@ -39,7 +39,7 @@ dados: LenteResult[];
 erro?: string;
 }> {
 try {
-const { data, error } = await supabase.rpc('rpc_buscar_lente', {
+const { data, error } = await supabase.rpc('buscar_lentes', {
 p_query: params.query,
 p_categoria: params.categoria || null,
 p_material: params.material || null,

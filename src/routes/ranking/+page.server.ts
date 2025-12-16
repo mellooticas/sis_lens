@@ -103,7 +103,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     
     try {
       const { data: lenteData, error: lenteError } = await supabase
-        .from('vw_lentes_catalogo')
+        .from('lens_catalog.lentes')
         .select('*')
         .eq('lente_id', lenteId)
         .single();
@@ -133,7 +133,9 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     
     try {
       const { data: rankingData, error: rankingError } = await supabase
-        .rpc('rpc_rank_opcoes', {
+        .from('vw_ranking_atual')
+        .select('*')
+        .eq('lente_id', {
           p_lente_id: lenteId,
           p_criterio: criterio,
           p_filtros: filtros

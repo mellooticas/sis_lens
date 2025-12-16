@@ -23,7 +23,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
     // 1. Construir query base
     let query = supabase
-      .from('lentes_catalogo')
+      .from('lens_catalog.lentes')
       .select(`
         id,
         sku_canonico,
@@ -68,13 +68,13 @@ export const load: PageServerLoad = async ({ url }) => {
 
     // 3. Buscar opções para filtros
     const { data: categorias } = await supabase
-      .from('lentes_catalogo')
+      .from('lens_catalog.lentes')
       .select('tipo_lente')
       .not('tipo_lente', 'is', null)
       .order('tipo_lente');
 
     const { data: materiais } = await supabase
-      .from('lentes_catalogo')
+      .from('lens_catalog.lentes')
       .select('material')
       .not('material', 'is', null)
       .order('material');

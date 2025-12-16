@@ -27,7 +27,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
     // 1. Query principal de lentes
     let query = supabase
-      .from('lentes_catalogo')
+      .from('lens_catalog.lentes')
       .select(`
         id,
         sku_canonico,
@@ -96,25 +96,25 @@ export const load: PageServerLoad = async ({ url }) => {
     // 3. Buscar opções para filtros
     const [marcasResult, tiposResult, materiaisResult, indicesResult, tratamentosResult] = await Promise.all([
       // Marcas
-      supabase.from('lentes_catalogo')
+      supabase.from('lens_catalog.lentes')
         .select('marca_nome')
         .not('marca_nome', 'is', null)
         .order('marca_nome'),
       
       // Tipos de lente
-      supabase.from('lentes_catalogo')
+      supabase.from('lens_catalog.lentes')
         .select('tipo_lente')
         .not('tipo_lente', 'is', null)
         .order('tipo_lente'),
       
       // Materiais
-      supabase.from('lentes_catalogo')
+      supabase.from('lens_catalog.lentes')
         .select('material')
         .not('material', 'is', null)
         .order('material'),
       
       // Índices de refração
-      supabase.from('lentes_catalogo')
+      supabase.from('lens_catalog.lentes')
         .select('indice_refracao')
         .not('indice_refracao', 'is', null)
         .order('indice_refracao'),

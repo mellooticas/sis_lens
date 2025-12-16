@@ -33,7 +33,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
     if (query.trim()) {
       const { data: lentes, error: lentesError } = await supabase
-        .rpc('rpc_buscar_lente', {
+        .rpc('buscar_lentes', {
           p_query: query,
           p_limit: 50
         });
@@ -114,7 +114,7 @@ export const actions: Actions = {
     try {
       // Chamar RPC de busca
       const { data: lentes, error: searchError } = await supabase
-        .rpc('rpc_buscar_lente', {
+        .rpc('buscar_lentes', {
           p_query: query,
           p_limit: 50
         });

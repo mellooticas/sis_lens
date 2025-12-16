@@ -32,50 +32,74 @@
   let status = $page.url.searchParams.get("status") || "ativo";
   let categoria = $page.url.searchParams.get("categoria") || "";
 
+  import { createClient } from '@supabase/supabase-js';
+  import { onMount } from 'svelte';
+  
   // Estado local
   let isLoading = false;
   let showNewModal = false;
-
-  // Dados mock para teste
-  const fornecedores = [
-    {
-      id: 1,
-      nome: "Ótica Premium",
-      codigo: "OPT001",
-      regiao: "SP",
-      categoria: "premium",
-      status: "ativo",
-      metricas: {
-        prazo_medio: 5,
-        preco_competitivo_pct: 85,
-        total_decisoes: 245,
-        prazo_cumprido_pct: 92,
-        qualidade_media: 4.5,
-      },
-    },
-    {
-      id: 2,
-      nome: "Lab Visão Total",
-      codigo: "VT002",
-      regiao: "RJ",
-      categoria: "standard",
-      status: "ativo",
-      metricas: {
-        prazo_medio: 7,
-        preco_competitivo_pct: 78,
-        total_decisoes: 189,
-        prazo_cumprido_pct: 88,
-        qualidade_media: 4.2,
-      },
-    },
-  ];
-
-  const estatisticas = {
-    total_fornecedores: 18,
-    fornecedores_ativos: 14,
-    nota_media: 4.2,
-    prazo_medio: 6,
+  let fornecedores: any[] = [];
+  let estatisticas = {
+    total_fornecedores: 0,
+    fornecedores_ativos: 0,
+    nota_media: 0,
+    prazo_medio: 0,
   };
+
+  // Carregar dados reais do banco
+  onMount(async () => {
+    try {
+      isLoading = true;
+      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+
+      if (!supabaseUrl || !supabaseKey) {
+        throw new Error('Missing Supabase environment variables');
+      }
+
+      const supabase = createClient(supabaseUrl, supabaseKey);
+      
+      // Buscar laboratórios usando a view pública
+      const { data, error } = await supabase
+        .from('vw_laboratorios_completo')
+        .select('*');
+
+      if (error) {
+        console.error('Erro ao carregar laboratórios:', error);
+      } else {
+        fornecedores = (data || []).map((lab: any) => ({
+          id: lab.id,
+          nome: lab.nome_fantasia,
+          codigo: lab.cnpj,
+          regiao: 'N/A',
+          categoria: lab.badge === 'QUALIFICADO' ? 'premium' : 'standard',
+          status: lab.ativo ? 'ativo' : 'inativo',
+          metricas: {
+            prazo_medio: lab.lead_time || 0,
+            preco_competitivo_pct: lab.score_preco || 0,
+            total_decisoes: 0,
+            prazo_cumprido_pct: lab.score_prazo || 0,
+            qualidade_media: lab.score_qualidade || 0,
+          },
+        }));
+
+        const ativos = fornecedores.filter(f => f.status === 'ativo');
+        const scores = ativos.map(f => f.metricas.qualidade_media).filter(s => s > 0);
+        const prazos = ativos.map(f => f.metricas.prazo_medio).filter(p => p > 0);
+        
+        estatisticas = {
+          total_fornecedores: fornecedores.length,
+          fornecedores_ativos: ativos.length,
+          nota_media: scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0,
+          prazo_medio: prazos.length > 0 ? prazos.reduce((a, b) => a + b, 0) / prazos.length : 0,
+        };
+      }
+    } catch (error) {
+      console.error('Erro ao carregar fornecedores:', error);
+    } finally {
+      isLoading = false;
+    }
+  });
 
   const regioes = [
     { codigo: "SP", nome: "São Paulo" },

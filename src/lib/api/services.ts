@@ -34,7 +34,7 @@ export class LentesService {
    */
   static async buscarLentes(query: string, filtros: any = {}, limit = 20) {
     try {
-      const { data, error } = await supabase.rpc('rpc_buscar_lente', {
+      const { data, error } = await supabase.rpc('buscar_lentes', {
         p_query: query,
         p_filtros: filtros,
         p_limit: limit
@@ -135,11 +135,10 @@ export class RankingService {
    */
   static async gerarRanking(lenteId: string, criterio: string, filtros: any = {}) {
     try {
-      const { data, error } = await supabase.rpc('rpc_rank_opcoes', {
-        p_lente_id: lenteId,
-        p_criterio: criterio,
-        p_filtros: filtros
-      });
+      const { data, error } = await supabase
+        .from('vw_ranking_atual')
+        .select('*')
+        .eq('lente_id', lenteId);
 
       if (error) throw error;
 
@@ -215,12 +214,12 @@ export class DecisaoService {
     observacoes = ''
   ) {
     try {
-      const { data, error } = await supabase.rpc('rpc_confirmar_decisao', {
-        p_lente_id: lenteId,
-        p_opcao_escolhida_id: opcaoEscolhidaId,
+      const { data, error } = await supabase.rpc('criar_decisao_lente', {
+        p_tenant_id: 1,
+        p_cliente_id: null,
+        p_receita: { lente_id: lenteId, opcao_id: opcaoEscolhidaId },
         p_criterio: criterio,
-        p_filtros: filtros,
-        p_observacoes: observacoes
+        p_filtros: filtros
       });
 
       if (error) throw error;

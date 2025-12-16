@@ -40,7 +40,7 @@ export class DatabaseClient {
     limit = 20
   ): Promise<ApiResponse<any[]>> {
     try {
-      const { data, error } = await supabase.rpc('rpc_buscar_lente', {
+      const { data, error } = await supabase.rpc('buscar_lentes', {
         p_query: query,
         p_filtros: filtros,
         p_limit: limit
@@ -65,8 +65,8 @@ export class DatabaseClient {
   ): Promise<DatabaseResponse<any>> {
     try {
       let query = supabase
-        .from('vw_lentes_catalogo')
-        .select('*', { count: 'exact' });
+        .from('lens_catalog.lentes')
+        .select('familia, design, material, indice_refracao, tratamentos, categoria', { count: 'exact' });
 
       // Aplicar filtros
       if (filtros.marca?.length) {
@@ -219,11 +219,10 @@ export class DatabaseClient {
     filtros: any = {}
   ): Promise<ApiResponse<any[]>> {
     try {
-      const { data, error } = await supabase.rpc('rpc_rank_opcoes', {
-        p_lente_id: lenteId,
-        p_criterio: criterio,
-        p_filtros: filtros
-      });
+      const { data, error } = await supabase
+        .from('vw_ranking_atual')
+        .select('*')
+        .eq('lente_id', lenteId);
 
       if (error) throw error;
 
@@ -284,19 +283,19 @@ export class DatabaseClient {
   }
 
   static async confirmarDecisaoCompra(
-    lenteId: string,
-    opcaoEscolhidaId: string,
-    criterio: string,
-    filtros: any = {},
-    observacoes = ''
+    tenantId: string,
+    clienteId: string,
+    receita: any,
+    criterio: string = 'EQUILIBRADO',
+    filtros: any = {}
   ): Promise<ApiResponse<any>> {
     try {
-      const { data, error } = await supabase.rpc('rpc_confirmar_decisao', {
-        p_lente_id: lenteId,
-        p_opcao_escolhida_id: opcaoEscolhidaId,
+      const { data, error } = await supabase.rpc('criar_decisao_lente', {
+        p_tenant_id: tenantId,
+        p_cliente_id: clienteId,
+        p_receita: receita,
         p_criterio: criterio,
-        p_filtros: filtros,
-        p_observacoes: observacoes
+        p_filtros: filtros
       });
 
       if (error) throw error;
@@ -309,7 +308,7 @@ export class DatabaseClient {
         }
       };
     } catch (error) {
-      console.error('Erro ao confirmar decisão:', error);
+      console.error('Erro ao criar decisão:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Erro desconhecido'

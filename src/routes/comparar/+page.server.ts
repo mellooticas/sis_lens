@@ -21,7 +21,7 @@ export const load: PageServerLoad = async ({ url }) => {
     if (lenteIds.length > 0) {
       // Buscar dados das lentes selecionadas
       const { data: lentes, error } = await supabase
-        .from('lentes_catalogo')
+        .from('lens_catalog.lentes')
         .select(`
           id,
           sku_canonico,
@@ -47,7 +47,7 @@ export const load: PageServerLoad = async ({ url }) => {
 
     // Buscar lentes populares para sugestões
     const { data: sugestoes } = await supabase
-      .from('lentes_catalogo')
+      .from('lens_catalog.lentes')
       .select(`
         id,
         familia,
