@@ -216,12 +216,9 @@ SELECT
         WHEN sl.score_geral >= 6.0 THEN 'BRONZE'
         ELSE 'STANDARD'
     END as badge,
-    -- MÉTRICAS
-    sl.total_pedidos,
-    sl.pedidos_no_prazo,
-    sl.percentual_pontualidade,
-    sl.prazo_medio_dias,
-    sl.ultima_atualizacao as score_atualizado_em
+    -- INFORMAÇÕES DO SCORE
+    sl.data_calculo as score_calculado_em,
+    sl.valido_ate as score_valido_ate
 FROM suppliers.laboratorios l
 LEFT JOIN scoring.scores_laboratorios sl ON l.id = sl.laboratorio_id
 WHERE l.ativo = true;
@@ -319,9 +316,6 @@ RETURNS TABLE (
     nome_fantasia TEXT,
     badge TEXT,
     score_geral NUMERIC,
-    percentual_pontualidade NUMERIC,
-    prazo_medio_dias INTEGER,
-    total_pedidos INTEGER,
     ativo BOOLEAN
 )
 SECURITY DEFINER
@@ -340,9 +334,6 @@ BEGIN
             ELSE 'STANDARD'::TEXT
         END,
         COALESCE(sl.score_geral, 0),
-        COALESCE(sl.percentual_pontualidade, 0),
-        COALESCE(sl.prazo_medio_dias::INTEGER, 0),
-        COALESCE(sl.total_pedidos::INTEGER, 0),
         l.ativo
     FROM suppliers.laboratorios l
     LEFT JOIN scoring.scores_laboratorios sl ON l.id = sl.laboratorio_id
@@ -386,13 +377,13 @@ BEGIN
             'geral', COALESCE(sl.score_geral, 0),
             'preco', COALESCE(sl.score_preco, 0),
             'prazo', COALESCE(sl.score_prazo, 0),
-            'qualidade', COALESCE(sl.score_qualidade, 0)
+            'qualidade', COALESCE(sl.score_qualidade, 0),
+            'servico', COALESCE(sl.score_servico, 0)
         ),
-        'metricas', jsonb_build_object(
-            'total_pedidos', COALESCE(sl.total_pedidos, 0),
-            'pedidos_no_prazo', COALESCE(sl.pedidos_no_prazo, 0),
-            'percentual_pontualidade', COALESCE(sl.percentual_pontualidade, 0),
-            'prazo_medio_dias', COALESCE(sl.prazo_medio_dias, 0)
+        'info_score', jsonb_build_object(
+            'data_calculo', sl.data_calculo,
+            'valido_ate', sl.valido_ate,
+            'nivel_qualificacao', sl.nivel_qualificacao
         )
     ) INTO v_resultado
     FROM suppliers.laboratorios l
