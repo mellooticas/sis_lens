@@ -1,62 +1,63 @@
 /**
- * 📚 Catálogo de Lentes - Server Load
- * Busca lentes do Supabase com filtros e paginação
+ * 📚 Catálogo de Lentes - Server Load (NOVA ESTRUTURA)
+ * Usa vw_buscar_lentes com agrupamento por canônicas
  */
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabase';
+
+const TENANT_ID = 'cd311ba0-9e20-46c4-a65f-9b48fb4b36ec'; // TODO: pegar do contexto
 
 export const load: PageServerLoad = async ({ url }) => {
   try {
     // Parâmetros de busca e filtros
     const busca = url.searchParams.get('busca') || '';
-    const categoria = url.searchParams.get('categoria') || '';
+    const tipo = url.searchParams.get('tipo') || ''; // PREMIUM ou GENÉRICA
+    const tipo_lente = url.searchParams.get('tipo_lente') || '';
     const material = url.searchParams.get('material') || '';
-    const preco_min = parseFloat(url.searchParams.get('preco_min') || '0');
-    const preco_max = parseFloat(url.searchParams.get('preco_max') || '99999');
+    const marca_id = url.searchParams.get('marca_id') || '';
+    const laboratorio_id = url.searchParams.get('laboratorio_id') || '';
     const pagina = parseInt(url.searchParams.get('pagina') || '1');
     const limite = 20;
     const offset = (pagina - 1) * limite;
 
-    console.log('📚 Catálogo: Carregando lentes com filtros:', {
-      busca, categoria, material, preco_min, preco_max, pagina
+    console.log('📚 Catálogo NOVO: Carregando lentes com filtros:', {
+      busca, tipo, tipo_lente, material, marca_id, laboratorio_id, pagina
     });
 
-    // 1. Construir query base
+    // 1. Buscar lentes usando a nova view vw_buscar_lentes
     let query = supabase
-      .from('lens_catalog.lentes')
-      .select(`
-        id,
-        sku_canonico,
-        familia,
-        design,
-        material,
-        indice_refracao,
-        tipo_lente,
-        marca_nome,
-        descricao_completa,
-        tratamentos,
-        preco_base,
-        disponibilidade,
-        created_at
-      `, { count: 'exact' });
+      .from('vw_buscar_lentes')
+      .select('*', { count: 'exact' })
+      .eq('tenant_id', TENANT_ID)
+      .eq('ativo', true);
 
-    // 2. Aplicar filtros
+    // Aplicar filtros
     if (busca) {
-      query = query.or(`familia.ilike.%${busca}%,marca_nome.ilike.%${busca}%,sku_canonico.ilike.%${busca}%`);
+      query = query.or(`nome_produto.ilike.%${busca}%,sku.ilike.%${busca}%,marca.ilike.%${busca}%`);
     }
 
-    if (categoria) {
-      query = query.eq('tipo_lente', categoria);
+    if (tipo) {
+      query = query.eq('tipo', tipo);
+    }
+
+    if (tipo_lente) {
+      query = query.eq('tipo_lente', tipo_lente);
     }
 
     if (material) {
       query = query.eq('material', material);
     }
 
+    if (marca_id) {
+      query = query.eq('marca_id', marca_id);
+    }
+
+    if (laboratorio_id) {
+      query = query.eq('laboratorio_id', laboratorio_id);
+    }
+
     query = query
-      .gte('preco_base', preco_min)
-      .lte('preco_base', preco_max)
-      .order('familia', { ascending: true })
+      .order('nome_produto', { ascending: true })
       .range(offset, offset + limite - 1);
 
     const { data: lentes, count, error } = await query;
@@ -66,28 +67,33 @@ export const load: PageServerLoad = async ({ url }) => {
       throw error;
     }
 
-    // 3. Buscar opções para filtros
-    const { data: categorias } = await supabase
-      .from('lens_catalog.lentes')
-      .select('tipo_lente')
-      .not('tipo_lente', 'is', null)
-      .order('tipo_lente');
+    // 2. Buscar marcas para filtro (vw_marcas)
+    const { data: marcas } = await supabase
+      .from('vw_marcas')
+      .select('id, nome, total_produtos')
+      .eq('tenant_id', TENANT_ID)
+      .order('nome');
 
-    const { data: materiais } = await supabase
-      .from('lens_catalog.lentes')
-      .select('material')
-      .not('material', 'is', null)
-      .order('material');
+    // 3. Buscar laboratórios para filtro (vw_laboratorios)
+    const { data: laboratorios } = await supabase
+      .from('vw_laboratorios')
+      .select('id, nome, total_produtos')
+      .eq('tenant_id', TENANT_ID)
+      .order('nome');
 
-    // 4. Estatísticas do catálogo
-    const { data: estatisticas } = await supabase
-      .rpc('obter_estatisticas_catalogo');
+    // 4. Buscar filtros disponíveis (vw_filtros_disponiveis)
+    const { data: filtrosDisponiveis } = await supabase
+      .from('vw_filtros_disponiveis')
+      .select('*')
+      .eq('tenant_id', TENANT_ID)
+      .single();
 
     // 5. Processar dados
-    const categoriasUnicas = [...new Set(categorias?.map(c => c.tipo_lente).filter(Boolean))];
-    const materiaisUnicos = [...new Set(materiais?.map(m => m.material).filter(Boolean))];
-
     const totalPaginas = Math.ceil((count || 0) / limite);
+
+    // Estatísticas calculadas
+    const totalPremium = lentes?.filter(l => l.tipo === 'PREMIUM').length || 0;
+    const totalGenerica = lentes?.filter(l => l.tipo === 'GENÉRICA').length || 0;
 
     return {
       lentes: lentes || [],
@@ -95,22 +101,47 @@ export const load: PageServerLoad = async ({ url }) => {
       pagina_atual: pagina,
       total_paginas: totalPaginas,
       has_more: pagina < totalPaginas,
+      
       filtros: {
         busca,
-        categoria,
+        tipo,
+        tipo_lente,
         material,
-        preco_min,
-        preco_max,
+        marca_id,
+        laboratorio_id,
         opcoes: {
-          categorias: categoriasUnicas.map(cat => ({ value: cat, label: cat })),
-          materiais: materiaisUnicos.map(mat => ({ value: mat, label: mat }))
+          tipos: [
+            { value: '', label: 'Todos os tipos' },
+            { value: 'PREMIUM', label: 'Premium' },
+            { value: 'GENÉRICA', label: 'Genérica' }
+          ],
+          tipos_lente: [
+            { value: '', label: 'Todos os tipos de lente' },
+            ...(filtrosDisponiveis?.tipos_lente?.map(t => ({ value: t, label: t })) || [])
+          ],
+          materiais: [
+            { value: '', label: 'Todos os materiais' },
+            ...(filtrosDisponiveis?.materiais?.map(m => ({ value: m, label: m })) || [])
+          ],
+          marcas: [
+            { value: '', label: 'Todas as marcas' },
+            ...(marcas?.map(m => ({ value: m.id, label: `${m.nome} (${m.total_produtos})` })) || [])
+          ],
+          laboratorios: [
+            { value: '', label: 'Todos os laboratórios' },
+            ...(laboratorios?.map(l => ({ value: l.id, label: `${l.nome} (${l.total_produtos})` })) || [])
+          ]
         }
       },
-      estatisticas: estatisticas?.[0] || {
+      
+      estatisticas: {
         total_lentes: count || 0,
-        total_marcas: 0,
-        preco_medio: 0
+        total_premium: totalPremium,
+        total_generica: totalGenerica,
+        total_marcas: marcas?.length || 0,
+        total_labs: laboratorios?.length || 0
       },
+      
       sucesso: true,
       erro: null
     };
@@ -124,16 +155,25 @@ export const load: PageServerLoad = async ({ url }) => {
       has_more: false,
       filtros: {
         busca: '',
-        categoria: '',
+        tipo: '',
+        tipo_lente: '',
         material: '',
-        preco_min: 0,
-        preco_max: 0,
-        opcoes: { categorias: [], materiais: [] }
+        marca_id: '',
+        laboratorio_id: '',
+        opcoes: {
+          tipos: [],
+          tipos_lente: [],
+          materiais: [],
+          marcas: [],
+          laboratorios: []
+        }
       },
       estatisticas: {
         total_lentes: 0,
+        total_premium: 0,
+        total_generica: 0,
         total_marcas: 0,
-        preco_medio: 0
+        total_labs: 0
       },
       sucesso: false,
       erro: 'Erro ao carregar catálogo de lentes'
