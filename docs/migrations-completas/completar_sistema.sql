@@ -190,9 +190,9 @@ GRANT SELECT ON public.vouchers TO anon;
 -- 5. COMENTÁRIOS
 -- ============================================================================
 
-COMMENT ON VIEW public.produtos_laboratorio IS 'View para produtos de laboratório - sistema híbrido BestLens';
-COMMENT ON VIEW public.mv_economia_por_fornecedor IS 'Análise de economia por fornecedor - sistema híbrido BestLens';
-COMMENT ON FUNCTION public.rpc_rank_opcoes IS 'Ranking de opções para decisão de lentes - sistema híbrido BestLens';
+COMMENT ON VIEW public.produtos_laboratorio IS 'View para produtos de laboratório - sistema híbrido SIS Lens';
+COMMENT ON VIEW public.mv_economia_por_fornecedor IS 'Análise de economia por fornecedor - sistema híbrido SIS Lens';
+COMMENT ON FUNCTION public.rpc_rank_opcoes IS 'Ranking de opções para decisão de lentes - sistema híbrido SIS Lens';
 
 -- ============================================================================
 -- FINALIZADO! Sistema híbrido completo

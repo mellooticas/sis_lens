@@ -123,7 +123,7 @@ async function descobrirEstruturaBanco() {
       console.log('✅ CONEXÃO COM BANCO: Funcionando');
       console.log(`📋 ESTRUTURA ATUAL: ${tables.length} tabelas/views encontradas`);
       
-      // Verificar se há tabelas relacionadas ao BestLens
+      // Verificar se há tabelas relacionadas ao SIS Lens
       const bestLensTables = tables.filter(t => 
         t.table_name.includes('lente') || 
         t.table_name.includes('laboratorio') || 

@@ -1,4 +1,4 @@
-# 🌟 BestLens - Sistema Decisor de Lentes
+# 🌟 SIS Lens - Sistema Decisor de Lentes
 
 Sistema inteligente para comparar e decidir a melhor opção de lentes oftálmicas entre laboratórios parceiros.
 
@@ -35,7 +35,7 @@ Sistema inteligente para comparar e decidir a melhor opção de lentes oftálmic
 ```bash
 VITE_SUPABASE_URL=https://ahcikwsoxhmqqteertkx.supabase.co
 VITE_SUPABASE_ANON_KEY=your_anon_key
-VITE_APP_NAME=BestLens
+VITE_APP_NAME=SIS Lens
 VITE_APP_VERSION=1.0.0
 VITE_APP_ENVIRONMENT=production
 ```

@@ -7,8 +7,6 @@
   import type { PageData } from "./$types";
 
   // Componentes padronizados
-  import Header from "$lib/components/layout/Header.svelte";
-
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -202,18 +200,15 @@
 </script>
 
 <svelte:head>
-  <title>Tabela de Preços - BestLens</title>
+  <title>Tabela de Preços - SIS Lens</title>
   <meta
     name="description"
     content="Tabela normalizada de preços de lentes para geração de vouchers"
   />
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header currentPage="tabela-precos" />
-
-  <main>
-    <Container maxWidth="xl" padding="md">
+<main>
+  <Container maxWidth="xl" padding="md">
       <!-- Hero Section -->
       <PageHero
         badge="💰 Sistema de Vouchers"
@@ -713,7 +708,6 @@
       </section>
     </Container>
   </main>
-</div>
 
 <!-- Modal de Detalhes -->
 {#if showModal && lenteSelecionada}

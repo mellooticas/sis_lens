@@ -1,7 +1,7 @@
-# 📋 GUIA COMPLETO DE COMPONENTES REUTILIZÁVEIS - BestLens
+# 📋 GUIA COMPLETO DE COMPONENTES REUTILIZÁVEIS - SIS Lens
 
 ## Visão Geral
-Este documento apresenta todos os componentes reutilizáveis do sistema BestLens, organizados por categoria, com suas props, funcionalidades e exemplos de uso.
+Este documento apresenta todos os componentes reutilizáveis do sistema SIS Lens, organizados por categoria, com suas props, funcionalidades e exemplos de uso.
 
 ---
 

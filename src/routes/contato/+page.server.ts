@@ -22,7 +22,7 @@ export const load: PageServerLoad = async ({ url }) => {
     return {
       // Dados de contato
       contato_info: {
-        empresa: 'BestLens - Sistema Decisor de Lentes',
+        empresa: 'SIS Lens - Sistema Decisor de Lentes',
         email: 'contato@bestlens.com.br',
         telefone: '(11) 3000-0000',
         endereco: 'São Paulo, SP - Brasil',
@@ -64,7 +64,7 @@ export const load: PageServerLoad = async ({ url }) => {
     // Retorna dados básicos mesmo em caso de erro
     return {
       contato_info: {
-        empresa: 'BestLens - Sistema Decisor de Lentes',
+        empresa: 'SIS Lens - Sistema Decisor de Lentes',
         email: 'contato@bestlens.com.br',
         telefone: '(11) 3000-0000',
         endereco: 'São Paulo, SP - Brasil',

@@ -1,5 +1,5 @@
 <!--
-  🏠 Dashboard Principal - BestLens
+  🏠 Dashboard Principal - SIS Lens
   Visão geral completa do sistema decisor de lentes
 -->
 <script lang="ts">
@@ -147,10 +147,10 @@
 </script>
 
 <svelte:head>
-  <title>Dashboard - BestLens</title>
+  <title>Dashboard - SIS Lens</title>
   <meta
     name="description"
-    content="Painel principal do sistema decisor de lentes BestLens"
+    content="Painel principal do sistema decisor de lentes SIS Lens"
   />
 </svelte:head>
 

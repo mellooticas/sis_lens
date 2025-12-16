@@ -9,7 +9,6 @@
 
 	export let data: PageData;
 
-	import Header from "$lib/components/layout/Header.svelte";
 	import Container from "$lib/components/layout/Container.svelte";
 	import PageHero from "$lib/components/layout/PageHero.svelte";
 	import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -115,14 +114,11 @@
 </script>
 
 <svelte:head>
-	<title>Gestão Comercial - BestLens</title>
+	<title>Gestão Comercial - SIS Lens</title>
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-	<Header />
-
-	<main>
-		<Container maxWidth="xl" padding="md">
+<main>
+	<Container maxWidth="xl" padding="md">
 			<!-- Hero -->
 			<div
 				class="flex flex-col md:flex-row justify-between items-start md:items-center gap-4 mb-8"
@@ -443,7 +439,6 @@
 			</div>
 		</Container>
 	</main>
-</div>
 
 <!-- Modal de Edição (Legacy styled with Tailwind classes) -->
 {#if modoEdicao && itemEditando}

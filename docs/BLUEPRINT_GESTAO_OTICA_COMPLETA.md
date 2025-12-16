@@ -1,5 +1,5 @@
 ---
-description: Blueprint para expansão do sistema BestLens em um ERP Completo para Óticas
+description: Blueprint para expansão do sistema SIS Lens em um ERP Completo para Óticas
 ---
 
 # 🏥 Blueprint: Sistema de Gestão Ótica Completo (ERP + Decisor)
@@ -7,7 +7,7 @@ description: Blueprint para expansão do sistema BestLens em um ERP Completo par
 ## 🎯 Visão Geral
 Expandir o atual **"Sistema Decisor de Lentes"** (focado em compras B2B e técnica) para um **"Sistema de Gestão de Ótica"** (focado na operação da loja B2C), criando uma solução ponta-a-ponta.
 
-O sistema atual (`BestLens`) será o **motor de inteligência** dentro do novo ERP.
+O sistema atual (`SIS Lens`) será o **motor de inteligência** dentro do novo ERP.
 
 ---
 
@@ -76,7 +76,7 @@ O "frente de caixa" que amarra tudo.
     - `id`, `pedido_venda_id`
     - `tipo_item` (PRODUTO_LOJA, LENTE_LAB, SERVICO)
     - `produto_store_id` (FK para armações/estoque)
-    - `decisao_lente_id` (FK para o **BestLens** existente! 🔗)
+    - `decisao_lente_id` (FK para o **SIS Lens** existente! 🔗)
     - `valor_unitario`, `quantidade`
 
 - **`sales.pagamentos`**
@@ -91,8 +91,8 @@ A grande inteligência está em conectar a **Venda (Sales)** com a **Decisão (L
 
 Quando o vendedor adiciona um par de lentes na OS:
 1. O sistema puxa a `clinical.receita` do cliente.
-2. Aciona o **BestLens** (`orders.processar_decisao_lente`) usando os dados da receita.
-3. O vendedor escolhe a lente (Preço/Prazo/Qualidade) no painel do BestLens.
+2. Aciona o **SIS Lens** (`orders.processar_decisao_lente`) usando os dados da receita.
+3. O vendedor escolhe a lente (Preço/Prazo/Qualidade) no painel do SIS Lens.
 4. O ID da decisão (`decisao_lente_id`) é salvo no item da venda.
 5. Quando a venda é paga, o sistema dispara o pedido para o laboratório (`suppliers`).
 
@@ -101,7 +101,7 @@ Quando o vendedor adiciona um par de lentes na OS:
 1.  **Recorrência Inteligente**: O sistema avisa quando a lente de contato está acabando ou quando a receita vai vencer (1 ano).
 2.  **Provador Virtual (Simples)**: Upload da foto do cliente para testar armações (usando `store.produtos` com fotos).
 3.  **Rastreio WhatsApp**: Cliente recebe "Seus óculos foram para o laboratório", "Chegaram na loja", etc.
-4.  **Ranking de Lucratividade**: O BestLens já escolhe a lente técnica, mas agora pode priorizar a lente que dá maior margem para a loja (Preço Venda - Custo Lab).
+4.  **Ranking de Lucratividade**: O SIS Lens já escolhe a lente técnica, mas agora pode priorizar a lente que dá maior margem para a loja (Preço Venda - Custo Lab).
 
 ## 📊 Fluxo de Trabalho Proposto
 
@@ -110,8 +110,8 @@ Quando o vendedor adiciona um par de lentes na OS:
 3.  **Vendedor**:
     *   Abre Venda (`sales`).
     *   Seleciona Armação (`store`).
-    *   Clica em "Selecionar Lentes" -> Abre Popup **BestLens**.
-    *   BestLens analisa receita e sugere lentes.
+    *   Clica em "Selecionar Lentes" -> Abre Popup **SIS Lens**.
+    *   SIS Lens analisa receita e sugere lentes.
     *   Vendedor confirma.
 4.  **Caixa**: Recebe Pagamento.
 5.  **Backoffice**: Dispara pedido pro Lab e acompanha status.

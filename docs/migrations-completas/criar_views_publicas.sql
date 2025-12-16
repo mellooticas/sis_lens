@@ -250,9 +250,9 @@ GRANT EXECUTE ON FUNCTION public.rpc_confirmar_decisao TO anon;
 -- 7. COMENTÁRIOS INFORMATIVOS
 -- ============================================================================
 
-COMMENT ON VIEW public.vw_lentes_catalogo IS 'View pública para catálogo de lentes - consumida pelo frontend BestLens';
-COMMENT ON VIEW public.vw_fornecedores IS 'View pública para laboratórios/fornecedores - consumida pelo frontend BestLens';
-COMMENT ON VIEW public.decisoes_compra IS 'View pública para histórico de decisões - consumida pelo frontend BestLens';
+COMMENT ON VIEW public.vw_lentes_catalogo IS 'View pública para catálogo de lentes - consumida pelo frontend SIS Lens';
+COMMENT ON VIEW public.vw_fornecedores IS 'View pública para laboratórios/fornecedores - consumida pelo frontend SIS Lens';
+COMMENT ON VIEW public.decisoes_compra IS 'View pública para histórico de decisões - consumida pelo frontend SIS Lens';
 
 COMMENT ON FUNCTION public.rpc_buscar_lente IS 'RPC pública para busca de lentes - wrapper para api.buscar_lentes';
 COMMENT ON FUNCTION public.rpc_rank_opcoes IS 'RPC pública para ranking de opções - implementação baseada na estrutura existente';

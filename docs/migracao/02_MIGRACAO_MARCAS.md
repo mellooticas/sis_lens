@@ -22,7 +22,7 @@
 
 ## 📊 SEÇÃO 1: ESTRUTURA DA TABELA DESTINO
 
-### **Tabela DESTINO (BestLens)**
+### **Tabela DESTINO (SIS Lens)**
 ```sql
 -- Schema: suppliers
 -- Tabela: marcas
@@ -81,7 +81,7 @@ Marcas premium/especializadas que devem existir:
 
 ## ✅ SEÇÃO 3: SQL DE CRIAÇÃO (BESTLENS)
 
-### **Status**: ✅ SQL PRONTO - Executar no BestLens!
+### **Status**: ✅ SQL PRONTO - Executar no SIS Lens!
 
 ```sql
 -- ========================================
@@ -350,7 +350,7 @@ COMMIT;
 ### **Instruções de Execução**
 
 1. **Copie todo o SQL acima**
-2. **Abra o SQL Editor no Supabase BestLens**
+2. **Abra o SQL Editor no Supabase SIS Lens**
 3. **Cole e execute**
 4. **Verifique o resultado**: deve retornar `COMMIT` sem erros
 5. **Prossiga para SEÇÃO 4** para validar os dados
@@ -373,7 +373,7 @@ _Esta seção será preenchida após você colar os dados exportados e confirmar
 
 ## 🔍 SEÇÃO 4: VALIDAÇÃO
 
-### **Pré-requisitos no BestLens**
+### **Pré-requisitos no SIS Lens**
 
 ```sql
 -- 1. Verificar se tenant existe
@@ -519,14 +519,14 @@ HAVING COUNT(*) > 1;
 ## ✅ CHECKLIST DE MIGRAÇÃO
 
 ### **Antes de Começar**
-- [x] Banco BestLens criado ✅
+- [x] Banco SIS Lens criado ✅
 - [x] Tenant criado ✅
 - [x] Schema `suppliers` existe ✅
 - [x] Tabela `marcas` criada ✅
 - [x] SQL de criação preparado ✅
 
 ### **Criação**
-- [ ] SQL executado no BestLens
+- [ ] SQL executado no SIS Lens
 - [ ] COMMIT bem-sucedido
 - [ ] 17 registros criados
 
@@ -616,7 +616,7 @@ Estas marcas serão referenciadas em:
 
 ## 🎯 EXECUTE AGORA
 
-**Copie o SQL da SEÇÃO 3** e execute no Supabase BestLens!
+**Copie o SQL da SEÇÃO 3** e execute no Supabase SIS Lens!
 
 Após execução:
 1. ✅ Cole os resultados das validações

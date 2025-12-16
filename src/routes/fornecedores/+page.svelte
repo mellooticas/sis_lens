@@ -9,8 +9,6 @@
   import type { PageData } from "./$types";
 
   // === Layout ===
-  import Header from "$lib/components/layout/Header.svelte";
-
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -223,18 +221,15 @@
 </script>
 
 <svelte:head>
-  <title>Fornecedores - BestLens</title>
+  <title>Fornecedores - SIS Lens</title>
   <meta
     name="description"
     content="Gestão e acompanhamento de fornecedores/laboratórios"
   />
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header currentPage="fornecedores" />
-
-  <main>
-    <Container maxWidth="xl" padding="md">
+<main>
+  <Container maxWidth="xl" padding="md">
       <!-- Hero Section -->
       <PageHero
         badge="🏢 Sistema de Fornecedores"
@@ -463,7 +458,6 @@
       </section>
     </Container>
   </main>
-</div>
 
 <!-- Modal Novo Fornecedor -->
 {#if showNewModal}

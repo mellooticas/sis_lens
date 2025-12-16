@@ -1,4 +1,4 @@
-# BestLens - Setup Status
+# SIS Lens - Setup Status
 
 ## ✅ **Configurado e Funcionando:**
 

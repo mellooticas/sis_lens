@@ -9,8 +9,6 @@
   import type { PageData } from "./$types";
 
   // === LAYOUT ===
-  import Header from "$lib/components/layout/Header.svelte";
-
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -239,18 +237,15 @@
 </script>
 
 <svelte:head>
-  <title>Ranking de Lentes - BestLens</title>
+  <title>Ranking de Lentes - SIS Lens</title>
   <meta
     name="description"
     content="Ranking inteligente de fornecedores baseado em critérios customizáveis"
   />
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header currentPage="ranking" />
-
-  <main>
-    <Container maxWidth="2xl" padding="lg">
+<main>
+  <Container maxWidth="2xl" padding="lg">
       <!-- Breadcrumbs -->
       <Breadcrumbs items={breadcrumbItems} />
 
@@ -825,7 +820,6 @@
       </section>
     </Container>
   </main>
-</div>
 
 <!-- Modal de Confirmação -->
 {#if showDecisionModal && selectedOption}

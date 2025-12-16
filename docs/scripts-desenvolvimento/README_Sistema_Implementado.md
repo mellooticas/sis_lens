@@ -1,4 +1,4 @@
-# 🎯 Sistema BestLens - Implementado com Sucesso!
+# 🎯 Sistema SIS Lens - Implementado com Sucesso!
 
 ## 📋 **Resumo da Implementação**
 
@@ -157,7 +157,7 @@ SELECT public.api_relatorio_sistema('2024-10-01', '2024-10-31');
 ## 🔮 **Integração Futura com PDV**
 
 ### **Fluxo Previsto:**
-1. **Sistema BestLens** → Gera voucher após decisão de lente
+1. **Sistema SIS Lens** → Gera voucher após decisão de lente
 2. **API/Webhook** → Envia código para PDV da loja
 3. **PDV aplica desconto** → Registra economia
 4. **Sistema atualiza ranking** → Gamificação em tempo real

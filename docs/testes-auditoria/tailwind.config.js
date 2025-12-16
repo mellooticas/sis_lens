@@ -4,7 +4,7 @@ export default {
   theme: {
     extend: {
       colors: {
-        // BestLens Brand Colors
+        // SIS Lens Brand Colors
         brand: {
           blue: {
             50: '#f0f4f8',

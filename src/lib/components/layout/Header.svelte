@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Header/Navbar BestLens (Modernized & Disruptive)
+   * Header/Navbar SIS Lens (Modernized & Disruptive)
    * Floating Glass Design
    */
   import { createEventDispatcher } from "svelte";
@@ -89,7 +89,7 @@
         </h1>
       </div>
       <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
-        Bem-vindo ao BestLens Dashboard
+        Bem-vindo ao SIS Lens Dashboard
       </span>
     </div>
   </div>

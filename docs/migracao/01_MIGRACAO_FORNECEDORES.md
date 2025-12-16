@@ -65,7 +65,7 @@ LIMIT 3;
 );
 ```
 
-### **Tabela DESTINO (BestLens)**
+### **Tabela DESTINO (SIS Lens)**
 ```sql
 -- Schema: suppliers
 -- Tabela: laboratorios
@@ -633,7 +633,7 @@ COMMIT;
 ### **Instruções de Execução**
 
 1. **Copie todo o SQL acima**
-2. **Abra o SQL Editor no Supabase BestLens**
+2. **Abra o SQL Editor no Supabase SIS Lens**
 3. **Cole e execute**
 4. **Verifique o resultado**: deve retornar `COMMIT` sem erros
 5. **Prossiga para SEÇÃO 5** para validar os dados
@@ -642,7 +642,7 @@ COMMIT;
 
 ## 🔍 SEÇÃO 5: VALIDAÇÃO
 
-### **Pré-requisitos no BestLens**
+### **Pré-requisitos no SIS Lens**
 
 ```sql
 -- 1. Verificar se tenant existe
@@ -775,7 +775,7 @@ LIMIT 5;
 
 ### **Antes de Começar**
 - [x] Banco Mello acessível ✅
-- [x] Banco BestLens criado ✅
+- [x] Banco SIS Lens criado ✅
 - [x] **Tenant criado (SEÇÃO 0)** ✅
 - [x] Schema `suppliers` existe ✅
 - [x] Tabela `laboratorios` criada ✅
@@ -791,7 +791,7 @@ LIMIT 5;
 - [x] tenant_id adicionado ✅
 - [x] UUIDs preservados ✅
 
-### **Importação (BestLens)**
+### **Importação (SIS Lens)**
 - [x] SQL gerado ✅
 - [x] Importação executada ✅
 - [x] Sem erros de constraint ✅

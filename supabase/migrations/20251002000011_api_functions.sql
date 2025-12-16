@@ -617,7 +617,7 @@ GRANT SELECT ON ALL TABLES IN SCHEMA api TO authenticated;
 -- DOCUMENTAÇÃO DA API
 -- ============================================
 
-COMMENT ON SCHEMA api IS 'Schema público para funções e views da API do BestLens';
+COMMENT ON SCHEMA api IS 'Schema público para funções e views da API do SIS Lens';
 
 COMMENT ON FUNCTION api.buscar_lentes IS 'Busca lentes no catálogo com filtros opcionais';
 COMMENT ON FUNCTION api.obter_lente IS 'Retorna detalhes completos de uma lente específica';

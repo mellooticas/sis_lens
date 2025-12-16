@@ -1,7 +1,7 @@
-🎨 Blueprint de Design – BestLens
+🎨 Blueprint de Design – SIS Lens
 🌟 Proposta de Valor (refinada)
 
-“BestLens garante que sua ótica escolha sempre o laboratório certo – com melhor preço, prazo real e margem garantida.”
+“SIS Lens garante que sua ótica escolha sempre o laboratório certo – com melhor preço, prazo real e margem garantida.”
 
 Benefício tangível: até R$ 50k/ano de economia (quantificável, ROI direto).
 
@@ -166,7 +166,7 @@ Documentação no Storybook ou próprio Figma.
 
 💡 Próximos Entregáveis de Design
 
-Logo vetorial (BestLens) – versão dark e light.
+Logo vetorial (SIS Lens) – versão dark e light.
 
 Mockup tela Ranking – com exemplo real de 3 laboratórios.
 
@@ -177,4 +177,4 @@ Pitch deck (10 slides → visão de negócio + UX).
 👉 Junior, com isso o Blueprint de Design fecha junto ao Blueprint Técnico.
 Fica claro o que construir, como mostrar e como vender.
 
-Quer que eu já comece pelo mockup visual da tela de Ranking (em Figma style, com cores e badges) ou prefere que eu entregue primeiro o logo vetorial do BestLens?
+Quer que eu já comece pelo mockup visual da tela de Ranking (em Figma style, com cores e badges) ou prefere que eu entregue primeiro o logo vetorial do SIS Lens?

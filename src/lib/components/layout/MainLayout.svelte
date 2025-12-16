@@ -24,7 +24,7 @@
   <!-- Main Content (Right) -->
   <div
     class="transition-all duration-500 ease-out flex flex-col min-h-screen"
-    style="padding-left: {sidebarCollapsed ? '5.5rem' : '18rem'}"
+    style="padding-left: {sidebarCollapsed ? '7.25rem' : '18rem'}"
   >
     <!-- Header (Top) -->
     <Header on:menuClick={toggleSidebar} collapsed={sidebarCollapsed} />

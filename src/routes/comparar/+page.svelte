@@ -7,8 +7,6 @@
   import type { PageData } from "./$types";
 
   // Componentes padronizados
-  import Header from "$lib/components/layout/Header.svelte";
-
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -58,18 +56,15 @@
 </script>
 
 <svelte:head>
-  <title>Comparar Lentes - BestLens</title>
+  <title>Comparar Lentes - SIS Lens</title>
   <meta
     name="description"
     content="Compare especificações e preços de lentes lado a lado"
   />
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header currentPage="comparar" />
-
-  <main>
-    <Container maxWidth="xl" padding="md">
+<main>
+  <Container maxWidth="xl" padding="md">
       <!-- Hero Section -->
       <PageHero
         badge="⚖️ Comparação Inteligente"
@@ -405,4 +400,3 @@
       </section>
     </Container>
   </main>
-</div>

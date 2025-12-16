@@ -46,7 +46,7 @@ COMMENT ON TABLE lens_catalog.grades_disponibilidade IS 'Define faixas de dioptr
 
 CREATE SCHEMA IF NOT EXISTS integration;
 
--- Clientes autorizados a consumir a API do BestLens (Ex: App Vendas, App CRM)
+-- Clientes autorizados a consumir a API do SIS Lens (Ex: App Vendas, App CRM)
 CREATE TABLE IF NOT EXISTS integration.clientes_api (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     nome TEXT NOT NULL, -- ex: "PDV Loja Centro"

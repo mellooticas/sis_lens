@@ -1,4 +1,4 @@
-# 🎨 BestLens - Guia de Uso do Logo
+# 🎨 SIS Lens - Guia de Uso do Logo
 
 ## 📋 Índice
 - [Variantes do Logo](#variantes-do-logo)
@@ -26,7 +26,7 @@ Apenas o círculo com check
 ```
 
 ### Text Only
-Apenas o texto BestLens
+Apenas o texto SIS Lens
 
 ```svelte
 <Logo variant="text" size="md" />
@@ -126,7 +126,7 @@ Sempre usa cor clara (#FFFFFF)
 <footer class="bg-neutral-900 text-white py-12">
   <div class="container mx-auto">
     <Logo theme="dark" size="md" />
-    <p class="mt-4">© 2025 BestLens. Todos os direitos reservados.</p>
+    <p class="mt-4">© 2025 SIS Lens. Todos os direitos reservados.</p>
   </div>
 </footer>
 ```
@@ -161,13 +161,13 @@ static/images/logo/
 
 ```html
 <!-- Light version -->
-<img src="/images/logo/logo-light.svg" alt="BestLens" height="48">
+<img src="/images/logo/logo-light.svg" alt="SIS Lens" height="48">
 
 <!-- Dark version -->
-<img src="/images/logo/logo-dark.svg" alt="BestLens" height="48">
+<img src="/images/logo/logo-dark.svg" alt="SIS Lens" height="48">
 
 <!-- Icon only -->
-<img src="/images/logo/logo-icon.svg" alt="BestLens" height="32">
+<img src="/images/logo/logo-icon.svg" alt="SIS Lens" height="32">
 ```
 
 ### Favicon

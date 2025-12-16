@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Componente Badge BestLens
+   * Componente Badge SIS Lens
    * Badges para status e destaques
    */
 

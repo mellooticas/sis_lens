@@ -28,21 +28,21 @@
 
 | ID | Nome | Status | Observação |
 |----|------|--------|------------|
-| `15db4d9c-8c60-4b4d-8b8d-7cc9a5fd97e1` | **Brascor** | ✅ Migrado | Já existe no BestLens |
-| `3a0a8ad3-4c55-44a2-b9fa-232a9f2fdc21` | **Polylux** | ✅ Migrado | Já existe no BestLens |
+| `15db4d9c-8c60-4b4d-8b8d-7cc9a5fd97e1` | **Brascor** | ✅ Migrado | Já existe no SIS Lens |
+| `3a0a8ad3-4c55-44a2-b9fa-232a9f2fdc21` | **Polylux** | ✅ Migrado | Já existe no SIS Lens |
 | `d90bebaf-e552-4cf0-a226-808c91bda73a` | **Kaizi Oculos Solares** | ⚠️ ARMAÇÕES | Não é laboratório de lentes! |
 | `c50ea6eb-a420-4cf7-8aa2-68aaeb41ac95` | **Navarro Oculos** | ⚠️ ARMAÇÕES | Não é laboratório de lentes! |
 | `e4a24408-3d58-4fc7-a096-cf7140f4f248` | **Galeria Florencio lj11** | ⚠️ ARMAÇÕES | Não é laboratório de lentes! |
-| `1d0b088f-dcb1-4179-9a18-5d67ce86c4b6` | **Sao Paulo Acessorios** | ✅ Migrado | Já existe no BestLens |
-| `8eb9498c-3d99-4d26-bb8c-e503f97ccf2c` | **Express** | ✅ Migrado | Já existe no BestLens |
-| `43721f5b-4f4a-4a75-bb34-6e8b373c5948` | **Braslentes** | ✅ Migrado | Já existe no BestLens |
-| `d88018ac-ecae-4b38-b321-94babe5f85e3` | **Style** | ✅ Migrado | Já existe no BestLens |
-| `e1e1eace-11b4-4f26-9f15-620808a4a410` | **So Blocos** | ✅ Migrado | Já existe no BestLens (Só Blocos) |
+| `1d0b088f-dcb1-4179-9a18-5d67ce86c4b6` | **Sao Paulo Acessorios** | ✅ Migrado | Já existe no SIS Lens |
+| `8eb9498c-3d99-4d26-bb8c-e503f97ccf2c` | **Express** | ✅ Migrado | Já existe no SIS Lens |
+| `43721f5b-4f4a-4a75-bb34-6e8b373c5948` | **Braslentes** | ✅ Migrado | Já existe no SIS Lens |
+| `d88018ac-ecae-4b38-b321-94babe5f85e3` | **Style** | ✅ Migrado | Já existe no SIS Lens |
+| `e1e1eace-11b4-4f26-9f15-620808a4a410` | **So Blocos** | ✅ Migrado | Já existe no SIS Lens (Só Blocos) |
 
 ### **🚨 PROBLEMA IDENTIFICADO:**
 - **3 fornecedores são de ARMAÇÕES, não lentes**: Kaizi, Navarro, Galeria Florencio
 - **7 laboratórios válidos**: Já foram todos migrados!
-- **Mapeamento perfeito**: Todos os labs de lentes já existem no BestLens
+- **Mapeamento perfeito**: Todos os labs de lentes já existem no SIS Lens
 
 ---
 
@@ -61,7 +61,7 @@
 ### **🎯 DESCOBERTAS IMPORTANTES:**
 
 1. **Marca "GENERICA"**: Catálogo usa "GENERICA" como marca padrão
-2. **Tipo "FREE FORM"**: Produtos Mello usam este tipo (não existe no BestLens)
+2. **Tipo "FREE FORM"**: Produtos Mello usam este tipo (não existe no SIS Lens)
 3. **Agregação eficiente**: Top lente tem 39 produtos agregados
 4. **SKU Pattern**: `LVN` + 6 dígitos (ex: LVN000019)
 5. **Sem fornecedor**: `catalogo_mello_lentes` é independente de fornecedor
@@ -111,13 +111,13 @@
 
 1. **Status**: Todos são "ATIVO" (não "ativo" minúsculo)
 2. **Tipos de lente no Mello**:
-   - `FREE FORM` (não existe no BestLens!)
+   - `FREE FORM` (não existe no SIS Lens!)
    - `MULTIFOCAL` (mapear para PROGRESSIVA)
    - `VISAO SIMPLES` (mapear para MONOFOCAL)
 3. **Materiais no Mello**:
    - `RESINA` (mapear para HIGH_INDEX ou CR39)
-   - `POLICARBONATO` (existe no BestLens)
-   - `CR-39` (existe no BestLens)
+   - `POLICARBONATO` (existe no SIS Lens)
+   - `CR-39` (existe no SIS Lens)
 4. **Marcas reais**: SOBLOCOS, ESSILOR (produtos têm marcas específicas)
 5. **Tratamentos**: Campos booleanos (ar, blue, fotossensivel, polarizado)
 6. **SKU Geral**: Nem sempre preenchido (vários NULL)
@@ -128,9 +128,9 @@
 
 ### **1. Tipo de Lente "FREE FORM"**
 
-❌ **Problema**: `FREE FORM` não existe no enum `tipo_lente` do BestLens
+❌ **Problema**: `FREE FORM` não existe no enum `tipo_lente` do SIS Lens
 
-**Enum BestLens:**
+**Enum SIS Lens:**
 ```sql
 CREATE TYPE tipo_lente AS ENUM (
   'MONOFOCAL',
@@ -148,7 +148,7 @@ CREATE TYPE tipo_lente AS ENUM (
 ### **2. Tipo de Lente "VISAO SIMPLES"**
 
 ❌ **Mello usa**: `VISAO SIMPLES`  
-✅ **BestLens usa**: `MONOFOCAL`
+✅ **SIS Lens usa**: `MONOFOCAL`
 
 **Mapeamento simples**: `VISAO SIMPLES` → `MONOFOCAL`
 
@@ -195,9 +195,9 @@ END
 
 ## 📋 **MAPEAMENTO COMPLETO DE CAMPOS**
 
-### **Mello → BestLens:**
+### **Mello → SIS Lens:**
 
-| Mello Campo | Tipo | BestLens Campo | Transformação |
+| Mello Campo | Tipo | SIS Lens Campo | Transformação |
 |-------------|------|----------------|---------------|
 | `id` | UUID | `id` | Preservar UUID |
 | `fornecedor_id` | UUID | `laboratorio_id` | Mapear UUIDs já migrados |

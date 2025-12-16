@@ -71,7 +71,7 @@ CREATE TABLE IF NOT EXISTS public.relatorios (
 
 -- Configurações iniciais
 INSERT INTO public.configuracoes (chave, valor, descricao) VALUES
-('app_name', '"BestLens"', 'Nome da aplicação'),
+('app_name', '"SIS Lens"', 'Nome da aplicação'),
 ('app_version', '"1.0.0"', 'Versão atual'),
 ('max_ranking_results', '10', 'Máximo de resultados no ranking'),
 ('default_criterio', '"NORMAL"', 'Critério padrão para decisões'),
@@ -139,9 +139,9 @@ GRANT SELECT ON public.vouchers TO anon;
 -- 5. COMENTÁRIOS
 -- ============================================================================
 
-COMMENT ON TABLE public.configuracoes IS 'Configurações gerais do sistema BestLens';
-COMMENT ON TABLE public.logs IS 'Log de ações do sistema BestLens';
-COMMENT ON TABLE public.relatorios IS 'Relatórios salvos do sistema BestLens';
+COMMENT ON TABLE public.configuracoes IS 'Configurações gerais do sistema SIS Lens';
+COMMENT ON TABLE public.logs IS 'Log de ações do sistema SIS Lens';
+COMMENT ON TABLE public.relatorios IS 'Relatórios salvos do sistema SIS Lens';
 
 -- ============================================================================
 -- FINALIZADO! Sistema 100% completo

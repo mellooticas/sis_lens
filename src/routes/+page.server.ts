@@ -14,7 +14,7 @@ export const load: PageServerLoad = async () => {
         economia_total_lentes: 0,
         total_vouchers_emitidos: 0,
         total_usuarios_ativos: 1,
-        laboratorio_top_nome: 'BestLens Demo',
+        laboratorio_top_nome: 'SIS Lens Demo',
         economia_media_decisao: 0
       },
       decisoes_recentes: [],

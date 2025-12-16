@@ -1,8 +1,8 @@
-# 📋 Documentação Completa do Backend - BestLens
+# 📋 Documentação Completa do Backend - SIS Lens
 
 ## 🎯 Visão Geral
 
-Este documento apresenta a estrutura completa do backend do **BestLens** - Sistema Decisor de Lentes, implementado em PostgreSQL com arquitetura multi-tenant e baseado nos padrões descritos no Blueprint.
+Este documento apresenta a estrutura completa do backend do **SIS Lens** - Sistema Decisor de Lentes, implementado em PostgreSQL com arquitetura multi-tenant e baseado nos padrões descritos no Blueprint.
 
 ### 🏗️ Arquitetura Geral
 
@@ -344,4 +344,4 @@ Este backend foi desenvolvido seguindo as especificações do **Blueprint Comple
 
 ---
 
-*Documentação gerada em 02/10/2024 - BestLens Backend v1.0*
+*Documentação gerada em 02/10/2024 - SIS Lens Backend v1.0*

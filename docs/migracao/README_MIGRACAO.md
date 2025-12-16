@@ -1,6 +1,6 @@
-# 📦 GUIA DE MIGRAÇÃO - Mello → BestLens
+# 📦 GUIA DE MIGRAÇÃO - Mello → SIS Lens
 
-> **Objetivo**: Migrar dados operacionais do sistema Mello para BestLens  
+> **Objetivo**: Migrar dados operacionais do sistema Mello para SIS Lens  
 > **Estratégia**: Manual, iterativa, baseada em CSV/SQL  
 > **Status**: Setup inicial concluído, pronto para migrações
 
@@ -13,7 +13,7 @@
 | Sistema | Tipo | Supabase Project | Status |
 |---------|------|------------------|--------|
 | **Mello** | Origem | `xqizvhugjqpkzgjuflsp` | ✅ Acessível |
-| **BestLens** | Destino | `ummrbydexhstaxfdcfpn` | ✅ Preparado |
+| **SIS Lens** | Destino | `ummrbydexhstaxfdcfpn` | ✅ Preparado |
 
 ### **Volume de Dados**
 
@@ -59,7 +59,7 @@
 ### **1. Pré-requisitos**
 - [ ] Setup inicial concluído (`00_SETUP_INICIAL_BESTLENS.md`)
 - [ ] Acesso ao Supabase Mello (origem)
-- [ ] Acesso ao Supabase BestLens (destino)
+- [ ] Acesso ao Supabase SIS Lens (destino)
 - [ ] SQL Editor aberto em ambos os projetos
 
 ### **2. Fluxo de Execução**
@@ -71,7 +71,7 @@ graph LR
     C --> D[Copiar Resultado]
     D --> E[SEÇÃO 3: Colar Dados]
     E --> F[SEÇÃO 4: Revisar SQL]
-    F --> G[Executar no BestLens]
+    F --> G[Executar no SIS Lens]
     G --> H[SEÇÃO 5: Validar]
     H --> I{Sucesso?}
     I -->|Sim| J[✅ Concluído]
@@ -87,7 +87,7 @@ Cada documento de migração contém:
 - **SEÇÃO 1**: Comparativo de estruturas (mapeamento campo a campo)
 - **SEÇÃO 2**: SQL de exportação (executar no Mello)
 - **SEÇÃO 3**: Área para colar dados exportados
-- **SEÇÃO 4**: SQL de importação (gerado/executar no BestLens)
+- **SEÇÃO 4**: SQL de importação (gerado/executar no SIS Lens)
 - **SEÇÃO 5**: Queries de validação (confirmar sucesso)
 
 ---
@@ -144,7 +144,7 @@ Cada documento de migração contém:
 ## 📊 PROGRESSO GERAL
 
 ### **Setup**
-- [x] ✅ Banco BestLens criado
+- [x] ✅ Banco SIS Lens criado
 - [x] ✅ Schemas criados (8)
 - [x] ✅ Tabelas criadas
 - [x] ✅ Views criadas
@@ -170,7 +170,7 @@ Cada documento de migração contém:
 
 ### **Supabase SQL Editor**
 - URL Mello: `https://supabase.com/dashboard/project/xqizvhugjqpkzgjuflsp/sql`
-- URL BestLens: `https://supabase.com/dashboard/project/ummrbydexhstaxfdcfpn/sql`
+- URL SIS Lens: `https://supabase.com/dashboard/project/ummrbydexhstaxfdcfpn/sql`
 
 ### **Comandos Úteis**
 
@@ -237,5 +237,5 @@ Uma migração é considerada concluída quando:
 ---
 
 **Última atualização**: 06/10/2025 - 18:30 BRT  
-**Responsável**: Migração Mello → BestLens  
+**Responsável**: Migração Mello → SIS Lens  
 **Próxima ação**: Executar `01_MIGRACAO_FORNECEDORES.md`

@@ -140,7 +140,7 @@ npm run dev- Controle por percentual conforme nível de usuário
 
 
 
-```VITE_APP_NAME=BestLens
+```VITE_APP_NAME=SIS Lens
 
 best_lens/
 
@@ -242,7 +242,7 @@ Este é um sistema híbrido completo e funcional. Para modificações:
 
 - ✅ Relatórios de performance    └── production/          # Scripts SQL de produção
 
-Projeto privado - Sistema BestLens © 2025
+Projeto privado - Sistema SIS Lens © 2025
 
 - ✅ Dashboard executivo        ├── 01_auth_system.sql
 
@@ -371,7 +371,7 @@ Este é um sistema híbrido completo e funcional. Para modificações:```
 
 4. Abrir Pull Request
 
-Projeto privado - Sistema BestLens © 2025
+Projeto privado - Sistema SIS Lens © 2025
 
 ## 📄 Licença
 

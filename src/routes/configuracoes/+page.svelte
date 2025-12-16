@@ -1,6 +1,5 @@
 <script lang="ts">
     import { goto } from "$app/navigation";
-    import Header from "$lib/components/layout/Header.svelte";
     import Container from "$lib/components/layout/Container.svelte";
     import PageHero from "$lib/components/layout/PageHero.svelte";
     import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -12,14 +11,11 @@
 </script>
 
 <svelte:head>
-    <title>Configurações - BestLens</title>
+    <title>Configurações - SIS Lens</title>
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-    <Header />
-
-    <main>
-        <Container maxWidth="xl" padding="md">
+<main>
+    <Container maxWidth="xl" padding="md">
             <!-- Hero -->
             <PageHero
                 badge="⚙️ Sistema"
@@ -157,4 +153,3 @@
             </section>
         </Container>
     </main>
-</div>

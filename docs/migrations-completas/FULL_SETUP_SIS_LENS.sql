@@ -1,4 +1,4 @@
--- ARQUIVO UNIFICADO DE ATUALIZAÇÃO DO BANCO (BestLens v2)
+-- ARQUIVO UNIFICADO DE ATUALIZAÇÃO DO BANCO (SIS Lens v2)
 -- Data: 2025-12-09
 -- Este script aplica todas as melhorias recentes:
 -- 1. Grades de Disponibilidade (Ranges)

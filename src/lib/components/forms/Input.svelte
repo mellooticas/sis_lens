@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Componente Input BestLens
+   * Componente Input SIS Lens
    * Input field padronizado
    */
   

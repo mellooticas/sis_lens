@@ -1,5 +1,5 @@
 /**
- * BestLens Design Tokens
+ * SIS Lens Design Tokens
  * Sistema completo de design tokens para uso em TypeScript/JavaScript
  */
 

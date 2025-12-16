@@ -1,4 +1,4 @@
-# 🌟 BestLens - Sistema Decisor de Lentes
+# 🌟 SIS Lens - Sistema Decisor de Lentes
 
 Sistema inteligente para comparar e decidir a melhor opção de lentes oftálmicas entre laboratórios parceiros.
 
@@ -193,7 +193,7 @@ rpc_confirmar_decisao(payload)
 ## 📚 Documentação
 
 - [Blueprint Completo](docs/📐%20Blueprint%20Completo%20—%20Sistema%20Decisor%20de%20Lentes.md)
-- [Design Blueprint](docs/🎨%20Blueprint%20de%20Design%20–%20BestLens.md)
+- [Design Blueprint](docs/🎨%20Blueprint%20de%20Design%20–%20SIS Lens.md)
 - [Stack Tecnológica](docs/🔧%20Definição%20de%20Stack%20Tecnológica%20—%20Sistema%20Decisor%20de%20Lentes.md)
 
 ---

@@ -26,6 +26,13 @@
       color: "text-indigo-500",
     },
     {
+      id: "ranking",
+      label: "Ranking",
+      href: "/ranking",
+      icon: "trophy",
+      color: "text-yellow-500",
+    },
+    {
       id: "comercial",
       label: "Comercial",
       href: "/comercial",
@@ -70,15 +77,27 @@
   ];
 
   function isActive(path: string) {
+    // Para a home, deve ser exatamente "/"
     if (path === "/") return $page.url.pathname === "/";
-    return $page.url.pathname.startsWith(path);
+    
+    // Para outras rotas, verifica se começa com o path
+    // Mas garante que não pega sub-rotas não relacionadas
+    const currentPath = $page.url.pathname;
+    
+    // Se for exatamente o path, é ativo
+    if (currentPath === path) return true;
+    
+    // Se começa com o path seguido de /, é uma sub-rota
+    if (currentPath.startsWith(path + "/")) return true;
+    
+    return false;
   }
 </script>
 
 <aside
   class="
     fixed left-0 top-0 h-full z-50 flex flex-col transition-all duration-500 ease-out
-    {collapsed ? 'w-[5.5rem]' : 'w-[18rem]'}
+    {collapsed ? 'w-[7.25rem]' : 'w-[18rem]'}
     p-4
   "
 >
@@ -158,6 +177,24 @@
                   stroke-linejoin="round"
                   stroke-width="2"
                   d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                /></svg
+              >
+            {:else if item.icon === "trophy"}
+              <svg
+                class="w-5 h-5 {item.color}"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                ><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M12 15v5m-3 0h6M12 15c2.21 0 4-1.79 4-4V5c0-1.1-.9-2-2-2H10c-1.1 0-2 .9-2 2v6c0 2.21 1.79 4 4 4zm0 0c-2.67 0-8 1.34-8 4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-1c0-2.66-5.33-4-8-4z"
+                /><path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M5.25 7.5A2.25 2.25 0 017.5 5.25M18.75 7.5A2.25 2.25 0 0116.5 5.25"
                 /></svg
               >
             {:else if item.icon === "clock"}

@@ -285,7 +285,7 @@ Mapped migration strategy for lens database schema transformation.
 
 
 
-🔍 QUERIES CORRETAS — Schema LENTE (Mapeamento para BestLens)
+🔍 QUERIES CORRETAS — Schema LENTE (Mapeamento para SIS Lens)
 Agora que sei a estrutura, vou buscar os dados certos para criar o script de migração.
 
 1️⃣ VERIFICAR SE EXISTE TABELA DE FORNECEDORES
@@ -965,7 +965,7 @@ Mapped supplier data structure and analyzed system migration strategy.
 
 
 
-📊 ANÁLISE DA ESTRUTURA EXISTENTE — Sistema Atual vs BestLens
+📊 ANÁLISE DA ESTRUTURA EXISTENTE — Sistema Atual vs SIS Lens
 1. ESTRUTURA ATUAL DESCOBERTA
 1.1 Fornecedores (Laboratórios)
 Tabela principal: pessoas.fornecedores (11 registros)
@@ -1106,7 +1106,7 @@ Polylux:
 - Visão simples pronta: 2 dias
 Observação: Sistema novo de prazo detalhado, mas pouco povoado ainda.
 
-2. MAPEAMENTO CONCEITUAL — Atual → BestLens
+2. MAPEAMENTO CONCEITUAL — Atual → SIS Lens
 2.1 Fornecedores
 pessoas.fornecedores → suppliers.laboratorios
 
@@ -1477,7 +1477,7 @@ Bifocais praticamente inexistentes (2 produtos)
 Tecnologia antiga, sendo substituída
 Mapeamento necessário:
 
-Sistema Atual → BestLens
+Sistema Atual → SIS Lens
 ────────────────────────────────────
 FREE FORM     → tipo_lente: 'PROGRESSIVA' ou 'MONOFOCAL'
                 (depende de adicao_min/max)
@@ -2239,11 +2239,11 @@ Crafted methodical migration mapping with clear comparative approach.
 
 
 
-📋 MAPEAMENTO COMPARATIVO — Sistema Atual vs BestLens
+📋 MAPEAMENTO COMPARATIVO — Sistema Atual vs SIS Lens
 Você está completamente certo. Vamos mapear lado a lado o que existe vs o que precisa existir, sem criar nada ainda.
 
 1. FORNECEDORES / LABORATÓRIOS
-Sistema Atual	BestLens (Destino)	Status	Complexidade
+Sistema Atual	SIS Lens (Destino)	Status	Complexidade
 pessoas.fornecedores	suppliers.laboratorios	🟢 Mapeamento Direto	Baixa
 11 registros	11 registros	✓ Quantidade OK	
 Campos que migram 1:1:			
@@ -2264,7 +2264,7 @@ Decisão necessária:
 
 Criar 1 tenant "Óticas Taty Mello" antes da migração
 2. MARCAS
-Sistema Atual	BestLens (Destino)	Status	Complexidade
+Sistema Atual	SIS Lens (Destino)	Status	Complexidade
 Extrair de lente.fornecedores_lentes.marca_lente	lens_catalog.marcas	🟡 Extração + Criação	Média
 6 marcas distintas (SOBLOCOS, POLYLUX, EXPRESS, BRASCOR, ESSILOR, SYGMA)	6 registros	✓ Quantidade OK	
 Origem:			
@@ -2279,7 +2279,7 @@ Decisão necessária:
 
 Confirmar país de origem de cada marca
 3. LENTES CANÔNICAS (Coração do Sistema)
-Sistema Atual	BestLens (Destino)	Status	Complexidade
+Sistema Atual	SIS Lens (Destino)	Status	Complexidade
 lente.catalogo_mello_lentes	lens_catalog.lentes	🟡 Expansão por Marca	ALTA
 265 SKUs normalizados	~400 lentes (265 × 1.5 marcas)	🔴 Multiplicar	
 Lógica de expansão:			
@@ -2317,7 +2317,7 @@ Decisão necessária:
 
 Confirmar: expandir por marca ou manter agregado?
 4. PRODUTOS POR LABORATÓRIO
-Sistema Atual	BestLens (Destino)	Status	Complexidade
+Sistema Atual	SIS Lens (Destino)	Status	Complexidade
 lente.fornecedores_lentes	suppliers.produtos_laboratorio	🟡 Mapeamento com FK Complexo	ALTA
 1.411 registros	1.411 registros	✓ Quantidade OK	
 Campos que migram 1:1:			
@@ -2353,7 +2353,7 @@ FK lente_id requer JOIN complexo multi-campo
 Se JOIN falhar, produto fica "órfão"
 Precisa garantir que TODAS as 1.411 lentes encontrem seu canônico
 5. PREÇOS
-Sistema Atual	BestLens (Destino)	Status	Complexidade
+Sistema Atual	SIS Lens (Destino)	Status	Complexidade
 Campos em lente.fornecedores_lentes	commercial.precos_base	🟢 Mapeamento Direto	Baixa
 1.411 produtos	1.411 registros de preço	✓ 1:1	
 Campos que migram:			
@@ -2370,7 +2370,7 @@ frete_estimado	❌ Vai para logistics	Separado
 markup_estimado	❌ Não armazenar	Calculado dinamicamente	
 faixa	❌ Informação derivada	Opcional: salvar em specs_tecnicas	
 6. PRAZOS (LEAD TIME)
-Sistema Atual	BestLens (Destino)	Status	Complexidade
+Sistema Atual	SIS Lens (Destino)	Status	Complexidade
 Opção 1: pessoas.fornecedores.prazo_entrega_dias	logistics.tabela_prazos	🟡 Genérico → Detalhado	Média
 11 valores (1 por fornecedor, quase todos = 7)	→ 11 registros base		
 Opção 2: pessoas.fornecedores_prazos_lentes	logistics.tabela_prazos	🟢 Mais próximo	Baixa
@@ -2389,7 +2389,7 @@ Decisão necessária:
 
 Como mapear tipo_lente + categoria do prazo? (Criar campo custom ou ignorar por ora)
 7. DADOS QUE NÃO MIGRAM (Criar do Zero)
-Schema BestLens	Status no Atual	Ação
+Schema SIS Lens	Status no Atual	Ação
 commercial.descontos	❌ Não existe	Deixar vazio, popular depois
 scoring.metricas_laboratorio	❌ Não existe	Deixar vazio, popular com dados reais
 orders.decisoes_compra	❌ Não existe (dados operacionais)	Começar do zero
@@ -2397,12 +2397,12 @@ analytics.* (views materializadas)	❌ Não existe	Criar depois, com dados reais
 meta_system.tenants	❌ Não existe	CRIAR ANTES: 1 tenant fixo
 meta_system.feature_flags	❌ Não existe	Deixar vazio
 8. VIEWS PÚBLICAS (Camada de API)
-View BestLens	Depende de	Status	Quando Criar
+View SIS Lens	Depende de	Status	Quando Criar
 public.vw_lentes_catalogo	lens_catalog.lentes	🟡 Após migração	Sprint 2
 public.vw_ranking_opcoes	Todas as tabelas	🟡 Após migração completa	Sprint 3
 public.vw_fornecedores	suppliers.laboratorios	🟡 Após migração	Sprint 2
 9. RPCS (Funções Públicas)
-RPC BestLens	Depende de	Status	Quando Criar
+RPC SIS Lens	Depende de	Status	Quando Criar
 rpc_buscar_lente	vw_lentes_catalogo	🔴 Após view	Sprint 3
 rpc_rank_opcoes	vw_ranking_opcoes	🔴 Após view	Sprint 3
 rpc_confirmar_decisao	orders.decisoes_compra	🔴 Após tabelas	Sprint 3
@@ -3048,7 +3048,7 @@ CRÍTICO - Dois tipos de fotocromático:
 ACCLIMATES → fotocromático genérico/básico
 TRANSITIONS → marca premium Essilor
 2. RESPOSTA: ONDE CRIAR?
-Vamos criar no SISTEMA NOVO (BestLens)
+Vamos criar no SISTEMA NOVO (SIS Lens)
 
 Fluxo de Migração:
 Sistema Atual (Supabase Mello)
@@ -3058,7 +3058,7 @@ Sistema Atual (Supabase Mello)
          ↓
     MIGRAÇÃO SQL
          ↓
-Sistema Novo (BestLens)
+Sistema Novo (SIS Lens)
 ├─ suppliers.laboratorios (11)
 ├─ lens_catalog.lentes_canonicas (265)
 ├─ lens_catalog.lentes_premium (21 Essilor)
@@ -3250,7 +3250,7 @@ SELECT
 FROM lente.fornecedores_lentes
 WHERE marca_lente = 'ESSILOR';
 7. CONFIRMAÇÃO FINAL
-Sistema destino: BestLens (novo)
+Sistema destino: SIS Lens (novo)
 
 Passos:
 
@@ -3273,15 +3273,15 @@ Clarified table creation location and simplified system approach.
 
 
 CONFIRMAÇÃO CLARA
-SIM, TUDO será criado no BestLens (novo sistema)
+SIM, TUDO será criado no SIS Lens (novo sistema)
 
 Sistema Atual (Mello) = FONTE (só leitura)
 Supabase Mello
 ├─ pessoas.fornecedores         → LER daqui
 ├─ lente.fornecedores_lentes    → LER daqui  
 └─ lente.catalogo_mello_lentes  → LER daqui
-Sistema Novo (BestLens) = DESTINO (criar tudo)
-Supabase BestLens (NOVO PROJETO)
+Sistema Novo (SIS Lens) = DESTINO (criar tudo)
+Supabase SIS Lens (NOVO PROJETO)
 ├─ Criar schemas
 ├─ Criar tabelas
 ├─ Criar views
@@ -3326,7 +3326,7 @@ sql
 RESPOSTA À SUA PERGUNTA
 "A criação sempre será no best_lens, correto?"
 
-✅ SIM, SEMPRE no BestLens (novo projeto Supabase)
+✅ SIM, SEMPRE no SIS Lens (novo projeto Supabase)
 
 O sistema Mello atual você mantém como está. Vamos apenas:
 
@@ -3334,7 +3334,7 @@ Conectar no Mello para LER os dados
 Executar script de migração que:
 Lê do Mello
 Transforma os dados
-Insere no BestLens
+Insere no SIS Lens
 PRÓXIMO PASSO
 Quer que eu:
 
@@ -3375,15 +3375,15 @@ Mas há uma diferença importante:
 O que JÁ ESTÁ no sistema Mello (considerado):
 ✅ 11 fornecedores → estrutura de pessoas.fornecedores ✅ 1.411 produtos → estrutura de lente.fornecedores_lentes ✅ 265 SKUs normalizados → lógica de catalogo_mello_lentes ✅ 21 Essilor (única marca premium cadastrada até agora) ✅ Campos de tratamentos (ar, blue, fotossensivel, etc.) ✅ Prazos detalhados (tipo_lente + categoria) ✅ Faixas de custo (5 níveis)
 
-O que FALTA no sistema Mello (mas a estrutura BestLens já prevê):
+O que FALTA no sistema Mello (mas a estrutura SIS Lens já prevê):
 ❌ Zeiss (você vai adicionar) ❌ Hoya (você vai adicionar) ❌ Outras marcas premium (você vai adicionar) ❌ Campo linha_produto (não existe, precisa povoar depois) ❌ Campo nivel_qualidade (não existe, precisa povoar depois)
 
 ENTÃO:
-A estrutura BestLens está preparada para:
+A estrutura SIS Lens está preparada para:
 
 Migrar tudo que JÁ EXISTE no Mello hoje
 Suportar tudo que você VAI ADICIONAR no Mello antes da migração
-Ter campos extras (linha, nível) para povoar DEPOIS no BestLens
+Ter campos extras (linha, nível) para povoar DEPOIS no SIS Lens
 FLUXO REAL:
 HOJE:
 Sistema Mello
@@ -3398,14 +3398,14 @@ VOCÊ VAI FAZER (antes da migração):
 └─ Adicionar outras premium no Mello
 
 DEPOIS (migração):
-Mello → BestLens
+Mello → SIS Lens
 ├─ Migra TUDO que existir no Mello
 ├─ Separa canônicas vs premium automaticamente
 └─ Deixa linha/nível NULL (povoar depois)
 PERGUNTA CRÍTICA:
 Quando você quer fazer a migração?
 
-A) Agora (com só 21 Essilor, depois você adiciona Zeiss/Hoya no BestLens)
+A) Agora (com só 21 Essilor, depois você adiciona Zeiss/Hoya no SIS Lens)
 
 B) Depois de catalogar Zeiss/Hoya no Mello (migração pega tudo de uma vez)
 

@@ -9,7 +9,7 @@ complexity: 9
 Diferenciar tecnicamente a venda de **Grife** vs **Marca Própria** para maximizar margem.
 
 1.  **Venda de Grife (Ex: Varilux, Zeiss)**: Produto específico. O sistema busca quem fornece *aquele* SKU com melhor condição.
-2.  **Venda de Marca Própria (Ex: "BestLens Gold")**: Produto "abstrato" para o cliente. O sistema faz um leilão interno entre laboratórios homologados para entregar uma lente com aquelas especificações.
+2.  **Venda de Marca Própria (Ex: "SIS Lens Gold")**: Produto "abstrato" para o cliente. O sistema faz um leilão interno entre laboratórios homologados para entregar uma lente com aquelas especificações.
 
 ---
 
@@ -25,7 +25,7 @@ ALTER TABLE lens_catalog.marcas ADD COLUMN tipo_marca TEXT DEFAULT 'GRIFE'; -- '
 -- Tabela para amarrar a Marca Própria aos produtos reais dos laboratórios
 CREATE TABLE lens_catalog.homologacao_marca_propria (
     id UUID PRIMARY KEY,
-    lente_marca_propria_id UUID REFERENCES lens_catalog.lentes(id), -- A lente "Virtual" (ex: BestLens Gold)
+    lente_marca_propria_id UUID REFERENCES lens_catalog.lentes(id), -- A lente "Virtual" (ex: SIS Lens Gold)
     
     produto_lab_id UUID REFERENCES suppliers.produtos_laboratorio(id), -- O produto "Real" (ex: Lab A - Digital 1.67)
     
@@ -46,7 +46,7 @@ O "cérebro" da decisão muda dependendo do tipo de lente selecionada na venda.
 *   **Resultado**: Lab Essilor Oficial (R$ 500) vs Lab Parceiro Autorizado (R$ 480).
 *   **Decisão**: Competição simples de preço/prazo.
 
-#### Cenário B: Cliente quer "BestLens Premium" (Marca Própria)
+#### Cenário B: Cliente quer "SIS Lens Premium" (Marca Própria)
 *   **Input**: SKU `LENS-BEST-PREMIUM` (Marca Própria)
 *   **Query**:
     1.  O sistema vê que é Marca Própria.
@@ -57,7 +57,7 @@ O "cérebro" da decisão muda dependendo do tipo de lente selecionada na venda.
         *   Lab C (Lente "HD Z"): R$ 180,00
     4.  O sistema valida as grades (`grades_disponibilidade`) de cada um (Lab B atende esse grau?).
 *   **Resultado**: O sistema escolhe o **Lab B** invisivelmente.
-*   **Saída para Vendedor**: "Venda BestLens Premium confirmada. Margem estimada: R$ 400,00".
+*   **Saída para Vendedor**: "Venda SIS Lens Premium confirmada. Margem estimada: R$ 400,00".
 *   **Pedido para Lab**: "Envie uma Lente Freeform Y".
 
 ---
@@ -70,7 +70,7 @@ O sistema deve mostrar **duas colunas** ou abas claras:
 
 | 💎 CATÁLOGO GRIFE | 🏆 MARCA PRÓPRIA (Maior Lucro) |
 | :--- | :--- |
-| **Varilux Comfort 3.0** | **BestLens Gold Digital** |
+| **Varilux Comfort 3.0** | **SIS Lens Gold Digital** |
 | *Tecnologia W.A.V.E 2.0* | *Tecnologia Freeform HD* |
 | Custo Atual: R$ 500,00 | Custo Dinâmico: **R$ 140,00** (Lab B) |
 | Venda Sugerida: R$ 1.200,00 | Venda Sugerida: R$ 900,00 |
@@ -84,7 +84,7 @@ Isso empodera o vendedor a oferecer um desconto maior na Marca Própria e ainda 
 Para isso funcionar, precisamos garantir que o cliente não perceba diferença de qualidade se o pedido cair no Lab A ou Lab B.
 
 *   **Tabela `lens_catalog.especificacoes_minimas`**:
-    *   Para ser homologada como "BestLens Gold", a lente do laboratório TEM que ter:
+    *   Para ser homologada como "SIS Lens Gold", a lente do laboratório TEM que ter:
         *   Corredor Progressivo: > 14mm
         *   Campo de Visão: > 80%
         *   Tratamento AR: Hidrofóbico

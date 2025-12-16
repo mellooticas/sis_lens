@@ -9,8 +9,6 @@
   import type { PageData } from "./$types";
 
   // === Layout ===
-  import Header from "$lib/components/layout/Header.svelte";
-
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -195,18 +193,15 @@
 </script>
 
 <svelte:head>
-  <title>Histórico de Decisões - BestLens</title>
+  <title>Histórico de Decisões - SIS Lens</title>
   <meta
     name="description"
     content="Histórico completo de todas as decisões de compra realizadas"
   />
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header currentPage="historico" />
-
-  <main>
-    <Container maxWidth="xl" padding="md">
+<main>
+  <Container maxWidth="xl" padding="md">
       <!-- Hero Section -->
       <PageHero
         badge="📋 Sistema de Histórico"
@@ -458,4 +453,3 @@
       </section>
     </Container>
   </main>
-</div>

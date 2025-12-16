@@ -1,4 +1,4 @@
-# 🚀 Sistema BestLens - Pronto para Frontend!
+# 🚀 Sistema SIS Lens - Pronto para Frontend!
 
 ## 📋 **Status Atual: 100% Implementado no Supabase Cloud**
 
@@ -41,10 +41,10 @@
 
 | Email | Senha | Role | Permissões |
 |-------|-------|------|------------|
-| `dcl@oticastatymello.com.br` | `BestLens2024!` | 🎯 DCL Decisor | Consulta + Vouchers (20%) |
-| `financeiroesc@hotmail.com` | `BestLens2024!` | 👑 Supervisor | Acesso Total (25%) |
-| `junior@oticastatymello.com.br` | `BestLens2024!` | ⚙️ Admin Junior | Admin + Vouchers (15%) |
-| `lojas@oticastatymello.com.br` | `BestLens2024!` | 🏪 Portal Lojas | Consulta + Uso Vouchers |
+| `dcl@oticastatymello.com.br` | `SIS Lens2024!` | 🎯 DCL Decisor | Consulta + Vouchers (20%) |
+| `financeiroesc@hotmail.com` | `SIS Lens2024!` | 👑 Supervisor | Acesso Total (25%) |
+| `junior@oticastatymello.com.br` | `SIS Lens2024!` | ⚙️ Admin Junior | Admin + Vouchers (15%) |
+| `lojas@oticastatymello.com.br` | `SIS Lens2024!` | 🏪 Portal Lojas | Consulta + Uso Vouchers |
 
 ---
 
@@ -188,4 +188,4 @@ GET /rest/v1/v_historico_consultas
 - ✅ **15 políticas RLS**
 - ✅ **Sistema 100% funcional**
 
-**🎉 Sistema BestLens pronto para produção!**
+**🎉 Sistema SIS Lens pronto para produção!**

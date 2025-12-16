@@ -1,6 +1,6 @@
 # 🎯 Estratégia de Migração: Lentes Canônicas vs Produtos de Laboratório
 
-**Autor**: Sistema BestLens  
+**Autor**: Sistema SIS Lens  
 **Data**: 06/10/2025  
 **Status**: 🔴 **DECISÃO ARQUITETURAL CRÍTICA**
 
@@ -25,7 +25,7 @@ A ordem original de migração está **arquiteturalmente incorreta**:
 
 ## 🧩 **ARQUITETURA DE DEPENDÊNCIAS**
 
-### **Como funciona no BestLens:**
+### **Como funciona no SIS Lens:**
 
 ```
 ┌─────────────────────────────────────────────────────────┐
@@ -323,7 +323,7 @@ LIMIT 10;
 
 1. ✅ **Zero perda de dados**: Todas as 1.4k lentes migradas
 2. ✅ **Segurança máxima**: Nada fica de fora
-3. ✅ **Flexibilidade**: Podemos agrupar/normalizar no BestLens depois
+3. ✅ **Flexibilidade**: Podemos agrupar/normalizar no SIS Lens depois
 4. ✅ **Auditoria**: Preserva dados originais completos
 5. ✅ **Incremental**: Normalização pode ser feita gradualmente
 
@@ -332,14 +332,14 @@ LIMIT 10;
 ```
 FASE 1: MIGRAÇÃO COMPLETA (1.4k produtos)
 lente.fornecedores_lentes (Mello)
-└─> suppliers.produtos_laboratorio (BestLens)
+└─> suppliers.produtos_laboratorio (SIS Lens)
     ├─ sku_laboratorio: codigo_fornecedor
     ├─ nome_comercial: nome_lente
     ├─ sku_fantasia: sku_geral (gerado)
     └─ lente_id: NULL (temporariamente)
 
 FASE 2: NORMALIZAÇÃO & AGRUPAMENTO
-Analisar produtos migrados no BestLens
+Analisar produtos migrados no SIS Lens
 └─> Criar lens_catalog.lentes (canônicas)
     └─ Agrupar por: tipo + material + indice + tratamentos
 
@@ -368,7 +368,7 @@ SET lente_id = (lente canônica correspondente)
 
 **Mapeamento de Campos:**
 
-| Mello (fornecedores_lentes) | BestLens (produtos_laboratorio) | Transformação |
+| Mello (fornecedores_lentes) | SIS Lens (produtos_laboratorio) | Transformação |
 |------------------------------|----------------------------------|---------------|
 | `id` | `id` (preservar UUID) | Direto |
 | `fornecedor_id` | `laboratorio_id` | FK resolvida (já migrados) |

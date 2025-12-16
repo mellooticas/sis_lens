@@ -8,8 +8,6 @@
   import type { PageData } from "./$types";
 
   // Componentes padronizados
-  import Header from "$lib/components/layout/Header.svelte";
-
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -149,18 +147,15 @@
 </script>
 
 <svelte:head>
-  <title>Catálogo de Lentes - BestLens</title>
+  <title>Catálogo de Lentes - SIS Lens</title>
   <meta
     name="description"
     content="Catálogo completo de lentes oftálmicas com filtros avançados e comparação de fornecedores"
   />
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header currentPage="catalogo" />
-
-  <main>
-    <Container maxWidth="xl" padding="md">
+<main>
+  <Container maxWidth="xl" padding="md">
       <!-- Hero Section -->
       <PageHero
         badge="📚 Catálogo Completo"
@@ -457,4 +452,3 @@
       </section>
     </Container>
   </main>
-</div>

@@ -1,4 +1,3 @@
-  import Header from "$lib/components/layout/Header.svelte";
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -36,14 +35,11 @@
 </script>
 
 <svelte:head>
-  <title>Confirmar Decisão - BestLens</title>
+  <title>Confirmar Decisão - SIS Lens</title>
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header />
-
-  <main>
-    <Container maxWidth="xl" padding="md">
+<main>
+  <Container maxWidth="xl" padding="md">
       <!-- Breadcrumbs custom implementation for now (or replace with component later) -->
       <nav class="text-sm text-neutral-500 mb-6 font-medium">
          <a href="/buscar" class="hover:text-brand-blue-600 transition-colors">Buscar</a>
@@ -201,4 +197,3 @@
       </div>
     </Container>
   </main>
-</div>

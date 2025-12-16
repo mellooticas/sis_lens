@@ -95,7 +95,7 @@ COMMENT ON COLUMN meta_system.parametros_tenant.valor IS 'Valor do parâmetro em
 -- ============================================
 -- Tenant padrão para desenvolvimento
 INSERT INTO meta_system.tenants (nome, slug, configuracoes) VALUES (
-    'BestLens Demo',
+    'SIS Lens Demo',
     'demo',
     '{
         "moeda_padrao": "BRL",

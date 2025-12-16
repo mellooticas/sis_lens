@@ -8,8 +8,6 @@
   import type { PageData } from "./$types";
 
   // === Layout ===
-  import Header from "$lib/components/layout/Header.svelte";
-
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -142,18 +140,15 @@
 </script>
 
 <svelte:head>
-  <title>Configurações de Fornecedores - BestLens</title>
+  <title>Configurações de Fornecedores - SIS Lens</title>
   <meta
     name="description"
     content="Gerencie configurações específicas dos fornecedores e laboratórios"
   />
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header currentPage="configuracoes" />
-
-  <main>
-    <Container maxWidth="xl" padding="md">
+<main>
+  <Container maxWidth="xl" padding="md">
       <!-- Hero Section -->
       <PageHero
         badge="⚙️ Configurações"
@@ -335,7 +330,6 @@
       </section>
     </Container>
   </main>
-</div>
 
 <!-- Modal de Edição -->
 {#if showEditModal && editingConfig}

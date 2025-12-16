@@ -24,7 +24,7 @@
 </script>
 
 <svelte:head>
-  <title>Debug - Dados do Banco | BestLens</title>
+  <title>Debug - Dados do Banco | SIS Lens</title>
 </svelte:head>
 
 <div class="container mx-auto px-4 py-6">

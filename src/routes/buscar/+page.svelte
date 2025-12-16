@@ -10,8 +10,6 @@
   import type { PageData, ActionData } from "./$types";
 
   // === Layout ===
-  import Header from "$lib/components/layout/Header.svelte";
-
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
@@ -121,18 +119,15 @@
 </script>
 
 <svelte:head>
-  <title>Buscar Lentes - BestLens</title>
+  <title>Buscar Lentes - SIS Lens</title>
   <meta
     name="description"
     content="Busque lentes oftálmicas com filtros avançados e compare fornecedores"
   />
 </svelte:head>
 
-<div class="min-h-screen bg-neutral-50 dark:bg-neutral-900 transition-colors">
-  <Header currentPage="buscar" />
-
-  <main>
-    <Container maxWidth="xl" padding="md">
+<main>
+  <Container maxWidth="xl" padding="md">
       <!-- Hero Section -->
       <PageHero
         badge="🔍 Sistema de Busca Inteligente"
@@ -426,4 +421,3 @@
       </section>
     </Container>
   </main>
-</div>

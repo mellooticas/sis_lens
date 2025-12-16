@@ -1,4 +1,4 @@
-# 📝 Instalação de Fontes - BestLens
+# 📝 Instalação de Fontes - SIS Lens
 
 ## Opção 1: Google Fonts (Recomendado - Já incluído no CSS)
 

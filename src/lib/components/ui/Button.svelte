@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Componente Button BestLens
+   * Componente Button SIS Lens
    * Botões padronizados com variantes
    */
   

@@ -1,6 +1,6 @@
-# 🔧 SETUP INICIAL - BestLens
+# 🔧 SETUP INICIAL - SIS Lens
 
-> **Objetivo**: Preparar o banco BestLens para receber as migrações  
+> **Objetivo**: Preparar o banco SIS Lens para receber as migrações  
 > **Executar**: UMA VEZ, antes de qualquer migração  
 > **Data**: 06/10/2025
 
@@ -32,7 +32,7 @@ FROM meta_system.tenants;
 -- ✅ Resultado atual:
 -- | id                                   | nome          | slug | ativo | criado_em                     |
 -- | ------------------------------------ | ------------- | ---- | ----- | ----------------------------- |
--- | c6c9818a-0cb8-4bf9-952c-4385c54713a2 | BestLens Demo | demo | true  | 2025-10-03 03:31:18.721122+00 |
+-- | c6c9818a-0cb8-4bf9-952c-4385c54713a2 | SIS Lens Demo | demo | true  | 2025-10-03 03:31:18.721122+00 |
 -- ⚠️ Tenant de teste existe, vamos criar o tenant de produção
 
 -- 1.1 Verificar estrutura da tabela tenants
@@ -287,7 +287,7 @@ WHERE id = '550e8400-e29b-41d4-a716-446655440000'::uuid;
 
 ## 📝 CHECKLIST DE SETUP
 
-- [x] Conectado ao Supabase BestLens
+- [x] Conectado ao Supabase SIS Lens
 - [x] Schemas verificados (8 existem)
 - [x] Tabelas verificadas (principais existem)
 - [x] **✅ Tenant criado (Óticas Taty Mello)**

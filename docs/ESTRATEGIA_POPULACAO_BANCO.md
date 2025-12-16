@@ -1,8 +1,8 @@
-# 📊 Estratégia Completa de População do Banco de Dados - BestLens
+# 📊 Estratégia Completa de População do Banco de Dados - SIS Lens
 
 ## 🎯 Objetivos do Documento
 
-Este documento define a estratégia completa para popular o banco de dados do sistema BestLens, incluindo ordem de inserção, tipos de dados necessários, fontes de informação e scripts automatizados.
+Este documento define a estratégia completa para popular o banco de dados do sistema SIS Lens, incluindo ordem de inserção, tipos de dados necessários, fontes de informação e scripts automatizados.
 
 ---
 
@@ -36,7 +36,7 @@ graph TD
 ```sql
 -- Dados necessários para começar
 INSERT INTO meta_system.tenants (nome, slug, configuracoes) VALUES
-('BestLens Demo', 'bestlens-demo', '{"tema": "azul", "moeda": "BRL"}'),
+('SIS Lens Demo', 'bestlens-demo', '{"tema": "azul", "moeda": "BRL"}'),
 ('Ótica Central', 'otica-central', '{"tema": "verde", "moeda": "BRL"}');
 ```
 

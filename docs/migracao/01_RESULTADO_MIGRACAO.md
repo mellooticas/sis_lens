@@ -13,7 +13,7 @@
 ### **Registros Migrados**
 ```
 Origem (Mello):        11 fornecedores
-Destino (BestLens):    11 laboratórios
+Destino (SIS Lens):    11 laboratórios
 Taxa de sucesso:       100%
 Erros:                 0
 ```
@@ -29,7 +29,7 @@ Erros:                 0
 
 ## 🔍 DADOS MIGRADOS
 
-### **11 Laboratórios no BestLens**
+### **11 Laboratórios no SIS Lens**
 
 1. ✅ **Brascor** - Brascor Distribuidora de Lentes
 2. ✅ **Braslentes** - Champ Brasil Comercio LTDA
@@ -112,12 +112,12 @@ Esta migração habilita:
 ## ⚠️ OBSERVAÇÕES
 
 ### **Registros de Teste**
-O banco BestLens já continha 3 laboratórios de teste:
+O banco SIS Lens já continha 3 laboratórios de teste:
 - Express (Ótica Express Nacional)
 - Premium Ótica
 - Visão Clara
 
-Estes pertencem ao tenant "BestLens Demo" e não impactam os dados migrados.
+Estes pertencem ao tenant "SIS Lens Demo" e não impactam os dados migrados.
 
 ### **Dados sem Email**
 2 laboratórios foram migrados sem email:
@@ -180,6 +180,6 @@ Comportamento esperado e validado.
 
 ---
 
-**Responsável**: Migração Mello → BestLens  
+**Responsável**: Migração Mello → SIS Lens  
 **Documentado em**: `docs/migracao/01_MIGRACAO_FORNECEDORES.md`  
 **Última atualização**: 06/10/2025 - 18:30 BRT

@@ -1,4 +1,4 @@
-# 🔄 Comparação: Sistema Desenrola DCL vs. Proposta BestLens
+# 🔄 Comparação: Sistema Desenrola DCL vs. Proposta SIS Lens
 
 ## **Sistema Atual (Desenrola DCL) - FUNCIONAL** ✅
 
@@ -59,7 +59,7 @@ user_permission_overrides (
 
 ---
 
-## **Proposta BestLens - NOVA** 🆕
+## **Proposta SIS Lens - NOVA** 🆕
 
 ### Arquitetura
 - **Schemas**: `auth` (Supabase) + `meta_system` (business)
@@ -107,7 +107,7 @@ CREATE TYPE user_role_enum AS ENUM (
 
 ## **Comparação Detalhada**
 
-| Aspecto | Desenrola DCL (Atual) | BestLens (Proposta) |
+| Aspecto | Desenrola DCL (Atual) | SIS Lens (Proposta) |
 |---------|----------------------|---------------------|
 | **Multi-tenancy** | `loja_id` por tabela | Schema `tenants` + `tenant_id` |
 | **Roles** | Text simples ('operador', 'admin') | ENUM estruturado (9 roles) |
@@ -156,7 +156,7 @@ lojas@oticastatymello.com.br
 2. Ou implementar o novo sistema (mais limpo, mais trabalho)?
 
 **Se escolher Opção 1:**
-- Adaptar estrutura do Desenrola DCL para BestLens
+- Adaptar estrutura do Desenrola DCL para SIS Lens
 - Migrar/ajustar usuários existentes
 - Manter compatibilidade com emails atuais
 

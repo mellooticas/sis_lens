@@ -1,6 +1,6 @@
-# 📁 Documentação e Scripts - BestLens
+# 📁 Documentação e Scripts - SIS Lens
 
-Este diretório contém toda a documentação, scripts de desenvolvimento e arquivos auxiliares do projeto BestLens.
+Este diretório contém toda a documentação, scripts de desenvolvimento e arquivos auxiliares do projeto SIS Lens.
 
 ## 📋 Estrutura Organizada
 
@@ -85,4 +85,4 @@ node docs/testes-auditoria/testar_views.js
 
 **📅 Última atualização:** 3 de outubro de 2025  
 **🎯 Status:** Sistema 100% operacional  
-**👨‍💻 Desenvolvido:** Sistema híbrido BestLens completo
+**👨‍💻 Desenvolvido:** Sistema híbrido SIS Lens completo

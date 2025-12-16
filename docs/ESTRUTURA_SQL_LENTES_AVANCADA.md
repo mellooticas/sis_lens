@@ -1,11 +1,11 @@
 ---
-description: Proposta de Refinamento da Estrutura de Dados para o Módulo de Lentes (BestLens)
+description: Proposta de Refinamento da Estrutura de Dados para o Módulo de Lentes (SIS Lens)
 complexity: 8
 ---
 
 # 🧠 Refinamento: Estrutura de Lentes Avançada & Integração Modular
 
-Como o **BestLens** operará como um módulo independente (Serviço de Inteligência) para outros apps (CRM, Vendas), precisamos aprofundar a estrutura técnica para garantir precisão nas decisões e facilidade de integração.
+Como o **SIS Lens** operará como um módulo independente (Serviço de Inteligência) para outros apps (CRM, Vendas), precisamos aprofundar a estrutura técnica para garantir precisão nas decisões e facilidade de integração.
 
 ## 1. 📏 Grades de Disponibilidade (Availability Grids)
 

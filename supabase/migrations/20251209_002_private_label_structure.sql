@@ -9,7 +9,7 @@
 ALTER TABLE lens_catalog.marcas 
 ADD COLUMN IF NOT EXISTS tipo_marca TEXT DEFAULT 'GRIFE' CHECK (tipo_marca IN ('GRIFE', 'PROPRIA'));
 
-COMMENT ON COLUMN lens_catalog.marcas.tipo_marca IS 'GRIFE: Marcas de mercado (Varilux, Zeiss). PROPRIA: Marcas da ótica (BestLens) com sourcing dinâmico.';
+COMMENT ON COLUMN lens_catalog.marcas.tipo_marca IS 'GRIFE: Marcas de mercado (Varilux, Zeiss). PROPRIA: Marcas da ótica (SIS Lens) com sourcing dinâmico.';
 
 -- ============================================
 -- 2. HOMOLOGAÇÃO DE PRODUTOS (The "Sourcing" Table)
@@ -19,7 +19,7 @@ COMMENT ON COLUMN lens_catalog.marcas.tipo_marca IS 'GRIFE: Marcas de mercado (V
 CREATE TABLE IF NOT EXISTS lens_catalog.homologacao_marca_propria (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),
     
-    -- A Lente "Face Cliente" (ex: BestLens Gold)
+    -- A Lente "Face Cliente" (ex: SIS Lens Gold)
     lente_marca_propria_id UUID NOT NULL REFERENCES lens_catalog.lentes(id) ON DELETE CASCADE,
     
     -- A Lente "Face Laboratório" (ex: Lab A - Digital X)

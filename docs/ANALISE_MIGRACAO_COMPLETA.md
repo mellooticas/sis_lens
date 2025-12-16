@@ -8,7 +8,7 @@
 
 ### ✅ Confirmações Principais
 
-1. **Sistema Destino**: SEMPRE BestLens (novo projeto Supabase)
+1. **Sistema Destino**: SEMPRE SIS Lens (novo projeto Supabase)
 2. **Sistema Origem**: Mello (apenas leitura para migração)
 3. **Estratégia de Lentes**: Duas tabelas separadas
    - `lens_catalog.lentes_canonicas` (laboratórios genéricos)
@@ -620,7 +620,7 @@ WHERE p.ativo = true;
 ## 🔄 MAPEAMENTO: MELLO → BESTLENS
 
 ### MAPEAMENTO 1: Fornecedores
-| Campo Mello | Campo BestLens | Ação |
+| Campo Mello | Campo SIS Lens | Ação |
 |-------------|----------------|------|
 | `id` | `id` | ✓ Preservar UUID |
 | `nome` | `nome_fantasia` | ✓ Renomear |
@@ -648,7 +648,7 @@ WHERE p.ativo = true;
 ---
 
 ### MAPEAMENTO 3: Lentes Canônicas
-| Campo Mello | Campo BestLens | Transformação |
+| Campo Mello | Campo SIS Lens | Transformação |
 |-------------|----------------|---------------|
 | `sku_normalizado` | `sku_canonico` | ✓ 1:1 |
 | `nome_comercial` | `nome_comercial` | ✓ 1:1 |
@@ -686,7 +686,7 @@ END
 ---
 
 ### MAPEAMENTO 4: Lentes Premium (Essilor)
-| Campo Mello | Campo BestLens | Transformação |
+| Campo Mello | Campo SIS Lens | Transformação |
 |-------------|----------------|---------------|
 | `id` | `id` | ✓ Preservar UUID |
 | `marca_lente = 'ESSILOR'` | `marca_id` (FK) | 🟡 Buscar Essilor |
@@ -710,7 +710,7 @@ tipo_fotossensivel: "TRANSITIONS"
 ---
 
 ### MAPEAMENTO 5: Produtos Laboratório
-| Campo Mello | Campo BestLens | Complexidade |
+| Campo Mello | Campo SIS Lens | Complexidade |
 |-------------|----------------|--------------|
 | `id` | `id` | ✓ Preservar |
 | `fornecedor_id` | `laboratorio_id` | ✓ Renomear |
@@ -733,7 +733,7 @@ END
 ---
 
 ### MAPEAMENTO 6: Preços
-| Campo Mello | Campo BestLens | Ação |
+| Campo Mello | Campo SIS Lens | Ação |
 |-------------|----------------|------|
 | `id` (do produto) | `produto_lab_id` (FK) | ✓ 1:1 |
 | `preco_custo` | `preco_custo` | ✓ 1:1 |
@@ -873,7 +873,7 @@ ORDER BY qtd DESC;
 ## 🎯 DECISÕES PENDENTES
 
 ### 1. Quando Migrar?
-- **Opção A**: Agora (só com 21 Essilor, depois adiciona Zeiss/Hoya no BestLens)
+- **Opção A**: Agora (só com 21 Essilor, depois adiciona Zeiss/Hoya no SIS Lens)
 - **Opção B**: Depois (primeiro cataloga Zeiss/Hoya no Mello, migra tudo de uma vez)
 
 ### 2. Linha e Nível
@@ -891,7 +891,7 @@ ORDER BY qtd DESC;
 
 ## 📦 CONTADORES ESPERADOS
 
-| Elemento | Atual (Mello) | Novo (BestLens) | Status |
+| Elemento | Atual (Mello) | Novo (SIS Lens) | Status |
 |----------|---------------|-----------------|--------|
 | Fornecedores | 11 | 11 | ✓ 1:1 |
 | Marcas | 6 (extrair) | 6 | ✓ Criar |
@@ -908,8 +908,8 @@ ORDER BY qtd DESC;
 
 1. **Revisar estrutura** proposta (tabelas, campos, constraints)
 2. **Confirmar decisões** pendentes (país, quando migrar, etc.)
-3. **Executar DDL** completo no BestLens (criar todas as tabelas)
-4. **Criar script de migração** SQL (Mello → BestLens)
+3. **Executar DDL** completo no SIS Lens (criar todas as tabelas)
+4. **Criar script de migração** SQL (Mello → SIS Lens)
 5. **Executar migração** e validar contadores
 6. **Povoar linha/nível** manualmente depois
 7. **Testar view** `vw_todas_lentes` no frontend

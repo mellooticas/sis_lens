@@ -1,4 +1,4 @@
-# 🚀 **BestLens - Estrutura Completa Implementada**
+# 🚀 **SIS Lens - Estrutura Completa Implementada**
 
 ## ✅ **Implementação Baseada no Blueprint**
 

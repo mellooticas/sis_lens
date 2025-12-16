@@ -1,6 +1,6 @@
-# 🚀 Guia Completo de Setup - BestLens
+# 🚀 Guia Completo de Setup - SIS Lens
 
-Este guia vai te ajudar a configurar o sistema BestLens do zero até estar rodando com dados completos.
+Este guia vai te ajudar a configurar o sistema SIS Lens do zero até estar rodando com dados completos.
 
 ## 📋 Pré-requisitos
 
@@ -110,9 +110,9 @@ O script de população cria estes usuários para teste:
 
 | Email | Senha | Perfil | Tenant |
 |-------|-------|--------|---------|
-| `admin@bestlens.com` | `admin123` | Administrador | BestLens Demo |
+| `admin@bestlens.com` | `admin123` | Administrador | SIS Lens Demo |
 | `gerente@opticacentral.com` | `gerente123` | Gerente | Ótica Central |
-| `vendedor@bestlens.com` | `vendedor123` | Vendedor | BestLens Demo |
+| `vendedor@bestlens.com` | `vendedor123` | Vendedor | SIS Lens Demo |
 
 ### **4.2 Login no Sistema**
 
@@ -230,7 +230,7 @@ Com o sistema funcionando, você pode:
 
 ---
 
-**🎉 Parabéns! Seu sistema BestLens está pronto para usar!**
+**🎉 Parabéns! Seu sistema SIS Lens está pronto para usar!**
 
 > Este guia cobre 95% dos casos de uso. Para configurações avançadas, consulte a documentação técnica em `docs/`.
 

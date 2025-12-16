@@ -1,5 +1,5 @@
 <!--
-  🏠 BestLens - Página Principal
+  🏠 SIS Lens - Página Principal
   Sistema Decisor de Lentes Inteligente
 -->
 <script lang="ts">
