@@ -216,12 +216,18 @@ CREATE OR REPLACE VIEW public.vw_historico_decisoes AS
 SELECT 
     d.id,
     d.tenant_id,
-    d.cliente_id,
-    c.nome as cliente_nome,
-    d.receita_dados,
-    d.criterio_escolhido,
+    d.codigo_decisao,
+    d.cliente_nome,
+    d.otica_id,
+    d.nome_otica,
+    d.receita,
+    d.tipo_receita,
     d.status,
+    d.prioridade,
+    d.preco_final,
+    d.prazo_entrega_prometido,
     d.criado_em,
+    d.atualizado_em,
     -- Alternativa escolhida
     (
         SELECT jsonb_build_object(
@@ -247,7 +253,6 @@ SELECT
         WHERE ac.decisao_id = d.id
     ) as total_alternativas
 FROM orders.decisoes_lentes d
-LEFT JOIN public.clientes c ON c.id = d.cliente_id
 ORDER BY d.criado_em DESC;
 
 COMMENT ON VIEW public.vw_historico_decisoes IS 
