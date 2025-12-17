@@ -5,9 +5,13 @@
    */
   import { page } from "$app/stores";
   import Logo from "$lib/components/layout/Logo.svelte";
+  import ThemeToggle from "$lib/components/ui/ThemeToggle.svelte";
+  import AccessibilityPanel from "$lib/components/ui/AccessibilityPanel.svelte";
   import { fly } from "svelte/transition";
 
   export let collapsed = false;
+  
+  let showAccessibilityPanel = false;
 
   // Menu items com novos ícones e labels
   const menuItems = [
@@ -132,14 +136,10 @@
   >
     <!-- Logo Section -->
     <div
-      class="h-20 flex items-center justify-center border-b border-neutral-200/50 dark:border-neutral-700/50"
+      class="h-32 flex items-center justify-center border-b border-neutral-200/50 dark:border-neutral-700/50 px-4"
     >
-      <div
-        class="transform transition-transform duration-300 {collapsed
-          ? 'scale-75'
-          : 'scale-90'}"
-      >
-        <Logo size="sm" variant={collapsed ? "icon" : "full"} />
+      <div class="flex items-center justify-center w-full">
+        <Logo size="2xl" variant={collapsed ? "icon" : "full"} />
       </div>
     </div>
 
@@ -402,6 +402,35 @@
       {/each}
     </nav>
 
+    <!-- Theme Toggle & Accessibility Section -->
+    <div class="px-3 py-3 border-t border-neutral-200/50 dark:border-neutral-700/50">
+      <div class="flex items-center justify-center gap-2">
+        <ThemeToggle size="md" />
+        <button
+          on:click={() => showAccessibilityPanel = true}
+          class="
+            inline-flex items-center justify-center rounded-xl 
+            bg-gradient-to-br from-purple-100 to-purple-200 dark:from-purple-900/40 dark:to-purple-800/40
+            text-purple-800 dark:text-purple-100
+            hover:from-purple-200 hover:to-purple-300
+            dark:hover:from-purple-800/50 dark:hover:to-purple-700/50
+            border border-purple-300/50 dark:border-purple-700/50
+            shadow-sm hover:shadow-md
+            transition-all duration-300 hover:scale-110
+            focus:outline-none focus:ring-2 focus:ring-purple-500 focus:ring-offset-2 
+            dark:focus:ring-offset-neutral-900
+            w-10 h-10
+          "
+          title="Configurações de Acessibilidade"
+          aria-label="Abrir painel de acessibilidade"
+        >
+          <svg width="22" height="22" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+          </svg>
+        </button>
+      </div>
+    </div>
+
     <!-- User Profile (Bottom) -->
     <div
       class="border-t border-neutral-200/50 dark:border-neutral-700/50 p-4 bg-white/30 dark:bg-black/20 backdrop-blur-sm"
@@ -441,3 +470,6 @@
     </div>
   </div>
 </aside>
+
+<!-- Accessibility Panel -->
+<AccessibilityPanel bind:isOpen={showAccessibilityPanel} />

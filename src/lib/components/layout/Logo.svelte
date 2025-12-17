@@ -2,17 +2,19 @@
   import { cn } from "$lib/utils";
 
   export let variant: "full" | "icon" | "text" = "full";
-  export let size: "sm" | "md" | "lg" | "xl" = "md";
+  export let size: "sm" | "md" | "lg" | "xl" | "2xl" | "3xl" = "md";
   export let theme: "auto" | "light" | "dark" = "auto";
 
   let className = "";
   export { className as class };
 
   const sizeClasses = {
-    sm: "h-8",
-    md: "h-12",
-    lg: "h-16",
-    xl: "h-20",
+    sm: "max-h-8 w-auto",
+    md: "max-h-12 w-auto",
+    lg: "max-h-16 w-auto",
+    xl: "max-h-20 w-auto",
+    "2xl": "max-h-32 w-auto",
+    "3xl": "max-h-40 w-auto",
   };
 
   const textSizeClasses = {
@@ -20,6 +22,8 @@
     md: "text-2xl",
     lg: "text-3xl",
     xl: "text-4xl",
+    "2xl": "text-5xl",
+    "3xl": "text-6xl",
   };
 
   const themeClasses = {
