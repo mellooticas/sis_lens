@@ -39,33 +39,27 @@
 
 <div class={cn("flex items-center gap-2", className)}>
   {#if variant === "icon"}
-    <!-- Apenas ícone - SVG inline com cores controláveis -->
-    <div class={cn("transition-all duration-300", sizeClasses[size])}>
-      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-        <!-- Círculo azul -->
-        <circle cx="50" cy="50" r="35" fill="#0b80e3" />
-        <!-- Lente laranja -->
-        <path d="M50 25 C35 25 25 35 25 50 C25 65 35 75 50 75 L50 25Z" fill="#fc7422" opacity="0.8" />
-        <!-- Detalhes em preto/branco conforme tema -->
-        <circle cx="50" cy="50" r="20" fill="none" stroke="{isDark ? '#ffffff' : '#000000'}" stroke-width="2" />
-        <path d="M45 50 L55 50 M50 45 L50 55" stroke="{isDark ? '#ffffff' : '#000000'}" stroke-width="2" stroke-linecap="round" />
-      </svg>
-    </div>
+    <!-- Apenas ícone - usa sis_lens_icon.svg REAL -->
+    <img
+      src="/sis_lens_icon.svg"
+      alt="SIS Lens"
+      class={cn(
+        "object-contain transition-all duration-300",
+        sizeClasses[size]
+      )}
+      style={isDark ? "filter: invert(1) hue-rotate(180deg) brightness(1.2);" : ""}
+    />
   {:else if variant === "full"}
-    <!-- Logo completo - SVG inline com cores controláveis -->
-    <div class={cn("transition-all duration-300", sizeClasses[size])}>
-      <svg viewBox="0 0 200 60" fill="none" xmlns="http://www.w3.org/2000/svg" class="w-full h-full">
-        <!-- Ícone -->
-        <circle cx="30" cy="30" r="20" fill="#0b80e3" />
-        <path d="M30 15 C20 15 15 20 15 30 C15 40 20 45 30 45 L30 15Z" fill="#fc7422" opacity="0.8" />
-        <circle cx="30" cy="30" r="12" fill="none" stroke="{isDark ? '#ffffff' : '#000000'}" stroke-width="1.5" />
-        
-        <!-- Texto SIS -->
-        <text x="60" y="40" font-family="Inter, sans-serif" font-size="28" font-weight="700" fill="{isDark ? '#ffffff' : '#000000'}">SIS</text>
-        <!-- Texto Lens em dourado -->
-        <text x="110" y="40" font-family="Inter, sans-serif" font-size="28" font-weight="700" fill="#eab308">Lens</text>
-      </svg>
-    </div>
+    <!-- Logo completo - usa SISlens.svg REAL -->
+    <img
+      src="/SISlens.svg"
+      alt="SIS Lens Intelligence"
+      class={cn(
+        "object-contain transition-all duration-300",
+        sizeClasses[size]
+      )}
+      style={isDark ? "filter: invert(1) hue-rotate(180deg) brightness(1.2);" : ""}
+    />
   {:else if variant === "text"}
     <!-- Apenas texto -->
     <div class="flex flex-col">
