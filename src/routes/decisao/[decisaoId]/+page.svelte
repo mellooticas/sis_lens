@@ -1,9 +1,11 @@
+<script lang="ts">
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
   import Button from "$lib/components/ui/Button.svelte";
   import Badge from "$lib/components/ui/Badge.svelte";
   import { goto } from '$app/navigation';
+  import type { PageData } from './$types';
 
   export let data: PageData;
   
