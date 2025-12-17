@@ -39,14 +39,22 @@
     <img
       src="/sis_lens_icon.svg"
       alt="SIS Lens"
-      class={cn("object-contain", sizeClasses[size])}
+      class={cn(
+        "object-contain transition-all duration-300",
+        "dark:brightness-0 dark:invert",
+        sizeClasses[size]
+      )}
     />
   {:else if variant === "full"}
     <!-- Logo completo - usa SISlens.svg -->
     <img
       src="/SISlens.svg"
       alt="SIS Lens Intelligence"
-      class={cn("object-contain", sizeClasses[size])}
+      class={cn(
+        "object-contain transition-all duration-300",
+        "dark:brightness-0 dark:invert",
+        sizeClasses[size]
+      )}
     />
   {:else if variant === "text"}
     <!-- Apenas texto -->
