@@ -31,6 +31,19 @@ function createThemeStore() {
         const newTheme = current === 'light' ? 'dark' : 'light';
         updateDocument(newTheme);
         localStorage.setItem('theme', newTheme);
+        
+        // Reaplicar contraste após mudança de tema
+        if (browser) {
+          setTimeout(() => {
+            const contrastLevel = localStorage.getItem('contrast-level') as any;
+            if (contrastLevel) {
+              import('$lib/utils/colorSystem').then(({ applyContrastLevel }) => {
+                applyContrastLevel(contrastLevel);
+              });
+            }
+          }, 50);
+        }
+        
         return newTheme;
       });
     }

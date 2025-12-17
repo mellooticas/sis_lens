@@ -87,6 +87,14 @@
     --glass-surface: rgba(255, 255, 255, 0.7);
     --glass-shadow: 0 8px 32px 0 rgba(100, 100, 111, 0.1);
     --glass-blur: 12px;
+    
+    /* Contrast System - Light Mode defaults */
+    --text-opacity-light: 0.87;
+    --text-opacity-dark: 0.87;
+    --border-strength: 0.1;
+    --shadow-strength: 0.08;
+    --contrast-text: rgb(0, 0, 0);
+    --contrast-bg: rgb(255, 255, 255);
   }
 
   /* Dark mode variables (High Contrast, Deep Blacks) */
@@ -125,6 +133,10 @@
     --shadow-card-hover: 0 0 0 1px rgba(6, 182, 212, 0.3), 0 10px 15px -3px rgba(0, 0, 0, 0.5);
     /* Subtle cyber glow on hover */
     --shadow-glow: 0 0 30px rgba(56, 189, 248, 0.15);
+    
+    /* Contrast System - Dark Mode defaults */
+    --contrast-text: rgb(255, 255, 255);
+    --contrast-bg: rgb(15, 23, 42);
   }
 
   /* ============================================ */

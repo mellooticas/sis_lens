@@ -9,11 +9,14 @@
   import MainLayout from "$lib/components/layout/MainLayout.svelte";
   import { onMount } from "svelte";
   import { theme } from "$lib/stores/theme"; // Updated path
+  import { contrastStore, colorThemeStore } from "$lib/stores/colorSystem";
   import { page } from "$app/stores";
 
-  // Inicializar tema
+  // Inicializar tema e sistema de cores
   onMount(() => {
     theme.init();
+    contrastStore.init();
+    colorThemeStore.init();
   });
 </script>
 

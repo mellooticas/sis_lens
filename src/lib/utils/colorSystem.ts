@@ -224,10 +224,30 @@ export function applyContrastLevel(level: ContrastLevel): void {
   const config = contrastConfig[level];
   const root = document.documentElement;
   
+  // Aplicar opacidades de texto
   root.style.setProperty('--text-opacity-light', config.textOnLight.toString());
   root.style.setProperty('--text-opacity-dark', config.textOnDark.toString());
   root.style.setProperty('--border-strength', config.borderStrength.toString());
   root.style.setProperty('--shadow-strength', config.shadowStrength.toString());
+  
+  // Aplicar contraste em cores baseado no tema atual
+  const isDark = root.classList.contains('dark');
+  
+  if (isDark) {
+    // Dark mode - aumentar contraste com cores mais claras
+    const textBrightness = 200 + (config.textOnDark * 55); // 200-255
+    const bgDarkness = 15 * (1 - config.textOnDark); // 15-0
+    
+    root.style.setProperty('--contrast-text', `rgb(${textBrightness}, ${textBrightness}, ${textBrightness})`);
+    root.style.setProperty('--contrast-bg', `rgb(${bgDarkness}, ${bgDarkness}, ${bgDarkness})`);
+  } else {
+    // Light mode - aumentar contraste com cores mais escuras
+    const textDarkness = 50 * (1 - config.textOnLight); // 50-0
+    const bgBrightness = 240 + (config.textOnLight * 15); // 240-255
+    
+    root.style.setProperty('--contrast-text', `rgb(${textDarkness}, ${textDarkness}, ${textDarkness})`);
+    root.style.setProperty('--contrast-bg', `rgb(${bgBrightness}, ${bgBrightness}, ${bgBrightness})`);
+  }
   
   // Salvar preferência
   localStorage.setItem('contrast-level', level);
