@@ -379,4 +379,209 @@
   .dark .custom-scrollbar {
     scrollbar-color: var(--color-neutral-700) transparent;
   }
+
+  /* ============================================ */
+  /* GLASS EFFECT - Global Styles for All Pages */
+  /* ============================================ */
+  
+  /* Cards com efeito glass - Seletores abrangentes */
+  :is(
+    [class*="stats-card"], 
+    [class*="action-card"], 
+    [class*="card"],
+    [class*="Card"],
+    .glass-card,
+    [class*="panel"],
+    [class*="Panel"],
+    [class*="container-"],
+    [class*="box"],
+    [class*="Box"]
+  ):not(.bg-white):not([class*="bg-neutral"]):not([class*="bg-gradient"]) {
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .dark :is(
+    [class*="stats-card"], 
+    [class*="action-card"], 
+    [class*="card"],
+    [class*="Card"],
+    .glass-card,
+    [class*="panel"],
+    [class*="Panel"],
+    [class*="container-"],
+    [class*="box"],
+    [class*="Box"]
+  ):not(.bg-white):not([class*="bg-neutral"]):not([class*="bg-gradient"]) {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 
+      0 8px 32px rgba(255, 255, 255, 0.08),
+      0 4px 16px rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Tables com glass effect - Melhorado para pegar TODAS */
+  :is(
+    table, 
+    [class*="table"], 
+    [class*="Table"],
+    [role="table"],
+    .data-table,
+    .grid[role="grid"]
+  ) {
+    background: rgba(255, 255, 255, 0.10) !important;
+    backdrop-filter: blur(10px) !important;
+    -webkit-backdrop-filter: blur(10px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .dark :is(
+    table, 
+    [class*="table"], 
+    [class*="Table"],
+    [role="table"],
+    .data-table,
+    .grid[role="grid"]
+  ) {
+    background: rgba(0, 0, 0, 0.25) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 
+      0 8px 32px rgba(255, 255, 255, 0.08),
+      0 4px 16px rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Table headers glass */
+  :is(thead, [class*="thead"], th, [role="columnheader"]) {
+    background: rgba(255, 255, 255, 0.2) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+  }
+
+  .dark :is(thead, [class*="thead"], th, [role="columnheader"]) {
+    background: rgba(255, 255, 255, 0.05) !important;
+    box-shadow: 
+      0 2px 8px rgba(255, 255, 255, 0.04),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  }
+
+  /* Table rows hover */
+  :is(tbody tr, [class*="table"] tr, [role="row"]):hover {
+    background: rgba(255, 255, 255, 0.15) !important;
+  }
+
+  .dark :is(tbody tr, [class*="table"] tr, [role="row"]):hover {
+    background: rgba(255, 255, 255, 0.08) !important;
+    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* Table cells */
+  :is(td, th, [role="cell"], [role="gridcell"]) {
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .dark :is(td, th, [role="cell"], [role="gridcell"]) {
+    border-color: rgba(255, 255, 255, 0.08) !important;
+  }
+
+  /* Forms e Inputs glass - Abrangente para TODOS os filtros */
+  :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), 
+    textarea, 
+    select,
+    [class*="input"],
+    [class*="Input"],
+    [class*="select"],
+    [class*="Select"],
+    [class*="filter"],
+    [class*="Filter"],
+    [class*="search"],
+    [class*="Search"],
+    [role="search"] input,
+    [role="searchbox"]
+  ) {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(8px) !important;
+    -webkit-backdrop-filter: blur(8px) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+  }
+
+  .dark :is(
+    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), 
+    textarea, 
+    select,
+    [class*="input"],
+    [class*="Input"],
+    [class*="select"],
+    [class*="Select"],
+    [class*="filter"],
+    [class*="Filter"],
+    [class*="search"],
+    [class*="Search"],
+    [role="search"] input,
+    [role="searchbox"]
+  ) {
+    background: rgba(0, 0, 0, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+    box-shadow: 
+      0 4px 16px rgba(255, 255, 255, 0.06),
+      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
+  }
+
+  /* Inputs focus state */
+  :is(input, textarea, select):focus {
+    background: rgba(255, 255, 255, 0.18) !important;
+    border-color: rgba(255, 255, 255, 0.35) !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
+  }
+
+  .dark :is(input, textarea, select):focus {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-color: rgba(255, 255, 255, 0.25) !important;
+    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05) !important;
+  }
+
+  /* Badges com glass */
+  [class*="badge"] {
+    backdrop-filter: blur(8px) !important;
+  }
+
+  /* Text shadows para melhor legibilidade */
+  h1, h2, h3, h4 {
+    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  }
+
+  .dark h1, .dark h2, .dark h3, .dark h4 {
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+  }
+
+  /* Alert/Message boxes glass */
+  [class*="alert"], [class*="message"], [class*="notification"] {
+    background: rgba(255, 255, 255, 0.12) !important;
+    backdrop-filter: blur(10px) !important;
+    border-color: rgba(255, 255, 255, 0.2) !important;
+  }
+
+  .dark [class*="alert"], .dark [class*="message"], .dark [class*="notification"] {
+    background: rgba(0, 0, 0, 0.25) !important;
+    border-color: rgba(255, 255, 255, 0.1) !important;
+  }
+
+  /* Modals e Overlays glass */
+  [class*="modal"], [class*="dialog"], [class*="dropdown"] {
+    background: rgba(255, 255, 255, 0.18) !important;
+    backdrop-filter: blur(16px) !important;
+    border: 1px solid rgba(255, 255, 255, 0.3) !important;
+  }
+
+  .dark [class*="modal"], .dark [class*="dialog"], .dark [class*="dropdown"] {
+    background: rgba(0, 0, 0, 0.35) !important;
+    border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  }
 }

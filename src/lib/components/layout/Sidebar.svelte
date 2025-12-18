@@ -473,3 +473,25 @@
 
 <!-- Accessibility Panel -->
 <AccessibilityPanel bind:isOpen={showAccessibilityPanel} />
+
+<style>
+  /* Glass Effect for Sidebar */
+  :global(.glass-sidebar) {
+    background: rgba(255, 255, 255, 0.15) !important;
+    backdrop-filter: blur(12px) !important;
+    -webkit-backdrop-filter: blur(12px) !important;
+    box-shadow: 
+      0 8px 32px rgba(0, 0, 0, 0.1),
+      inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.25) !important;
+  }
+
+  :global(.dark .glass-sidebar) {
+    background: rgba(0, 0, 0, 0.3) !important;
+    border-right: 1px solid rgba(255, 255, 255, 0.15) !important;
+    box-shadow: 
+      0 8px 32px rgba(255, 255, 255, 0.08),
+      0 4px 16px rgba(255, 255, 255, 0.05),
+      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
+  }
+</style>
