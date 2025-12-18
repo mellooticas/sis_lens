@@ -189,7 +189,7 @@
               </div>
            </div>
         {:else}
-           <div class="flex flex-col items-center justify-center py-20 bg-white dark:bg-neutral-800 rounded-2xl shadow-lg border border-neutral-200 dark:border-neutral-700">
+           <div class="glass-panel rounded-2xl p-6 shadow-xl flex flex-col items-center justify-center py-20">
               <div class="text-6xl mb-6">❌</div>
               <h2 class="text-2xl font-bold text-neutral-900 dark:text-white mb-2">Decisão não encontrada</h2>
               <p class="text-neutral-500 mb-8">Não foi possível carregar os detalhes desta decisão.</p>

@@ -78,9 +78,9 @@
   </div>
 
   <!-- Filtros -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+  <div class="glass-panel p-6 rounded-xl shadow-xl mb-6">
     <SectionHeader title="Filtros" icon="filter" />
-    
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
       <Select
         label="Marca"
@@ -88,14 +88,14 @@
         options={marcasOptions}
         on:change={aplicarFiltros}
       />
-      
+
       <Select
         label="Tipo de Lente"
         bind:value={tipo_lente}
         options={tiposOptions}
         on:change={aplicarFiltros}
       />
-      
+
       <div class="flex items-end gap-2">
         <Button variant="outline" on:click={limparFiltros}>
           Limpar Filtros
@@ -114,13 +114,13 @@
   {:else}
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
       {#each produtos as produto}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 hover:shadow-md transition-shadow">
+        <div
+          class="glass-panel rounded-xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300"
+        >
           <!-- Header do Card -->
           <div class="flex items-start justify-between mb-4">
             <div class="flex-1">
-              <Badge variant="primary" size="sm" class="mb-2">
-                PREMIUM
-              </Badge>
+              <Badge variant="primary" size="sm" class="mb-2">PREMIUM</Badge>
               <h3 class="font-semibold text-gray-900 text-lg mb-1">
                 {produto.nome}
               </h3>
@@ -161,7 +161,10 @@
           <!-- Disponibilidade em Labs -->
           <div class="border-t pt-4 mb-4">
             <p class="text-sm font-medium text-gray-700 mb-2">
-              Disponível em {produto.qtd_laboratorios} laboratório{produto.qtd_laboratorios !== 1 ? 's' : ''}:
+              Disponível em {produto.qtd_laboratorios} laboratório{produto.qtd_laboratorios !==
+              1
+                ? "s"
+                : ""}:
             </p>
             <div class="space-y-1">
               {#each produto.laboratorios?.slice(0, 3) || [] as lab}

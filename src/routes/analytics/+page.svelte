@@ -108,9 +108,7 @@
 
       <!-- Controles de Período -->
       <section class="mt-8">
-        <div
-          class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm"
-        >
+        <div class="glass-panel rounded-xl p-6 shadow-xl">
           <SectionHeader
             title="Período de Análise"
             subtitle="Selecione o período para visualizar os dados"
@@ -239,9 +237,7 @@
           />
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-            <div
-              class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6"
-            >
+            <div class="glass-panel rounded-xl p-6 shadow-xl">
               <div class="flex items-center justify-between mb-4">
                 <h3
                   class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
@@ -277,9 +273,7 @@
               {/if}
             </div>
 
-            <div
-              class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6"
-            >
+            <div class="glass-panel rounded-xl p-6 shadow-xl">
               <div class="flex items-center justify-between mb-4">
                 <h3
                   class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
@@ -315,9 +309,7 @@
               {/if}
             </div>
 
-            <div
-              class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6"
-            >
+            <div class="glass-panel rounded-xl p-6 shadow-xl">
               <div class="flex items-center justify-between mb-4">
                 <h3
                   class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
@@ -364,9 +356,7 @@
         />
 
         {#if topFornecedores.length > 0}
-          <div
-            class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden mt-6"
-          >
+          <div class="glass-panel rounded-xl p-6 shadow-xl overflow-hidden mt-6">
             <Table
               headers={fornecedoresHeaders}
               data={fornecedoresData}

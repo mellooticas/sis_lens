@@ -195,9 +195,7 @@
 
       <!-- Filtros de Busca -->
       <section class="mt-12">
-        <div
-          class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm"
-        >
+        <div class="glass-panel rounded-xl p-6 shadow-xl">
           <SectionHeader
             title="Buscar no Catálogo"
             subtitle="Use os filtros para encontrar a lente ideal"
@@ -315,9 +313,7 @@
             <LoadingSpinner size="lg" />
           </div>
         {:else if temResultados}
-          <div
-            class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden mt-6"
-          >
+          <div class="glass-panel rounded-xl p-6 shadow-xl overflow-hidden mt-6">
             <Table headers={tableHeaders} data={lentes} hoverable striped>
               <svelte:fragment slot="cell" let:row let:column>
                 {#if column === "familia"}

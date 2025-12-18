@@ -254,7 +254,7 @@
 					>
 						{#each data.vouchers as voucher}
 							<div
-								class="card overflow-hidden group hover:-translate-y-1 transition-transform duration-300"
+								class="glass-panel rounded-xl overflow-hidden group hover:-translate-y-1 transition-transform duration-300"
 							>
 								<!-- Header -->
 								<div

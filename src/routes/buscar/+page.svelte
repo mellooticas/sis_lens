@@ -128,296 +128,285 @@
 
 <main>
   <Container maxWidth="xl" padding="md">
-      <!-- Hero Section -->
-      <PageHero
-        badge="🔍 Sistema de Busca Inteligente"
-        title="Buscar Lentes"
-        subtitle="Encontre as melhores opções com filtros avançados e compare fornecedores em tempo real"
-        alignment="center"
-        maxWidth="lg"
-      />
+    <!-- Hero Section -->
+    <PageHero
+      badge="🔍 Sistema de Busca Inteligente"
+      title="Buscar Lentes"
+      subtitle="Encontre as melhores opções com filtros avançados e compare fornecedores em tempo real"
+      alignment="center"
+      maxWidth="lg"
+    />
 
-      <!-- Estatísticas da Busca -->
-      {#if data.estatisticas}
-        <section class="mt-8">
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-            <StatsCard
-              title="Lentes Disponíveis"
-              value={data.estatisticas.total_lentes.toString()}
-              icon="👓"
-              color="blue"
-            />
-
-            <StatsCard
-              title="Fornecedores Ativos"
-              value={data.estatisticas.total_fornecedores.toString()}
-              icon="🏢"
-              color="green"
-            />
-
-            <StatsCard
-              title="Preço Médio"
-              value={formatCurrency(data.estatisticas.preco_medio)}
-              icon="💰"
-              color="orange"
-            />
-          </div>
-        </section>
-      {/if}
-
-      <!-- Formulário de Busca -->
-      <section class="mt-12">
-        <div
-          class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm"
-        >
-          <SectionHeader
-            title="Buscar Lentes"
-            subtitle="Digite o nome, família ou SKU da lente"
+    <!-- Estatísticas da Busca -->
+    {#if data.estatisticas}
+      <section class="mt-8">
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+          <StatsCard
+            title="Lentes Disponíveis"
+            value={data.estatisticas.total_lentes.toString()}
+            icon="👓"
+            color="blue"
           />
 
-          <form
-            method="POST"
-            action="?/buscar"
-            use:enhance={({ formData }) => {
-              isLoading = true;
-              return async ({ result, update }) => {
-                isLoading = false;
-                await update();
-              };
-            }}
-            class="space-y-6"
-          >
-            <!-- Busca Principal -->
-            <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
-              <div class="lg:col-span-3">
-                <Input
-                  label="Buscar lentes"
-                  placeholder="Ex: Varilux, Essilor 1.67, Progressive..."
-                  bind:value={query}
-                  name="query"
-                  required
-                />
-              </div>
-              <div class="flex items-end">
-                <Button
-                  type="submit"
-                  variant="primary"
-                  size="md"
-                  fullWidth
-                  disabled={isLoading || !query.trim()}
-                >
-                  {#if isLoading}
-                    <LoadingSpinner size="sm" color="white" />
-                    <span class="ml-2">Buscando...</span>
-                  {:else}
-                    🔍 Buscar
-                  {/if}
-                </Button>
-              </div>
-            </div>
+          <StatsCard
+            title="Fornecedores Ativos"
+            value={data.estatisticas.total_fornecedores.toString()}
+            icon="🏢"
+            color="green"
+          />
 
-            <!-- Toggle Filtros Avançados -->
-            <div class="flex items-center gap-3">
+          <StatsCard
+            title="Preço Médio"
+            value={formatCurrency(data.estatisticas.preco_medio)}
+            icon="💰"
+            color="orange"
+          />
+        </div>
+      </section>
+    {/if}
+
+    <!-- Formulário de Busca -->
+    <section class="mt-12">
+      <div class="glass-panel rounded-xl p-6 shadow-xl">
+        <SectionHeader
+          title="Buscar Lentes"
+          subtitle="Digite o nome, família ou SKU da lente"
+        />
+
+        <form
+          method="POST"
+          action="?/buscar"
+          use:enhance={({ formData }) => {
+            isLoading = true;
+            return async ({ result, update }) => {
+              isLoading = false;
+              await update();
+            };
+          }}
+          class="space-y-6"
+        >
+          <!-- Busca Principal -->
+          <div class="grid grid-cols-1 lg:grid-cols-4 gap-4">
+            <div class="lg:col-span-3">
+              <Input
+                label="Buscar lentes"
+                placeholder="Ex: Varilux, Essilor 1.67, Progressive..."
+                bind:value={query}
+                name="query"
+                required
+              />
+            </div>
+            <div class="flex items-end">
+              <Button
+                type="submit"
+                variant="primary"
+                size="md"
+                fullWidth
+                disabled={isLoading || !query.trim()}
+              >
+                {#if isLoading}
+                  <LoadingSpinner size="sm" color="white" />
+                  <span class="ml-2">Buscando...</span>
+                {:else}
+                  🔍 Buscar
+                {/if}
+              </Button>
+            </div>
+          </div>
+
+          <!-- Toggle Filtros Avançados -->
+          <div class="flex items-center gap-3">
+            <Button
+              type="button"
+              variant="ghost"
+              size="sm"
+              on:click={toggleFiltrosAvancados}
+            >
+              {mostrarFiltrosAvancados ? "▼" : "▶"} Filtros Avançados
+              {#if temFiltrosAtivos}
+                <Badge variant="primary" size="sm" class="ml-2">Ativos</Badge>
+              {/if}
+            </Button>
+
+            {#if temFiltrosAtivos}
               <Button
                 type="button"
                 variant="ghost"
                 size="sm"
-                on:click={toggleFiltrosAvancados}
+                on:click={limparFiltros}
               >
-                {mostrarFiltrosAvancados ? "▼" : "▶"} Filtros Avançados
-                {#if temFiltrosAtivos}
-                  <Badge variant="primary" size="sm" class="ml-2">Ativos</Badge>
-                {/if}
+                🗑️ Limpar Filtros
               </Button>
-
-              {#if temFiltrosAtivos}
-                <Button
-                  type="button"
-                  variant="ghost"
-                  size="sm"
-                  on:click={limparFiltros}
-                >
-                  🗑️ Limpar Filtros
-                </Button>
-              {/if}
-            </div>
-
-            <!-- Filtros Avançados (Colapsável) -->
-            {#if mostrarFiltrosAvancados}
-              <div
-                class="pt-4 border-t border-neutral-200 dark:border-neutral-700 space-y-4"
-              >
-                <h3
-                  class="text-sm font-semibold text-neutral-700 dark:text-neutral-300"
-                >
-                  Filtros Avançados
-                </h3>
-
-                <div
-                  class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-                >
-                  <Select
-                    label="Categoria"
-                    bind:value={categoria}
-                    name="categoria"
-                    options={categoriaOptions}
-                  />
-
-                  <Select
-                    label="Material"
-                    bind:value={material}
-                    name="material"
-                    options={materialOptions}
-                  />
-
-                  <Input
-                    label="Preço Mínimo"
-                    type="number"
-                    placeholder="R$ 0,00"
-                    bind:value={preco_min}
-                    name="preco_min"
-                    min="0"
-                    step="0.01"
-                  />
-
-                  <Input
-                    label="Preço Máximo"
-                    type="number"
-                    placeholder="R$ 999,99"
-                    bind:value={preco_max}
-                    name="preco_max"
-                    min="0"
-                    step="0.01"
-                  />
-                </div>
-              </div>
             {/if}
-          </form>
-        </div>
-      </section>
+          </div>
 
-      <!-- Resultados da Busca -->
-      <section class="mt-12">
-        <SectionHeader
-          title="Resultados da Busca"
-          subtitle={temResultados
-            ? `${totalResultados} lentes encontradas`
-            : ""}
+          <!-- Filtros Avançados (Colapsável) -->
+          {#if mostrarFiltrosAvancados}
+            <div
+              class="pt-4 border-t border-neutral-200 dark:border-neutral-700 space-y-4"
+            >
+              <h3
+                class="text-sm font-semibold text-neutral-700 dark:text-neutral-300"
+              >
+                Filtros Avançados
+              </h3>
+
+              <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <Select
+                  label="Categoria"
+                  bind:value={categoria}
+                  name="categoria"
+                  options={categoriaOptions}
+                />
+
+                <Select
+                  label="Material"
+                  bind:value={material}
+                  name="material"
+                  options={materialOptions}
+                />
+
+                <Input
+                  label="Preço Mínimo"
+                  type="number"
+                  placeholder="R$ 0,00"
+                  bind:value={preco_min}
+                  name="preco_min"
+                  min="0"
+                  step="0.01"
+                />
+
+                <Input
+                  label="Preço Máximo"
+                  type="number"
+                  placeholder="R$ 999,99"
+                  bind:value={preco_max}
+                  name="preco_max"
+                  min="0"
+                  step="0.01"
+                />
+              </div>
+            </div>
+          {/if}
+        </form>
+      </div>
+    </section>
+
+    <!-- Resultados da Busca -->
+    <section class="mt-12">
+      <SectionHeader
+        title="Resultados da Busca"
+        subtitle={temResultados ? `${totalResultados} lentes encontradas` : ""}
+      />
+
+      {#if isLoading}
+        <div class="flex justify-center py-12">
+          <LoadingSpinner size="lg" />
+        </div>
+      {:else if temResultados}
+        <div class="glass-panel rounded-xl p-6 shadow-xl overflow-hidden">
+          <Table headers={tableHeaders} rows={lentes} hoverable>
+            <svelte:fragment slot="cell" let:row let:header>
+              {#if header.key === "tipo_lente"}
+                <Badge variant="info" size="sm">
+                  {row.tipo_lente || "N/A"}
+                </Badge>
+              {:else if header.key === "indice_refracao"}
+                <Badge variant="secondary" size="sm">
+                  {row.indice_refracao || "N/A"}
+                </Badge>
+              {:else if header.key === "material"}
+                <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                  {row.material || "N/A"}
+                </span>
+              {:else if header.key === "descricao_completa"}
+                <div class="space-y-1">
+                  <p class="font-medium text-neutral-900 dark:text-neutral-100">
+                    {row.descricao_completa || row.familia || "Sem descrição"}
+                  </p>
+                  {#if row.tratamentos && row.tratamentos.length > 0}
+                    <div class="flex flex-wrap gap-1">
+                      {#each row.tratamentos as tratamento}
+                        <Badge variant="success" size="sm">{tratamento}</Badge>
+                      {/each}
+                    </div>
+                  {/if}
+                </div>
+              {:else if header.key === "actions"}
+                <div class="flex gap-2 justify-center">
+                  <Button
+                    variant="primary"
+                    size="sm"
+                    on:click={() => verRanking(row.lente_id)}
+                  >
+                    📊 Ranking
+                  </Button>
+
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    on:click={() => verDetalhes(row.lente_id)}
+                  >
+                    👁️ Ver
+                  </Button>
+                </div>
+              {:else}
+                {row[header.key] || "N/A"}
+              {/if}
+            </svelte:fragment>
+          </Table>
+        </div>
+      {:else if query}
+        <EmptyState
+          icon="🔍"
+          title="Nenhuma lente encontrada"
+          description="Não encontramos lentes com os critérios especificados. Tente ajustar os filtros."
+          actionLabel="Limpar Filtros"
+          on:action={limparFiltros}
+        />
+      {:else}
+        <EmptyState
+          icon="👓"
+          title="Comece sua busca"
+          description="Digite o nome, família ou SKU da lente que você procura"
+          actionLabel="Ver Todas as Lentes"
+          on:action={() => goto("/catalogo")}
+        />
+      {/if}
+    </section>
+
+    <!-- Ações Rápidas -->
+    <section class="mt-12 mb-8">
+      <SectionHeader title="Ações Rápidas" />
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <ActionCard
+          icon="📊"
+          title="Ver Fornecedores"
+          description="Compare todos os fornecedores disponíveis"
+          actionLabel="Ver Fornecedores"
+          color="blue"
+          on:click={() => goto("/fornecedores")}
         />
 
-        {#if isLoading}
-          <div class="flex justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
-        {:else if temResultados}
-          <div
-            class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden"
-          >
-            <Table headers={tableHeaders} rows={lentes} hoverable>
-              <svelte:fragment slot="cell" let:row let:header>
-                {#if header.key === "tipo_lente"}
-                  <Badge variant="info" size="sm">
-                    {row.tipo_lente || "N/A"}
-                  </Badge>
-                {:else if header.key === "indice_refracao"}
-                  <Badge variant="secondary" size="sm">
-                    {row.indice_refracao || "N/A"}
-                  </Badge>
-                {:else if header.key === "material"}
-                  <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                    {row.material || "N/A"}
-                  </span>
-                {:else if header.key === "descricao_completa"}
-                  <div class="space-y-1">
-                    <p
-                      class="font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      {row.descricao_completa || row.familia || "Sem descrição"}
-                    </p>
-                    {#if row.tratamentos && row.tratamentos.length > 0}
-                      <div class="flex flex-wrap gap-1">
-                        {#each row.tratamentos as tratamento}
-                          <Badge variant="success" size="sm">{tratamento}</Badge
-                          >
-                        {/each}
-                      </div>
-                    {/if}
-                  </div>
-                {:else if header.key === "actions"}
-                  <div class="flex gap-2 justify-center">
-                    <Button
-                      variant="primary"
-                      size="sm"
-                      on:click={() => verRanking(row.lente_id)}
-                    >
-                      📊 Ranking
-                    </Button>
+        <ActionCard
+          icon="📋"
+          title="Histórico de Decisões"
+          description="Veja suas decisões de compra anteriores"
+          actionLabel="Ver Histórico"
+          color="green"
+          on:click={() => goto("/historico")}
+        />
 
-                    <Button
-                      variant="ghost"
-                      size="sm"
-                      on:click={() => verDetalhes(row.lente_id)}
-                    >
-                      👁️ Ver
-                    </Button>
-                  </div>
-                {:else}
-                  {row[header.key] || "N/A"}
-                {/if}
-              </svelte:fragment>
-            </Table>
-          </div>
-        {:else if query}
-          <EmptyState
-            icon="🔍"
-            title="Nenhuma lente encontrada"
-            description="Não encontramos lentes com os critérios especificados. Tente ajustar os filtros."
-            actionLabel="Limpar Filtros"
-            on:action={limparFiltros}
-          />
-        {:else}
-          <EmptyState
-            icon="👓"
-            title="Comece sua busca"
-            description="Digite o nome, família ou SKU da lente que você procura"
-            actionLabel="Ver Todas as Lentes"
-            on:action={() => goto("/catalogo")}
-          />
-        {/if}
-      </section>
-
-      <!-- Ações Rápidas -->
-      <section class="mt-12 mb-8">
-        <SectionHeader title="Ações Rápidas" />
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ActionCard
-            icon="📊"
-            title="Ver Fornecedores"
-            description="Compare todos os fornecedores disponíveis"
-            actionLabel="Ver Fornecedores"
-            color="blue"
-            on:click={() => goto("/fornecedores")}
-          />
-
-          <ActionCard
-            icon="📋"
-            title="Histórico de Decisões"
-            description="Veja suas decisões de compra anteriores"
-            actionLabel="Ver Histórico"
-            color="green"
-            on:click={() => goto("/historico")}
-          />
-
-          <ActionCard
-            icon="🏢"
-            title="Fornecedores"
-            description="Veja todos os fornecedores ativos"
-            actionLabel="Ver Fornecedores"
-            color="orange"
-            on:click={() => goto("/fornecedores")}
-          />
-        </div>
-      </section>
-    </Container>
-  </main>
+        <ActionCard
+          icon="🏢"
+          title="Fornecedores"
+          description="Veja todos os fornecedores ativos"
+          actionLabel="Ver Fornecedores"
+          color="orange"
+          on:click={() => goto("/fornecedores")}
+        />
+      </div>
+    </section>
+  </Container>
+</main>

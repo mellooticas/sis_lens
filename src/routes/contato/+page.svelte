@@ -143,7 +143,7 @@
 
       <div class="grid grid-cols-1 lg:grid-cols-2 gap-12 mt-12">
         <!-- Formulário de Contato -->
-        <section>
+        <section class="glass-panel p-8 rounded-xl shadow-xl">
           <SectionHeader
             title="Envie sua Mensagem"
             subtitle="Preencha o formulário abaixo e responderemos em breve"
@@ -269,9 +269,7 @@
 
           <div class="space-y-6">
             <!-- Dados da Empresa -->
-            <div
-              class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6"
-            >
+            <div class="glass-panel rounded-xl p-6 shadow-xl">
               <h3
                 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4"
               >
@@ -331,9 +329,7 @@
             </div>
 
             <!-- Links Rápidos -->
-            <div
-              class="bg-gradient-to-r from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-xl p-6"
-            >
+            <div class="glass-panel rounded-xl p-6 shadow-xl">
               <h4
                 class="font-semibold text-neutral-900 dark:text-neutral-100 mb-4"
               >

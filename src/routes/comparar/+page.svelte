@@ -76,9 +76,7 @@
 
       <!-- Status da Comparação -->
       <section class="mt-8">
-        <div
-          class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6 shadow-sm"
-        >
+        <div class="glass-panel rounded-xl p-6 shadow-xl">
           <div class="flex items-center justify-between">
             <div>
               <h2
@@ -130,9 +128,7 @@
             subtitle="Especificações lado a lado"
           />
 
-          <div
-            class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden mt-6"
-          >
+          <div class="glass-panel rounded-xl p-6 shadow-xl overflow-hidden mt-6">
             <div class="overflow-x-auto">
               <table class="w-full">
                 <thead
@@ -311,9 +307,7 @@
             class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"
           >
             {#each lentesSugeridas.slice(0, 9) as lente}
-              <div
-                class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-4 hover:shadow-md transition-shadow"
-              >
+              <div class="glass-panel rounded-xl p-4 hover:shadow-lg transition-all">
                 <div class="space-y-3">
                   <div>
                     <h3

@@ -300,9 +300,7 @@
 
       <!-- Filtros -->
       <section class="mt-12">
-        <div
-          class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 p-6"
-        >
+        <div class="glass-panel rounded-xl p-6 shadow-xl">
           <SectionHeader title="Filtros de Busca" />
 
           <div class="space-y-6">
@@ -365,11 +363,12 @@
 
       <!-- Tabela de Fornecedores -->
       <section class="mt-12">
-        <SectionHeader
-          title="Fornecedores Cadastrados"
-          subtitle={fornecedoresFiltrados.length
-            ? `${fornecedoresFiltrados.length} fornecedores encontrados`
-            : ""}
+        <div class="glass-panel rounded-xl p-6 shadow-xl">
+          <SectionHeader
+            title="Fornecedores Cadastrados"
+            subtitle={fornecedoresFiltrados.length
+              ? `${fornecedoresFiltrados.length} fornecedores encontrados`
+              : ""}
           actionLabel="+ Novo Fornecedor"
           on:action={() => (showNewModal = true)}
         />
@@ -445,6 +444,8 @@
             on:action={limparFiltros}
           />
         {/if}
+
+        </div>
       </section>
 
       <!-- Ações Rápidas -->

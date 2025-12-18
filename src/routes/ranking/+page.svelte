@@ -261,9 +261,7 @@
       <!-- Informações da Lente Buscada -->
       {#if lente_info}
         <section class="mt-8">
-          <div
-            class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/20 dark:to-blue-800/20 rounded-2xl border border-blue-200 dark:border-blue-800 p-8 shadow-lg"
-          >
+          <div class="glass-panel rounded-xl p-8 shadow-xl">
             <div
               class="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-6"
             >
@@ -337,10 +335,10 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
           {#each criterios as crit}
             <button
-              class="text-left p-6 rounded-xl border-2 transition-all duration-200 {criterioAtual ===
+              class="text-left p-6 rounded-xl border transition-all duration-200 glass-panel {criterioAtual ===
               crit.id
-                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/30 shadow-lg scale-105'
-                : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:border-blue-300 hover:shadow-md'}"
+                ? 'border-blue-500 shadow-lg scale-105'
+                : 'hover:border-blue-300 hover:shadow-md'}"
               on:click={() => mudarCriterio(crit.id)}
             >
               <div class="flex items-center gap-3 mb-3">
@@ -437,7 +435,7 @@
 
                 <!-- Card -->
                 <div
-                  class="bg-white dark:bg-neutral-800 rounded-2xl border-2 {index ===
+                  class="glass-panel rounded-2xl border {index ===
                   0
                     ? 'border-yellow-500 shadow-2xl'
                     : index === 1
@@ -610,9 +608,7 @@
       <!-- Comparação -->
       {#if selectedForComparison.length >= 2}
         <section class="mt-12">
-          <div
-            class="bg-blue-50 dark:bg-blue-900/20 border-2 border-blue-200 dark:border-blue-800 rounded-xl p-6"
-          >
+          <div class="glass-panel rounded-xl p-6 shadow-xl border border-blue-200 dark:border-blue-800">
             <div class="flex items-center justify-between mb-4">
               <h3
                 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
@@ -660,9 +656,7 @@
             subtitle={`${outros.length} fornecedores adicionais`}
           />
 
-          <div
-            class="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 overflow-hidden"
-          >
+          <div class="glass-panel rounded-xl p-6 shadow-xl overflow-hidden">
             <div class="overflow-x-auto">
               <table class="w-full">
                 <thead class="bg-neutral-50 dark:bg-neutral-700">

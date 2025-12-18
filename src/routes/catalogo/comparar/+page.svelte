@@ -84,9 +84,9 @@
   </div>
 
   <!-- Filtros -->
-  <div class="bg-white rounded-xl shadow-sm border border-gray-200 p-6 mb-6">
+  <div class="glass-panel p-6 rounded-xl shadow-xl mb-6">
     <SectionHeader title="Filtros" icon="filter" />
-    
+
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
       <Select
         label="Mínimo de Labs"
@@ -94,14 +94,14 @@
         options={minLabsOptions}
         on:change={aplicarFiltros}
       />
-      
+
       <Select
         label="Tipo de Produto"
         bind:value={tipo}
         options={tiposOptions}
         on:change={aplicarFiltros}
       />
-      
+
       <div class="flex items-end gap-2">
         <Button variant="outline" on:click={limparFiltros}>
           Limpar Filtros
@@ -120,7 +120,7 @@
   {:else}
     <div class="space-y-6">
       {#each produtos as produto}
-        <div class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden">
+        <div class="glass-panel rounded-xl shadow-xl overflow-hidden">
           <!-- Header -->
           <div class="bg-gradient-to-r from-blue-50 to-purple-50 p-6">
             <div class="flex items-start justify-between mb-3">
@@ -156,7 +156,9 @@
               </div>
               <div>
                 <p class="text-xs text-gray-600">Índice</p>
-                <p class="font-medium text-gray-900">{produto.indice_refracao}</p>
+                <p class="font-medium text-gray-900">
+                  {produto.indice_refracao}
+                </p>
               </div>
             </div>
 
@@ -178,26 +180,29 @@
           <!-- Opções de Labs -->
           <div class="p-6">
             <h4 class="font-semibold text-gray-900 mb-4">
-              Disponível em {produto.qtd_labs} laboratório{produto.qtd_labs !== 1 ? 's' : ''}:
+              Disponível em {produto.qtd_labs} laboratório{produto.qtd_labs !==
+              1
+                ? "s"
+                : ""}:
             </h4>
-            
+
             <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {#each produto.opcoes_labs || [] as opcao}
-                <div class="border border-gray-200 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all">
+                <div
+                  class="border border-white/20 rounded-lg p-4 hover:border-blue-300 hover:shadow-sm transition-all bg-white/5"
+                >
                   <div class="flex items-start justify-between mb-2">
                     <div class="flex-1">
                       <p class="font-semibold text-gray-900">
                         {opcao.laboratorio}
                       </p>
                       <p class="text-xs text-gray-600 mt-1">
-                        SKU: {opcao.sku_laboratorio || 'N/A'}
+                        SKU: {opcao.sku_laboratorio || "N/A"}
                       </p>
                     </div>
-                    <Badge variant="success" size="xs">
-                      Disponível
-                    </Badge>
+                    <Badge variant="success" size="xs">Disponível</Badge>
                   </div>
-                  
+
                   <Button
                     variant="outline"
                     size="sm"
