@@ -73,8 +73,7 @@
   <title>Lentes Premium - SIS Lens</title>
 </svelte:head>
 
-<main class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
-  <Container maxWidth="xl" padding="lg">
+<Container maxWidth="xl" padding="lg">
     
     <!-- Header -->
     <PageHero
@@ -281,4 +280,3 @@
 
     {/if}
   </Container>
-</main>
