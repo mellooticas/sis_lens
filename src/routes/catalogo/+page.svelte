@@ -7,11 +7,21 @@
   import { CatalogoAPI } from '$lib/api/catalogo-api';
   import type { CanonicaGenerica } from '$lib/types/database-views';
 
+  // Componentes padronizados
+  import Container from "$lib/components/layout/Container.svelte";
+  import PageHero from "$lib/components/layout/PageHero.svelte";
+  import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
+  import Button from "$lib/components/ui/Button.svelte";
+  import Input from "$lib/components/forms/Input.svelte";
+  import Select from "$lib/components/forms/Select.svelte";
+  import Badge from "$lib/components/ui/Badge.svelte";
+  import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
+
   // State
   let canonicas: CanonicaGenerica[] = [];
   let loading = true;
   let error = '';
-  
+
   // Filtros
   let filtroTipo = '';
   let filtroMaterial = '';
@@ -55,107 +65,97 @@
   <title>Catálogo de Lentes - SIS Lens</title>
 </svelte:head>
 
-<main class="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-purple-50 py-12">
-  <div class="container mx-auto px-4 max-w-7xl">
-    
-    <!-- Header -->
-    <header class="text-center mb-12">
-      <div class="inline-block px-4 py-2 bg-violet-100 text-violet-700 rounded-full text-sm font-medium mb-4">
-        📚 Catálogo
-      </div>
-      <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-        Lentes Canônicas
-      </h1>
-      <p class="text-lg text-slate-600 max-w-2xl mx-auto">
-        {canonicas.length} grupos normalizados disponíveis
-      </p>
-    </header>
+<main>
+  <Container maxWidth="xl" padding="md">
+    <!-- Hero -->
+    <PageHero
+      badge="📚 Catálogo"
+      title="Lentes Canônicas"
+      subtitle="{canonicas.length} grupos normalizados disponíveis"
+    />
 
     <!-- Filtros -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <section class="glass-panel p-6 rounded-xl shadow-lg mb-8 mt-8">
+      <SectionHeader
+        title="🔍 Filtros"
+        subtitle="Refine sua busca por grupos canônicos"
+      />
+
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
         <!-- Busca -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            🔍 Buscar
-          </label>
-          <input
-            type="text"
-            bind:value={filtroBusca}
-            placeholder="Nome da lente..."
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-          />
-        </div>
+        <Input
+          label="Buscar"
+          bind:value={filtroBusca}
+          placeholder="Nome da lente..."
+        />
 
         <!-- Tipo -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            👓 Tipo
-          </label>
-          <select
-            bind:value={filtroTipo}
-            on:change={carregarDados}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-          >
-            <option value="">Todos</option>
-            <option value="visao_simples">Visão Simples</option>
-            <option value="multifocal">Multifocal</option>
-            <option value="bifocal">Bifocal</option>
-          </select>
-        </div>
+        <Select
+          label="Tipo"
+          bind:value={filtroTipo}
+          options={[
+            { value: "", label: "Todos" },
+            { value: "visao_simples", label: "Visão Simples" },
+            { value: "multifocal", label: "Multifocal" },
+            { value: "bifocal", label: "Bifocal" },
+          ]}
+          on:change={carregarDados}
+        />
 
         <!-- Material -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            🧪 Material
-          </label>
-          <select
-            bind:value={filtroMaterial}
-            on:change={carregarDados}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-violet-500 focus:border-transparent"
-          >
-            <option value="">Todos</option>
-            <option value="CR39">CR39</option>
-            <option value="POLICARBONATO">Policarbonato</option>
-            <option value="TRIVEX">Trivex</option>
-            <option value="HIGH_INDEX">High Index</option>
-          </select>
-        </div>
+        <Select
+          label="Material"
+          bind:value={filtroMaterial}
+          options={[
+            { value: "", label: "Todos" },
+            { value: "CR39", label: "CR39" },
+            { value: "POLICARBONATO", label: "Policarbonato" },
+            { value: "TRIVEX", label: "Trivex" },
+            { value: "HIGH_INDEX", label: "High Index" },
+          ]}
+          on:change={carregarDados}
+        />
       </div>
-    </div>
+    </section>
 
     <!-- Loading -->
     {#if loading}
-      <div class="flex justify-center items-center py-20">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-violet-600"></div>
-        <span class="ml-4 text-slate-600">Carregando catálogo...</span>
+      <div class="flex justify-center py-12">
+        <LoadingSpinner size="lg" />
       </div>
-    
+
     <!-- Error -->
     {:else if error}
-      <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p class="text-red-800">⚠️ {error}</p>
-        <button
-          on:click={carregarDados}
-          class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
+      <section class="glass-panel p-6 rounded-xl shadow-lg text-center">
+        <p class="text-red-600 dark:text-red-400 mb-4">⚠️ {error}</p>
+        <Button variant="danger" on:click={carregarDados}>
           Tentar novamente
-        </button>
-      </div>
-    
+        </Button>
+      </section>
+
     <!-- Empty State -->
     {:else if filtradas.length === 0}
-      <div class="text-center py-20">
+      <section class="glass-panel p-12 rounded-xl shadow-lg text-center">
         <div class="text-6xl mb-4">🔍</div>
-        <h3 class="text-2xl font-bold text-slate-900 mb-2">Nenhuma lente encontrada</h3>
-        <p class="text-slate-600">Tente ajustar os filtros</p>
-      </div>
-    
+        <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+          Nenhuma lente encontrada
+        </h3>
+        <p class="text-neutral-600 dark:text-neutral-400">
+          Tente ajustar os filtros
+        </p>
+      </section>
+
     <!-- Grid de Canônicas -->
     {:else}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-        {#each filtradas as canonica}
-          <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 overflow-hidden">
+      <section>
+        <SectionHeader
+          title="📦 Grupos Canônicos"
+          subtitle="{filtradas.length} grupos encontrados"
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
+          {#each filtradas as canonica}
+            <div class="glass-panel rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
             
             <!-- Header -->
             <div class="bg-gradient-to-r from-violet-500 to-purple-600 p-4">
@@ -197,16 +197,16 @@
               {#if canonica.ar || canonica.blue || canonica.fotossensivel || canonica.polarizado}
                 <div class="flex flex-wrap gap-2">
                   {#if canonica.ar}
-                    <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full">AR</span>
+                    <Badge variant="primary" size="sm">AR</Badge>
                   {/if}
                   {#if canonica.blue}
-                    <span class="px-2 py-1 bg-cyan-100 text-cyan-700 text-xs rounded-full">Blue</span>
+                    <Badge variant="info" size="sm">Blue</Badge>
                   {/if}
                   {#if canonica.fotossensivel}
-                    <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full">Foto</span>
+                    <Badge variant="warning" size="sm">Foto</Badge>
                   {/if}
                   {#if canonica.polarizado}
-                    <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full">Polar</span>
+                    <Badge variant="purple" size="sm">Polar</Badge>
                   {/if}
                 </div>
               {/if}
@@ -241,21 +241,23 @@
 
             <!-- Footer -->
             <div class="px-5 pb-4">
-              <a
-                href="/catalogo/comparar?id={canonica.id}"
-                class="block w-full text-center py-2 bg-gradient-to-r from-violet-500 to-purple-600 text-white rounded-lg font-medium hover:from-violet-600 hover:to-purple-700 transition-all"
+              <Button
+                variant="primary"
+                fullWidth
+                on:click={() => window.location.href = `/catalogo/comparar?id=${canonica.id}`}
               >
                 Ver Detalhes →
-              </a>
+              </Button>
             </div>
           </div>
         {/each}
-      </div>
+        </div>
 
-      <!-- Contador -->
-      <div class="mt-8 text-center text-slate-600">
-        Exibindo {filtradas.length} de {canonicas.length} grupos canônicos
-      </div>
+        <!-- Contador -->
+        <div class="mt-8 text-center text-neutral-600 dark:text-neutral-400">
+          Exibindo {filtradas.length} de {canonicas.length} grupos canônicos
+        </div>
+      </section>
     {/if}
-  </div>
+  </Container>
 </main>

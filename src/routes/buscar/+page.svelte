@@ -8,6 +8,16 @@
   import { CatalogoAPI } from '$lib/api/catalogo-api';
   import type { LenteCatalogo } from '$lib/types/database-views';
 
+  // Componentes padronizados
+  import Container from "$lib/components/layout/Container.svelte";
+  import PageHero from "$lib/components/layout/PageHero.svelte";
+  import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
+  import Button from "$lib/components/ui/Button.svelte";
+  import Input from "$lib/components/forms/Input.svelte";
+  import Select from "$lib/components/forms/Select.svelte";
+  import Badge from "$lib/components/ui/Badge.svelte";
+  import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
+
   // State
   let lentes: LenteCatalogo[] = [];
   let loading = true;
@@ -15,7 +25,7 @@
   let total = 0;
   let paginaAtual = 1;
   const itensPorPagina = 12;
-  
+
   // Filtros
   let filtroBusca = '';
   let filtroTipo = '';
@@ -23,7 +33,7 @@
   let filtroIndice = '';
   let filtroMarca = '';
   let filtroCategoria = '';
-  
+
   // Filtros disponíveis
   let marcas: string[] = [];
 
@@ -119,193 +129,161 @@
   <title>Buscar Lentes - SIS Lens</title>
 </svelte:head>
 
-<main class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50 py-12">
-  <div class="container mx-auto px-4 max-w-7xl">
-    
-    <!-- Header -->
-    <header class="text-center mb-12">
-      <div class="inline-block px-4 py-2 bg-blue-100 text-blue-700 rounded-full text-sm font-medium mb-4">
-        🔍 Buscar Lentes
-      </div>
-      <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-        Catálogo Completo
-      </h1>
-      <p class="text-lg text-slate-600 max-w-2xl mx-auto">
-        {total.toLocaleString('pt-BR')} lentes disponíveis de todos os laboratórios
-      </p>
-    </header>
+<main>
+  <Container maxWidth="xl" padding="md">
+    <!-- Hero -->
+    <PageHero
+      badge="🔍 Buscar"
+      title="Catálogo Completo"
+      subtitle="{total.toLocaleString('pt-BR')} lentes disponíveis de todos os laboratórios"
+    />
 
     <!-- Filtros -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-4">
+    <section class="glass-panel p-6 rounded-xl shadow-lg mb-8 mt-8">
+      <SectionHeader
+        title="🔍 Filtros de Busca"
+        subtitle="Refine sua pesquisa no catálogo"
+      />
+
+      <div class="grid grid-cols-1 md:grid-cols-3 lg:grid-cols-4 gap-6 mt-6">
         <!-- Busca -->
         <div class="md:col-span-2">
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            🔍 Buscar por nome
-          </label>
-          <input
-            type="text"
+          <Input
+            label="Buscar por nome"
             bind:value={filtroBusca}
             placeholder="Digite o nome da lente..."
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
             on:keypress={(e) => e.key === 'Enter' && aplicarFiltros()}
           />
         </div>
 
         <!-- Marca -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            🏭 Marca
-          </label>
-          <select
-            bind:value={filtroMarca}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Todas</option>
-            {#each marcas as marca}
-              <option value={marca}>{marca}</option>
-            {/each}
-          </select>
-        </div>
+        <Select
+          label="Marca"
+          bind:value={filtroMarca}
+          options={[
+            { value: "", label: "Todas" },
+            ...(marcas || []).map((m) => ({
+              value: m,
+              label: m,
+            })),
+          ]}
+        />
 
         <!-- Categoria -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            ⭐ Categoria
-          </label>
-          <select
-            bind:value={filtroCategoria}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Todas</option>
-            <option value="economica">Econômica</option>
-            <option value="intermediaria">Intermediária</option>
-            <option value="premium">Premium</option>
-            <option value="super_premium">Super Premium</option>
-          </select>
-        </div>
+        <Select
+          label="Categoria"
+          bind:value={filtroCategoria}
+          options={[
+            { value: "", label: "Todas" },
+            { value: "economica", label: "Econômica" },
+            { value: "intermediaria", label: "Intermediária" },
+            { value: "premium", label: "Premium" },
+            { value: "super_premium", label: "Super Premium" },
+          ]}
+        />
 
         <!-- Tipo -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            👓 Tipo
-          </label>
-          <select
-            bind:value={filtroTipo}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Todos</option>
-            <option value="visao_simples">Visão Simples</option>
-            <option value="multifocal">Multifocal</option>
-            <option value="bifocal">Bifocal</option>
-            <option value="leitura">Leitura</option>
-            <option value="ocupacional">Ocupacional</option>
-          </select>
-        </div>
+        <Select
+          label="Tipo"
+          bind:value={filtroTipo}
+          options={[
+            { value: "", label: "Todos" },
+            { value: "visao_simples", label: "Visão Simples" },
+            { value: "multifocal", label: "Multifocal" },
+            { value: "bifocal", label: "Bifocal" },
+            { value: "leitura", label: "Leitura" },
+            { value: "ocupacional", label: "Ocupacional" },
+          ]}
+        />
 
         <!-- Material -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            🧪 Material
-          </label>
-          <select
-            bind:value={filtroMaterial}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Todos</option>
-            <option value="CR39">CR39</option>
-            <option value="POLICARBONATO">Policarbonato</option>
-            <option value="TRIVEX">Trivex</option>
-            <option value="HIGH_INDEX">High Index</option>
-            <option value="VIDRO">Vidro</option>
-          </select>
-        </div>
+        <Select
+          label="Material"
+          bind:value={filtroMaterial}
+          options={[
+            { value: "", label: "Todos" },
+            { value: "CR39", label: "CR39" },
+            { value: "POLICARBONATO", label: "Policarbonato" },
+            { value: "TRIVEX", label: "Trivex" },
+            { value: "HIGH_INDEX", label: "High Index" },
+            { value: "VIDRO", label: "Vidro" },
+          ]}
+        />
 
         <!-- Índice -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            📐 Índice
-          </label>
-          <select
-            bind:value={filtroIndice}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-blue-500 focus:border-transparent"
-          >
-            <option value="">Todos</option>
-            <option value="1.50">1.50</option>
-            <option value="1.56">1.56</option>
-            <option value="1.59">1.59</option>
-            <option value="1.61">1.61</option>
-            <option value="1.67">1.67</option>
-            <option value="1.74">1.74</option>
-          </select>
-        </div>
+        <Select
+          label="Índice"
+          bind:value={filtroIndice}
+          options={[
+            { value: "", label: "Todos" },
+            { value: "1.50", label: "1.50" },
+            { value: "1.56", label: "1.56" },
+            { value: "1.59", label: "1.59" },
+            { value: "1.61", label: "1.61" },
+            { value: "1.67", label: "1.67" },
+            { value: "1.74", label: "1.74" },
+          ]}
+        />
       </div>
 
       <!-- Botões -->
-      <div class="flex gap-3">
-        <button
-          on:click={aplicarFiltros}
-          class="px-6 py-2 bg-gradient-to-r from-blue-500 to-indigo-600 text-white rounded-lg font-medium hover:from-blue-600 hover:to-indigo-700 transition-all"
-        >
-          🔍 Buscar
-        </button>
-        <button
-          on:click={limparFiltros}
-          class="px-6 py-2 bg-slate-200 text-slate-700 rounded-lg font-medium hover:bg-slate-300 transition-all"
-        >
-          🔄 Limpar
-        </button>
+      <div class="flex justify-end gap-3 mt-6">
+        <Button variant="ghost" on:click={limparFiltros}>Limpar</Button>
+        <Button variant="primary" on:click={aplicarFiltros}>Buscar</Button>
       </div>
-    </div>
+    </section>
 
     <!-- Loading -->
     {#if loading}
-      <div class="flex justify-center items-center py-20">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600"></div>
-        <span class="ml-4 text-slate-600">Buscando lentes...</span>
+      <div class="flex justify-center py-12">
+        <LoadingSpinner size="lg" />
       </div>
-    
+
     <!-- Error -->
     {:else if error}
-      <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p class="text-red-800">⚠️ {error}</p>
-        <button
-          on:click={carregarLentes}
-          class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
-        >
+      <section class="glass-panel p-6 rounded-xl shadow-lg text-center">
+        <p class="text-red-600 dark:text-red-400 mb-4">⚠️ {error}</p>
+        <Button variant="danger" on:click={carregarLentes}>
           Tentar novamente
-        </button>
-      </div>
-    
+        </Button>
+      </section>
+
     <!-- Empty State -->
     {:else if lentes.length === 0}
-      <div class="text-center py-20">
+      <section class="glass-panel p-12 rounded-xl shadow-lg text-center">
         <div class="text-6xl mb-4">🔍</div>
-        <h3 class="text-2xl font-bold text-slate-900 mb-2">Nenhuma lente encontrada</h3>
-        <p class="text-slate-600 mb-6">Tente ajustar os filtros de busca</p>
-        <button
-          on:click={limparFiltros}
-          class="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700"
-        >
+        <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+          Nenhuma lente encontrada
+        </h3>
+        <p class="text-neutral-600 dark:text-neutral-400 mb-6">
+          Tente ajustar os filtros de busca
+        </p>
+        <Button variant="primary" on:click={limparFiltros}>
           Limpar Filtros
-        </button>
-      </div>
+        </Button>
+      </section>
     
     <!-- Grid de Lentes -->
     {:else}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8">
-        {#each lentes as lente}
-          <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border border-slate-200 overflow-hidden">
+      <section>
+        <SectionHeader
+          title="📦 Resultados da Busca"
+          subtitle="{lentes.length} lentes encontradas"
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 mt-6">
+          {#each lentes as lente}
+            <div class="glass-panel rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
             
             <!-- Header -->
             <div class="bg-gradient-to-r from-blue-500 to-indigo-600 p-4">
               <div class="flex items-start justify-between mb-2">
-                <span class="px-2 py-1 bg-white/20 text-white text-xs rounded-full">
+                <Badge variant="neutral" size="sm">
                   {lente.marca_nome}
-                </span>
-                <span class="px-2 py-1 bg-white/20 text-white text-xs rounded-full capitalize">
+                </Badge>
+                <Badge variant="neutral" size="sm">
                   {lente.categoria.replace('_', ' ')}
-                </span>
+                </Badge>
               </div>
               <h3 class="font-semibold text-white text-lg leading-tight">
                 {lente.nome_comercial}
@@ -420,10 +398,12 @@
           </button>
         </div>
 
-        <div class="mt-4 text-center text-sm text-slate-600">
-          Página {paginaAtual} de {totalPaginas} • {total.toLocaleString('pt-BR')} lentes no total
-        </div>
-      {/if}
+            <div class="mt-4 text-center text-sm text-neutral-600 dark:text-neutral-400">
+              Página {paginaAtual} de {totalPaginas} • {total.toLocaleString('pt-BR')} lentes no total
+            </div>
+          </div>
+        {/if}
+      </section>
     {/if}
-  </div>
+  </Container>
 </main>
