@@ -398,11 +398,10 @@
           </button>
         </div>
 
-            <div class="mt-4 text-center text-sm text-neutral-600 dark:text-neutral-400">
-              Página {paginaAtual} de {totalPaginas} • {total.toLocaleString('pt-BR')} lentes no total
-            </div>
-          </div>
-        {/if}
+        <div class="mt-4 text-center text-sm text-neutral-600 dark:text-neutral-400">
+          Página {paginaAtual} de {totalPaginas} • {total.toLocaleString('pt-BR')} lentes no total
+        </div>
+      {/if}
       </section>
     {/if}
   </Container>
