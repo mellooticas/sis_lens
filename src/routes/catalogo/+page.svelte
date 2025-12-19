@@ -244,9 +244,9 @@
               <Button
                 variant="primary"
                 fullWidth
-                on:click={() => window.location.href = `/catalogo/comparar?id=${canonica.id}`}
+                on:click={() => window.location.href = `/catalogo/${canonica.id}`}
               >
-                Ver Detalhes →
+                Comparar Laboratórios →
               </Button>
             </div>
           </div>
