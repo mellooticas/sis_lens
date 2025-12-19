@@ -1,396 +1,230 @@
 <!--
-  ⚖️ Página de Comparação de Lentes
-  Compare especificações e preços lado a lado
+  ⚖️ Página de Comparação de Fornecedores
+  Compare preços de diferentes fornecedores para produtos similares
 -->
 <script lang="ts">
   import { goto } from "$app/navigation";
-  import type { PageData } from "./$types";
+  import { page } from "$app/stores";
 
   // Componentes padronizados
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
-  import ActionCard from "$lib/components/cards/ActionCard.svelte";
-  import Button from "$lib/components/ui/Button.svelte";
-  import Badge from "$lib/components/ui/Badge.svelte";
+  import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
   import EmptyState from "$lib/components/ui/EmptyState.svelte";
+  import Button from "$lib/components/ui/Button.svelte";
+  
+  // Componente de comparação real
+  import CompararFornecedores from "$lib/components/catalogo/CompararFornecedores.svelte";
 
-  export let data: PageData;
+  // Hooks com dados reais
+  import { useCompararFornecedores } from "$lib/hooks/useCompararFornecedores";
+  
+  // State do hook
+  const { state, compararPorGrupo } = useCompararFornecedores();
 
-  // Dados computados
-  $: lentesComparacao = data.lentes_comparacao || [];
-  $: lentesSugeridas = data.lentes_sugeridas || [];
-  $: totalSelecionadas = data.total_selecionadas || 0;
-  $: maxComparacao = data.max_comparacao || 3;
-  $: podeAdicionarMais = totalSelecionadas < maxComparacao;
+  // Obter parâmetros da URL
+  $: skuCanonicoParam = $page.url.searchParams.get('sku') || '';
+  
+  // Dados reativos
+  $: comparacoes = $state.comparacoes || [];
+  $: loading = $state.loading;
+  $: error = $state.error;
+
+  // Buscar dados automaticamente se há SKU na URL
+  $: if (skuCanonicoParam && !loading && comparacoes.length === 0) {
+    compararPorGrupo(skuCanonicoParam);
+  }
+  
+  // Estado local para busca
+  let skuInput = skuCanonicoParam;
 
   // Funções
-  function formatCurrency(value: number): string {
-    if (!value) return "R$ 0,00";
-    return value.toLocaleString("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    });
+  function buscarComparacao() {
+    if (!skuInput.trim()) return;
+    goto(`/comparar?sku=${encodeURIComponent(skuInput)}`);
+    compararPorGrupo(skuInput);
   }
-
-  function adicionarLente(lenteId: string) {
-    const params = new URLSearchParams(window.location.search);
-    const proximoSlot = `lente${totalSelecionadas + 1}`;
-    params.set(proximoSlot, lenteId);
-    goto(`/comparar?${params.toString()}`);
-  }
-
-  function removerLente(index: number) {
-    const params = new URLSearchParams(window.location.search);
-    params.delete(`lente${index + 1}`);
-    goto(`/comparar?${params.toString()}`);
-  }
-
-  function limparComparacao() {
-    goto("/comparar");
-  }
-
-  function verRanking(lenteId: string) {
-    goto(`/ranking?lente_id=${lenteId}`);
+  
+  function limpar() {
+    skuInput = '';
+    goto('/comparar');
   }
 </script>
 
 <svelte:head>
-  <title>Comparar Lentes - SIS Lens</title>
+  <title>Comparar Fornecedores - SIS Lens</title>
   <meta
     name="description"
-    content="Compare especificações e preços de lentes lado a lado"
+    content="Compare preços entre fornecedores para o mesmo produto canônico"
   />
 </svelte:head>
 
 <main>
   <Container maxWidth="xl" padding="md">
-      <!-- Hero Section -->
-      <PageHero
-        badge="⚖️ Comparação Inteligente"
-        title="Comparar Lentes"
-        subtitle="Compare até 3 lentes lado a lado para tomar a melhor decisão"
-        alignment="center"
-        maxWidth="lg"
-      />
+    <!-- Hero Section -->
+    <PageHero
+      badge="⚖️ Comparação Inteligente"
+      title="Comparar Fornecedores"
+      subtitle="Encontre o melhor preço comparando diferentes fornecedores para o mesmo produto"
+      alignment="center"
+      maxWidth="lg"
+    />
 
-      <!-- Status da Comparação -->
-      <section class="mt-8">
-        <div class="glass-panel rounded-xl p-6 shadow-xl">
-          <div class="flex items-center justify-between">
-            <div>
-              <h2
-                class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
-              >
-                Comparação Ativa
-              </h2>
-              <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
-                {totalSelecionadas} de {maxComparacao} lentes selecionadas
-              </p>
-            </div>
+    <!-- Busca por SKU Canônico -->
+    <section class="mt-8">
+      <div class="glass-panel rounded-xl p-6 shadow-xl max-w-2xl mx-auto">
+        <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
+          Buscar por SKU Canônico
+        </h3>
+        
+        <form on:submit|preventDefault={buscarComparacao} class="flex gap-4">
+          <input
+            type="text"
+            bind:value={skuInput}
+            placeholder="Ex: SV_CR39_150, PROG_POLY_167..."
+            class="flex-1 px-4 py-2 rounded-lg border border-neutral-300 dark:border-neutral-600 
+                   bg-white dark:bg-neutral-800 text-neutral-900 dark:text-neutral-100
+                   focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          />
+          
+          <Button variant="primary" type="submit" disabled={!skuInput.trim()}>
+            🔍 Comparar
+          </Button>
+          
+          {#if skuInput}
+            <Button variant="ghost" type="button" on:click={limpar}>
+              Limpar
+            </Button>
+          {/if}
+        </form>
+        
+        <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-2">
+          Digite o SKU canônico para comparar preços entre todos os fornecedores
+        </p>
+      </div>
+    </section>
 
-            <div class="flex gap-2">
-              {#if totalSelecionadas > 0}
-                <Button variant="ghost" size="sm" on:click={limparComparacao}>
-                  🗑️ Limpar Todas
-                </Button>
-              {/if}
-
-              <Button
-                variant="primary"
-                size="sm"
-                disabled={totalSelecionadas === 0}
-              >
-                📊 Gerar Relatório
-              </Button>
-            </div>
-          </div>
-
-          <!-- Indicador de Progresso -->
-          <div class="mt-4">
-            <div
-              class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2"
-            >
-              <div
-                class="bg-blue-600 h-2 rounded-full transition-all duration-300"
-                style="width: {(totalSelecionadas / maxComparacao) * 100}%"
-              ></div>
-            </div>
+    <!-- Resultados da Comparação -->
+    <section class="mt-12">
+      {#if loading}
+        <div class="flex justify-center py-12">
+          <LoadingSpinner size="lg" />
+        </div>
+      {:else if error}
+        <EmptyState
+          icon="⚠️"
+          title="Erro ao carregar comparação"
+          description={error}
+        />
+      {:else if comparacoes.length === 0 && skuCanonicoParam}
+        <EmptyState
+          icon="🔍"
+          title="Nenhum fornecedor encontrado"
+          description="Não encontramos fornecedores para este SKU canônico"
+        />
+      {:else if comparacoes.length > 0}
+        <SectionHeader
+          title="Comparação de Fornecedores"
+          subtitle={`${comparacoes.length} fornecedor(es) encontrado(s) para "${skuCanonicoParam}"`}
+        />
+        
+        <div class="mt-6 glass-panel rounded-xl p-6 shadow-xl">
+          <p class="text-lg font-semibold mb-4">Produto: {comparacoes[0]?.produto || skuCanonicoParam}</p>
+          <div class="overflow-x-auto">
+            <table class="w-full">
+              <thead>
+                <tr class="border-b border-neutral-200 dark:border-neutral-700">
+                  <th class="text-left p-4">Fornecedor</th>
+                  <th class="text-left p-4">SKU</th>
+                  <th class="text-right p-4">Preço Tabela</th>
+                </tr>
+              </thead>
+              <tbody>
+                {#each comparacoes as comp}
+                  {#each comp.opcoes as opcao}
+                    <tr class="border-b border-neutral-100 dark:border-neutral-800 hover:bg-neutral-50 dark:hover:bg-neutral-800">
+                      <td class="p-4">
+                        <p class="font-medium">{opcao.fornecedor}</p>
+                        <p class="text-sm text-neutral-600 dark:text-neutral-400">{opcao.marca}</p>
+                      </td>
+                      <td class="p-4">
+                        <p class="text-sm font-mono">{opcao.sku}</p>
+                        <p class="text-xs text-neutral-600 dark:text-neutral-400">{opcao.nome_comercial}</p>
+                      </td>
+                      <td class="p-4 text-right">
+                        <p class="font-medium text-green-600 dark:text-green-400">
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(opcao.preco_tabela || 0)}
+                        </p>
+                        <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                          Custo: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(opcao.custo_base || 0)}
+                        </p>
+                      </td>
+                    </tr>
+                  {/each}
+                {/each}
+              </tbody>
+            </table>
           </div>
         </div>
-      </section>
-
-      <!-- Tabela de Comparação -->
-      {#if lentesComparacao.length > 0}
-        <section class="mt-12">
-          <SectionHeader
-            title="Comparação Detalhada"
-            subtitle="Especificações lado a lado"
-          />
-
-          <div class="glass-panel rounded-xl p-6 shadow-xl overflow-hidden mt-6">
-            <div class="overflow-x-auto">
-              <table class="w-full">
-                <thead
-                  class="bg-neutral-50 dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700"
-                >
-                  <tr>
-                    <th
-                      class="px-6 py-4 text-left text-sm font-semibold text-neutral-700 dark:text-neutral-300"
-                    >
-                      Especificação
-                    </th>
-                    {#each lentesComparacao as lente, index}
-                      <th
-                        class="px-6 py-4 text-center text-sm font-semibold text-neutral-700 dark:text-neutral-300"
-                      >
-                        <div class="space-y-2">
-                          <div class="font-medium">Lente {index + 1}</div>
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            on:click={() => removerLente(index)}
-                          >
-                            ❌ Remover
-                          </Button>
-                        </div>
-                      </th>
-                    {/each}
-                  </tr>
-                </thead>
-
-                <tbody
-                  class="divide-y divide-neutral-200 dark:divide-neutral-700"
-                >
-                  <!-- Nome/Família -->
-                  <tr>
-                    <td
-                      class="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      Nome/Família
-                    </td>
-                    {#each lentesComparacao as lente}
-                      <td class="px-6 py-4 text-center">
-                        <div class="space-y-1">
-                          <div
-                            class="font-medium text-neutral-900 dark:text-neutral-100"
-                          >
-                            {lente.familia || "N/A"}
-                          </div>
-                          <div
-                            class="text-xs text-neutral-500 dark:text-neutral-400"
-                          >
-                            {lente.sku_canonico || ""}
-                          </div>
-                        </div>
-                      </td>
-                    {/each}
-                  </tr>
-
-                  <!-- Marca -->
-                  <tr class="bg-neutral-50 dark:bg-neutral-900/50">
-                    <td
-                      class="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      Marca
-                    </td>
-                    {#each lentesComparacao as lente}
-                      <td class="px-6 py-4 text-center">
-                        <Badge variant="primary" size="sm">
-                          {lente.marca_nome || "N/A"}
-                        </Badge>
-                      </td>
-                    {/each}
-                  </tr>
-
-                  <!-- Tipo -->
-                  <tr>
-                    <td
-                      class="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      Tipo de Lente
-                    </td>
-                    {#each lentesComparacao as lente}
-                      <td class="px-6 py-4 text-center">
-                        <Badge variant="success" size="sm">
-                          {lente.tipo_lente || "N/A"}
-                        </Badge>
-                      </td>
-                    {/each}
-                  </tr>
-
-                  <!-- Material -->
-                  <tr class="bg-neutral-50 dark:bg-neutral-900/50">
-                    <td
-                      class="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      Material
-                    </td>
-                    {#each lentesComparacao as lente}
-                      <td class="px-6 py-4 text-center">
-                        <Badge variant="warning" size="sm">
-                          {lente.material || "N/A"}
-                        </Badge>
-                      </td>
-                    {/each}
-                  </tr>
-
-                  <!-- Índice de Refração -->
-                  <tr>
-                    <td
-                      class="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      Índice de Refração
-                    </td>
-                    {#each lentesComparacao as lente}
-                      <td
-                        class="px-6 py-4 text-center font-medium text-purple-600 dark:text-purple-400"
-                      >
-                        {lente.indice_refracao || "N/A"}
-                      </td>
-                    {/each}
-                  </tr>
-
-                  <!-- Preço Base -->
-                  <tr class="bg-neutral-50 dark:bg-neutral-900/50">
-                    <td
-                      class="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      Preço Base
-                    </td>
-                    {#each lentesComparacao as lente}
-                      <td
-                        class="px-6 py-4 text-center font-bold text-green-600 dark:text-green-400"
-                      >
-                        {formatCurrency(lente.preco_base || 0)}
-                      </td>
-                    {/each}
-                  </tr>
-
-                  <!-- Ações -->
-                  <tr>
-                    <td
-                      class="px-6 py-4 font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      Ações
-                    </td>
-                    {#each lentesComparacao as lente}
-                      <td class="px-6 py-4 text-center">
-                        <div class="space-y-2">
-                          <Button
-                            variant="primary"
-                            size="sm"
-                            on:click={() => verRanking(lente.id)}
-                          >
-                            📊 Ver Ranking
-                          </Button>
-                        </div>
-                      </td>
-                    {/each}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+      {:else}
+        <EmptyState
+          icon="⚖️"
+          title="Comece uma comparação"
+          description="Digite um SKU canônico acima para comparar preços entre fornecedores"
+        />
       {/if}
+    </section>
 
-      <!-- Adicionar Lentes -->
-      {#if podeAdicionarMais && lentesSugeridas.length > 0}
-        <section class="mt-12">
-          <SectionHeader
-            title="Adicionar Lentes à Comparação"
-            subtitle={`Selecione até ${maxComparacao - totalSelecionadas} lentes para comparar`}
-          />
-
-          <div
-            class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6"
+    <!-- Exemplos de SKUs -->
+    {#if !skuCanonicoParam}
+      <section class="mt-12">
+        <SectionHeader
+          title="Exemplos de SKUs Canônicos"
+          subtitle="Clique para testar a comparação"
+        />
+        
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-6">
+          <button
+            class="glass-panel rounded-lg p-4 hover:shadow-lg transition-shadow text-left"
+            on:click={() => {
+              skuInput = 'SV_CR39_150';
+              buscarComparacao();
+            }}
           >
-            {#each lentesSugeridas.slice(0, 9) as lente}
-              <div class="glass-panel rounded-xl p-4 hover:shadow-lg transition-all">
-                <div class="space-y-3">
-                  <div>
-                    <h3
-                      class="font-medium text-neutral-900 dark:text-neutral-100"
-                    >
-                      {lente.familia || "N/A"}
-                    </h3>
-                    <p class="text-sm text-neutral-600 dark:text-neutral-400">
-                      {lente.marca_nome || "N/A"}
-                    </p>
-                  </div>
-
-                  <div class="flex items-center gap-2">
-                    <Badge variant="primary" size="sm">
-                      {lente.tipo_lente || "N/A"}
-                    </Badge>
-                    <span
-                      class="text-sm font-medium text-green-600 dark:text-green-400"
-                    >
-                      {formatCurrency(lente.preco_base || 0)}
-                    </span>
-                  </div>
-
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    fullWidth
-                    on:click={() => adicionarLente(lente.id)}
-                  >
-                    ➕ Adicionar
-                  </Button>
-                </div>
-              </div>
-            {/each}
-          </div>
-        </section>
-      {/if}
-
-      <!-- Estado Vazio -->
-      {#if lentesComparacao.length === 0}
-        <section class="mt-12">
-          <EmptyState
-            icon="⚖️"
-            title="Nenhuma lente selecionada"
-            description="Adicione lentes para começar a comparação. Você pode comparar até 3 lentes simultaneamente."
-            actionLabel="Explorar Catálogo"
-            on:action={() => goto("/catalogo")}
-          />
-        </section>
-      {/if}
-
-      <!-- Ações Rápidas -->
-      <section class="mt-12 mb-8">
-        <SectionHeader title="Ações Rápidas" />
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-          <ActionCard
-            icon="📚"
-            title="Explorar Catálogo"
-            description="Navegue pelo catálogo completo de lentes"
-            actionLabel="Ver Catálogo"
-            color="blue"
-            on:click={() => goto("/catalogo")}
-          />
-
-          <ActionCard
-            icon="🔍"
-            title="Busca Avançada"
-            description="Use filtros específicos para encontrar lentes"
-            actionLabel="Buscar"
-            color="green"
-            on:click={() => goto("/buscar")}
-          />
-
-          <ActionCard
-            icon="📊"
-            title="Ver Rankings"
-            description="Compare fornecedores por lente específica"
-            actionLabel="Rankings"
-            color="orange"
-            on:click={() => goto("/ranking")}
-          />
+            <p class="font-mono text-blue-600 dark:text-blue-400 font-medium">SV_CR39_150</p>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              Visão Simples • CR-39 • Índice 1.50
+            </p>
+          </button>
+          
+          <button
+            class="glass-panel rounded-lg p-4 hover:shadow-lg transition-shadow text-left"
+            on:click={() => {
+              skuInput = 'PROG_POLY_167';
+              buscarComparacao();
+            }}
+          >
+            <p class="font-mono text-purple-600 dark:text-purple-400 font-medium">PROG_POLY_167</p>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              Progressiva • Policarbonato • Índice 1.67
+            </p>
+          </button>
+          
+          <button
+            class="glass-panel rounded-lg p-4 hover:shadow-lg transition-shadow text-left"
+            on:click={() => {
+              skuInput = 'BIF_TRIVEX_153';
+              buscarComparacao();
+            }}
+          >
+            <p class="font-mono text-green-600 dark:text-green-400 font-medium">BIF_TRIVEX_153</p>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+              Bifocal • Trivex • Índice 1.53
+            </p>
+          </button>
         </div>
       </section>
-    </Container>
-  </main>
+    {/if}
+  </Container>
+</main>
