@@ -341,6 +341,16 @@
                 </div>
               {/if}
             </div>
+
+            <!-- Botão Ver Detalhes -->
+            <div class="px-4 pb-4">
+              <a
+                href="/buscar/{lente.id}"
+                class="block w-full text-center py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all"
+              >
+                Ver Detalhes →
+              </a>
+            </div>
           </div>
         {/each}
       </div>

@@ -51,6 +51,9 @@ export class CatalogoAPI {
         .select('*', { count: 'exact' });
 
       // Aplicar filtros
+      if (filtros.ids && filtros.ids.length > 0) {
+        query = query.in('id', filtros.ids);
+      }
       if (filtros.tipos && filtros.tipos.length > 0) {
         query = query.in('tipo_lente', filtros.tipos);
       }

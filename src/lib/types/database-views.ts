@@ -338,6 +338,7 @@ export interface StatsCatalogo {
 // ============================================================================
 
 export interface FiltrosLentes {
+  ids?: string[];
   tipos?: TipoLente[];
   categorias?: CategoriaLente[];
   materiais?: MaterialLente[];
