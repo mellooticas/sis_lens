@@ -44,13 +44,6 @@
       color: "text-amber-500",
     },
     {
-      id: "catalogo-comparar",
-      label: "Comparar Labs",
-      href: "/catalogo/comparar",
-      icon: "arrow-left-right",
-      color: "text-cyan-500",
-    },
-    {
       id: "ranking",
       label: "Ranking",
       href: "/ranking",
