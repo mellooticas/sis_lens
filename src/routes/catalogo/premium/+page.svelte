@@ -267,10 +267,10 @@
             <!-- Footer -->
             <div class="px-5 pb-4">
               <a
-                href="/catalogo/comparar?id={canonica.id}"
-                class="block w-full text-center py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg font-medium hover:from-amber-600 hover:to-orange-700 transition-all"
+                href="/catalogo/premium/{canonica.id}"
+                class="block w-full text-center py-2 bg-gradient-to-r from-indigo-600 to-purple-600 text-white rounded-lg font-medium hover:from-indigo-700 hover:to-purple-700 transition-all"
               >
-                Ver Detalhes →
+                Comparar Laboratórios →
               </a>
             </div>
           </div>
