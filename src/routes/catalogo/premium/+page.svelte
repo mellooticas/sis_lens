@@ -85,11 +85,10 @@
     />
 
     <!-- Filtros -->
-    <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border border-indigo-100">
+    <section class="glass-panel p-6 rounded-xl shadow-lg mb-8 mt-8">
       <SectionHeader
         title="🔍 Filtros de Busca"
         subtitle="Refine sua pesquisa"
-        size="sm"
       />
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         <!-- Busca -->
@@ -123,7 +122,7 @@
           ]}
         />
       </div>
-    </div>
+    </section>
 
     <!-- Loading -->
     {#if loading}
