@@ -15,6 +15,7 @@ import type {
   CanonicaGenerica,
   CanonicaPremium,
   DetalhePremium,
+  DetalheGenerico,
   StatsCatalogo,
   FiltrosLentes,
   PaginacaoParams,
@@ -393,6 +394,79 @@ export class CatalogoAPI {
       };
     } catch (error) {
       console.error('Erro ao comparar laboratórios:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  // ============================================================================
+  // MÓDULO: COMPARAR GENÉRICAS (vw_detalhes_genericas)
+  // ============================================================================
+
+  /**
+   * Listar todas as lentes reais de uma canônica genérica
+   * Para o botão "Comparar Laboratórios" no módulo Catálogo
+   */
+  static async listarDetalhesGenericas(
+    canonicaId: string
+  ): Promise<ApiResponse<DetalheGenerico[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('vw_detalhes_genericas')
+        .select('*')
+        .eq('canonica_id', canonicaId)
+        .order('marca_nome')
+        .order('preco_tabela');
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data || [],
+        count: data?.length || 0
+      };
+    } catch (error) {
+      console.error('Erro ao listar detalhes genéricas:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  /**
+   * Comparar lentes genéricas de múltiplos laboratórios
+   * Agrupa por marca/laboratório
+   */
+  static async compararLaboratoriosGenericas(
+    canonicaId: string
+  ): Promise<ApiResponse<Record<string, DetalheGenerico[]>>> {
+    try {
+      const resultado = await this.listarDetalhesGenericas(canonicaId);
+      
+      if (!resultado.success || !resultado.data) {
+        return resultado as any;
+      }
+
+      // Agrupar por marca
+      const agrupadoPorMarca = resultado.data.reduce((acc, lente) => {
+        const marca = lente.marca_nome;
+        if (!acc[marca]) {
+          acc[marca] = [];
+        }
+        acc[marca].push(lente);
+        return acc;
+      }, {} as Record<string, DetalheGenerico[]>);
+
+      return {
+        success: true,
+        data: agrupadoPorMarca,
+        count: Object.keys(agrupadoPorMarca).length
+      };
+    } catch (error) {
+      console.error('Erro ao comparar laboratórios genéricos:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Erro desconhecido'

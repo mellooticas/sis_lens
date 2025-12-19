@@ -284,6 +284,154 @@ export interface DetalhePremium {
 }
 
 // ============================================================================
+// VIEW 4B: vw_detalhes_genericas (COMPARAR - detalhes genéricas)
+// ============================================================================
+
+export interface DetalheGenerico {
+  // Canônica
+  canonica_id: string;
+  nome_canonico: string;
+  canonica_tipo_lente: TipoLente;
+  canonica_material: MaterialLente;
+  canonica_indice: IndiceRefracao;
+  canonica_categoria: CategoriaLente;
+  
+  // Lente Real
+  lente_id: string;
+  sku_fornecedor: string;
+  codigo_original: string | null;
+  nome_comercial: string;
+  linha_produto: string | null;
+  categoria: CategoriaLente;
+  material: MaterialLente;
+  indice_refracao: IndiceRefracao;
+  
+  // Marca (Laboratório)
+  marca_id: string;
+  marca_nome: string;
+  marca_slug: string;
+  marca_premium: boolean;
+  
+  // Tratamentos
+  ar: boolean;
+  antirrisco: boolean;
+  hidrofobico: boolean;
+  antiembaçante: boolean;
+  blue: boolean;
+  uv400: boolean;
+  fotossensivel: TratamentoFoto;
+  polarizado: boolean;
+  
+  // Tecnologias
+  digital: boolean;
+  free_form: boolean;
+  indoor: boolean;
+  drive: boolean;
+  
+  // Especificações Ópticas
+  esferico_min: number | null;
+  esferico_max: number | null;
+  cilindrico_min: number | null;
+  cilindrico_max: number | null;
+  adicao_min: number | null;
+  adicao_max: number | null;
+  diametro: number | null;
+  espessura_central: number | null;
+  
+  // Preços
+  custo_base: number;
+  preco_tabela: number;
+  preco_fabricante: number | null;
+  
+  // Logística
+  disponivel: boolean;
+  prazo_entrega: number | null;
+  obs_prazo: string | null;
+  
+  // Status
+  destaque: boolean | null;
+  novidade: boolean | null;
+  
+  // Descrições
+  descricao_curta: string | null;
+  beneficios: string[] | null;
+}
+
+// ============================================================================
+// VIEW 4B: vw_detalhes_genericas (COMPARAR - detalhes genéricas)
+// ============================================================================
+
+export interface DetalheGenerico {
+  // Canônica
+  canonica_id: string;
+  nome_canonico: string;
+  canonica_tipo_lente: TipoLente;
+  canonica_material: MaterialLente;
+  canonica_indice: IndiceRefracao;
+  canonica_categoria: CategoriaLente;
+  
+  // Lente Real
+  lente_id: string;
+  sku_fornecedor: string;
+  codigo_original: string | null;
+  nome_comercial: string;
+  linha_produto: string | null;
+  categoria: CategoriaLente;
+  material: MaterialLente;
+  indice_refracao: IndiceRefracao;
+  
+  // Marca (Laboratório)
+  marca_id: string;
+  marca_nome: string;
+  marca_slug: string;
+  marca_premium: boolean;
+  
+  // Tratamentos
+  ar: boolean;
+  antirrisco: boolean;
+  hidrofobico: boolean;
+  antiembaçante: boolean;
+  blue: boolean;
+  uv400: boolean;
+  fotossensivel: TratamentoFoto;
+  polarizado: boolean;
+  
+  // Tecnologias
+  digital: boolean;
+  free_form: boolean;
+  indoor: boolean;
+  drive: boolean;
+  
+  // Especificações Ópticas
+  esferico_min: number | null;
+  esferico_max: number | null;
+  cilindrico_min: number | null;
+  cilindrico_max: number | null;
+  adicao_min: number | null;
+  adicao_max: number | null;
+  diametro: number | null;
+  espessura_central: number | null;
+  
+  // Preços
+  custo_base: number;
+  preco_tabela: number;
+  preco_fabricante: number | null;
+  
+  // Logística
+  disponivel: boolean;
+  prazo_entrega: number | null;
+  obs_prazo: string | null;
+  
+  // Status
+  destaque: boolean | null;
+  novidade: boolean | null;
+  
+  // Descrições
+  descricao_curta: string | null;
+  beneficios: string[] | null;
+}
+
+// ============================================================================
 // VIEW 5: vw_stats_catalogo (ESTATÍSTICAS)
 // ============================================================================
 

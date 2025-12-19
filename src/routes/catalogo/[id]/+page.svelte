@@ -7,7 +7,7 @@
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { CatalogoAPI } from '$lib/api/catalogo-api';
-  import type { LenteCatalogo, CanonicaGenerica } from '$lib/types/database-views';
+  import type { DetalheGenerico, CanonicaGenerica } from '$lib/types/database-views';
 
   // Componentes padronizados
   import Container from "$lib/components/layout/Container.svelte";
@@ -18,7 +18,7 @@
   import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
 
   // State
-  let lentes: LenteCatalogo[] = [];
+  let lentes: DetalheGenerico[] = [];
   let canonica: CanonicaGenerica | null = null;
   let loading = true;
   let error = '';
@@ -44,14 +44,11 @@
         canonica = resultadoCanonica.data.dados.find(c => c.id === canonicaId) || null;
       }
 
-      // Buscar lentes desta canônica
-      const resultadoLentes = await CatalogoAPI.buscarLentes(
-        {},
-        { limite: 1000 }
-      );
+      // Buscar lentes usando a view vw_detalhes_genericas
+      const resultadoLentes = await CatalogoAPI.listarDetalhesGenericas(canonicaId);
 
       if (resultadoLentes.success && resultadoLentes.data) {
-        lentes = resultadoLentes.data.dados.filter(l => l.lente_canonica_id === canonicaId);
+        lentes = resultadoLentes.data;
       }
 
       if (!canonica || lentes.length === 0) {
@@ -71,7 +68,7 @@
     }
     acc[lente.marca_nome].push(lente);
     return acc;
-  }, {} as Record<string, LenteCatalogo[]>);
+  }, {} as Record<string, DetalheGenerico[]>);
 
   $: marcas = Object.keys(lentesAgrupadas).sort();
   $: precoMinimo = lentes.length > 0 ? Math.min(...lentes.map(l => l.preco_tabela)) : 0;
