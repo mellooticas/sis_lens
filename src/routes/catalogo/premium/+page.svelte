@@ -1,200 +1,276 @@
 <!--
-  🏆 Página de Produtos Premium
-  Catálogo de produtos premium agrupados por canônicas
+  🏆 Premium - Lentes Canônicas Premium (250 grupos)
+  Dados reais da view vw_canonicas_premium
 -->
 <script lang="ts">
-  import { goto } from "$app/navigation";
-  import type { PageData } from "./$types";
+  import { onMount } from 'svelte';
+  import { CatalogoAPI } from '$lib/api/catalogo-api';
+  import type { CanonicaPremium } from '$lib/types/database-views';
 
-  import Container from "$lib/components/layout/Container.svelte";
-  import PageHero from "$lib/components/layout/PageHero.svelte";
-  import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
-  import StatsCard from "$lib/components/cards/StatsCard.svelte";
-  import Button from "$lib/components/ui/Button.svelte";
-  import Select from "$lib/components/ui/Select.svelte";
-  import Badge from "$lib/components/ui/Badge.svelte";
-  import EmptyState from "$lib/components/ui/EmptyState.svelte";
-
-  export let data: PageData;
-
+  // State
+  let canonicas: CanonicaPremium[] = [];
+  let loading = true;
+  let error = '';
+  
   // Filtros
-  let marca_id = data.filtros?.marca_id || "";
-  let tipo_lente = data.filtros?.tipo_lente || "";
+  let filtroMarca = '';
+  let filtroTipo = '';
+  let filtroBusca = '';
 
-  $: produtos = data.produtos || [];
-  $: estatisticas = data.estatisticas || {};
-  $: marcasOptions = data.filtros?.opcoes?.marcas || [];
-  $: tiposOptions = data.filtros?.opcoes?.tipos_lente || [];
+  // Carregar dados
+  onMount(async () => {
+    await carregarDados();
+  });
 
-  function aplicarFiltros() {
-    const params = new URLSearchParams();
-    if (marca_id) params.set("marca_id", marca_id);
-    if (tipo_lente) params.set("tipo_lente", tipo_lente);
-    goto(`/catalogo/premium?${params.toString()}`);
+  async function carregarDados() {
+    loading = true;
+    error = '';
+    
+    const resultado = await CatalogoAPI.listarCanonicasPremium(
+      {
+        tipos: filtroTipo ? [filtroTipo as any] : undefined
+      },
+      { limite: 300, ordenar: 'nome_canonico', direcao: 'asc' }
+    );
+
+    if (resultado.success && resultado.data) {
+      canonicas = resultado.data.dados;
+    } else {
+      error = resultado.error || 'Erro ao carregar premium';
+    }
+    
+    loading = false;
   }
 
-  function limparFiltros() {
-    marca_id = "";
-    tipo_lente = "";
-    aplicarFiltros();
-  }
+  // Filtros locais
+  $: filtradas = canonicas.filter(c => {
+    const busca = filtroBusca.toLowerCase();
+    const buscaOk = !busca || 
+      c.nome_canonico.toLowerCase().includes(busca) ||
+      c.marca_nome.toLowerCase().includes(busca) ||
+      c.linha_produto?.toLowerCase().includes(busca);
+    
+    const marcaOk = !filtroMarca || c.marca_nome === filtroMarca;
+    
+    return buscaOk && marcaOk;
+  });
 
-  function verDetalhes(produtoId: string) {
-    goto(`/catalogo/premium/${produtoId}`);
-  }
+  // Marcas únicas para filtro
+  $: marcasUnicas = [...new Set(canonicas.map(c => c.marca_nome))].sort();
 </script>
 
 <svelte:head>
-  <title>Produtos Premium - SIS Lens</title>
+  <title>Lentes Premium - SIS Lens</title>
 </svelte:head>
 
-<PageHero
-  title="🏆 Produtos Premium"
-  description="Catálogo de lentes premium agrupadas por produto canônico"
-  icon="sparkles"
-/>
+<main class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 py-12">
+  <div class="container mx-auto px-4 max-w-7xl">
+    
+    <!-- Header -->
+    <header class="text-center mb-12">
+      <div class="inline-block px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-4">
+        🏆 Premium
+      </div>
+      <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
+        Lentes Premium
+      </h1>
+      <p class="text-lg text-slate-600 max-w-2xl mx-auto">
+        {canonicas.length} produtos premium disponíveis
+      </p>
+    </header>
 
-<Container>
-  <!-- Estatísticas -->
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8">
-    <StatsCard
-      title="Total de Produtos"
-      value={estatisticas.total_produtos?.toString() || "0"}
-      icon="box"
-      variant="primary"
-    />
-    <StatsCard
-      title="Marcas Premium"
-      value={estatisticas.total_marcas?.toString() || "0"}
-      icon="award"
-      variant="success"
-    />
-    <StatsCard
-      title="Média Labs/Produto"
-      value={estatisticas.media_labs_por_produto?.toFixed(1) || "0.0"}
-      icon="users"
-      variant="warning"
-    />
-  </div>
+    <!-- Filtros -->
+    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-8">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <!-- Busca -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            🔍 Buscar
+          </label>
+          <input
+            type="text"
+            bind:value={filtroBusca}
+            placeholder="Nome, marca ou linha..."
+            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          />
+        </div>
 
-  <!-- Filtros -->
-  <div class="glass-panel p-6 rounded-xl shadow-xl mb-6">
-    <SectionHeader title="Filtros" icon="filter" />
+        <!-- Marca -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            🏭 Marca
+          </label>
+          <select
+            bind:value={filtroMarca}
+            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          >
+            <option value="">Todas</option>
+            {#each marcasUnicas as marca}
+              <option value={marca}>{marca}</option>
+            {/each}
+          </select>
+        </div>
 
-    <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-      <Select
-        label="Marca"
-        bind:value={marca_id}
-        options={marcasOptions}
-        on:change={aplicarFiltros}
-      />
-
-      <Select
-        label="Tipo de Lente"
-        bind:value={tipo_lente}
-        options={tiposOptions}
-        on:change={aplicarFiltros}
-      />
-
-      <div class="flex items-end gap-2">
-        <Button variant="outline" on:click={limparFiltros}>
-          Limpar Filtros
-        </Button>
+        <!-- Tipo -->
+        <div>
+          <label class="block text-sm font-medium text-slate-700 mb-2">
+            👓 Tipo
+          </label>
+          <select
+            bind:value={filtroTipo}
+            on:change={carregarDados}
+            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
+          >
+            <option value="">Todos</option>
+            <option value="visao_simples">Visão Simples</option>
+            <option value="multifocal">Multifocal</option>
+            <option value="bifocal">Bifocal</option>
+          </select>
+        </div>
       </div>
     </div>
-  </div>
 
-  <!-- Lista de Produtos -->
-  {#if produtos.length === 0}
-    <EmptyState
-      title="Nenhum produto premium encontrado"
-      description="Tente ajustar os filtros para ver mais resultados"
-      icon="search"
-    />
-  {:else}
-    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-      {#each produtos as produto}
-        <div
-          class="glass-panel rounded-xl shadow-xl p-6 hover:shadow-2xl transition-all duration-300"
+    <!-- Loading -->
+    {#if loading}
+      <div class="flex justify-center items-center py-20">
+        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
+        <span class="ml-4 text-slate-600">Carregando produtos premium...</span>
+      </div>
+    
+    <!-- Error -->
+    {:else if error}
+      <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
+        <p class="text-red-800">⚠️ {error}</p>
+        <button
+          on:click={carregarDados}
+          class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
         >
-          <!-- Header do Card -->
-          <div class="flex items-start justify-between mb-4">
-            <div class="flex-1">
-              <Badge variant="primary" size="sm" class="mb-2">PREMIUM</Badge>
-              <h3 class="font-semibold text-gray-900 text-lg mb-1">
-                {produto.nome}
-              </h3>
-              <p class="text-sm text-gray-600">{produto.marca}</p>
-            </div>
-          </div>
-
-          <!-- Características -->
-          <div class="space-y-2 mb-4">
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Tipo:</span>
-              <span class="font-medium">{produto.tipo_lente}</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Material:</span>
-              <span class="font-medium">{produto.material}</span>
-            </div>
-            <div class="flex justify-between text-sm">
-              <span class="text-gray-600">Índice:</span>
-              <span class="font-medium">{produto.indice_refracao}</span>
-            </div>
-          </div>
-
-          <!-- Tratamentos -->
-          {#if produto.tratamentos && produto.tratamentos.length > 0}
-            <div class="mb-4">
-              <p class="text-xs text-gray-600 mb-2">Tratamentos:</p>
-              <div class="flex flex-wrap gap-1">
-                {#each produto.tratamentos as tratamento}
-                  <Badge variant="outline" size="xs">
-                    {tratamento}
-                  </Badge>
-                {/each}
+          Tentar novamente
+        </button>
+      </div>
+    
+    <!-- Empty State -->
+    {:else if filtradas.length === 0}
+      <div class="text-center py-20">
+        <div class="text-6xl mb-4">🔍</div>
+        <h3 class="text-2xl font-bold text-slate-900 mb-2">Nenhum produto encontrado</h3>
+        <p class="text-slate-600">Tente ajustar os filtros</p>
+      </div>
+    
+    <!-- Grid de Premium -->
+    {:else}
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {#each filtradas as canonica}
+          <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-amber-200 overflow-hidden">
+            
+            <!-- Header com Marca -->
+            <div class="bg-gradient-to-r from-amber-500 to-orange-600 p-4">
+              <div class="flex items-center justify-between mb-2">
+                <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full font-medium">
+                  {canonica.marca_nome}
+                </span>
+                {#if canonica.categoria === 'super_premium'}
+                  <span class="text-white text-xl">⭐</span>
+                {/if}
               </div>
+              <h3 class="font-semibold text-white text-lg leading-tight">
+                {canonica.nome_canonico}
+              </h3>
+              {#if canonica.linha_produto}
+                <p class="text-amber-100 text-sm mt-1">
+                  {canonica.linha_produto}
+                </p>
+              {/if}
             </div>
-          {/if}
 
-          <!-- Disponibilidade em Labs -->
-          <div class="border-t pt-4 mb-4">
-            <p class="text-sm font-medium text-gray-700 mb-2">
-              Disponível em {produto.qtd_laboratorios} laboratório{produto.qtd_laboratorios !==
-              1
-                ? "s"
-                : ""}:
-            </p>
-            <div class="space-y-1">
-              {#each produto.laboratorios?.slice(0, 3) || [] as lab}
-                <div class="text-xs text-gray-600">
-                  • {lab.laboratorio}
+            <!-- Corpo -->
+            <div class="p-5 space-y-3">
+              <!-- Specs -->
+              <div class="grid grid-cols-2 gap-2 text-sm">
+                <div class="bg-slate-50 px-3 py-2 rounded-lg">
+                  <div class="text-slate-500 text-xs">Tipo</div>
+                  <div class="font-medium text-slate-900 capitalize">
+                    {canonica.tipo_lente.replace('_', ' ')}
+                  </div>
                 </div>
-              {/each}
-              {#if produto.laboratorios?.length > 3}
-                <div class="text-xs text-blue-600">
-                  + {produto.laboratorios.length - 3} mais
+                
+                <div class="bg-slate-50 px-3 py-2 rounded-lg">
+                  <div class="text-slate-500 text-xs">Material</div>
+                  <div class="font-medium text-slate-900">{canonica.material}</div>
+                </div>
+
+                <div class="bg-slate-50 px-3 py-2 rounded-lg">
+                  <div class="text-slate-500 text-xs">Índice</div>
+                  <div class="font-medium text-slate-900">{canonica.indice_refracao}</div>
+                </div>
+
+                <div class="bg-slate-50 px-3 py-2 rounded-lg">
+                  <div class="text-slate-500 text-xs">Categoria</div>
+                  <div class="font-medium text-amber-700 capitalize text-xs">
+                    {canonica.categoria.replace('_', ' ')}
+                  </div>
+                </div>
+              </div>
+
+              <!-- Tratamentos Premium -->
+              {#if canonica.ar || canonica.blue || canonica.fotossensivel || canonica.polarizado}
+                <div class="flex flex-wrap gap-2">
+                  {#if canonica.ar}
+                    <span class="px-2 py-1 bg-blue-100 text-blue-700 text-xs rounded-full font-medium">✨ AR</span>
+                  {/if}
+                  {#if canonica.blue}
+                    <span class="px-2 py-1 bg-cyan-100 text-cyan-700 text-xs rounded-full font-medium">🔵 Blue</span>
+                  {/if}
+                  {#if canonica.fotossensivel}
+                    <span class="px-2 py-1 bg-amber-100 text-amber-700 text-xs rounded-full font-medium">☀️ Foto</span>
+                  {/if}
+                  {#if canonica.polarizado}
+                    <span class="px-2 py-1 bg-purple-100 text-purple-700 text-xs rounded-full font-medium">🕶️ Polar</span>
+                  {/if}
+                </div>
+              {/if}
+
+              <!-- Stats -->
+              <div class="pt-3 border-t border-slate-200">
+                <div class="grid grid-cols-2 gap-2 text-center">
+                  <div>
+                    <div class="text-xs text-slate-500">Lentes Ativas</div>
+                    <div class="text-lg font-bold text-amber-600">{canonica.lentes_ativas || 0}</div>
+                  </div>
+                  <div>
+                    <div class="text-xs text-slate-500">Preço Médio</div>
+                    <div class="text-sm font-bold text-emerald-600">
+                      {canonica.preco_medio ? `R$ ${canonica.preco_medio.toFixed(0)}` : '-'}
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Faixa de Preço -->
+              {#if canonica.preco_minimo && canonica.preco_maximo}
+                <div class="text-xs text-slate-600 pt-2 border-t">
+                  <strong>Faixa:</strong> R$ {canonica.preco_minimo.toFixed(0)} - R$ {canonica.preco_maximo.toFixed(0)}
                 </div>
               {/if}
             </div>
+
+            <!-- Footer -->
+            <div class="px-5 pb-4">
+              <a
+                href="/catalogo/comparar?id={canonica.id}"
+                class="block w-full text-center py-2 bg-gradient-to-r from-amber-500 to-orange-600 text-white rounded-lg font-medium hover:from-amber-600 hover:to-orange-700 transition-all"
+              >
+                Ver Detalhes →
+              </a>
+            </div>
           </div>
+        {/each}
+      </div>
 
-          <!-- Ações -->
-          <Button
-            variant="primary"
-            size="sm"
-            fullWidth
-            on:click={() => verDetalhes(produto.id)}
-          >
-            Ver Detalhes e Comparar
-          </Button>
-        </div>
-      {/each}
-    </div>
-  {/if}
-</Container>
-
-<style>
-  /* Adicione estilos customizados se necessário */
-</style>
+      <!-- Contador -->
+      <div class="mt-8 text-center text-slate-600">
+        Exibindo {filtradas.length} de {canonicas.length} produtos premium
+      </div>
+    {/if}
+  </div>
+</main>
