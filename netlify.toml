@@ -1,12 +1,8 @@
 [build]
-  command = "npm install && npm run build"
+  command = "npm ci && npm run build"
   publish = "build"
 
 [build.environment]
   NODE_VERSION = "20"
-  NPM_FLAGS = "--include=dev"
   VITE_SUPABASE_URL = "https://ahcikwsoxhmqqteertkx.supabase.co"
   VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2lrd3NveGhtcXF0ZWVydGt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MzAwMzMsImV4cCI6MjA3NTAwNjAzM30.29PQSkRCNgmer_h7AcePf0BnOigyKJk4no8VqtmWBFk"
-
-[context.production.environment]
-  NODE_ENV = "production"
