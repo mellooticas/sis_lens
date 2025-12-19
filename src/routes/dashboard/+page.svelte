@@ -20,9 +20,9 @@
   import { useFornecedores } from "$lib/hooks/useFornecedores";
   
   // State dos hooks
-  const { state: statsState } = useStatsCatalogo();
-  const { state: marcasState } = useMarcas();
-  const { state: fornecedoresState } = useFornecedores();
+  const { state: statsState, carregarEstatisticas } = useStatsCatalogo();
+  const { state: marcasState, carregarMarcas } = useMarcas();
+  const { state: fornecedoresState, carregarFornecedores } = useFornecedores();
 
   // Dados reativos
   $: stats = $statsState.stats;
@@ -33,8 +33,13 @@
   // Estado local
   let currentTime = new Date();
 
-  // Atualizar relógio
+  // Carregar dados e atualizar relógio
   onMount(() => {
+    // Carregar dados iniciais
+    carregarEstatisticas();
+    carregarMarcas();
+    carregarFornecedores();
+
     const interval = setInterval(() => {
       currentTime = new Date();
     }, 1000);
@@ -87,16 +92,16 @@
 
           <StatsCard
             title="Lentes Premium"
-            value={formatNumber(stats.lentes_premium || 0)}
+            value={formatNumber(stats.total_premium || 0)}
             icon="⭐"
             color="orange"
           />
 
           <StatsCard
-            title="Lentes Genéricas"
-            value={formatNumber(stats.lentes_genericas || 0)}
-            icon="📦"
-            color="green"
+            title="Super Premium"
+            value={formatNumber(stats.total_super_premium || 0)}
+            icon="💎"
+            color="purple"
           />
 
           <StatsCard
@@ -104,6 +109,168 @@
             value={formatNumber(stats.total_marcas || 0)}
             icon="🏷️"
             color="gold"
+          />
+        </div>
+      </section>
+
+      <!-- Estatísticas por Tipo -->
+      <section class="mt-8">
+        <SectionHeader
+          title="📈 Distribuição por Tipo"
+          subtitle="Categorização das lentes no catálogo"
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <StatsCard
+            title="Visão Simples"
+            value={formatNumber(stats.total_visao_simples || 0)}
+            icon="👓"
+            color="blue"
+          />
+
+          <StatsCard
+            title="Multifocais"
+            value={formatNumber(stats.total_multifocal || 0)}
+            icon="🔄"
+            color="green"
+          />
+
+          <StatsCard
+            title="Bifocais"
+            value={formatNumber(stats.total_bifocal || 0)}
+            icon="👁️"
+            color="orange"
+          />
+        </div>
+      </section>
+
+      <!-- Estatísticas por Material -->
+      <section class="mt-8">
+        <SectionHeader
+          title="🔬 Distribuição por Material"
+          subtitle="Materiais das lentes disponíveis"
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+          <StatsCard
+            title="CR-39"
+            value={formatNumber(stats.total_cr39 || 0)}
+            icon="🔵"
+            color="blue"
+          />
+
+          <StatsCard
+            title="Policarbonato"
+            value={formatNumber(stats.total_policarbonato || 0)}
+            icon="💪"
+            color="green"
+          />
+
+          <StatsCard
+            title="Trivex"
+            value={formatNumber(stats.total_trivex || 0)}
+            icon="⚡"
+            color="purple"
+          />
+
+          <StatsCard
+            title="High Index"
+            value={formatNumber(stats.total_high_index || 0)}
+            icon="✨"
+            color="gold"
+          />
+        </div>
+      </section>
+
+      <!-- Tratamentos Especiais -->
+      <section class="mt-8">
+        <SectionHeader
+          title="✨ Tratamentos e Recursos"
+          subtitle="Tecnologias aplicadas nas lentes"
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
+          <StatsCard
+            title="Anti-Reflexo"
+            value={formatNumber(stats.total_com_ar || 0)}
+            icon="💎"
+            color="blue"
+          />
+
+          <StatsCard
+            title="Blue Light"
+            value={formatNumber(stats.total_com_blue || 0)}
+            icon="🔵"
+            color="cyan"
+          />
+
+          <StatsCard
+            title="Fotossensíveis"
+            value={formatNumber(stats.total_fotossensiveis || 0)}
+            icon="☀️"
+            color="orange"
+          />
+
+          <StatsCard
+            title="Polarizadas"
+            value={formatNumber(stats.total_polarizados || 0)}
+            icon="🕶️"
+            color="purple"
+          />
+        </div>
+      </section>
+
+      <!-- Tecnologia -->
+      <section class="mt-8">
+        <SectionHeader
+          title="🎯 Tecnologias Avançadas"
+          subtitle="Manufatura e processos especiais"
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
+          <StatsCard
+            title="Free-Form"
+            value={formatNumber(stats.total_free_form || 0)}
+            icon="🔧"
+            color="blue"
+          />
+
+          <StatsCard
+            title="Digitais"
+            value={formatNumber(stats.total_digitais || 0)}
+            icon="💻"
+            color="green"
+          />
+        </div>
+      </section>
+
+      <!-- Faixa de Preços -->
+      <section class="mt-8">
+        <SectionHeader
+          title="💰 Faixa de Preços"
+          subtitle="Range de valores do catálogo"
+        />
+
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
+          <StatsCard
+            title="Preço Mínimo"
+            value={stats.preco_minimo ? `R$ ${stats.preco_minimo.toFixed(2)}` : '-'}
+            icon="⬇️"
+            color="green"
+          />
+
+          <StatsCard
+            title="Preço Médio"
+            value={stats.preco_medio ? `R$ ${stats.preco_medio.toFixed(2)}` : '-'}
+            icon="📊"
+            color="blue"
+          />
+
+          <StatsCard
+            title="Preço Máximo"
+            value={stats.preco_maximo ? `R$ ${stats.preco_maximo.toFixed(2)}` : '-'}
+            icon="⬆️"
+            color="orange"
           />
         </div>
       </section>

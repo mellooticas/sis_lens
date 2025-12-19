@@ -7,6 +7,16 @@
   import { CatalogoAPI } from '$lib/api/catalogo-api';
   import type { CanonicaPremium } from '$lib/types/database-views';
 
+  // Componentes padronizados
+  import Container from "$lib/components/layout/Container.svelte";
+  import PageHero from "$lib/components/layout/PageHero.svelte";
+  import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
+  import Button from "$lib/components/ui/Button.svelte";
+  import Input from "$lib/components/forms/Input.svelte";
+  import Select from "$lib/components/forms/Select.svelte";
+  import Badge from "$lib/components/ui/Badge.svelte";
+  import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
+
   // State
   let canonicas: CanonicaPremium[] = [];
   let loading = true;
@@ -63,108 +73,110 @@
   <title>Lentes Premium - SIS Lens</title>
 </svelte:head>
 
-<main class="min-h-screen bg-gradient-to-br from-amber-50 via-orange-50 to-yellow-50 py-12">
-  <div class="container mx-auto px-4 max-w-7xl">
+<main class="min-h-screen bg-gradient-to-br from-blue-50 via-indigo-50 to-purple-50">
+  <Container maxWidth="xl" padding="lg">
     
     <!-- Header -->
-    <header class="text-center mb-12">
-      <div class="inline-block px-4 py-2 bg-amber-100 text-amber-700 rounded-full text-sm font-medium mb-4">
-        🏆 Premium
-      </div>
-      <h1 class="text-4xl md:text-5xl font-bold text-slate-900 mb-4">
-        Lentes Premium
-      </h1>
-      <p class="text-lg text-slate-600 max-w-2xl mx-auto">
-        {canonicas.length} produtos premium disponíveis
-      </p>
-    </header>
+    <PageHero
+      badge="🏆 Premium"
+      title="Lentes Premium"
+      subtitle={`${canonicas.length} produtos premium de alta qualidade`}
+      alignment="center"
+      maxWidth="lg"
+    />
 
     <!-- Filtros -->
-    <div class="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg p-6 mb-8">
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <div class="bg-white/90 backdrop-blur-sm rounded-2xl shadow-xl p-6 mb-8 border border-indigo-100">
+      <SectionHeader
+        title="🔍 Filtros de Busca"
+        subtitle="Refine sua pesquisa"
+        size="sm"
+      />
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
         <!-- Busca -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            🔍 Buscar
-          </label>
-          <input
-            type="text"
-            bind:value={filtroBusca}
-            placeholder="Nome, marca ou linha..."
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-          />
-        </div>
+        <Input
+          label="🔍 Buscar"
+          bind:value={filtroBusca}
+          placeholder="Nome, marca ou linha..."
+          type="text"
+        />
 
         <!-- Marca -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            🏭 Marca
-          </label>
-          <select
-            bind:value={filtroMarca}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-          >
-            <option value="">Todas</option>
-            {#each marcasUnicas as marca}
-              <option value={marca}>{marca}</option>
-            {/each}
-          </select>
-        </div>
+        <Select
+          label="🏭 Marca"
+          bind:value={filtroMarca}
+          options={[
+            { value: '', label: 'Todas as marcas' },
+            ...marcasUnicas.map(m => ({ value: m, label: m }))
+          ]}
+        />
 
         <!-- Tipo -->
-        <div>
-          <label class="block text-sm font-medium text-slate-700 mb-2">
-            👓 Tipo
-          </label>
-          <select
-            bind:value={filtroTipo}
-            on:change={carregarDados}
-            class="w-full px-4 py-2 border border-slate-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent"
-          >
-            <option value="">Todos</option>
-            <option value="visao_simples">Visão Simples</option>
-            <option value="multifocal">Multifocal</option>
-            <option value="bifocal">Bifocal</option>
-          </select>
-        </div>
+        <Select
+          label="👓 Tipo de Lente"
+          bind:value={filtroTipo}
+          on:change={carregarDados}
+          options={[
+            { value: '', label: 'Todos os tipos' },
+            { value: 'visao_simples', label: 'Visão Simples' },
+            { value: 'multifocal', label: 'Multifocal' },
+            { value: 'bifocal', label: 'Bifocal' }
+          ]}
+        />
       </div>
     </div>
 
     <!-- Loading -->
     {#if loading}
-      <div class="flex justify-center items-center py-20">
-        <div class="animate-spin rounded-full h-12 w-12 border-b-2 border-amber-600"></div>
-        <span class="ml-4 text-slate-600">Carregando produtos premium...</span>
+      <div class="flex flex-col justify-center items-center py-20">
+        <LoadingSpinner size="lg" />
+        <p class="mt-4 text-slate-600">Carregando produtos premium...</p>
       </div>
     
     <!-- Error -->
     {:else if error}
-      <div class="bg-red-50 border border-red-200 rounded-lg p-6 text-center">
-        <p class="text-red-800">⚠️ {error}</p>
-        <button
+      <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-8 text-center">
+        <div class="text-5xl mb-4">⚠️</div>
+        <p class="text-red-800 text-lg font-medium mb-4">{error}</p>
+        <Button
+          variant="danger"
           on:click={carregarDados}
-          class="mt-4 px-6 py-2 bg-red-600 text-white rounded-lg hover:bg-red-700"
         >
-          Tentar novamente
-        </button>
+          Tentar Novamente
+        </Button>
       </div>
     
     <!-- Empty State -->
     {:else if filtradas.length === 0}
-      <div class="text-center py-20">
+      <div class="text-center py-20 bg-white/60 rounded-2xl backdrop-blur-sm">
         <div class="text-6xl mb-4">🔍</div>
         <h3 class="text-2xl font-bold text-slate-900 mb-2">Nenhum produto encontrado</h3>
-        <p class="text-slate-600">Tente ajustar os filtros</p>
+        <p class="text-slate-600 mb-4">Tente ajustar os filtros de busca</p>
+        <Button
+          variant="secondary"
+          on:click={() => {
+            filtroBusca = '';
+            filtroMarca = '';
+            filtroTipo = '';
+          }}
+        >
+          Limpar Filtros
+        </Button>
       </div>
     
     <!-- Grid de Premium -->
     {:else}
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <SectionHeader
+        title="✨ Produtos Premium"
+        subtitle={`Exibindo ${filtradas.length} de ${canonicas.length} produtos`}
+      />
+      
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
         {#each filtradas as canonica}
-          <div class="bg-white/90 backdrop-blur-sm rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 border-2 border-amber-200 overflow-hidden">
+          <div class="bg-white/95 backdrop-blur-sm rounded-2xl shadow-lg hover:shadow-2xl transition-all duration-300 border border-indigo-100 overflow-hidden group hover:-translate-y-1">
             
             <!-- Header com Marca -->
-            <div class="bg-gradient-to-r from-amber-500 to-orange-600 p-4">
+            <div class="bg-gradient-to-r from-indigo-600 to-purple-600 p-5">
               <div class="flex items-center justify-between mb-2">
                 <span class="px-3 py-1 bg-white/20 backdrop-blur-sm text-white text-xs rounded-full font-medium">
                   {canonica.marca_nome}
@@ -267,10 +279,6 @@
         {/each}
       </div>
 
-      <!-- Contador -->
-      <div class="mt-8 text-center text-slate-600">
-        Exibindo {filtradas.length} de {canonicas.length} produtos premium
-      </div>
     {/if}
-  </div>
+  </Container>
 </main>
