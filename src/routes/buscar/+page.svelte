@@ -43,34 +43,40 @@
   }
 
   async function carregarLentes() {
-    loading = true;
-    error = '';
-    
-    const resultado = await CatalogoAPI.buscarLentes(
-      {
-        busca: filtroBusca || undefined,
-        tipos: filtroTipo ? [filtroTipo as any] : undefined,
-        materiais: filtroMaterial ? [filtroMaterial as any] : undefined,
-        indices: filtroIndice ? [filtroIndice as any] : undefined,
-        categorias: filtroCategoria ? [filtroCategoria as any] : undefined,
-        marcas: filtroMarca ? [filtroMarca] : undefined
-      },
-      { 
-        pagina: paginaAtual, 
-        limite: itensPorPagina,
-        ordenar: 'nome_comercial',
-        direcao: 'asc'
-      }
-    );
+    try {
+      loading = true;
+      error = '';
+      
+      const resultado = await CatalogoAPI.buscarLentes(
+        {
+          busca: filtroBusca || undefined,
+          tipos: filtroTipo ? [filtroTipo as any] : undefined,
+          materiais: filtroMaterial ? [filtroMaterial as any] : undefined,
+          indices: filtroIndice ? [filtroIndice as any] : undefined,
+          categorias: filtroCategoria ? [filtroCategoria as any] : undefined,
+          marcas: filtroMarca ? [filtroMarca] : undefined
+        },
+        { 
+          pagina: paginaAtual, 
+          limite: itensPorPagina,
+          ordenar: 'nome_comercial',
+          direcao: 'asc'
+        }
+      );
 
-    if (resultado.success && resultado.data) {
-      lentes = resultado.data.dados;
-      total = resultado.data.total;
-    } else {
-      error = resultado.error || 'Erro ao buscar lentes';
+      if (resultado.success && resultado.data) {
+        lentes = resultado.data.dados;
+        total = resultado.data.paginacao.total;
+      } else {
+        error = resultado.error || 'Erro ao buscar lentes';
+        console.error('Erro ao buscar lentes:', error);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar lentes:', err);
+      error = err instanceof Error ? err.message : 'Erro desconhecido';
+    } finally {
+      loading = false;
     }
-    
-    loading = false;
   }
 
   // Resetar página ao filtrar
@@ -340,7 +346,7 @@
               <div class="pt-3 border-t">
                 <div class="text-center">
                   <div class="text-2xl font-bold text-emerald-600">
-                    R$ {lente.preco.toFixed(0)}
+                    R$ {(lente.preco_tabela || 0).toFixed(0)}
                   </div>
                   {#if lente.desconto_promocional && lente.desconto_promocional > 0}
                     <div class="text-xs text-red-600 font-medium">

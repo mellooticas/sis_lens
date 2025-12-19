@@ -109,7 +109,7 @@ export class CatalogoAPI {
         }
       };
     } catch (error) {
-      console.error('Erro ao buscar lentes:', error);
+      console.error('❌ Erro ao buscar lentes:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Erro desconhecido'
