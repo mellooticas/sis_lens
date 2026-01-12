@@ -186,25 +186,31 @@ export class CatalogoAPI {
    * 🌟 Busca Inteligente por Receita (Prescription Match)
    * Usa a RPC buscar_lentes_por_receita
    */
-  static async buscarLentesPorReceita(
-      esferico: number,
-      cilindrico: number,
-      adicao?: number,
-      tipo?: string
-  ): Promise<ApiResponse<ResultadoBuscaInteligente[]>> {
+  static async buscarLentesPorReceita(params: {
+      receita: {
+          esferico: number;
+          cilindrico: number;
+          eixo?: number;
+          adicao?: number;
+      };
+      tipo_lente?: string;
+      limite?: number;
+  }): Promise<ApiResponse<{ dados: LenteCatalogo[] }>> {
     try {
         const { data, error } = await supabase.rpc('buscar_lentes_por_receita', {
-            p_esferico: esferico,
-            p_cilindrico: cilindrico,
-            p_adicao: adicao || null,
-            p_tipo_lente: tipo || null
+            p_esferico: params.receita.esferico,
+            p_cilindrico: params.receita.cilindrico,
+            p_adicao: params.receita.adicao || null,
+            p_tipo_lente: params.tipo_lente || null
         });
 
         if (error) throw error;
 
         return {
             success: true,
-            data: data || [],
+            data: {
+                dados: data || []
+            },
             count: data?.length || 0
         };
     } catch (error) {
