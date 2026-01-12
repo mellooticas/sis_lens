@@ -17,54 +17,19 @@
   // APIs
   import { CatalogoAPI } from "$lib/api/catalogo-api";
   import { FornecedoresAPI } from "$lib/api/fornecedores-api";
-  
-  // Hooks com dados reais
-  import { useStatsCatalogo } from "$lib/hooks/useStatsCatalogo";
-  
-  // State dos hooks
-  const { state: statsState, carregarEstatisticas } = useStatsCatalogo();
 
-  // Dados reativos
-  $: stats = $statsState.stats;
-  $: loading = $statsState.loading;
+  // Estado local
+  let loading = false;
+  let loadingExtras = true;
+  let currentTime = new Date();
+  
+  // Dados principais - agora da view vw_stats_catalogo unificada
+  let stats: any = null;
   
   // Dados adicionais
   let topCaros: any[] = [];
   let topPopulares: any[] = [];
   let fornecedoresAtivos = 0;
-  let loadingExtras = true;
-  
-  // Estatísticas detalhadas
-  let statsTratamentos = {
-    total_com_ar: 0,
-    total_com_blue: 0,
-    total_fotossensiveis: 0,
-    total_polarizados: 0,
-    total_free_form: 0,
-    total_digitais: 0
-  };
-  
-  let statsTipos = {
-    total_visao_simples: 0,
-    total_multifocal: 0,
-    total_bifocal: 0
-  };
-  
-  let statsMateriais = {
-    total_cr39: 0,
-    total_policarbonato: 0,
-    total_trivex: 0,
-    total_high_index: 0
-  };
-  
-  let statsPrecos = {
-    preco_minimo: 0,
-    preco_medio: 0,
-    preco_maximo: 0
-  };
-
-  // Estado local
-  let currentTime = new Date();
 
   // Carregar dados e atualizar relógio
   onMount(() => {
@@ -79,26 +44,33 @@
     return () => clearInterval(interval);
   });
   
+  // Carregar estatísticas unificadas da view vw_stats_catalogo
+  async function carregarEstatisticas() {
+    loading = true;
+    try {
+      const response = await CatalogoAPI.obterEstatisticas();
+      if (response.success && response.data) {
+        stats = response.data;
+      }
+    } catch (err) {
+      console.error('Erro ao carregar estatísticas:', err);
+    } finally {
+      loading = false;
+    }
+  }
+  
   async function carregarDadosExtras() {
     loadingExtras = true;
     try {
-      // Buscar top 5 mais caros e populares
+      // Buscar top 5 mais caros e populares + fornecedores
       const [
         resCaros, 
         resPopulares, 
-        resFornecedores, 
-        resTratamentos,
-        resTipos,
-        resMateriais,
-        resPrecos
+        resFornecedores
       ] = await Promise.all([
         CatalogoAPI.buscarTopCaros(5),
         CatalogoAPI.buscarTopPopulares(5),
-        FornecedoresAPI.buscarFornecedores(),
-        CatalogoAPI.obterEstatisticasTratamentos(),
-        CatalogoAPI.obterEstatisticasTipos(),
-        CatalogoAPI.obterEstatisticasMateriais(),
-        CatalogoAPI.obterFaixasPreco()
+        FornecedoresAPI.buscarFornecedores()
       ]);
       
       if (resCaros.success && resCaros.data) topCaros = resCaros.data;
@@ -106,10 +78,6 @@
       if (resFornecedores.success && resFornecedores.data) {
         fornecedoresAtivos = resFornecedores.data.length;
       }
-      if (resTratamentos.success && resTratamentos.data) statsTratamentos = resTratamentos.data;
-      if (resTipos.success && resTipos.data) statsTipos = resTipos.data;
-      if (resMateriais.success && resMateriais.data) statsMateriais = resMateriais.data;
-      if (resPrecos.success && resPrecos.data) statsPrecos = resPrecos.data;
     } catch (err) {
       console.error('Erro ao carregar dados extras:', err);
     } finally {
@@ -175,9 +143,10 @@
 
           <StatsCard
             title="Lentes Premium"
-            value={formatNumber(stats?.total_premium || 0)}
+            value={formatNumber(stats?.grupos_premium || 0)}
             icon="⭐"
             color="orange"
+            subtitle="Grupos premium no catálogo"
           />
 
           <StatsCard
@@ -276,21 +245,21 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <StatsCard
             title="Visão Simples"
-            value={formatNumber(statsTipos.total_visao_simples)}
+            value={formatNumber(stats?.total_visao_simples || 0)}
             icon="👓"
             color="blue"
           />
 
           <StatsCard
             title="Multifocais"
-            value={formatNumber(statsTipos.total_multifocal)}
+            value={formatNumber(stats?.total_multifocal || 0)}
             icon="🔄"
             color="green"
           />
 
           <StatsCard
             title="Bifocais"
-            value={formatNumber(statsTipos.total_bifocal)}
+            value={formatNumber(stats?.total_bifocal || 0)}
             icon="👁️"
             color="orange"
           />
@@ -307,28 +276,28 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
           <StatsCard
             title="CR-39"
-            value={formatNumber(statsMateriais.total_cr39)}
+            value={formatNumber(stats?.total_cr39 || 0)}
             icon="🔵"
             color="blue"
           />
 
           <StatsCard
             title="Policarbonato"
-            value={formatNumber(statsMateriais.total_policarbonato)}
+            value={formatNumber(stats?.total_policarbonato || 0)}
             icon="💪"
             color="green"
           />
 
           <StatsCard
             title="Trivex"
-            value={formatNumber(statsMateriais.total_trivex)}
+            value={formatNumber(stats?.total_trivex || 0)}
             icon="⚡"
             color="purple"
           />
 
           <StatsCard
             title="High Index"
-            value={formatNumber(statsMateriais.total_high_index)}
+            value={formatNumber(stats?.total_high_index || 0)}
             icon="✨"
             color="gold"
           />
@@ -345,28 +314,28 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
           <StatsCard
             title="Anti-Reflexo"
-            value={formatNumber(statsTratamentos.total_com_ar)}
+            value={formatNumber(stats?.total_com_ar || 0)}
             icon="💎"
             color="blue"
           />
 
           <StatsCard
             title="Blue Light"
-            value={formatNumber(statsTratamentos.total_com_blue)}
+            value={formatNumber(stats?.total_com_blue || 0)}
             icon="🔵"
             color="cyan"
           />
 
           <StatsCard
             title="Fotossensíveis"
-            value={formatNumber(statsTratamentos.total_fotossensiveis)}
+            value={formatNumber(stats?.total_fotossensiveis || 0)}
             icon="☀️"
             color="orange"
           />
 
           <StatsCard
             title="Polarizadas"
-            value={formatNumber(statsTratamentos.total_polarizados)}
+            value={formatNumber(stats?.total_polarizado || 0)}
             icon="🕶️"
             color="purple"
           />
@@ -383,16 +352,18 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <StatsCard
             title="Free-Form"
-            value={formatNumber(statsTratamentos.total_free_form)}
+            value="0"
             icon="🔧"
             color="blue"
+            subtitle="Campo não disponível"
           />
 
           <StatsCard
             title="Digitais"
-            value={formatNumber(statsTratamentos.total_digitais)}
+            value="0"
             icon="💻"
             color="green"
+            subtitle="Campo não disponível"
           />
         </div>
       </section>
@@ -407,21 +378,21 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <StatsCard
             title="Preço Mínimo"
-            value={formatarPreco(statsPrecos.preco_minimo)}
+            value={formatarPreco(stats?.preco_minimo_catalogo)}
             icon="⬇️"
             color="green"
           />
 
           <StatsCard
             title="Preço Médio"
-            value={formatarPreco(statsPrecos.preco_medio)}
+            value={formatarPreco(stats?.preco_medio_catalogo)}
             icon="📊"
             color="blue"
           />
 
           <StatsCard
             title="Preço Máximo"
-            value={formatarPreco(statsPrecos.preco_maximo)}
+            value={formatarPreco(stats?.preco_maximo_catalogo)}
             icon="⬆️"
             color="orange"
           />

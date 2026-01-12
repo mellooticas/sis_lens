@@ -993,17 +993,17 @@ export class CatalogoAPI {
     try {
       const { data, error } = await supabase
         .from('v_lentes_catalogo')
-        .select('tratamento_antirreflexo, tratamento_blue_light, tratamento_fotossensiveis, tratamento_polarizado, free_form, digital');
+        .select('ar, blue, fotossensivel');
 
       if (error) throw error;
 
       const stats = {
-        total_com_ar: (data || []).filter(item => item.tratamento_antirreflexo === true).length,
-        total_com_blue: (data || []).filter(item => item.tratamento_blue_light === true).length,
-        total_fotossensiveis: (data || []).filter(item => item.tratamento_fotossensiveis && item.tratamento_fotossensiveis !== 'nenhum').length,
-        total_polarizados: (data || []).filter(item => item.tratamento_polarizado === true).length,
-        total_free_form: (data || []).filter(item => item.free_form === true).length,
-        total_digitais: (data || []).filter(item => item.digital === true).length
+        total_com_ar: (data || []).filter(item => item.ar === true).length,
+        total_com_blue: (data || []).filter(item => item.blue === true).length,
+        total_fotossensiveis: (data || []).filter(item => item.fotossensivel && item.fotossensivel !== 'nenhum').length,
+        total_polarizados: 0, // Campo não existe na view, retorna 0
+        total_free_form: 0, // Campo não existe na view, retorna 0
+        total_digitais: 0 // Campo não existe na view, retorna 0
       };
 
       return {

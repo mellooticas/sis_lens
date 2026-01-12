@@ -9,7 +9,8 @@
   export let change: number | undefined = undefined;
   export let icon = "📊";
   export let trend: "up" | "down" | "neutral" = "neutral";
-  export let color: "blue" | "green" | "orange" | "gold" = "blue";
+  export let color: "blue" | "green" | "orange" | "gold" | "cyan" | "purple" = "blue";
+  export let subtitle: string | undefined = undefined;
 
   const colors = {
     blue: "bg-brand-blue-50 text-brand-blue-600 dark:bg-brand-blue-800 dark:text-brand-blue-300",
@@ -18,6 +19,8 @@
     orange:
       "bg-brand-orange-50 text-brand-orange-600 dark:bg-brand-orange-800 dark:text-brand-orange-300",
     gold: "bg-brand-gold-50 text-brand-gold-600 dark:bg-brand-gold-800 dark:text-brand-gold-300",
+    cyan: "bg-cyan-50 text-cyan-600 dark:bg-cyan-800 dark:text-cyan-300",
+    purple: "bg-purple-50 text-purple-600 dark:bg-purple-800 dark:text-purple-300",
   };
 </script>
 
@@ -47,6 +50,12 @@
     <div class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
       {value}
     </div>
+    
+    {#if subtitle}
+      <div class="text-xs text-neutral-500 dark:text-neutral-500 mb-2">
+        {subtitle}
+      </div>
+    {/if}
 
     {#if change !== undefined}
       <div
