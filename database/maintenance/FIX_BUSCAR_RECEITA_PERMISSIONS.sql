@@ -69,12 +69,12 @@ BEGIN
         -- Validação da adição (apenas para multifocal/bifocal)
         AND (
             p_adicao IS NULL 
-            OR v.tipo_lente = 'visao_simples'
+            OR v.tipo_lente::TEXT = 'visao_simples'
             OR (v.adicao_min IS NOT NULL AND p_adicao >= v.adicao_min AND p_adicao <= v.adicao_max)
         )
         
-        -- Validação do tipo de lente
-        AND (p_tipo_lente IS NULL OR v.tipo_lente = p_tipo_lente)
+        -- Validação do tipo de lente (cast para comparação)
+        AND (p_tipo_lente IS NULL OR v.tipo_lente::TEXT = p_tipo_lente)
     
     -- Ordenação: premium primeiro, depois por índice, depois por preço
     ORDER BY 
