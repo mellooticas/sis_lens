@@ -44,7 +44,7 @@ AS $$
         v.categoria::TEXT,
         v.material::TEXT,
         v.indice_refracao::TEXT,
-        v.preco_tabela,
+        v.preco_venda_sugerido as preco_tabela,
         v.marca_nome::TEXT,
         v.marca_premium,
         v.ar,
@@ -86,7 +86,7 @@ AS $$
             WHEN v.indice_refracao::TEXT = '1.56' THEN 3
             ELSE 4
         END,
-        v.preco_tabela ASC NULLS LAST
+        v.preco_venda_sugerido ASC NULLS LAST
     LIMIT 100;
 $$;
 
