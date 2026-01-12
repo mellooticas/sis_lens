@@ -1,13 +1,14 @@
+<!--
+  🏆 Rankings de Lentes - SIS Lens
+  Análise completa dos grupos canônicos mais relevantes
+-->
 <script lang="ts">
-  /**
-   * 🏆 Página de Ranking - Análise de Grupos Canônicos
-   * Exibe os grupos mais caros, mais populares e premium
-   */
-  
   import { onMount } from 'svelte';
   import { CatalogoAPI } from '$lib/api/catalogo-api';
-  import GlassCard from '$lib/components/ui/GlassCard.svelte';
+  import Container from '$lib/components/layout/Container.svelte';
   import PageHero from '$lib/components/layout/PageHero.svelte';
+  import SectionHeader from '$lib/components/layout/SectionHeader.svelte';
+  import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
   import type { VGruposCanonico } from '$lib/types/database-views';
   
   let topCaros: VGruposCanonico[] = [];
@@ -61,333 +62,214 @@
     if (!texto) return 'N/A';
     return texto.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
   }
+
+  function calcularTotal(items: any[]): number {
+    return items.reduce((sum, item) => sum + (item.count || 0), 0);
+  }
+
+  function calcularPercentual(valor: number, total: number): number {
+    if (!total || total === 0) return 0;
+    return Math.round((valor / total) * 100);
+  }
 </script>
 
-<div class="page-ranking">
-  <PageHero 
-    title="🏆 Ranking de Lentes"
-    description="Análise dos grupos canônicos mais relevantes"
-  />
-  
-  {#if loading}
-    <div class="loading">
-      <GlassCard variant="light" blur="md" padding="lg">
-        <p>Carregando ranking...</p>
-      </GlassCard>
-    </div>
-  {:else if error}
-    <div class="error">
-      <GlassCard variant="light" blur="md" padding="lg">
-        <p class="error-message">❌ {error}</p>
-      </GlassCard>
-    </div>
-  {:else}
-    <div class="content">
-      
-      <!-- Top 10 Mais Caros -->
-      <section class="ranking-section">
-        <GlassCard variant="light" blur="md" padding="lg">
-          <h2 class="section-title">💰 Top 10 Mais Caros</h2>
-          <div class="ranking-list">
-            {#each topCaros as grupo, index}
-              <div class="ranking-item">
-                <span class="rank">#{index + 1}</span>
-                <div class="item-info">
-                  <h3 class="item-title">{grupo.nome_grupo}</h3>
-                  <p class="item-details">
-                    {formatarTexto(grupo.tipo_lente)} • 
-                    {formatarTexto(grupo.material)} • 
-                    {grupo.total_lentes} lentes
-                  </p>
-                </div>
-                <span class="item-price">{formatarPreco(grupo.preco_medio)}</span>
-              </div>
-            {/each}
-          </div>
-        </GlassCard>
-      </section>
-      
-      <!-- Top 10 Mais Populares -->
-      <section class="ranking-section">
-        <GlassCard variant="light" blur="md" padding="lg">
-          <h2 class="section-title">🔥 Top 10 Mais Populares</h2>
-          <p class="section-subtitle">Grupos com maior quantidade de lentes</p>
-          <div class="ranking-list">
-            {#each topPopulares as grupo, index}
-              <div class="ranking-item">
-                <span class="rank">#{index + 1}</span>
-                <div class="item-info">
-                  <h3 class="item-title">{grupo.nome_grupo}</h3>
-                  <p class="item-details">
-                    {formatarTexto(grupo.tipo_lente)} • 
-                    {formatarTexto(grupo.material)} • 
-                    {formatarPreco(grupo.preco_medio)}
-                  </p>
-                </div>
-                <span class="item-count">{grupo.total_lentes} lentes</span>
-              </div>
-            {/each}
-          </div>
-        </GlassCard>
-      </section>
-      
-      <!-- Top 10 Premium -->
-      <section class="ranking-section">
-        <GlassCard variant="light" blur="md" padding="lg">
-          <h2 class="section-title">👑 Top 10 Premium</h2>
-          <p class="section-subtitle">Grupos premium de maior valor</p>
-          <div class="ranking-list">
-            {#each topPremium as grupo, index}
-              <div class="ranking-item premium">
-                <span class="rank">#{index + 1}</span>
-                <div class="item-info">
-                  <h3 class="item-title">{grupo.nome_grupo}</h3>
-                  <p class="item-details">
-                    {formatarTexto(grupo.tipo_lente)} • 
-                    {formatarTexto(grupo.material)} • 
-                    {grupo.total_lentes} lentes
-                  </p>
-                </div>
-                <span class="item-price premium">{formatarPreco(grupo.preco_medio)}</span>
-              </div>
-            {/each}
-          </div>
-        </GlassCard>
-      </section>
-      
-      <!-- Distribuições -->
-      <div class="distributions">
-        
-        <!-- Distribuição por Tipo -->
-        <section class="distribution-section">
-          <GlassCard variant="light" blur="md" padding="lg">
-            <h2 class="section-title">📊 Distribuição por Tipo</h2>
-            <div class="distribution-list">
-              {#each distribuicaoTipo as item}
-                <div class="distribution-item">
-                  <span class="dist-label">{formatarTexto(item.tipo_lente)}</span>
-                  <div class="dist-bar-container">
-                    <div 
-                      class="dist-bar" 
-                      style="width: {(item.count / distribuicaoTipo[0].count) * 100}%"
-                    ></div>
-                  </div>
-                  <span class="dist-count">{item.count}</span>
-                </div>
-              {/each}
-            </div>
-          </GlassCard>
-        </section>
-        
-        <!-- Distribuição por Material -->
-        <section class="distribution-section">
-          <GlassCard variant="light" blur="md" padding="lg">
-            <h2 class="section-title">🧪 Distribuição por Material</h2>
-            <div class="distribution-list">
-              {#each distribuicaoMaterial as item}
-                <div class="distribution-item">
-                  <span class="dist-label">{formatarTexto(item.material)}</span>
-                  <div class="dist-bar-container">
-                    <div 
-                      class="dist-bar material" 
-                      style="width: {(item.count / distribuicaoMaterial[0].count) * 100}%"
-                    ></div>
-                  </div>
-                  <span class="dist-count">{item.count}</span>
-                </div>
-              {/each}
-            </div>
-          </GlassCard>
-        </section>
-        
-      </div>
-      
-    </div>
-  {/if}
-</div>
+<svelte:head>
+  <title>Rankings | SIS Lens</title>
+  <meta name="description" content="Rankings e análises de grupos canônicos de lentes" />
+</svelte:head>
 
-<style>
-  .page-ranking {
-    padding: 2rem;
-    min-height: 100vh;
-  }
-  
-  .content {
-    display: flex;
-    flex-direction: column;
-    gap: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
-  }
-  
-  .loading, .error {
-    display: flex;
-    justify-content: center;
-    padding: 4rem 2rem;
-  }
-  
-  .error-message {
-    color: #ef4444;
-    font-weight: 600;
-  }
-  
-  /* Sections */
-  .ranking-section {
-    width: 100%;
-  }
-  
-  .section-title {
-    font-size: 1.5rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    margin-bottom: 0.5rem;
-  }
-  
-  .section-subtitle {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-    margin-bottom: 1rem;
-  }
-  
-  /* Ranking List */
-  .ranking-list {
-    display: flex;
-    flex-direction: column;
-    gap: 0.75rem;
-  }
-  
-  .ranking-item {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: rgba(255, 255, 255, 0.5);
-    border-radius: 0.75rem;
-    border: 1px solid rgba(0, 0, 0, 0.1);
-    transition: all 0.3s ease;
-  }
-  
-  .ranking-item:hover {
-    background: rgba(255, 255, 255, 0.7);
-    transform: translateX(4px);
-  }
-  
-  .ranking-item.premium {
-    background: linear-gradient(135deg, rgba(250, 204, 21, 0.2), rgba(251, 146, 60, 0.2));
-    border-color: rgba(250, 204, 21, 0.4);
-  }
-  
-  .rank {
-    font-size: 1.25rem;
-    font-weight: 800;
-    color: var(--color-primary);
-    min-width: 3rem;
-    text-align: center;
-  }
-  
-  .item-info {
-    flex: 1;
-  }
-  
-  .item-title {
-    font-size: 1rem;
-    font-weight: 600;
-    color: var(--color-text-primary);
-    margin-bottom: 0.25rem;
-  }
-  
-  .item-details {
-    font-size: 0.875rem;
-    color: var(--color-text-secondary);
-  }
-  
-  .item-price {
-    font-size: 1.25rem;
-    font-weight: 700;
-    color: var(--color-primary);
-  }
-  
-  .item-price.premium {
-    background: linear-gradient(135deg, #fbbf24, #f59e0b);
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-    background-clip: text;
-  }
-  
-  .item-count {
-    font-size: 1.125rem;
-    font-weight: 700;
-    color: var(--color-secondary);
-  }
-  
-  /* Distributions */
-  .distributions {
-    display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
-    gap: 2rem;
-  }
-  
-  .distribution-list {
-    display: flex;
-    flex-direction: column;
-    gap: 1rem;
-  }
-  
-  .distribution-item {
-    display: grid;
-    grid-template-columns: 150px 1fr 60px;
-    align-items: center;
-    gap: 1rem;
-  }
-  
-  .dist-label {
-    font-size: 0.875rem;
-    font-weight: 600;
-    color: var(--color-text-primary);
-  }
-  
-  .dist-bar-container {
-    height: 24px;
-    background: rgba(0, 0, 0, 0.1);
-    border-radius: 999px;
-    overflow: hidden;
-  }
-  
-  .dist-bar {
-    height: 100%;
-    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
-    border-radius: 999px;
-    transition: width 0.5s ease;
-  }
-  
-  .dist-bar.material {
-    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
-  }
-  
-  .dist-count {
-    font-size: 1rem;
-    font-weight: 700;
-    color: var(--color-text-primary);
-    text-align: right;
-  }
-  
-  /* Responsive */
-  @media (max-width: 768px) {
-    .page-ranking {
-      padding: 1rem;
-    }
-    
-    .distributions {
-      grid-template-columns: 1fr;
-    }
-    
-    .distribution-item {
-      grid-template-columns: 100px 1fr 50px;
-      gap: 0.5rem;
-    }
-    
-    .dist-label {
-      font-size: 0.75rem;
-    }
-  }
-</style>
+<main class="min-h-screen bg-gradient-to-br from-neutral-50 via-blue-50 to-neutral-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
+  <Container>
+    <PageHero
+      title="🏆 Rankings de Lentes"
+      description="Análise completa dos grupos canônicos mais relevantes do catálogo"
+    />
+
+    {#if loading}
+      <div class="flex justify-center items-center py-20">
+        <LoadingSpinner size="lg" />
+      </div>
+    {:else if error}
+      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 mt-8">
+        <p class="text-red-800 dark:text-red-200">❌ {error}</p>
+      </div>
+    {:else}
+      <!-- Top 10 Rankings Grid -->
+      <section class="mt-8">
+        <SectionHeader
+          title="🏅 Top 10 Rankings"
+          subtitle="Grupos canônicos classificados por diferentes critérios"
+        />
+
+        <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
+          <!-- Mais Caros -->
+          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+            <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>💰</span>
+                <span>Mais Caros</span>
+              </h3>
+              <p class="text-amber-50 text-sm mt-1">Grupos de maior valor médio</p>
+            </div>
+            <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
+              {#each topCaros as grupo, index}
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+                  <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold text-sm">
+                    {index + 1}
+                  </span>
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1">
+                      {grupo.nome_grupo}
+                    </h4>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                      {formatarTexto(grupo.tipo_lente)} • {grupo.total_lentes} un
+                    </p>
+                  </div>
+                  <div class="flex-shrink-0 text-right">
+                    <p class="font-bold text-amber-600 dark:text-amber-400 text-sm">
+                      {formatarPreco(grupo.preco_medio)}
+                    </p>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          </div>
+
+          <!-- Mais Populares -->
+          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+            <div class="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-4">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>🔥</span>
+                <span>Mais Populares</span>
+              </h3>
+              <p class="text-green-50 text-sm mt-1">Maior quantidade de lentes</p>
+            </div>
+            <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
+              {#each topPopulares as grupo, index}
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+                  <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold text-sm">
+                    {index + 1}
+                  </span>
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1">
+                      {grupo.nome_grupo}
+                    </h4>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                      {formatarTexto(grupo.tipo_lente)} • {formatarPreco(grupo.preco_medio)}
+                    </p>
+                  </div>
+                  <div class="flex-shrink-0 text-right">
+                    <p class="font-bold text-green-600 dark:text-green-400 text-sm">
+                      {grupo.total_lentes} un
+                    </p>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          </div>
+
+          <!-- Premium -->
+          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+            <div class="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-4">
+              <h3 class="text-lg font-bold text-white flex items-center gap-2">
+                <span>👑</span>
+                <span>Top Premium</span>
+              </h3>
+              <p class="text-purple-50 text-sm mt-1">Grupos premium de destaque</p>
+            </div>
+            <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
+              {#each topPremium as grupo, index}
+                <div class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
+                  <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 font-bold text-sm">
+                    {index + 1}
+                  </span>
+                  <div class="flex-1 min-w-0">
+                    <h4 class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1">
+                      {grupo.nome_grupo}
+                    </h4>
+                    <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                      {formatarTexto(grupo.tipo_lente)} • {grupo.total_lentes} un
+                    </p>
+                  </div>
+                  <div class="flex-shrink-0 text-right">
+                    <p class="font-bold text-purple-600 dark:text-purple-400 text-sm">
+                      {formatarPreco(grupo.preco_medio)}
+                    </p>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          </div>
+        </div>
+      </section>
+
+      <!-- Distribuições -->
+      <section class="mt-12">
+        <SectionHeader
+          title="📊 Distribuição do Catálogo"
+          subtitle="Composição por tipo de lente e material"
+        />
+
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
+          <!-- Por Tipo -->
+          <div class="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+            <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
+              Por Tipo de Lente
+            </h3>
+            <div class="space-y-4">
+              {#each distribuicaoTipo as item}
+                {@const total = calcularTotal(distribuicaoTipo)}
+                {@const percentual = calcularPercentual(item.count, total)}
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                      {formatarTexto(item.tipo_lente)}
+                    </span>
+                    <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                      {item.count.toLocaleString('pt-BR')} ({percentual}%)
+                    </span>
+                  </div>
+                  <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5">
+                    <div
+                      class="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-500"
+                      style="width: {percentual}%"
+                    ></div>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          </div>
+
+          <!-- Por Material -->
+          <div class="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+            <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
+              Por Material
+            </h3>
+            <div class="space-y-4">
+              {#each distribuicaoMaterial as item}
+                {@const total = calcularTotal(distribuicaoMaterial)}
+                {@const percentual = calcularPercentual(item.count, total)}
+                <div>
+                  <div class="flex justify-between items-center mb-2">
+                    <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                      {formatarTexto(item.material)}
+                    </span>
+                    <span class="text-sm text-neutral-600 dark:text-neutral-400">
+                      {item.count.toLocaleString('pt-BR')} ({percentual}%)
+                    </span>
+                  </div>
+                  <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5">
+                    <div
+                      class="bg-gradient-to-r from-green-500 to-emerald-600 h-2.5 rounded-full transition-all duration-500"
+                      style="width: {percentual}%"
+                    ></div>
+                  </div>
+                </div>
+              {/each}
+            </div>
+          </div>
+        </div>
+      </section>
+    {/if}
+  </Container>
+</main>

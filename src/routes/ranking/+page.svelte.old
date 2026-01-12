@@ -1,0 +1,395 @@
+<script lang="ts">
+  /**
+   * 🏆 Página de Ranking - Análise de Grupos Canônicos
+   * Exibe os grupos mais caros, mais populares e premium
+   */
+  
+  import { onMount } from 'svelte';
+  import { CatalogoAPI } from '$lib/api/catalogo-api';
+  import Container from '$lib/components/layout/Container.svelte';
+  import PageHero from '$lib/components/layout/PageHero.svelte';
+  import SectionHeader from '$lib/components/layout/SectionHeader.svelte';
+  import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
+  import type { VGruposCanonico } from '$lib/types/database-views';
+  
+  let topCaros: VGruposCanonico[] = [];
+  let topPopulares: VGruposCanonico[] = [];
+  let topPremium: VGruposCanonico[] = [];
+  let distribuicaoTipo: Array<{ tipo_lente: string; count: number }> = [];
+  let distribuicaoMaterial: Array<{ material: string; count: number }> = [];
+  let loading = true;
+  let error = '';
+  
+  onMount(async () => {
+    await carregarDados();
+  });
+  
+  async function carregarDados() {
+    loading = true;
+    error = '';
+    
+    try {
+      const [resCaros, resPopulares, resPremium, resTipo, resMaterial] = await Promise.all([
+        CatalogoAPI.buscarTopCaros(10),
+        CatalogoAPI.buscarTopPopulares(10),
+        CatalogoAPI.buscarTopPremium(10),
+        CatalogoAPI.obterDistribuicaoPorTipo(),
+        CatalogoAPI.obterDistribuicaoPorMaterial()
+      ]);
+      
+      if (resCaros.success && resCaros.data) topCaros = resCaros.data;
+      if (resPopulares.success && resPopulares.data) topPopulares = resPopulares.data;
+      if (resPremium.success && resPremium.data) topPremium = resPremium.data;
+      if (resTipo.success && resTipo.data) distribuicaoTipo = resTipo.data.sort((a, b) => b.count - a.count);
+      if (resMaterial.success && resMaterial.data) distribuicaoMaterial = resMaterial.data.sort((a, b) => b.count - a.count);
+      
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Erro ao carregar dados';
+      console.error('❌ Erro ao carregar ranking:', err);
+    } finally {
+      loading = false;
+    }
+  }
+  
+  function formatarPreco(valor: number | null): string {
+    if (!valor) return 'N/A';
+    return new Intl.NumberFormat('pt-BR', { 
+      style: 'currency', 
+      currency: 'BRL' 
+    }).format(valor);
+  }
+  
+  function formatarTexto(texto: string | null): string {
+    if (!texto) return 'N/A';
+    return texto.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+  }
+</script>
+
+<div class="page-ranking">
+  <PageHero 
+    title="🏆 Ranking de Lentes"
+    description="Análise dos grupos canônicos mais relevantes"
+  />
+  
+  {#if loading}
+    <div class="loading">
+      <GlassCard variant="light" blur="md" padding="lg">
+        <p>Carregando ranking...</p>
+      </GlassCard>
+    </div>
+  {:else if error}
+    <div class="error">
+      <GlassCard variant="light" blur="md" padding="lg">
+        <p class="error-message">❌ {error}</p>
+      </GlassCard>
+    </div>
+  {:else}
+    <div class="content">
+      
+      <!-- Top 10 Mais Caros -->
+      <section class="ranking-section">
+        <GlassCard variant="light" blur="md" padding="lg">
+          <h2 class="section-title">💰 Top 10 Mais Caros</h2>
+          <div class="ranking-list">
+            {#each topCaros as grupo, index}
+              <div class="ranking-item">
+                <span class="rank">#{index + 1}</span>
+                <div class="item-info">
+                  <h3 class="item-title">{grupo.nome_grupo}</h3>
+                  <p class="item-details">
+                    {formatarTexto(grupo.tipo_lente)} • 
+                    {formatarTexto(grupo.material)} • 
+                    {grupo.total_lentes} lentes
+                  </p>
+                </div>
+                <span class="item-price">{formatarPreco(grupo.preco_medio)}</span>
+              </div>
+            {/each}
+          </div>
+        </GlassCard>
+      </section>
+      
+      <!-- Top 10 Mais Populares -->
+      <section class="ranking-section">
+        <GlassCard variant="light" blur="md" padding="lg">
+          <h2 class="section-title">🔥 Top 10 Mais Populares</h2>
+          <p class="section-subtitle">Grupos com maior quantidade de lentes</p>
+          <div class="ranking-list">
+            {#each topPopulares as grupo, index}
+              <div class="ranking-item">
+                <span class="rank">#{index + 1}</span>
+                <div class="item-info">
+                  <h3 class="item-title">{grupo.nome_grupo}</h3>
+                  <p class="item-details">
+                    {formatarTexto(grupo.tipo_lente)} • 
+                    {formatarTexto(grupo.material)} • 
+                    {formatarPreco(grupo.preco_medio)}
+                  </p>
+                </div>
+                <span class="item-count">{grupo.total_lentes} lentes</span>
+              </div>
+            {/each}
+          </div>
+        </GlassCard>
+      </section>
+      
+      <!-- Top 10 Premium -->
+      <section class="ranking-section">
+        <GlassCard variant="light" blur="md" padding="lg">
+          <h2 class="section-title">👑 Top 10 Premium</h2>
+          <p class="section-subtitle">Grupos premium de maior valor</p>
+          <div class="ranking-list">
+            {#each topPremium as grupo, index}
+              <div class="ranking-item premium">
+                <span class="rank">#{index + 1}</span>
+                <div class="item-info">
+                  <h3 class="item-title">{grupo.nome_grupo}</h3>
+                  <p class="item-details">
+                    {formatarTexto(grupo.tipo_lente)} • 
+                    {formatarTexto(grupo.material)} • 
+                    {grupo.total_lentes} lentes
+                  </p>
+                </div>
+                <span class="item-price premium">{formatarPreco(grupo.preco_medio)}</span>
+              </div>
+            {/each}
+          </div>
+        </GlassCard>
+      </section>
+      
+      <!-- Distribuições -->
+      <div class="distributions">
+        
+        <!-- Distribuição por Tipo -->
+        <section class="distribution-section">
+          <GlassCard variant="light" blur="md" padding="lg">
+            <h2 class="section-title">📊 Distribuição por Tipo</h2>
+            <div class="distribution-list">
+              {#each distribuicaoTipo as item}
+                <div class="distribution-item">
+                  <span class="dist-label">{formatarTexto(item.tipo_lente)}</span>
+                  <div class="dist-bar-container">
+                    <div 
+                      class="dist-bar" 
+                      style="width: {(item.count / distribuicaoTipo[0].count) * 100}%"
+                    ></div>
+                  </div>
+                  <span class="dist-count">{item.count}</span>
+                </div>
+              {/each}
+            </div>
+          </GlassCard>
+        </section>
+        
+        <!-- Distribuição por Material -->
+        <section class="distribution-section">
+          <GlassCard variant="light" blur="md" padding="lg">
+            <h2 class="section-title">🧪 Distribuição por Material</h2>
+            <div class="distribution-list">
+              {#each distribuicaoMaterial as item}
+                <div class="distribution-item">
+                  <span class="dist-label">{formatarTexto(item.material)}</span>
+                  <div class="dist-bar-container">
+                    <div 
+                      class="dist-bar material" 
+                      style="width: {(item.count / distribuicaoMaterial[0].count) * 100}%"
+                    ></div>
+                  </div>
+                  <span class="dist-count">{item.count}</span>
+                </div>
+              {/each}
+            </div>
+          </GlassCard>
+        </section>
+        
+      </div>
+      
+    </div>
+  {/if}
+</div>
+
+<style>
+  .page-ranking {
+    padding: 2rem;
+    min-height: 100vh;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .loading, .error {
+    display: flex;
+    justify-content: center;
+    padding: 4rem 2rem;
+  }
+  
+  .error-message {
+    color: #ef4444;
+    font-weight: 600;
+  }
+  
+  /* Sections */
+  .ranking-section {
+    width: 100%;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.5rem;
+  }
+  
+  .section-subtitle {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+    margin-bottom: 1rem;
+  }
+  
+  /* Ranking List */
+  .ranking-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .ranking-item {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+    padding: 1rem;
+    background: rgba(255, 255, 255, 0.5);
+    border-radius: 0.75rem;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+  }
+  
+  .ranking-item:hover {
+    background: rgba(255, 255, 255, 0.7);
+    transform: translateX(4px);
+  }
+  
+  .ranking-item.premium {
+    background: linear-gradient(135deg, rgba(250, 204, 21, 0.2), rgba(251, 146, 60, 0.2));
+    border-color: rgba(250, 204, 21, 0.4);
+  }
+  
+  .rank {
+    font-size: 1.25rem;
+    font-weight: 800;
+    color: var(--color-primary);
+    min-width: 3rem;
+    text-align: center;
+  }
+  
+  .item-info {
+    flex: 1;
+  }
+  
+  .item-title {
+    font-size: 1rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
+  }
+  
+  .item-details {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+  
+  .item-price {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  
+  .item-price.premium {
+    background: linear-gradient(135deg, #fbbf24, #f59e0b);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+  
+  .item-count {
+    font-size: 1.125rem;
+    font-weight: 700;
+    color: var(--color-secondary);
+  }
+  
+  /* Distributions */
+  .distributions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(500px, 1fr));
+    gap: 2rem;
+  }
+  
+  .distribution-list {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+  }
+  
+  .distribution-item {
+    display: grid;
+    grid-template-columns: 150px 1fr 60px;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .dist-label {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  
+  .dist-bar-container {
+    height: 24px;
+    background: rgba(0, 0, 0, 0.1);
+    border-radius: 999px;
+    overflow: hidden;
+  }
+  
+  .dist-bar {
+    height: 100%;
+    background: linear-gradient(90deg, var(--color-primary), var(--color-secondary));
+    border-radius: 999px;
+    transition: width 0.5s ease;
+  }
+  
+  .dist-bar.material {
+    background: linear-gradient(90deg, #3b82f6, #8b5cf6);
+  }
+  
+  .dist-count {
+    font-size: 1rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    text-align: right;
+  }
+  
+  /* Responsive */
+  @media (max-width: 768px) {
+    .page-ranking {
+      padding: 1rem;
+    }
+    
+    .distributions {
+      grid-template-columns: 1fr;
+    }
+    
+    .distribution-item {
+      grid-template-columns: 100px 1fr 50px;
+      gap: 0.5rem;
+    }
+    
+    .dist-label {
+      font-size: 0.75rem;
+    }
+  }
+</style>
