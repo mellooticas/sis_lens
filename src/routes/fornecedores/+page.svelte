@@ -48,33 +48,34 @@
 <div class="page-fornecedores">
   <PageHero 
     title="🏭 Fornecedores"
-    description="Gestão de laboratórios e fornecedores de lentes"
+    subtitle="Gestão de laboratórios e fornecedores de lentes"
   />
   
-  {#if loading}
-    <div class="loading">
-      <GlassCard variant="light" blur="md" padding="lg">
-        <p>Carregando fornecedores...</p>
-      </GlassCard>
-    </div>
-  {:else if error}
-    <div class="error">
-      <GlassCard variant="light" blur="md" padding="lg">
-        <p class="error-message">❌ {error}</p>
-      </GlassCard>
-    </div>
-  {:else if fornecedores.length === 0}
-    <div class="empty">
-      <GlassCard variant="light" blur="md" padding="lg">
-        <p>Nenhum fornecedor encontrado</p>
-      </GlassCard>
-    </div>
-  {:else}
-    <div class="content">
+  <div class="container">
+    {#if loading}
+      <div class="loading">
+        <GlassCard blur="md" padding="lg">
+          <p>Carregando fornecedores...</p>
+        </GlassCard>
+      </div>
+    {:else if error}
+      <div class="error">
+        <GlassCard blur="md" padding="lg">
+          <p class="error-message">❌ {error}</p>
+        </GlassCard>
+      </div>
+    {:else if fornecedores.length === 0}
+      <div class="empty">
+        <GlassCard blur="md" padding="lg">
+          <p>Nenhum fornecedor encontrado</p>
+        </GlassCard>
+      </div>
+    {:else}
+      <div class="content">
       
       <!-- Estatísticas Gerais -->
       <div class="stats-grid">
-        <GlassCard variant="light" blur="md" padding="md">
+        <GlassCard blur="md" padding="md">
           <div class="stat-card">
             <div class="stat-icon">
               <Package size={24} />
@@ -86,7 +87,7 @@
           </div>
         </GlassCard>
         
-        <GlassCard variant="light" blur="md" padding="md">
+        <GlassCard blur="md" padding="md">
           <div class="stat-card">
             <div class="stat-icon">
               <Layers size={24} />
@@ -100,7 +101,7 @@
           </div>
         </GlassCard>
         
-        <GlassCard variant="light" blur="md" padding="md">
+        <GlassCard blur="md" padding="md">
           <div class="stat-card">
             <div class="stat-icon">
               <Clock size={24} />
@@ -126,7 +127,7 @@
         
         <div class="fornecedores-grid">
           {#each fornecedores as fornecedor}
-            <GlassCard variant="light" blur="md" padding="lg" className="fornecedor-card">
+            <GlassCard blur="md" padding="lg" className="fornecedor-card">
               
               <!-- Header -->
               <div class="fornecedor-header">
@@ -204,28 +205,34 @@
         </div>
       </section>
       
-    </div>
-  {/if}
+      </div>
+    {/if}
+  </div>
 </div>
 
 <style>
   .page-fornecedores {
-    padding: 2rem;
     min-height: 100vh;
+    padding-bottom: 4rem;
+  }
+
+  .container {
+    max-width: 1400px;
+    margin: 0 auto;
+    padding: 0 2rem;
   }
   
   .content {
     display: flex;
     flex-direction: column;
     gap: 2rem;
-    max-width: 1400px;
-    margin: 0 auto;
+    margin-top: 2rem;
   }
   
   .loading, .error, .empty {
     display: flex;
     justify-content: center;
-    padding: 4rem 2rem;
+    padding: 4rem 0;
   }
   
   .error-message {
@@ -288,7 +295,7 @@
   
   .fornecedores-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 400px), 1fr));
     gap: 1.5rem;
   }
   
@@ -467,23 +474,37 @@
   }
   
   /* Responsive */
-  @media (max-width: 1024px) {
+  @media (max-width: 1200px) {
     .fornecedores-grid {
-      grid-template-columns: 1fr;
+      grid-template-columns: repeat(auto-fit, minmax(min(100%, 350px), 1fr));
     }
   }
-  
+
   @media (max-width: 768px) {
-    .page-fornecedores {
-      padding: 1rem;
+    .container {
+      padding: 0 1rem;
+    }
+
+    .content {
+      margin-top: 1.5rem;
     }
     
     .stats-grid {
+      grid-template-columns: 1fr;
+      gap: 1rem;
+    }
+
+    .fornecedores-grid {
       grid-template-columns: 1fr;
     }
     
     .prazos-grid {
       grid-template-columns: 1fr;
+    }
+
+    .fornecedor-stats {
+      flex-direction: column;
+      gap: 0.75rem;
     }
   }
 </style>

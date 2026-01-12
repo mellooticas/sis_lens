@@ -1,6 +1,6 @@
 <!--
-  🧪 Simulador de Busca por Receita
-  Interface técnica para validar a função RPC `buscar_lentes_por_receita`
+  👓 Simulador de Receita Oftalmológica
+  Interface profissional para busca de lentes por prescrição
 -->
 <script lang="ts">
     import { CatalogoAPI } from "$lib/api/catalogo-api";
@@ -8,363 +8,701 @@
     import PageHero from "$lib/components/layout/PageHero.svelte";
     import Button from "$lib/components/ui/Button.svelte";
     import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
+    import LenteCard from "$lib/components/catalogo/LenteCard.svelte";
+    import { Eye, Search, RotateCcw } from "lucide-svelte";
 
-    // Estado do formulário - Espelhando os parâmetros da função SQL
-    let parametros = {
-        esferico: -2.0,
-        cilindrico: -0.5,
-        eixo: 180,
-        adicao: 0.0,
-        tipo: "visao_simples" as "visao_simples" | "multifocal" | "bifocal",
+    // Ranges oftalmológicos padrão
+    const esféricos = Array.from({ length: 81 }, (_, i) => -20 + i * 0.25); // -20 a +20 (0.25 em 0.25)
+    const cilíndricos = Array.from({ length: 33 }, (_, i) => -8 + i * 0.25); // -8 a 0 (0.25 em 0.25)
+    const eixos = Array.from({ length: 181 }, (_, i) => i); // 0 a 180
+    const adições = Array.from({ length: 17 }, (_, i) => 0.75 + i * 0.25); // +0.75 a +4.75 (0.25 em 0.25)
+
+    // Estado da receita - OD (Olho Direito)
+    let od = {
+        esferico: 0,
+        cilindrico: 0,
+        eixo: 0,
+        adicao: 0,
+        dnp: 32 // Distância naso-pupilar
     };
 
-    // Estado da resposta
+    // Estado da receita - OE (Olho Esquerdo)
+    let oe = {
+        esferico: 0,
+        cilindrico: 0,
+        eixo: 0,
+        adicao: 0,
+        dnp: 32
+    };
+
+    // Configurações gerais
+    let tipoLente: "visao_simples" | "multifocal" | "bifocal" = "visao_simples";
+    let usarMesmaReceita = false; // Opção para copiar OD para OE
+
+    // Estado dos resultados
     let loading = false;
     let resultados: any[] = [];
-    let tempoExecucao = 0;
     let erro = "";
-    let sqlQuery = "";
+    let mostrarPreview = true;
 
-    async function executarTeste() {
+    // Copia receita do OD para OE
+    function copiarODparaOE() {
+        oe = { ...od };
+    }
+
+    // Limpa o formulário
+    function limparReceita() {
+        od = { esferico: 0, cilindrico: 0, eixo: 0, adicao: 0, dnp: 32 };
+        oe = { esferico: 0, cilindrico: 0, eixo: 0, adicao: 0, dnp: 32 };
+        resultados = [];
+        erro = "";
+    }
+
+    // Formata valor para exibição (com sinal +/-)
+    function formatarGrau(valor: number): string {
+        if (valor === 0) return "0.00";
+        return (valor > 0 ? "+" : "") + valor.toFixed(2);
+    }
+
+    // Busca lentes compatíveis
+    async function buscarLentes() {
         loading = true;
         erro = "";
         resultados = [];
-        const inicio = performance.now();
-
-        // Simulação da query SQL que o backend executa
-        sqlQuery = `SELECT * FROM public.buscar_lentes_por_receita(
-  p_esferico => ${parametros.esferico},
-  p_cilindrico => ${parametros.cilindrico},
-  p_adicao => ${parametros.adicao},
-  p_tipo_lente => '${parametros.tipo}'
-);`;
 
         try {
-            // Chamada real ao banco via API
-            const resp = await CatalogoAPI.buscarLentesPorReceita({
+            // Busca para OD
+            const respOD = await CatalogoAPI.buscarLentesPorReceita({
                 receita: {
-                    esferico: parametros.esferico,
-                    cilindrico: parametros.cilindrico,
-                    eixo: parametros.eixo,
-                    adicao: parametros.adicao,
+                    esferico: od.esferico,
+                    cilindrico: od.cilindrico,
+                    eixo: od.eixo,
+                    adicao: od.adicao,
                 },
-                tipo_lente: parametros.tipo,
-                limite: 50, // Testando com limite alto
+                tipo_lente: tipoLente,
+                limite: 100,
             });
 
-            if (resp.success && resp.data) {
-                resultados = resp.data.dados;
+            // Busca para OE
+            const respOE = await CatalogoAPI.buscarLentesPorReceita({
+                receita: {
+                    esferico: oe.esferico,
+                    cilindrico: oe.cilindrico,
+                    eixo: oe.eixo,
+                    adicao: oe.adicao,
+                },
+                tipo_lente: tipoLente,
+                limite: 100,
+            });
+
+            // Combina e remove duplicatas (lentes que servem para ambos os olhos)
+            if (respOD.success && respOE.success && respOD.data && respOE.data) {
+                const lentesOD = respOD.data.dados || [];
+                const lentesOE = respOE.data.dados || [];
+                
+                // Intersecção: lentes que atendem ambos os olhos
+                const idsOD = new Set(lentesOD.map((l: any) => l.id));
+                const lentesComuns = lentesOE.filter((l: any) => idsOD.has(l.id));
+                
+                resultados = lentesComuns.length > 0 ? lentesComuns : [...lentesOD, ...lentesOE];
+                
+                // Remove duplicatas finais
+                const uniqueIds = new Set();
+                resultados = resultados.filter((l: any) => {
+                    if (uniqueIds.has(l.id)) return false;
+                    uniqueIds.add(l.id);
+                    return true;
+                });
             } else {
-                erro = "A função retornou sucesso=false ou dados vazios.";
+                erro = "Erro ao buscar lentes compatíveis";
             }
         } catch (e: any) {
-            erro = e.message || "Erro desconhecido na execução da RPC";
+            erro = e.message || "Erro ao processar busca";
         } finally {
-            const fim = performance.now();
-            tempoExecucao = fim - inicio;
             loading = false;
         }
     }
 
-    function formatarMoeda(valor: number) {
-        return new Intl.NumberFormat("pt-BR", {
-            style: "currency",
-            currency: "BRL",
-        }).format(valor);
+    // Atualiza OE quando "mesma receita" está ativo
+    $: if (usarMesmaReceita) {
+        copiarODparaOE();
     }
 </script>
 
 <svelte:head>
-    <title>Simulador SQL: Lentes por Receita - SIS Lens</title>
+    <title>Simulador de Receita - SIS Lens</title>
 </svelte:head>
 
 <Container maxWidth="xl" padding="md">
     <PageHero
-        badge="🧪 Laboratório de Dados"
-        title="Simulador de Compatibilidade"
-        subtitle="Teste direto da função de banco de dados: buscar_lentes_por_receita()"
+        badge="👓 Simulador"
+        title="Buscar Lentes por Receita"
+        subtitle="Encontre lentes compatíveis com a prescrição oftalmológica"
     />
 
-    <div class="grid grid-cols-1 lg:grid-cols-3 gap-8 mt-8">
-        <!-- Painel de Parâmetros (Input) -->
-        <div class="glass-panel p-6 rounded-xl h-fit">
-            <h3
-                class="text-lg font-bold text-neutral-900 dark:text-white mb-4 flex items-center gap-2"
-            >
-                📥 Parâmetros de Entrada
+    <div class="mt-8 space-y-6">
+        
+        <!-- Tipo de Lente -->
+        <div class="glass-panel p-6 rounded-xl">
+            <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
+                Tipo de Lente
             </h3>
-
-            <div class="space-y-4">
-                <div>
-                    <label
-                        class="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1"
-                        >Tipo de Lente</label
-                    >
-                    <select bind:value={parametros.tipo} class="input w-full">
-                        <option value="visao_simples">Visão Simples</option>
-                        <option value="multifocal">Multifocal</option>
-                        <option value="bifocal">Bifocal</option>
-                    </select>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1"
-                            >Esférico</label
-                        >
-                        <input
-                            type="number"
-                            step="0.25"
-                            bind:value={parametros.esferico}
-                            class="input w-full"
-                        />
-                    </div>
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1"
-                            >Cilíndrico</label
-                        >
-                        <input
-                            type="number"
-                            step="0.25"
-                            bind:value={parametros.cilindrico}
-                            class="input w-full"
-                        />
-                    </div>
-                </div>
-
-                <div class="grid grid-cols-2 gap-4">
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1"
-                            >Eixo</label
-                        >
-                        <input
-                            type="number"
-                            step="1"
-                            bind:value={parametros.eixo}
-                            class="input w-full"
-                        />
-                    </div>
-                    <div>
-                        <label
-                            class="block text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1"
-                            >Adição</label
-                        >
-                        <input
-                            type="number"
-                            step="0.25"
-                            bind:value={parametros.adicao}
-                            class="input w-full"
-                            disabled={parametros.tipo === "visao_simples"}
-                        />
-                    </div>
-                </div>
-
-                <div class="pt-4">
-                    <Button
-                        variant="primary"
-                        fullWidth
-                        on:click={executarTeste}
-                        disabled={loading}
-                    >
-                        {#if loading}
-                            <LoadingSpinner size="sm" /> Processando...
-                        {:else}
-                            🚀 Executar RPC
-                        {/if}
-                    </Button>
-                </div>
-            </div>
-
-            <!-- SQL Preview -->
-            <div class="mt-6 p-3 bg-neutral-900 rounded-lg overflow-x-auto">
-                <code class="text-xs text-green-400 font-mono whitespace-pre"
-                    >{sqlQuery || "-- Aguardando execução..."}</code
-                >
+            <div class="flex gap-4 flex-wrap">
+                <label class="tipo-radio">
+                    <input type="radio" bind:group={tipoLente} value="visao_simples" />
+                    <span>Visão Simples</span>
+                </label>
+                <label class="tipo-radio">
+                    <input type="radio" bind:group={tipoLente} value="bifocal" />
+                    <span>Bifocal</span>
+                </label>
+                <label class="tipo-radio">
+                    <input type="radio" bind:group={tipoLente} value="multifocal" />
+                    <span>Multifocal / Progressiva</span>
+                </label>
             </div>
         </div>
 
-        <!-- Painel de Resultados (Output) -->
-        <div class="lg:col-span-2 space-y-6">
-            <!-- Métricas da Execução -->
-            {#if resultados.length > 0 || erro}
-                <div class="grid grid-cols-3 gap-4">
-                    <div class="glass-panel p-4 rounded-xl text-center">
-                        <div
-                            class="text-xs text-neutral-500 uppercase font-bold"
-                        >
-                            Status
-                        </div>
-                        <div
-                            class="text-lg font-bold {erro
-                                ? 'text-red-500'
-                                : 'text-green-500'}"
-                        >
-                            {erro ? "ERRO" : "SUCESSO"}
-                        </div>
-                    </div>
-                    <div class="glass-panel p-4 rounded-xl text-center">
-                        <div
-                            class="text-xs text-neutral-500 uppercase font-bold"
-                        >
-                            Lentes Compatíveis
-                        </div>
-                        <div
-                            class="text-lg font-bold text-neutral-900 dark:text-white"
-                        >
-                            {resultados.length}
-                        </div>
-                    </div>
-                    <div class="glass-panel p-4 rounded-xl text-center">
-                        <div
-                            class="text-xs text-neutral-500 uppercase font-bold"
-                        >
-                            Tempo (Client)
-                        </div>
-                        <div class="text-lg font-bold text-blue-500">
-                            {tempoExecucao.toFixed(0)} ms
-                        </div>
-                    </div>
+        <!-- Receita Oftalmológica -->
+        <div class="grid lg:grid-cols-2 gap-6">
+            
+            <!-- OD - Olho Direito -->
+            <div class="receita-card">
+                <div class="receita-header">
+                    <Eye class="text-brand-blue-500" size={24} />
+                    <h3>OD - Olho Direito</h3>
                 </div>
-            {/if}
 
-            {#if erro}
-                <div
-                    class="bg-red-100 dark:bg-red-900/30 text-red-700 dark:text-red-300 p-4 rounded-xl border border-red-200 dark:border-red-800"
-                >
-                    <strong>Erro na execução:</strong>
-                    {erro}
-                </div>
-            {/if}
+                <div class="receita-body">
+                    <!-- Esférico -->
+                    <div class="campo-receita">
+                        <label>Esférico</label>
+                        <select bind:value={od.esferico} class="select-receita">
+                            {#each esféricos as valor}
+                                <option value={valor}>{formatarGrau(valor)}</option>
+                            {/each}
+                        </select>
+                    </div>
 
-            <!-- Tabela de Dados Bruta (Para Validação Técnica) -->
-            {#if resultados.length > 0}
-                <div
-                    class="glass-panel rounded-xl overflow-hidden shadow-xl border border-neutral-200 dark:border-neutral-700"
-                >
-                    <div class="overflow-x-auto max-h-[600px]">
-                        <table
-                            class="w-full text-left text-sm whitespace-nowrap"
-                        >
-                            <thead
-                                class="bg-neutral-100 dark:bg-neutral-800 sticky top-0 z-10 font-bold text-neutral-700 dark:text-neutral-300"
-                            >
-                                <tr>
-                                    <th
-                                        class="p-3 border-b border-r dark:border-neutral-700"
-                                        >Lente (Nome Comercial)</th
-                                    >
-                                    <th
-                                        class="p-3 border-b border-r dark:border-neutral-700"
-                                        >Marca</th
-                                    >
-                                    <th
-                                        class="p-3 border-b border-r dark:border-neutral-700"
-                                        >Material / Índice</th
-                                    >
-                                    <th
-                                        class="p-3 border-b border-r dark:border-neutral-700 bg-blue-50 dark:bg-blue-900/20"
-                                        >Preço Tabela</th
-                                    >
-                                    <th
-                                        class="p-3 border-b border-r dark:border-neutral-700"
-                                        >Tratamentos</th
-                                    >
-                                    <th
-                                        class="p-3 border-b dark:border-neutral-700"
-                                        >Range (Validação)</th
-                                    >
-                                </tr>
-                            </thead>
-                            <tbody
-                                class="divide-y divide-neutral-200 dark:divide-neutral-700"
-                            >
-                                {#each resultados as row}
-                                    <tr
-                                        class="hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors"
-                                    >
-                                        <td
-                                            class="p-3 border-r dark:border-neutral-700 font-medium text-neutral-900 dark:text-white"
-                                        >
-                                            {row.nome_comercial}
-                                            {#if row.categoria === "premium"}
-                                                <Badge
-                                                    variant="gold"
-                                                    size="sm"
-                                                    class="ml-2">Premium</Badge
-                                                >
-                                            {/if}
-                                        </td>
-                                        <td
-                                            class="p-3 border-r dark:border-neutral-700"
-                                            >{row.marca_nome}</td
-                                        >
-                                        <td
-                                            class="p-3 border-r dark:border-neutral-700"
-                                        >
-                                            {row.material}
-                                            <span class="text-neutral-400"
-                                                >|</span
-                                            >
-                                            {row.indice_refracao}
-                                        </td>
-                                        <td
-                                            class="p-3 border-r dark:border-neutral-700 bg-blue-50/50 dark:bg-blue-900/10 font-bold text-green-600"
-                                        >
-                                            {row.preco_tabela
-                                                ? formatarMoeda(
-                                                      row.preco_tabela,
-                                                  )
-                                                : "-"}
-                                        </td>
-                                        <td
-                                            class="p-3 border-r dark:border-neutral-700 text-xs"
-                                        >
-                                            <div
-                                                class="flex gap-1 flex-wrap max-w-[200px]"
-                                            >
-                                                {#if row.ar}
-                                                    <span
-                                                        class="px-1.5 py-0.5 rounded bg-blue-100 text-blue-700"
-                                                        >AR</span
-                                                    >
-                                                {/if}
-                                                {#if row.blue}
-                                                    <span
-                                                        class="px-1.5 py-0.5 rounded bg-cyan-100 text-cyan-700"
-                                                        >Blue</span
-                                                    >
-                                                {/if}
-                                                {#if row.fotossensivel}
-                                                    <span
-                                                        class="px-1.5 py-0.5 rounded bg-orange-100 text-orange-700"
-                                                        >Foto</span
-                                                    >
-                                                {/if}
-                                            </div>
-                                        </td>
-                                        <td
-                                            class="p-3 text-xs text-neutral-500 font-mono"
-                                        >
-                                            Esf: [{row.esferico_min} a {row.esferico_max}]<br
-                                            />
-                                            Cil: [{row.cilindrico_min} a {row.cilindrico_max}]
-                                        </td>
-                                    </tr>
+                    <!-- Cilíndrico -->
+                    <div class="campo-receita">
+                        <label>Cilíndrico</label>
+                        <select bind:value={od.cilindrico} class="select-receita">
+                            {#each cilíndricos as valor}
+                                <option value={valor}>{formatarGrau(valor)}</option>
+                            {/each}
+                        </select>
+                    </div>
+
+                    <!-- Eixo -->
+                    <div class="campo-receita">
+                        <label>Eixo</label>
+                        <select bind:value={od.eixo} class="select-receita">
+                            {#each eixos as valor}
+                                <option value={valor}>{valor}°</option>
+                            {/each}
+                        </select>
+                    </div>
+
+                    <!-- Adição (apenas para multifocal/bifocal) -->
+                    {#if tipoLente !== "visao_simples"}
+                        <div class="campo-receita">
+                            <label>Adição</label>
+                            <select bind:value={od.adicao} class="select-receita">
+                                <option value={0}>Sem adição</option>
+                                {#each adições as valor}
+                                    <option value={valor}>{formatarGrau(valor)}</option>
                                 {/each}
-                            </tbody>
-                        </table>
+                            </select>
+                        </div>
+                    {/if}
+
+                    <!-- DNP -->
+                    <div class="campo-receita">
+                        <label>DNP (mm)</label>
+                        <input 
+                            type="number" 
+                            bind:value={od.dnp} 
+                            min="20" 
+                            max="40" 
+                            step="0.5"
+                            class="input-receita"
+                        />
                     </div>
                 </div>
-            {:else if !loading && !erro}
-                <div class="text-center py-20 opacity-50">
-                    <div class="text-6xl mb-4">🧪</div>
-                    <p class="text-lg">Aguardando execução do teste...</p>
+            </div>
+
+            <!-- OE - Olho Esquerdo -->
+            <div class="receita-card">
+                <div class="receita-header">
+                    <Eye class="text-brand-orange-500" size={24} />
+                    <h3>OE - Olho Esquerdo</h3>
+                    <label class="ml-auto flex items-center gap-2 text-sm cursor-pointer">
+                        <input 
+                            type="checkbox" 
+                            bind:checked={usarMesmaReceita}
+                            class="checkbox"
+                        />
+                        <span>Mesma receita</span>
+                    </label>
                 </div>
-            {/if}
+
+                <div class="receita-body">
+                    <!-- Esférico -->
+                    <div class="campo-receita">
+                        <label>Esférico</label>
+                        <select bind:value={oe.esferico} class="select-receita" disabled={usarMesmaReceita}>
+                            {#each esféricos as valor}
+                                <option value={valor}>{formatarGrau(valor)}</option>
+                            {/each}
+                        </select>
+                    </div>
+
+                    <!-- Cilíndrico -->
+                    <div class="campo-receita">
+                        <label>Cilíndrico</label>
+                        <select bind:value={oe.cilindrico} class="select-receita" disabled={usarMesmaReceita}>
+                            {#each cilíndricos as valor}
+                                <option value={valor}>{formatarGrau(valor)}</option>
+                            {/each}
+                        </select>
+                    </div>
+
+                    <!-- Eixo -->
+                    <div class="campo-receita">
+                        <label>Eixo</label>
+                        <select bind:value={oe.eixo} class="select-receita" disabled={usarMesmaReceita}>
+                            {#each eixos as valor}
+                                <option value={valor}>{valor}°</option>
+                            {/each}
+                        </select>
+                    </div>
+
+                    <!-- Adição (apenas para multifocal/bifocal) -->
+                    {#if tipoLente !== "visao_simples"}
+                        <div class="campo-receita">
+                            <label>Adição</label>
+                            <select bind:value={oe.adicao} class="select-receita" disabled={usarMesmaReceita}>
+                                <option value={0}>Sem adição</option>
+                                {#each adições as valor}
+                                    <option value={valor}>{formatarGrau(valor)}</option>
+                                {/each}
+                            </select>
+                        </div>
+                    {/if}
+
+                    <!-- DNP -->
+                    <div class="campo-receita">
+                        <label>DNP (mm)</label>
+                        <input 
+                            type="number" 
+                            bind:value={oe.dnp} 
+                            min="20" 
+                            max="40" 
+                            step="0.5"
+                            class="input-receita"
+                            disabled={usarMesmaReceita}
+                        />
+                    </div>
+                </div>
+            </div>
         </div>
+
+        <!-- Preview da Receita -->
+        {#if mostrarPreview}
+            <div class="receita-preview">
+                <h4 class="text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-3">
+                    📋 Preview da Receita
+                </h4>
+                <div class="preview-table">
+                    <table>
+                        <thead>
+                            <tr>
+                                <th></th>
+                                <th>Esférico</th>
+                                <th>Cilíndrico</th>
+                                <th>Eixo</th>
+                                {#if tipoLente !== "visao_simples"}
+                                    <th>Adição</th>
+                                {/if}
+                                <th>DNP</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="label-col">OD</td>
+                                <td>{formatarGrau(od.esferico)}</td>
+                                <td>{formatarGrau(od.cilindrico)}</td>
+                                <td>{od.eixo}°</td>
+                                {#if tipoLente !== "visao_simples"}
+                                    <td>{formatarGrau(od.adicao)}</td>
+                                {/if}
+                                <td>{od.dnp} mm</td>
+                            </tr>
+                            <tr>
+                                <td class="label-col">OE</td>
+                                <td>{formatarGrau(oe.esferico)}</td>
+                                <td>{formatarGrau(oe.cilindrico)}</td>
+                                <td>{oe.eixo}°</td>
+                                {#if tipoLente !== "visao_simples"}
+                                    <td>{formatarGrau(oe.adicao)}</td>
+                                {/if}
+                                <td>{oe.dnp} mm</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        {/if}
+
+        <!-- Ações -->
+        <div class="flex gap-4 justify-center flex-wrap">
+            <Button variant="primary" on:click={buscarLentes} disabled={loading}>
+                {#if loading}
+                    <LoadingSpinner size="sm" />
+                    Buscando...
+                {:else}
+                    <Search size={18} />
+                    Buscar Lentes Compatíveis
+                {/if}
+            </Button>
+            <Button variant="secondary" on:click={limparReceita}>
+                <RotateCcw size={18} />
+                Limpar
+            </Button>
+        </div>
+
+        <!-- Erro -->
+        {#if erro}
+            <div class="erro-card">
+                <p>❌ {erro}</p>
+            </div>
+        {/if}
+
+        <!-- Resultados -->
+        {#if resultados.length > 0}
+            <div class="resultados-section">
+                <div class="resultados-header">
+                    <h3>Lentes Compatíveis</h3>
+                    <span class="badge-count">{resultados.length} lente{resultados.length !== 1 ? 's' : ''}</span>
+                </div>
+
+                <div class="lentes-grid">
+                    {#each resultados as lente}
+                        <LenteCard {lente} mostrarFornecedor={true} />
+                    {/each}
+                </div>
+            </div>
+        {:else if !loading && !erro}
+            <div class="empty-state">
+                <div class="empty-icon">👓</div>
+                <p>Preencha a receita e clique em "Buscar" para encontrar lentes compatíveis</p>
+            </div>
+        {/if}
     </div>
 </Container>
+
+<style>
+    /* Tipo de Lente Radio */
+    .tipo-radio {
+        display: flex;
+        align-items: center;
+        gap: 0.5rem;
+        padding: 0.75rem 1.5rem;
+        background: rgba(255, 255, 255, 0.5);
+        border: 2px solid transparent;
+        border-radius: 0.75rem;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+
+    :global(.dark) .tipo-radio {
+        background: rgba(30, 30, 30, 0.5);
+    }
+
+    .tipo-radio:hover {
+        background: rgba(255, 255, 255, 0.8);
+        border-color: var(--color-primary);
+    }
+
+    :global(.dark) .tipo-radio:hover {
+        background: rgba(40, 40, 40, 0.8);
+    }
+
+    .tipo-radio input[type="radio"] {
+        width: 1.25rem;
+        height: 1.25rem;
+        accent-color: var(--color-primary);
+        cursor: pointer;
+    }
+
+    .tipo-radio span {
+        font-weight: 600;
+        color: var(--color-text-primary);
+    }
+
+    /* Cards de Receita */
+    .receita-card {
+        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(0, 0, 0, 0.1);
+        border-radius: 1rem;
+        overflow: hidden;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    :global(.dark) .receita-card {
+        background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(40, 40, 40, 0.7));
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .receita-header {
+        display: flex;
+        align-items: center;
+        gap: 0.75rem;
+        padding: 1.25rem 1.5rem;
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(249, 115, 22, 0.1));
+        border-bottom: 2px solid rgba(0, 0, 0, 0.05);
+    }
+
+    :global(.dark) .receita-header {
+        background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(249, 115, 22, 0.2));
+        border-bottom-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .receita-header h3 {
+        font-size: 1.125rem;
+        font-weight: 700;
+        color: var(--color-text-primary);
+    }
+
+    .receita-body {
+        padding: 1.5rem;
+        display: grid;
+        gap: 1.25rem;
+    }
+
+    /* Campos da Receita */
+    .campo-receita {
+        display: flex;
+        flex-direction: column;
+        gap: 0.5rem;
+    }
+
+    .campo-receita label {
+        font-size: 0.875rem;
+        font-weight: 600;
+        color: var(--color-text-secondary);
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+    }
+
+    .select-receita,
+    .input-receita {
+        width: 100%;
+        padding: 0.75rem 1rem;
+        font-size: 1rem;
+        font-weight: 600;
+        background: white;
+        border: 2px solid rgba(0, 0, 0, 0.1);
+        border-radius: 0.5rem;
+        color: var(--color-text-primary);
+        transition: all 0.2s;
+        cursor: pointer;
+    }
+
+    :global(.dark) .select-receita,
+    :global(.dark) .input-receita {
+        background: rgba(30, 30, 30, 0.8);
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .select-receita:focus,
+    .input-receita:focus {
+        outline: none;
+        border-color: var(--color-primary);
+        box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
+    }
+
+    .select-receita:disabled,
+    .input-receita:disabled {
+        opacity: 0.5;
+        cursor: not-allowed;
+    }
+
+    .checkbox {
+        width: 1.125rem;
+        height: 1.125rem;
+        accent-color: var(--color-primary);
+        cursor: pointer;
+    }
+
+    /* Preview da Receita */
+    .receita-preview {
+        background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(249, 115, 22, 0.1));
+        border: 2px dashed rgba(234, 179, 8, 0.3);
+        border-radius: 1rem;
+        padding: 1.5rem;
+    }
+
+    :global(.dark) .receita-preview {
+        background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(249, 115, 22, 0.2));
+        border-color: rgba(234, 179, 8, 0.5);
+    }
+
+    .preview-table {
+        overflow-x: auto;
+        border-radius: 0.5rem;
+        border: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    :global(.dark) .preview-table {
+        border-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .preview-table table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+    }
+
+    :global(.dark) .preview-table table {
+        background: rgba(30, 30, 30, 0.8);
+    }
+
+    .preview-table thead {
+        background: rgba(59, 130, 246, 0.1);
+    }
+
+    :global(.dark) .preview-table thead {
+        background: rgba(59, 130, 246, 0.2);
+    }
+
+    .preview-table th,
+    .preview-table td {
+        padding: 0.75rem 1rem;
+        text-align: center;
+        border: 1px solid rgba(0, 0, 0, 0.05);
+    }
+
+    :global(.dark) .preview-table th,
+    :global(.dark) .preview-table td {
+        border-color: rgba(255, 255, 255, 0.05);
+    }
+
+    .preview-table th {
+        font-size: 0.75rem;
+        font-weight: 700;
+        text-transform: uppercase;
+        color: var(--color-text-secondary);
+    }
+
+    .preview-table td {
+        font-size: 0.875rem;
+        font-weight: 600;
+        font-family: 'Courier New', monospace;
+        color: var(--color-text-primary);
+    }
+
+    .preview-table .label-col {
+        background: rgba(59, 130, 246, 0.05);
+        font-weight: 800;
+        color: var(--color-primary);
+    }
+
+    :global(.dark) .preview-table .label-col {
+        background: rgba(59, 130, 246, 0.15);
+    }
+
+    /* Erro */
+    .erro-card {
+        background: rgba(239, 68, 68, 0.1);
+        border: 2px solid rgba(239, 68, 68, 0.3);
+        border-radius: 1rem;
+        padding: 1.25rem;
+        text-align: center;
+    }
+
+    .erro-card p {
+        font-weight: 600;
+        color: #dc2626;
+    }
+
+    /* Resultados */
+    .resultados-section {
+        margin-top: 3rem;
+    }
+
+    .resultados-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1.5rem;
+        padding-bottom: 1rem;
+        border-bottom: 2px solid rgba(0, 0, 0, 0.1);
+    }
+
+    :global(.dark) .resultados-header {
+        border-bottom-color: rgba(255, 255, 255, 0.1);
+    }
+
+    .resultados-header h3 {
+        font-size: 1.5rem;
+        font-weight: 800;
+        color: var(--color-text-primary);
+    }
+
+    .badge-count {
+        padding: 0.5rem 1rem;
+        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        color: white;
+        border-radius: 999px;
+        font-size: 0.875rem;
+        font-weight: 700;
+    }
+
+    .lentes-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fill, minmax(min(100%, 350px), 1fr));
+        gap: 1.5rem;
+    }
+
+    /* Empty State */
+    .empty-state {
+        text-align: center;
+        padding: 4rem 2rem;
+        opacity: 0.6;
+    }
+
+    .empty-icon {
+        font-size: 4rem;
+        margin-bottom: 1rem;
+    }
+
+    .empty-state p {
+        font-size: 1.125rem;
+        color: var(--color-text-secondary);
+    }
+
+    /* Responsive */
+    @media (max-width: 768px) {
+        .lentes-grid {
+            grid-template-columns: 1fr;
+        }
+
+        .preview-table {
+            font-size: 0.75rem;
+        }
+
+        .preview-table th,
+        .preview-table td {
+            padding: 0.5rem;
+            font-size: 0.75rem;
+        }
+
+        .tipo-radio {
+            padding: 0.5rem 1rem;
+            font-size: 0.875rem;
+        }
+    }
+</style>
