@@ -10,18 +10,32 @@
 
   export let currentPage: string = "/";
   
-  const menuItems = [
+  type MenuItem = {
+    icon: string;
+    label: string;
+    path: string;
+    submenu?: MenuItem[];
+  };
+  
+  const menuItems: MenuItem[] = [
     { icon: "🏠", label: "Dashboard", path: "/dashboard" },
-    { icon: "🔍", label: "Buscar", path: "/buscar" },
-    { icon: "⚖️", label: "Comparar", path: "/comparar" },
+    { 
+      icon: "📦", 
+      label: "Catálogo", 
+      path: "/catalogo",
+      submenu: [
+        { icon: "🔍", label: "Ver Tudo", path: "/catalogo" },
+        { icon: "📋", label: "Standard", path: "/catalogo/standard" },
+        { icon: "👑", label: "Premium", path: "/catalogo/premium" },
+      ]
+    },
     { icon: "🏆", label: "Ranking", path: "/ranking" },
-    { icon: "📜", label: "Histórico", path: "/historico" },
-    { icon: "📦", label: "Catálogo", path: "/catalogo" },
     { icon: "🏭", label: "Fornecedores", path: "/fornecedores" },
-    { icon: "💼", label: "Comercial", path: "/comercial" },
-    { icon: "📊", label: "Analytics", path: "/analytics" },
+    { icon: "📊", label: "BI/Relatórios", path: "/bi" },
     { icon: "⚙️", label: "Configurações", path: "/configuracoes" },
   ];
+  
+  let expandedMenus: Record<string, boolean> = {};
 
   function isActive(path: string): boolean {
     return currentPage === path || currentPage.startsWith(path + "/");
@@ -29,6 +43,10 @@
 
   function handleNavigation(path: string) {
     goto(path);
+  }
+  
+  function toggleSubmenu(path: string) {
+    expandedMenus[path] = !expandedMenus[path];
   }
 </script>
 
@@ -46,18 +64,58 @@
     <!-- Menu Items -->
     <div class="nav-menu">
       {#each menuItems as item}
-        <button
-          class="nav-item"
-          class:active={isActive(item.path)}
-          on:click={() => handleNavigation(item.path)}
-          title={item.label}
-        >
-          <span class="nav-icon">{item.icon}</span>
-          <span class="nav-label">{item.label}</span>
-          {#if isActive(item.path)}
-            <div class="active-indicator"></div>
-          {/if}
-        </button>
+        {#if item.submenu}
+          <!-- Item com submenu -->
+          <div class="nav-item-group">
+            <button
+              class="nav-item"
+              class:active={isActive(item.path)}
+              class:has-submenu={true}
+              on:click={() => toggleSubmenu(item.path)}
+              title={item.label}
+            >
+              <span class="nav-icon">{item.icon}</span>
+              <span class="nav-label">{item.label}</span>
+              <span class="submenu-arrow" class:expanded={expandedMenus[item.path]}>›</span>
+              {#if isActive(item.path)}
+                <div class="active-indicator"></div>
+              {/if}
+            </button>
+            
+            {#if expandedMenus[item.path]}
+              <div class="submenu">
+                {#each item.submenu as subitem}
+                  <button
+                    class="nav-item submenu-item"
+                    class:active={isActive(subitem.path)}
+                    on:click={() => handleNavigation(subitem.path)}
+                    title={subitem.label}
+                  >
+                    <span class="nav-icon">{subitem.icon}</span>
+                    <span class="nav-label">{subitem.label}</span>
+                    {#if isActive(subitem.path)}
+                      <div class="active-indicator"></div>
+                    {/if}
+                  </button>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        {:else}
+          <!-- Item normal -->
+          <button
+            class="nav-item"
+            class:active={isActive(item.path)}
+            on:click={() => handleNavigation(item.path)}
+            title={item.label}
+          >
+            <span class="nav-icon">{item.icon}</span>
+            <span class="nav-label">{item.label}</span>
+            {#if isActive(item.path)}
+              <div class="active-indicator"></div>
+            {/if}
+          </button>
+        {/if}
       {/each}
     </div>
 
@@ -181,6 +239,45 @@
     width: 3px;
     background: linear-gradient(180deg, #f59e0b, #ef4444);
     border-radius: 999px 0 0 999px;
+  }
+  
+  /* Submenu */
+  .nav-item-group {
+    display: flex;
+    flex-direction: column;
+  }
+  
+  .nav-item.has-submenu {
+    cursor: pointer;
+  }
+  
+  .submenu-arrow {
+    font-size: 1.25rem;
+    transition: transform 0.3s ease;
+    color: rgba(255, 255, 255, 0.5);
+  }
+  
+  .submenu-arrow.expanded {
+    transform: rotate(90deg);
+  }
+  
+  .submenu {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    margin-left: 1rem;
+    margin-top: 0.25rem;
+    padding-left: 0.5rem;
+    border-left: 2px solid rgba(255, 255, 255, 0.1);
+  }
+  
+  .submenu-item {
+    padding: 0.625rem 0.875rem;
+    font-size: 0.8125rem;
+  }
+  
+  .submenu-item .nav-icon {
+    font-size: 1rem;
   }
 
   /* User Section */

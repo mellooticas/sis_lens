@@ -44,7 +44,7 @@
   <Container maxWidth="xl" padding="md">
       <!-- Breadcrumbs custom implementation for now (or replace with component later) -->
       <nav class="text-sm text-neutral-500 mb-6 font-medium">
-         <a href="/buscar" class="hover:text-brand-blue-600 transition-colors">Buscar</a>
+         <a href="/catalogo" class="hover:text-brand-blue-600 transition-colors">Catálogo</a>
          <span class="mx-2">/</span>
          <a href="/ranking?lente_id={data.decisao?.lente_id}" class="hover:text-brand-blue-600 transition-colors">Ranking</a>
          <span class="mx-2">/</span>
@@ -193,7 +193,7 @@
               <div class="text-6xl mb-6">❌</div>
               <h2 class="text-2xl font-bold text-neutral-900 dark:text-white mb-2">Decisão não encontrada</h2>
               <p class="text-neutral-500 mb-8">Não foi possível carregar os detalhes desta decisão.</p>
-              <Button variant="primary" on:click={() => goto('/buscar')}>Voltar para Busca</Button>
+              <Button variant="primary" on:click={() => goto('/catalogo')}>Voltar ao Catálogo</Button>
            </div>
         {/if}
       </div>

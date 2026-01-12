@@ -14,7 +14,18 @@
   let showAccessibilityPanel = false;
 
   // Menu items com novos ícones e labels
-  const menuItems = [
+  type MenuItem = {
+    id: string;
+    label: string;
+    href?: string;
+    icon: string;
+    color: string;
+    submenu?: MenuItem[];
+  };
+  
+  let expandedMenus: Record<string, boolean> = {};
+  
+  const menuItems: MenuItem[] = [
     {
       id: "home",
       label: "Dashboard",
@@ -23,25 +34,34 @@
       color: "text-blue-500",
     },
     {
-      id: "buscar",
-      label: "Buscar Lentes",
-      href: "/buscar",
-      icon: "search",
-      color: "text-indigo-500",
-    },
-    {
       id: "catalogo",
       label: "Catálogo",
       href: "/catalogo",
-      icon: "box",
-      color: "text-violet-500",
-    },
-    {
-      id: "catalogo-premium",
-      label: "Premium",
-      href: "/catalogo/premium",
-      icon: "sparkles",
-      color: "text-amber-500",
+      icon: "search",
+      color: "text-indigo-500",
+      submenu: [
+        {
+          id: "catalogo-all",
+          label: "Ver Tudo",
+          href: "/catalogo",
+          icon: "search",
+          color: "text-indigo-500",
+        },
+        {
+          id: "standard",
+          label: "Standard",
+          href: "/catalogo/standard",
+          icon: "box",
+          color: "text-violet-500",
+        },
+        {
+          id: "catalogo-premium",
+          label: "Premium",
+          href: "/catalogo/premium",
+          icon: "sparkles",
+          color: "text-amber-500",
+        },
+      ]
     },
     {
       id: "ranking",
@@ -51,20 +71,6 @@
       color: "text-yellow-500",
     },
     {
-      id: "comercial",
-      label: "Comercial",
-      href: "/comercial",
-      icon: "dollar-sign",
-      color: "text-emerald-500",
-    },
-    {
-      id: "vouchers",
-      label: "Vouchers",
-      href: "/vouchers",
-      icon: "ticket",
-      color: "text-pink-500",
-    },
-    {
       id: "fornecedores",
       label: "Fornecedores",
       href: "/fornecedores",
@@ -72,25 +78,18 @@
       color: "text-orange-500",
     },
     {
-      id: "historico",
-      label: "Histórico",
-      href: "/historico",
-      icon: "clock",
+      id: "simulador",
+      label: "Simulador",
+      href: "/simulador/receita",
+      icon: "zap",
       color: "text-purple-500",
     },
     {
-      id: "analytics",
-      label: "Analytics",
-      href: "/analytics",
+      id: "bi",
+      label: "BI/Relatórios",
+      href: "/bi",
       icon: "chart",
       color: "text-green-500",
-    },
-    {
-      id: "simulador",
-      label: "Simulador DB",
-      href: "/simulador/receita",
-      icon: "zap",
-      color: "text-amber-500",
     },
     {
       id: "config",
@@ -100,6 +99,10 @@
       color: "text-gray-500",
     },
   ];
+  
+  function toggleSubmenu(itemId: string) {
+    expandedMenus[itemId] = !expandedMenus[itemId];
+  }
 
   function isActive(path: string) {
     // Para a home, deve ser exatamente "/"
@@ -146,259 +149,262 @@
     <!-- Navigation -->
     <nav class="flex-1 py-6 px-3 space-y-2 overflow-y-auto custom-scrollbar">
       {#each menuItems as item}
-        <a
-          href={item.href}
-          class="
-            relative flex items-center gap-4 px-3 py-3.5 rounded-xl transition-all duration-300 group
-            {isActive(item.href)
-            ? 'bg-brand-blue-50 dark:bg-brand-blue-900/40 shadow-inner' // Active State
-            : 'hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60 hover:shadow-sm hover:translate-x-1'} // Hover State
-          "
-          title={collapsed ? item.label : ""}
-        >
-          <!-- Active Indicator Line -->
-          {#if isActive(item.href)}
-            <div
-              class="absolute left-0 h-8 w-1 bg-brand-blue-500 rounded-r-full shadow-[0_0_10px_rgba(28,59,90,0.5)]"
-              transition:fly={{ x: -5, duration: 300 }}
-            ></div>
-          {/if}
-
-          <!-- Icon Gradient Wrapper -->
-          <span
-            class="
-              shrink-0 flex items-center justify-center w-8 h-8 rounded-lg
-              {isActive(item.href)
-              ? 'bg-white dark:bg-neutral-800 shadow-sm scale-110'
-              : 'bg-transparent scale-100'}
-              transition-all duration-300
-            "
-          >
-            {#if item.icon === "home"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                /></svg
-              >
-            {:else if item.icon === "search"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                /></svg
-              >
-            {:else if item.icon === "box"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"
-                /><polyline
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  points="3.27 6.96 12 12.01 20.73 6.96"
-                /><line
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  x1="12"
-                  y1="22.08"
-                  x2="12"
-                  y2="12"
-                /></svg
-              >
-            {:else if item.icon === "sparkles"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
-                /></svg
-              >
-            {:else if item.icon === "arrow-left-right"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M7 16l-4-4m0 0l4-4m-4 4h18M17 8l4 4m0 0l-4 4m4-4H3"
-                /></svg
-              >
-            {:else if item.icon === "trophy"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 15v5m-3 0h6M12 15c2.21 0 4-1.79 4-4V5c0-1.1-.9-2-2-2H10c-1.1 0-2 .9-2 2v6c0 2.21 1.79 4 4 4zm0 0c-2.67 0-8 1.34-8 4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-1c0-2.66-5.33-4-8-4z"
-                /><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M5.25 7.5A2.25 2.25 0 017.5 5.25M18.75 7.5A2.25 2.25 0 0116.5 5.25"
-                /></svg
-              >
-            {:else if item.icon === "clock"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-                /></svg
-              >
-            {:else if item.icon === "chart"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
-                /></svg
-              >
-            {:else if item.icon === "settings"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
-                /><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                /></svg
-              >
-            {:else if item.icon === "dollar-sign"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M12 1v22M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"
-                /></svg
-              >
-            {:else if item.icon === "ticket"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M21 12H3m7 8l-4-4 4-4m5 8l4-4-4-4"
-                /><!-- Wait, this is not a ticket icon. Using a generic tag icon path instead -->
-                <path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M20.59 13.41l-7.17 7.17a2 2 0 0 1-2.83 0L2 12V2h10l8.59 8.59a2 2 0 0 1 0 2.82z"
-                />
-                <line x1="7" y1="7" x2="7.01" y2="7" stroke-width="2"></line>
-              </svg>
-            {:else if item.icon === "truck"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M1 3h15v13H1z"
-                /><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M16 8h4l3 3v5h-7V8z"
-                /><circle cx="5.5" cy="18.5" r="2.5" />
-                <circle cx="18.5" cy="18.5" r="2.5" />
-              </svg>
-            {:else if item.icon === "zap"}
-              <svg
-                class="w-5 h-5 {item.color}"
-                fill="none"
-                viewBox="0 0 24 24"
-                stroke="currentColor"
-                ><path
-                  stroke-linecap="round"
-                  stroke-linejoin="round"
-                  stroke-width="2"
-                  d="M13 10V3L4 14h7v7l9-11h-7z"
-                /></svg
-              >
-            {/if}
-          </span>
-
-          {#if !collapsed}
-            <div
-              class="flex flex-col overflow-hidden"
-              in:fly={{ x: -10, duration: 300 }}
+        {#if item.submenu}
+          <!-- Item com submenu -->
+          <div class="space-y-1">
+            <button
+              on:click={() => toggleSubmenu(item.id)}
+              class="
+                w-full relative flex items-center gap-4 px-3 py-3.5 rounded-xl transition-all duration-300 group
+                {isActive(item.href || '')
+                ? 'bg-brand-blue-50 dark:bg-brand-blue-900/40 shadow-inner'
+                : 'hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60 hover:shadow-sm hover:translate-x-1'}
+              "
+              title={collapsed ? item.label : ""}
             >
+              <!-- Active Indicator Line -->
+              {#if isActive(item.href || '')}
+                <div
+                  class="absolute left-0 h-8 w-1 bg-brand-blue-500 rounded-r-full shadow-[0_0_10px_rgba(28,59,90,0.5)]"
+                  transition:fly={{ x: -5, duration: 300 }}
+                ></div>
+              {/if}
+
+              <!-- Icon Gradient Wrapper -->
               <span
-                class="whitespace-nowrap font-medium text-sm {isActive(
-                  item.href,
-                )
-                  ? 'text-brand-blue-700 dark:text-brand-blue-300'
-                  : 'text-neutral-600 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white'}"
+                class="
+                  shrink-0 flex items-center justify-center w-8 h-8 rounded-lg
+                  {isActive(item.href || '')
+                  ? 'bg-white dark:bg-neutral-800 shadow-sm scale-110'
+                  : 'bg-transparent scale-100'}
+                  transition-all duration-300
+                "
               >
-                {item.label}
+                {#if item.icon === "search"}
+                  <svg
+                    class="w-5 h-5 {item.color}"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                    ><path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                    /></svg
+                  >
+                {/if}
               </span>
-            </div>
-          {/if}
-        </a>
+
+              {#if !collapsed}
+                <div
+                  class="flex flex-1 items-center justify-between overflow-hidden"
+                  in:fly={{ x: -10, duration: 300 }}
+                >
+                  <span
+                    class="whitespace-nowrap font-medium text-sm {isActive(
+                      item.href || '',
+                    )
+                      ? 'text-brand-blue-700 dark:text-brand-blue-300'
+                      : 'text-neutral-600 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white'}"
+                  >
+                    {item.label}
+                  </span>
+                  <svg
+                    class="w-4 h-4 transition-transform duration-300 {expandedMenus[item.id] ? 'rotate-90' : ''}"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                    stroke="currentColor"
+                  >
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                  </svg>
+                </div>
+              {/if}
+            </button>
+            
+            {#if expandedMenus[item.id] && item.submenu}
+              <div class="ml-4 space-y-1">
+                {#each item.submenu as subitem}
+                  <a
+                    href={subitem.href}
+                    class="
+                      relative flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all duration-300 group
+                      {isActive(subitem.href || '')
+                      ? 'bg-brand-blue-50/50 dark:bg-brand-blue-900/20 shadow-inner'
+                      : 'hover:bg-neutral-100/60 dark:hover:bg-neutral-800/40 hover:translate-x-1'}
+                    "
+                    title={collapsed ? subitem.label : ""}
+                  >
+                    <span
+                      class="
+                        shrink-0 flex items-center justify-center w-6 h-6 rounded-lg
+                        {isActive(subitem.href || '')
+                        ? 'bg-white dark:bg-neutral-800 shadow-sm'
+                        : 'bg-transparent'}
+                        transition-all duration-300
+                      "
+                    >
+                      {#if subitem.icon === "search"}
+                        <svg class="w-4 h-4 {subitem.color}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                      {:else if subitem.icon === "box"}
+                        <svg class="w-4 h-4 {subitem.color}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                        </svg>
+                      {:else if subitem.icon === "sparkles"}
+                        <svg class="w-4 h-4 {subitem.color}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        </svg>
+                      {/if}
+                    </span>
+                    
+                    {#if !collapsed}
+                      <span
+                        class="whitespace-nowrap font-medium text-xs {isActive(subitem.href || '')
+                          ? 'text-brand-blue-600 dark:text-brand-blue-400'
+                          : 'text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-800 dark:group-hover:text-white'}"
+                      >
+                        {subitem.label}
+                      </span>
+                    {/if}
+                  </a>
+                {/each}
+              </div>
+            {/if}
+          </div>
+        {:else}
+          <!-- Item normal -->
+          <a
+            href={item.href}
+            class="
+              relative flex items-center gap-4 px-3 py-3.5 rounded-xl transition-all duration-300 group
+              {isActive(item.href || '')
+              ? 'bg-brand-blue-50 dark:bg-brand-blue-900/40 shadow-inner'
+              : 'hover:bg-neutral-100/80 dark:hover:bg-neutral-800/60 hover:shadow-sm hover:translate-x-1'}
+            "
+            title={collapsed ? item.label : ""}
+          >
+            <!-- Active Indicator Line -->
+            {#if isActive(item.href || '')}
+              <div
+                class="absolute left-0 h-8 w-1 bg-brand-blue-500 rounded-r-full shadow-[0_0_10px_rgba(28,59,90,0.5)]"
+                transition:fly={{ x: -5, duration: 300 }}
+              ></div>
+            {/if}
+
+            <!-- Icon Gradient Wrapper -->
+            <span
+              class="
+                shrink-0 flex items-center justify-center w-8 h-8 rounded-lg
+                {isActive(item.href || '')
+                ? 'bg-white dark:bg-neutral-800 shadow-sm scale-110'
+                : 'bg-transparent scale-100'}
+                transition-all duration-300
+              "
+            >
+              {#if item.icon === "home"}
+                <svg
+                  class="w-5 h-5 {item.color}"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
+                  /></svg
+                >
+              {:else if item.icon === "trophy"}
+                <svg
+                  class="w-5 h-5 {item.color}"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M12 15v5m-3 0h6M12 15c2.21 0 4-1.79 4-4V5c0-1.1-.9-2-2-2H10c-1.1 0-2 .9-2 2v6c0 2.21 1.79 4 4 4zm0 0c-2.67 0-8 1.34-8 4v1c0 .55.45 1 1 1h14c.55 0 1-.45 1-1v-1c0-2.66-5.33-4-8-4z"
+                  /></svg
+                >
+              {:else if item.icon === "truck"}
+                <svg
+                  class="w-5 h-5 {item.color}"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  ><rect x="1" y="3" width="15" height="13" stroke-width="2" />
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8h4l3 3v5h-7V8z" />
+                  <circle cx="5.5" cy="18.5" r="2.5" />
+                  <circle cx="18.5" cy="18.5" r="2.5" />
+                </svg>
+              {:else if item.icon === "chart"}
+                <svg
+                  class="w-5 h-5 {item.color}"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"
+                  /></svg
+                >
+              {:else if item.icon === "zap"}
+                <svg
+                  class="w-5 h-5 {item.color}"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M13 10V3L4 14h7v7l9-11h-7z"
+                  /></svg
+                >
+              {:else if item.icon === "settings"}
+                <svg
+                  class="w-5 h-5 {item.color}"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                  ><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z"
+                  /><path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                  /></svg
+                >
+              {/if}
+            </span>
+
+            {#if !collapsed}
+              <div
+                class="flex flex-col overflow-hidden"
+                in:fly={{ x: -10, duration: 300 }}
+              >
+                <span
+                  class="whitespace-nowrap font-medium text-sm {isActive(
+                    item.href || '',
+                  )
+                    ? 'text-brand-blue-700 dark:text-brand-blue-300'
+                    : 'text-neutral-600 dark:text-neutral-300 group-hover:text-neutral-900 dark:group-hover:text-white'}"
+                >
+                  {item.label}
+                </span>
+              </div>
+            {/if}
+          </a>
+        {/if}
       {/each}
     </nav>
 

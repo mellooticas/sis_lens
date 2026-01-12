@@ -1,13 +1,13 @@
 <!--
-  📚 Detalhes Canônica Genérica
-  Mostra todas as lentes de diferentes laboratórios normalizadas neste grupo
+  📋 Detalhes da Lente
+  Todas as informações completas do banco de dados
 -->
 <script lang="ts">
   import { page } from '$app/stores';
   import { goto } from '$app/navigation';
   import { onMount } from 'svelte';
   import { CatalogoAPI } from '$lib/api/catalogo-api';
-  import type { DetalheGenerico, CanonicaGenerica } from '$lib/types/database-views';
+  import type { LenteCatalogo } from '$lib/types/database-views';
 
   // Componentes padronizados
   import Container from "$lib/components/layout/Container.svelte";
@@ -18,12 +18,11 @@
   import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
 
   // State
-  let lentes: DetalheGenerico[] = [];
-  let canonica: CanonicaGenerica | null = null;
+  let lente: LenteCatalogo | null = null;
   let loading = true;
   let error = '';
 
-  const canonicaId = $page.params.id;
+  const lenteId = $page.params.id;
 
   onMount(async () => {
     await carregarDetalhes();
@@ -34,54 +33,33 @@
       loading = true;
       error = '';
       
-      // Buscar info da canônica
-      const resultadoCanonica = await CatalogoAPI.listarCanonicasGenericas(
-        {},
-        { limite: 1000 }
-      );
+      const resultado = await CatalogoAPI.obterLente(lenteId);
 
-      if (resultadoCanonica.success && resultadoCanonica.data) {
-        canonica = resultadoCanonica.data.dados.find(c => c.id === canonicaId) || null;
-      }
-
-      // Buscar lentes usando a view vw_detalhes_genericas
-      const resultadoLentes = await CatalogoAPI.listarDetalhesGenericas(canonicaId);
-
-      if (resultadoLentes.success && resultadoLentes.data) {
-        lentes = resultadoLentes.data;
-      }
-
-      if (!canonica || lentes.length === 0) {
-        error = 'Canônica não encontrada ou sem lentes disponíveis';
+      if (resultado.success && resultado.data) {
+        lente = resultado.data;
+      } else {
+        error = resultado.error || 'Lente não encontrada';
       }
     } catch (err) {
       error = 'Erro ao carregar detalhes';
+      console.error('Erro:', err);
     } finally {
       loading = false;
     }
   }
 
-  // Agrupar por marca
-  $: lentesAgrupadas = lentes.reduce((acc, lente) => {
-    if (!acc[lente.marca_nome]) {
-      acc[lente.marca_nome] = [];
-    }
-    acc[lente.marca_nome].push(lente);
-    return acc;
-  }, {} as Record<string, DetalheGenerico[]>);
-
-  $: marcas = Object.keys(lentesAgrupadas).sort();
-  $: precoMinimo = lentes.length > 0 ? Math.min(...lentes.map(l => l.preco_tabela)) : 0;
-  $: precoMaximo = lentes.length > 0 ? Math.max(...lentes.map(l => l.preco_tabela)) : 0;
-  $: precoMedio = lentes.length > 0 ? lentes.reduce((sum, l) => sum + l.preco_tabela, 0) / lentes.length : 0;
-
-  function formatarPreco(valor: number): string {
+  function formatarPreco(valor: number | null): string {
+    if (!valor) return '-';
     return `R$ ${valor.toFixed(2)}`;
+  }
+
+  function formatarBoolean(valor: boolean): string {
+    return valor ? '✅ Sim' : '❌ Não';
   }
 </script>
 
 <svelte:head>
-  <title>{canonica?.nome_canonico || 'Detalhes Canônica'} - SIS Lens</title>
+  <title>{lente?.nome_comercial || 'Detalhes da Lente'} - SIS Lens</title>
 </svelte:head>
 
 <Container maxWidth="xl" padding="md">
@@ -91,12 +69,12 @@
       <p class="mt-4 text-slate-600">Carregando detalhes...</p>
     </div>
   
-  {:else if error || !canonica}
+  {:else if error || !lente}
     <div class="bg-red-50 border-2 border-red-200 rounded-2xl p-8 text-center">
       <div class="text-5xl mb-4">⚠️</div>
       <p class="text-red-800 text-lg font-medium mb-4">{error}</p>
       <Button variant="primary" on:click={() => goto('/catalogo')}>
-        Voltar para Catálogo
+        Voltar ao Catálogo
       </Button>
     </div>
   
@@ -104,262 +82,345 @@
     <!-- Botão Voltar -->
     <div class="mb-6">
       <Button variant="secondary" on:click={() => goto('/catalogo')}>
-        ← Voltar para Catálogo
+        ← Voltar ao Catálogo
       </Button>
     </div>
 
-    <!-- Header da Canônica -->
+    <!-- Header -->
     <div class="glass-panel rounded-2xl p-8 mb-8">
-      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-6">
+      <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
         <div class="flex-1">
           <div class="flex flex-wrap gap-2 mb-4">
-            <Badge variant="primary">📚 Catálogo</Badge>
-            <Badge variant="neutral">{canonica.tipo_lente.replace('_', ' ')}</Badge>
-            <Badge variant="neutral">{canonica.material}</Badge>
-            <Badge variant="neutral">Índice {canonica.indice_refracao}</Badge>
-            <Badge variant={canonica.categoria.includes('premium') ? 'gold' : 'neutral'}>
-              {canonica.categoria.replace('_', ' ')}
+            <Badge variant="primary">{lente.marca_nome}</Badge>
+            <Badge variant={lente.categoria.includes('premium') ? 'gold' : 'neutral'}>
+              {lente.categoria.replace('_', ' ')}
             </Badge>
+            {#if lente.destaque}
+              <Badge variant="gold">⭐ Destaque</Badge>
+            {/if}
+            {#if lente.novidade}
+              <Badge variant="blue">🆕 Novidade</Badge>
+            {/if}
           </div>
           
           <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-            {canonica.nome_canonico}
+            {lente.nome_lente}
           </h1>
           
-          {#if canonica.descricao}
-            <p class="text-lg text-slate-600 mb-4">{canonica.descricao}</p>
+          {#if lente.nome_grupo}
+            <p class="text-lg text-slate-600 mb-4">Grupo: {lente.nome_grupo}</p>
           {/if}
-
-          <p class="text-slate-700">
-            {lentes.length} lente{lentes.length > 1 ? 's' : ''} disponíve{lentes.length > 1 ? 'is' : 'l'} 
-            de {marcas.length} laboratório{marcas.length > 1 ? 's' : ''}
-          </p>
         </div>
 
-        <!-- Estatísticas de Preço -->
-        {#if lentes.length > 0}
-          <div class="grid grid-cols-3 gap-4">
-            <div class="bg-green-50 rounded-xl p-4 text-center">
-              <div class="text-xs text-green-700 mb-1">Mínimo</div>
-              <div class="text-lg font-bold text-green-800">{formatarPreco(precoMinimo)}</div>
-            </div>
-            <div class="bg-blue-50 rounded-xl p-4 text-center">
-              <div class="text-xs text-blue-700 mb-1">Médio</div>
-              <div class="text-lg font-bold text-blue-800">{formatarPreco(precoMedio)}</div>
-            </div>
-            <div class="bg-orange-50 rounded-xl p-4 text-center">
-              <div class="text-xs text-orange-700 mb-1">Máximo</div>
-              <div class="text-lg font-bold text-orange-800">{formatarPreco(precoMaximo)}</div>
-            </div>
+        <div class="text-right">
+          <div class="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-2xl p-6 min-w-[200px]">
+            <div class="text-sm opacity-90 mb-1">Preço Sugerido</div>
+            <div class="text-3xl font-bold">{formatarPreco(lente.preco_venda_sugerido)}</div>
+            <div class="text-xs opacity-75 mt-2">Custo: {formatarPreco(lente.preco_custo)}</div>
+            {#if lente.margem_lucro}
+              <div class="text-xs opacity-75">Margem: {lente.margem_lucro.toFixed(1)}%</div>
+            {/if}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informações Técnicas -->
+    <SectionHeader title="🔬 Especificações Técnicas" subtitle="Características ópticas e técnicas" />
+    
+    <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mb-8 mt-6">
+      <!-- Tipo e Material -->
+      <div class="glass-panel p-6 rounded-xl">
+        <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+          👓 Tipo e Material
+        </h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-600">Tipo:</span>
+            <span class="font-medium capitalize">{lente.tipo_lente.replace('_', ' ')}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600">Material:</span>
+            <span class="font-medium">{lente.material}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600">Índice Refração:</span>
+            <span class="font-medium">{lente.indice_refracao}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Dimensões -->
+      <div class="glass-panel p-6 rounded-xl">
+        <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+          📏 Dimensões
+        </h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-600">Diâmetro:</span>
+            <span class="font-medium">{lente.diametro ? `${lente.diametro} mm` : '-'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600">Espessura Central:</span>
+            <span class="font-medium">{lente.espessura_central ? `${lente.espessura_central} mm` : '-'}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600">Peso Aproximado:</span>
+            <span class="font-medium">{lente.peso_aproximado ? `${lente.peso_aproximado} g` : '-'}</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Faixas Ópticas -->
+      <div class="glass-panel p-6 rounded-xl">
+        <h3 class="font-semibold text-slate-900 mb-4 flex items-center gap-2">
+          🎯 Faixas Ópticas
+        </h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-600">Esférico:</span>
+            <span class="font-medium">
+              {lente.esferico_min != null && lente.esferico_max != null 
+                ? `${lente.esferico_min} a ${lente.esferico_max}` 
+                : '-'}
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600">Cilíndrico:</span>
+            <span class="font-medium">
+              {lente.cilindrico_min != null && lente.cilindrico_max != null 
+                ? `${lente.cilindrico_min} a ${lente.cilindrico_max}` 
+                : '-'}
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600">Adição:</span>
+            <span class="font-medium">
+              {lente.adicao_min != null && lente.adicao_max != null 
+                ? `${lente.adicao_min} a ${lente.adicao_max}` 
+                : '-'}
+            </span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-600">DNP:</span>
+            <span class="font-medium">
+              {lente.dnp_min != null && lente.dnp_max != null 
+                ? `${lente.dnp_min} a ${lente.dnp_max} mm` 
+                : '-'}
+            </span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tratamentos -->
+    <SectionHeader title="✨ Tratamentos e Proteções" subtitle="Tecnologias aplicadas" />
+    
+    <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.ar ? '✅' : '❌'}</span>
+          <span class="text-sm">Anti-Reflexo</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.antirrisco ? '✅' : '❌'}</span>
+          <span class="text-sm">Anti-Risco</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.hidrofobico ? '✅' : '❌'}</span>
+          <span class="text-sm">Hidrofóbico</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.antiembaçante ? '✅' : '❌'}</span>
+          <span class="text-sm">Anti-Embaçante</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.blue ? '✅' : '❌'}</span>
+          <span class="text-sm">Blue Light</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.uv400 ? '✅' : '❌'}</span>
+          <span class="text-sm">UV400</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.fotossensivel !== 'nenhum' ? '✅' : '❌'}</span>
+          <span class="text-sm">Fotossensível ({lente.fotossensivel})</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.polarizado ? '✅' : '❌'}</span>
+          <span class="text-sm">Polarizado</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Tecnologias -->
+    <SectionHeader title="🚀 Tecnologias" subtitle="Recursos avançados" />
+    
+    <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.digital ? '✅' : '❌'}</span>
+          <span class="text-sm">Digital</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.free_form ? '✅' : '❌'}</span>
+          <span class="text-sm">Free-Form</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.indoor ? '✅' : '❌'}</span>
+          <span class="text-sm">Indoor</span>
+        </div>
+        <div class="flex items-center gap-2">
+          <span class="text-2xl">{lente.drive ? '✅' : '❌'}</span>
+          <span class="text-sm">Drive</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Descrição Completa -->
+    {#if lente.descricao_completa}
+      <SectionHeader title="📝 Descrição Completa" />
+      <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+        <p class="text-slate-700 whitespace-pre-wrap">{lente.descricao_completa}</p>
+      </div>
+    {/if}
+
+    <!-- Benefícios -->
+    {#if lente.beneficios && lente.beneficios.length > 0}
+      <SectionHeader title="⭐ Benefícios" />
+      <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+        <ul class="space-y-2">
+          {#each lente.beneficios as beneficio}
+            <li class="flex items-start gap-2">
+              <span class="text-green-600 mt-1">✓</span>
+              <span class="text-slate-700">{beneficio}</span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
+    <!-- Indicações -->
+    {#if lente.indicacoes && lente.indicacoes.length > 0}
+      <SectionHeader title="👍 Indicações" />
+      <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+        <ul class="space-y-2">
+          {#each lente.indicacoes as indicacao}
+            <li class="flex items-start gap-2">
+              <span class="text-blue-600 mt-1">→</span>
+              <span class="text-slate-700">{indicacao}</span>
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+
+    <!-- Contraindicações -->
+    {#if lente.contraindicacoes}
+      <SectionHeader title="⚠️ Contraindicações" />
+      <div class="glass-panel p-6 rounded-xl mb-8 mt-6 bg-amber-50">
+        <p class="text-slate-700">{lente.contraindicacoes}</p>
+      </div>
+    {/if}
+
+    <!-- Logística e Entrega -->
+    <SectionHeader title="📦 Logística e Entrega" />
+    
+    <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div>
+          <div class="text-sm text-slate-600 mb-1">Prazo de Entrega</div>
+          <div class="text-lg font-semibold">
+            {lente.prazo_entrega ? `${lente.prazo_entrega} dias` : '-'}
+          </div>
+          {#if lente.obs_prazo}
+            <div class="text-xs text-slate-500 mt-1">{lente.obs_prazo}</div>
+          {/if}
+        </div>
+        <div>
+          <div class="text-sm text-slate-600 mb-1">Peso Frete</div>
+          <div class="text-lg font-semibold">
+            {lente.peso_frete ? `${lente.peso_frete} kg` : '-'}
+          </div>
+        </div>
+        <div>
+          <div class="text-sm text-slate-600 mb-1">Receita Especial</div>
+          <div class="text-lg font-semibold">
+            {lente.exige_receita_especial !== null 
+              ? (lente.exige_receita_especial ? '✅ Requerido' : '❌ Não requerido')
+              : '-'}
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Informações Comerciais -->
+    <SectionHeader title="💰 Informações Comerciais" />
+    
+    <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+      <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
+        <div>
+          <div class="text-sm text-slate-600 mb-1">SKU Fornecedor</div>
+          <div class="font-mono text-sm">{lente.sku_fornecedor}</div>
+        </div>
+        {#if lente.codigo_original}
+          <div>
+            <div class="text-sm text-slate-600 mb-1">Código Original</div>
+            <div class="font-mono text-sm">{lente.codigo_original}</div>
+          </div>
+        {/if}
+        <div>
+          <div class="text-sm text-slate-600 mb-1">Custo Base</div>
+          <div class="text-lg font-semibold">{formatarPreco(lente.custo_base)}</div>
+        </div>
+        <div>
+          <div class="text-sm text-slate-600 mb-1">Status</div>
+          <div>
+            <Badge variant={lente.status === 'ativo' ? 'success' : 'neutral'}>
+              {lente.status}
+            </Badge>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Observações -->
+    {#if lente.observacoes}
+      <SectionHeader title="📌 Observações" />
+      <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+        <p class="text-slate-700 whitespace-pre-wrap">{lente.observacoes}</p>
+      </div>
+    {/if}
+
+    <!-- Datas -->
+    <div class="glass-panel p-4 rounded-xl mb-8 bg-slate-50">
+      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-600">
+        <div>
+          <span class="font-medium">Cadastro:</span> {new Date(lente.created_at).toLocaleDateString('pt-BR')}
+        </div>
+        <div>
+          <span class="font-medium">Atualização:</span> {new Date(lente.updated_at).toLocaleDateString('pt-BR')}
+        </div>
+        {#if lente.data_lancamento}
+          <div>
+            <span class="font-medium">Lançamento:</span> {new Date(lente.data_lancamento).toLocaleDateString('pt-BR')}
+          </div>
+        {/if}
+        {#if lente.data_descontinuacao}
+          <div>
+            <span class="font-medium">Descontinuação:</span> {new Date(lente.data_descontinuacao).toLocaleDateString('pt-BR')}
           </div>
         {/if}
       </div>
     </div>
 
-    <!-- Características Comuns -->
-    <SectionHeader 
-      title="🔬 Características Comuns" 
-      subtitle="Especificações técnicas compartilhadas por todas as lentes deste grupo"
-    />
-
-    <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-sm">
-        <div>
-          <div class="text-slate-600 text-xs mb-1">Tipo</div>
-          <div class="font-medium capitalize">{canonica.tipo_lente.replace('_', ' ')}</div>
-        </div>
-        <div>
-          <div class="text-slate-600 text-xs mb-1">Material</div>
-          <div class="font-medium">{canonica.material}</div>
-        </div>
-        <div>
-          <div class="text-slate-600 text-xs mb-1">Índice</div>
-          <div class="font-medium">{canonica.indice_refracao}</div>
-        </div>
-        <div>
-          <div class="text-slate-600 text-xs mb-1">Categoria</div>
-          <div class="font-medium capitalize">{canonica.categoria.replace('_', ' ')}</div>
-        </div>
-      </div>
-
-      <!-- Tratamentos Comuns -->
-      {#if canonica.ar || canonica.blue || canonica.fotossensivel || canonica.polarizado}
-        <div class="mt-4 pt-4 border-t">
-          <div class="text-xs text-slate-600 mb-2">Tratamentos Comuns:</div>
-          <div class="flex flex-wrap gap-2">
-            {#if canonica.ar}<Badge variant="blue" size="sm">AR</Badge>{/if}
-            {#if canonica.blue}<Badge variant="cyan" size="sm">Blue Light</Badge>{/if}
-            {#if canonica.fotossensivel}<Badge variant="orange" size="sm">Fotossensível</Badge>{/if}
-            {#if canonica.polarizado}<Badge variant="purple" size="sm">Polarizado</Badge>{/if}
-          </div>
-        </div>
-      {/if}
-
-      <!-- Faixas Ópticas -->
-      {#if canonica.esferico_min != null || canonica.cilindrico_min != null || canonica.adicao_min != null}
-        <div class="mt-4 pt-4 border-t grid grid-cols-1 md:grid-cols-3 gap-4 text-sm">
-          {#if canonica.esferico_min != null && canonica.esferico_max != null}
-            <div>
-              <div class="text-slate-600 text-xs mb-1">Esférico</div>
-              <div class="font-medium">{canonica.esferico_min} a {canonica.esferico_max}</div>
-            </div>
-          {/if}
-          {#if canonica.cilindrico_min != null && canonica.cilindrico_max != null}
-            <div>
-              <div class="text-slate-600 text-xs mb-1">Cilíndrico</div>
-              <div class="font-medium">{canonica.cilindrico_min} a {canonica.cilindrico_max}</div>
-            </div>
-          {/if}
-          {#if canonica.adicao_min != null && canonica.adicao_max != null}
-            <div>
-              <div class="text-slate-600 text-xs mb-1">Adição</div>
-              <div class="font-medium">{canonica.adicao_min} a {canonica.adicao_max}</div>
-            </div>
-          {/if}
-        </div>
-      {/if}
-    </div>
-
-    <!-- Comparação por Laboratório -->
-    <SectionHeader 
-      title="🏭 Comparação por Laboratório" 
-      subtitle="Todas as lentes normalizadas com as mesmas características técnicas"
-    />
-
-    <div class="space-y-6 mt-6">
-      {#each marcas as marca}
-        <div class="glass-panel rounded-xl overflow-hidden">
-          <!-- Header do Laboratório -->
-          <div class="bg-gradient-to-r from-blue-600 to-cyan-600 p-4">
-            <div class="flex items-center justify-between">
-              <h3 class="text-xl font-bold text-white">{marca}</h3>
-              <Badge variant="neutral" className="bg-white/20 text-white">
-                {lentesAgrupadas[marca].length} lente{lentesAgrupadas[marca].length > 1 ? 's' : ''}
-              </Badge>
-            </div>
-          </div>
-
-          <!-- Grid de Lentes -->
-          <div class="p-6">
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-              {#each lentesAgrupadas[marca] as lente}
-                <div class="bg-slate-50 rounded-lg p-4 hover:shadow-md transition-shadow">
-                  <!-- Nome -->
-                  <h4 class="font-semibold text-slate-900 mb-2 leading-tight">
-                    {lente.nome_comercial}
-                  </h4>
-
-                  {#if lente.linha_produto}
-                    <p class="text-xs text-slate-600 mb-3">Linha: {lente.linha_produto}</p>
-                  {/if}
-
-                  <!-- Tratamentos -->
-                  <div class="flex flex-wrap gap-1 mb-3">
-                    {#if lente.ar}<Badge variant="blue" size="sm">AR</Badge>{/if}
-                    {#if lente.blue}<Badge variant="cyan" size="sm">Blue</Badge>{/if}
-                    {#if lente.fotossensivel !== 'nenhum'}<Badge variant="orange" size="sm">Foto</Badge>{/if}
-                    {#if lente.polarizado}<Badge variant="purple" size="sm">Polar</Badge>{/if}
-                    {#if lente.digital}<Badge variant="green" size="sm">Digital</Badge>{/if}
-                    {#if lente.free_form}<Badge variant="gold" size="sm">Free-Form</Badge>{/if}
-                  </div>
-
-                  <!-- Especificações -->
-                  <div class="space-y-1 text-xs mb-3">
-                    {#if lente.esferico_min != null && lente.esferico_max != null}
-                      <div class="flex justify-between">
-                        <span class="text-slate-600">Esférico:</span>
-                        <span class="font-medium">{lente.esferico_min} a {lente.esferico_max}</span>
-                      </div>
-                    {/if}
-                    {#if lente.cilindrico_min != null && lente.cilindrico_max != null}
-                      <div class="flex justify-between">
-                        <span class="text-slate-600">Cilíndrico:</span>
-                        <span class="font-medium">{lente.cilindrico_min} a {lente.cilindrico_max}</span>
-                      </div>
-                    {/if}
-                    {#if lente.diametro}
-                      <div class="flex justify-between">
-                        <span class="text-slate-600">Diâmetro:</span>
-                        <span class="font-medium">{lente.diametro} mm</span>
-                      </div>
-                    {/if}
-                  </div>
-
-                  <!-- Preço e Disponibilidade -->
-                  <div class="border-t pt-3">
-                    <div class="flex items-center justify-between mb-2">
-                      <div>
-                        <div class="text-2xl font-bold text-blue-700">
-                          {formatarPreco(lente.preco_tabela)}
-                        </div>
-                        {#if lente.preco_fabricante}
-                          <div class="text-xs text-slate-500">
-                            Fabricante: {formatarPreco(lente.preco_fabricante)}
-                          </div>
-                        {/if}
-                      </div>
-                      <div class="text-right">
-                        {#if lente.disponivel}
-                          <Badge variant="success" size="sm">Disponível</Badge>
-                        {:else}
-                          <Badge variant="neutral" size="sm">Indisponível</Badge>
-                        {/if}
-                        {#if lente.novidade}
-                          <Badge variant="blue" size="sm">🆕</Badge>
-                        {/if}
-                        {#if lente.destaque}
-                          <Badge variant="gold" size="sm">⭐</Badge>
-                        {/if}
-                      </div>
-                    </div>
-
-                    {#if lente.prazo_entrega}
-                      <div class="text-xs text-slate-600">
-                        📦 Prazo: {lente.prazo_entrega} dias
-                        {#if lente.obs_prazo}
-                          ({lente.obs_prazo})
-                        {/if}
-                      </div>
-                    {/if}
-                  </div>
-
-                  <!-- Ações -->
-                  <div class="mt-3 pt-3 border-t flex gap-2">
-                    <a
-                      href="/buscar/{lente.id}"
-                      class="flex-1 text-center py-1.5 px-3 bg-blue-600 text-white text-sm rounded-lg hover:bg-blue-700 transition-colors"
-                    >
-                      Ver Detalhes
-                    </a>
-                  </div>
-                </div>
-              {/each}
-            </div>
-          </div>
-        </div>
-      {/each}
-    </div>
-
-    <!-- Resumo de Economia -->
-    {#if lentes.length > 0 && precoMaximo - precoMinimo > 0}
-      <div class="glass-panel p-6 rounded-xl mt-8 bg-green-50 border-2 border-green-200">
-        <div class="text-center">
-          <div class="text-4xl mb-2">💰</div>
-          <h3 class="text-xl font-bold text-green-900 mb-2">Economia de até {formatarPreco(precoMaximo - precoMinimo)}</h3>
-          <p class="text-green-700">
-            Comparando o preço mais baixo ({formatarPreco(precoMinimo)}) com o mais alto ({formatarPreco(precoMaximo)})
-          </p>
-          <p class="text-sm text-green-600 mt-2">
-            Diferença de {((precoMaximo - precoMinimo) / precoMaximo * 100).toFixed(1)}% entre fornecedores
-          </p>
-        </div>
-      </div>
-    {/if}
-
     <!-- Ações -->
-    <div class="flex gap-4 justify-center mt-8">
+    <div class="flex gap-4 justify-center">
       <Button variant="secondary" on:click={() => goto('/catalogo')}>
-        ← Voltar para Catálogo
+        ← Voltar ao Catálogo
+      </Button>
+      <Button variant="primary">
+        🛒 Adicionar ao Pedido
       </Button>
     </div>
   {/if}

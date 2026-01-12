@@ -62,7 +62,7 @@ export class CatalogoAPI {
       }
 
       let query = supabase
-        .from('vw_lentes_catalogo')
+        .from('v_lentes_catalogo')
         .select('*', { count: 'exact' });
 
       // Aplicar filtros
@@ -85,25 +85,22 @@ export class CatalogoAPI {
         query = query.in('marca_nome', filtros.marcas);
       }
 
-      // Filtros de tratamentos
+      // Filtros de tratamentos (novos nomes de campos)
       if (filtros.tratamentos) {
-        if (filtros.tratamentos.ar === true) query = query.eq('ar', true);
-        if (filtros.tratamentos.blue === true) query = query.eq('blue', true);
-        if (filtros.tratamentos.fotossensivel === true) query = query.neq('fotossensivel', 'nenhum');
-        if (filtros.tratamentos.polarizado === true) query = query.eq('polarizado', true);
-        if (filtros.tratamentos.digital === true) query = query.eq('digital', true);
-        if (filtros.tratamentos.free_form === true) query = query.eq('free_form', true);
+        if (filtros.tratamentos.ar === true) query = query.eq('tratamento_antirreflexo', true);
+        if (filtros.tratamentos.blue === true) query = query.eq('tratamento_blue_light', true);
+        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_fotossensiveis', 'nenhum');
       }
 
-      // Filtro de preço
+      // Filtro de preço (novo nome de campo)
       if (filtros.preco) {
-        if (filtros.preco.min !== undefined) query = query.gte('preco_tabela', filtros.preco.min);
-        if (filtros.preco.max !== undefined) query = query.lte('preco_tabela', filtros.preco.max);
+        if (filtros.preco.min !== undefined) query = query.gte('preco_venda_sugerido', filtros.preco.min);
+        if (filtros.preco.max !== undefined) query = query.lte('preco_venda_sugerido', filtros.preco.max);
       }
 
-      // Busca textual simples (fallback se < 3 chars)
+      // Busca textual simples (novo campo)
       if (filtros.busca) {
-        query = query.ilike('nome_comercial', `%${filtros.busca}%`);
+        query = query.ilike('nome_lente', `%${filtros.busca}%`);
       }
 
       // Ordenação e paginação
@@ -222,7 +219,7 @@ export class CatalogoAPI {
   static async obterLente(id: string): Promise<ApiResponse<LenteCatalogo>> {
     try {
       const { data, error } = await supabase
-        .from('vw_lentes_catalogo')
+        .from('v_lentes_catalogo')
         .select('*')
         .eq('id', id)
         .single();
@@ -235,6 +232,390 @@ export class CatalogoAPI {
       };
     } catch (error) {
       console.error('Erro ao obter lente:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  // ============================================================================
+  // MÓDULO: STANDARD (v_grupos_canonicos - ~187 grupos standard)
+  // ============================================================================
+
+  /**
+   * Buscar grupos canônicos standard com filtros
+   * Para o módulo "Catálogo Standard"
+   */
+  static async buscarGruposCanonicosStandard(
+    filtros: FiltrosLentes = {},
+    paginacao: PaginacaoParams = {}
+  ): Promise<ApiResponse<RespostaPaginada<import('$lib/types/database-views').VGruposCanonico>>> {
+    try {
+      console.log('🔍 API: buscarGruposCanonicosStandard chamada', { filtros, paginacao });
+      
+      const { pagina = 1, limite = 50, ordenar = 'preco_medio', direcao = 'asc' } = paginacao;
+      const offset = (pagina - 1) * limite;
+
+      let query = supabase
+        .from('v_grupos_canonicos')
+        .select('*', { count: 'exact' })
+        .eq('is_premium', false); // Apenas grupos standard
+      
+      console.log('📊 Query base criada: v_grupos_canonicos com is_premium=false');
+
+      // Aplicar filtros
+      if (filtros.tipos && filtros.tipos.length > 0) {
+        query = query.in('tipo_lente', filtros.tipos);
+      }
+      if (filtros.materiais && filtros.materiais.length > 0) {
+        query = query.in('material', filtros.materiais);
+      }
+      if (filtros.indices && filtros.indices.length > 0) {
+        query = query.in('indice_refracao', filtros.indices);
+      }
+
+      // Filtros de tratamentos
+      if (filtros.tratamentos) {
+        if (filtros.tratamentos.ar === true) query = query.eq('tratamento_antirreflexo', true);
+        if (filtros.tratamentos.blue === true) query = query.eq('tratamento_blue_light', true);
+        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_fotossensiveis', 'nenhum');
+      }
+
+      // Filtro de preço (preço médio do grupo)
+      if (filtros.preco) {
+        if (filtros.preco.min !== undefined) query = query.gte('preco_medio', filtros.preco.min);
+        if (filtros.preco.max !== undefined) query = query.lte('preco_medio', filtros.preco.max);
+      }
+
+      // Busca textual
+      if (filtros.busca) {
+        query = query.ilike('nome_grupo', `%${filtros.busca}%`);
+      }
+
+      // Ordenação e paginação
+      query = query.order(ordenar, { ascending: direcao === 'asc' });
+      query = query.range(offset, offset + limite - 1);
+
+      console.log('📤 Executando query Supabase...', { offset, limite, ordenar, direcao });
+
+      const { data, error, count } = await query;
+
+      console.log('📥 Resposta Supabase:', { 
+        data: data ? `${data.length} registros` : 'null', 
+        count, 
+        error: error ? error.message : 'nenhum' 
+      });
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: {
+          dados: data || [],
+          paginacao: {
+            total: count || 0,
+            pagina,
+            limite,
+            total_paginas: Math.ceil((count || 0) / limite)
+          }
+        }
+      };
+    } catch (error) {
+      console.error('❌ Erro ao buscar grupos canônicos standard:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  /**
+   * Buscar grupos canônicos PREMIUM (is_premium = true)
+   * Usa a view v_grupos_premium que já filtra apenas grupos premium
+   */
+  static async buscarGruposCanonicosPremium(
+    filtros: FiltrosLentes = {},
+    paginacao: PaginacaoParams = {}
+  ): Promise<ApiResponse<RespostaPaginada<import('$lib/types/database-views').VGruposCanonico>>> {
+    try {
+      console.log('🔍 API: buscarGruposCanonicosPremium chamada', { filtros, paginacao });
+      
+      const { pagina = 1, limite = 50, ordenar = 'preco_medio', direcao = 'desc' } = paginacao;
+      const offset = (pagina - 1) * limite;
+
+      let query = supabase
+        .from('v_grupos_premium') // View específica para premium!
+        .select('*', { count: 'exact' });
+      
+      console.log('📊 Query base criada: v_grupos_premium (view específica)');
+
+      // Aplicar filtros
+      if (filtros.tipos && filtros.tipos.length > 0) {
+        query = query.in('tipo_lente', filtros.tipos);
+      }
+      if (filtros.materiais && filtros.materiais.length > 0) {
+        query = query.in('material', filtros.materiais);
+      }
+      if (filtros.indices && filtros.indices.length > 0) {
+        query = query.in('indice_refracao', filtros.indices);
+      }
+
+      // Filtros de tratamentos
+      if (filtros.tratamentos) {
+        if (filtros.tratamentos.ar === true) query = query.eq('tratamento_antirreflexo', true);
+        if (filtros.tratamentos.blue === true) query = query.eq('tratamento_blue_light', true);
+        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_fotossensiveis', 'nenhum');
+      }
+
+      // Filtro de preço (preço médio do grupo)
+      if (filtros.preco) {
+        if (filtros.preco.min !== undefined) query = query.gte('preco_medio', filtros.preco.min);
+        if (filtros.preco.max !== undefined) query = query.lte('preco_medio', filtros.preco.max);
+      }
+
+      // Busca textual
+      if (filtros.busca) {
+        query = query.ilike('nome_grupo', `%${filtros.busca}%`);
+      }
+
+      // Ordenação e paginação (Premium ordena por preço decrescente por padrão)
+      query = query.order(ordenar, { ascending: direcao === 'asc' });
+      query = query.range(offset, offset + limite - 1);
+
+      console.log('📤 Executando query Supabase...', { offset, limite, ordenar, direcao });
+
+      const { data, error, count } = await query;
+
+      console.log('📥 Resposta Supabase:', { 
+        data: data ? `${data.length} registros` : 'null', 
+        count, 
+        error: error ? error.message : 'nenhum' 
+      });
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: {
+          dados: data || [],
+          paginacao: {
+            total: count || 0,
+            pagina,
+            limite,
+            total_paginas: Math.ceil((count || 0) / limite)
+          }
+        }
+      };
+    } catch (error) {
+      console.error('❌ Erro ao buscar grupos canônicos premium:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  /**
+   * Obter um grupo canônico específico por ID
+   */
+  static async obterGrupoCanonico(id: string): Promise<ApiResponse<import('$lib/types/database-views').VGruposCanonico>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_grupos_canonicos')
+        .select('*')
+        .eq('id', id)
+        .single();
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data || undefined
+      };
+    } catch (error) {
+      console.error('Erro ao obter grupo canônico:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+  
+  // ============================================================================
+  // MÓDULO: RANKING (Análise de Grupos Canônicos)
+  // ============================================================================
+  
+  /**
+   * Buscar Top Grupos por Preço (mais caros)
+   */
+  static async buscarTopCaros(limite: number = 10): Promise<ApiResponse<import('$lib/types/database-views').VGruposCanonico[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_grupos_canonicos')
+        .select('*')
+        .order('preco_medio', { ascending: false })
+        .limit(limite);
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data || []
+      };
+    } catch (error) {
+      console.error('❌ Erro ao buscar top caros:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+  
+  /**
+   * Buscar Top Grupos por Popularidade (mais lentes no grupo)
+   */
+  static async buscarTopPopulares(limite: number = 10): Promise<ApiResponse<import('$lib/types/database-views').VGruposCanonico[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_grupos_canonicos')
+        .select('*')
+        .order('total_lentes', { ascending: false })
+        .limit(limite);
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data || []
+      };
+    } catch (error) {
+      console.error('❌ Erro ao buscar top populares:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+  
+  /**
+   * Buscar Top Premium (grupos premium mais caros)
+   */
+  static async buscarTopPremium(limite: number = 10): Promise<ApiResponse<import('$lib/types/database-views').VGruposCanonico[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_grupos_premium')
+        .select('*')
+        .order('preco_medio', { ascending: false })
+        .limit(limite);
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data || []
+      };
+    } catch (error) {
+      console.error('❌ Erro ao buscar top premium:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+  
+  /**
+   * Obter distribuição por tipo de lente
+   */
+  static async obterDistribuicaoPorTipo(): Promise<ApiResponse<Array<{ tipo_lente: string; count: number }>>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_grupos_canonicos')
+        .select('tipo_lente');
+
+      if (error) throw error;
+
+      // Contar manualmente no frontend
+      const distribuicao = (data || []).reduce((acc, item) => {
+        const tipo = item.tipo_lente || 'Não especificado';
+        acc[tipo] = (acc[tipo] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      const resultado = Object.entries(distribuicao).map(([tipo_lente, count]) => ({
+        tipo_lente,
+        count
+      }));
+
+      return {
+        success: true,
+        data: resultado
+      };
+    } catch (error) {
+      console.error('❌ Erro ao obter distribuição por tipo:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+  
+  /**
+   * Obter distribuição por material
+   */
+  static async obterDistribuicaoPorMaterial(): Promise<ApiResponse<Array<{ material: string; count: number }>>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_grupos_canonicos')
+        .select('material');
+
+      if (error) throw error;
+
+      // Contar manualmente no frontend
+      const distribuicao = (data || []).reduce((acc, item) => {
+        const mat = item.material || 'Não especificado';
+        acc[mat] = (acc[mat] || 0) + 1;
+        return acc;
+      }, {} as Record<string, number>);
+
+      const resultado = Object.entries(distribuicao).map(([material, count]) => ({
+        material,
+        count
+      }));
+
+      return {
+        success: true,
+        data: resultado
+      };
+    } catch (error) {
+      console.error('❌ Erro ao obter distribuição por material:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  /**
+   * Buscar lentes de um grupo canônico específico
+   */
+  static async buscarLentesDoGrupo(grupoId: string): Promise<ApiResponse<import('$lib/types/database-views').VLenteCatalogo[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_lentes_catalogo')
+        .select('*')
+        .eq('grupo_id', grupoId)
+        .order('preco_venda_sugerido', { ascending: true });
+
+      if (error) throw error;
+
+      return {
+        success: true,
+        data: data || [],
+        count: data?.length || 0
+      };
+    } catch (error) {
+      console.error('Erro ao buscar lentes do grupo:', error);
       return {
         success: false,
         error: error instanceof Error ? error.message : 'Erro desconhecido'
@@ -608,7 +989,7 @@ export class CatalogoAPI {
   static async listarMarcas(): Promise<ApiResponse<string[]>> {
     try {
       const { data, error } = await supabase
-        .from('vw_lentes_catalogo')
+        .from('v_lentes_catalogo')
         .select('marca_nome')
         .order('marca_nome');
 
@@ -641,7 +1022,7 @@ export class CatalogoAPI {
   }>> {
     try {
       const { data, error } = await supabase
-        .from('vw_lentes_catalogo')
+        .from('v_lentes_catalogo')
         .select('tipo_lente, material, indice_refracao, categoria');
 
       if (error) throw error;

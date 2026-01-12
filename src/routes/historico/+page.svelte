@@ -305,7 +305,7 @@
 
               <div class="flex-1"></div>
 
-              <Button variant="secondary" on:click={() => goto("/buscar")}>
+              <Button variant="secondary" on:click={() => goto("/catalogo")}>
                 ➕ Nova Busca
               </Button>
             </div>
@@ -427,7 +427,7 @@
             description="Buscar lentes e criar nova decisão"
             actionLabel="Buscar Lentes"
             color="blue"
-            on:click={() => goto("/buscar")}
+            on:click={() => goto("/catalogo")}
           />
 
           <ActionCard

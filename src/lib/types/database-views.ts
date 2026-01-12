@@ -27,46 +27,47 @@ export type TratamentoFoto = 'nenhum' | 'transitions' | 'fotocromático' | 'pola
 export type StatusLente = 'ativo' | 'inativo' | 'descontinuado' | 'em_falta';
 
 // ============================================================================
-// VIEW 1: vw_lentes_catalogo (BUSCAR LENTES - 1.411 lentes)
+// VIEW 1: v_lentes_catalogo (CATÁLOGO COMPLETO - 1.411 lentes)
+// Esta é a view POPULADA com todos os dados reais
 // ============================================================================
 
-export interface LenteCatalogo {
+export interface VLenteCatalogo {
   // IDs
   id: string;
   marca_id: string;
   fornecedor_id: string;
-  lente_canonica_id: string | null;
-  premium_canonica_id: string | null;
+  grupo_id: string | null;
   
   // Códigos e Nomes
-  sku_fornecedor: string;
-  codigo_original: string | null;
-  nome_comercial: string;
+  slug: string | null;
+  nome_lente: string;
+  nome_canonizado: string | null;
+  fornecedor_nome: string | null;
   
   // Marca
   marca_nome: string;
   marca_slug: string;
   marca_premium: boolean;
+  nome_grupo: string | null;
+  grupo_slug: string | null;
   
   // Características Técnicas
   tipo_lente: TipoLente;
   categoria: CategoriaLente;
   material: MaterialLente;
   indice_refracao: IndiceRefracao;
-  linha_produto: string | null;
   
   // Especificações Ópticas
-  diametro: number | null;
-  espessura_central: number | null;
-  peso_aproximado: number | null;
-  esferico_min: number | null;
-  esferico_max: number | null;
-  cilindrico_min: number | null;
-  cilindrico_max: number | null;
+  diametro_mm: number | null;
+  espessura_centro_mm: number | null;
+  curva_base: number | null;
+  grau_esferico_min: number | null;
+  grau_esferico_max: number | null;
+  grau_cilindrico_min: number | null;
+  grau_cilindrico_max: number | null;
   adicao_min: number | null;
   adicao_max: number | null;
-  dnp_min: number | null;
-  dnp_max: number | null;
+  peso: number | null;
   
   // Tratamentos
   ar: boolean;
@@ -84,37 +85,35 @@ export interface LenteCatalogo {
   indoor: boolean;
   drive: boolean;
   
-  // Preços
-  custo_base: number;
-  preco_fabricante: number | null;
-  preco_tabela: number;
+  // Preços (nomes diferentes)
+  preco_custo: number;
+  preco_venda_sugerido: number;
+  margem_lucro: number | null;
   
-  // Logística
-  prazo_entrega: number | null;
-  obs_prazo: string | null;
-  peso_frete: number | null;
-  exige_receita_especial: boolean | null;
+  // Logística (prazos específicos por tipo)
+  prazo_visao_simples: number | null;
+  prazo_multifocal: number | null;
+  prazo_surfacada: number | null;
+  prazo_free_form: number | null;
   
-  // Descrições
-  descricao_curta: string | null;
-  descricao_completa: string | null;
-  beneficios: string[] | null;
-  indicacoes: string[] | null;
-  contraindicacoes: string | null;
-  observacoes: string | null;
+  // Estoque
+  estoque_disponivel: number | null;
+  estoque_reservado: number | null;
   
   // Status
   status: StatusLente;
-  disponivel: boolean;
-  destaque: boolean | null;
-  novidade: boolean | null;
-  data_lancamento: string | null;
-  data_descontinuacao: string | null;
+  ativo: boolean;
+  
+  // Metadata adicional
+  metadata: any | null;
   
   // Metadata
   created_at: string;
   updated_at: string;
 }
+
+// Alias para compatibilidade com código existente
+export type LenteCatalogo = VLenteCatalogo;
 
 // ============================================================================
 // VIEW 2: vw_canonicas_genericas (CATÁLOGO - 187 grupos)
@@ -208,6 +207,55 @@ export interface CanonicaPremium {
   created_at: string;
   updated_at: string;
 }
+
+// ============================================================================
+// VIEW: v_grupos_canonicos (GRUPOS CANÔNICOS STANDARD - ~187 grupos)
+// ============================================================================
+
+export interface VGruposCanonico {
+  // IDs e Identificação
+  id: string;
+  slug: string;
+  nome_grupo: string;
+  
+  // Características Técnicas
+  tipo_lente: TipoLente;
+  material: MaterialLente;
+  indice_refracao: IndiceRefracao;
+  categoria_predominante: CategoriaLente;
+  
+  // Faixas Ópticas
+  grau_esferico_min: number | null;
+  grau_esferico_max: number | null;
+  grau_cilindrico_min: number | null;
+  grau_cilindrico_max: number | null;
+  adicao_min: number | null;
+  adicao_max: number | null;
+  descricao_ranges: string | null;
+  
+  // Tratamentos
+  tratamento_antirreflexo: boolean;
+  tratamento_antirrisco: boolean;
+  tratamento_uv: boolean;
+  tratamento_blue_light: boolean;
+  tratamento_fotossensiveis: TratamentoFoto;
+  
+  // Precificação (agregada)
+  preco_minimo: number | null;
+  preco_maximo: number | null;
+  preco_medio: number | null;
+  
+  // Estatísticas
+  total_lentes: number;
+  total_marcas: number;
+  peso: number | null;
+  
+  // Classificação
+  is_premium: boolean;
+}
+
+// Alias para compatibilidade
+export type GrupoCanonico = VGruposCanonico;
 
 // ============================================================================
 // VIEW 4: vw_detalhes_premium (COMPARAR - detalhes por canônica)

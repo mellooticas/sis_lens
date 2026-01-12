@@ -1,557 +1,489 @@
 <script lang="ts">
   /**
-   * Página de Gestão de Fornecedores - Interface Principal
-   * Lista e gerencia laboratórios/fornecedores com métricas
+   * 🏭 Página de Fornecedores - Gestão de Laboratórios
+   * Exibe informações completas dos fornecedores cadastrados
    */
-
-  import { goto } from "$app/navigation";
-  import { page } from "$app/stores";
-  import type { PageData } from "./$types";
-
-  // === Layout ===
-  import Container from "$lib/components/layout/Container.svelte";
-  import PageHero from "$lib/components/layout/PageHero.svelte";
-  import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
-
-  // === UI ===
-  import Button from "$lib/components/ui/Button.svelte";
-  import Input from "$lib/components/ui/Input.svelte";
-  import Select from "$lib/components/ui/Select.svelte";
-  import Badge from "$lib/components/ui/Badge.svelte";
-  import Table from "$lib/components/ui/Table.svelte";
-  import EmptyState from "$lib/components/ui/EmptyState.svelte";
-  import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
-
-  // === Cards ===
-  import StatsCard from "$lib/components/cards/StatsCard.svelte";
-  import ActionCard from "$lib/components/cards/ActionCard.svelte";
-
-  // Filtros
-  let busca = $page.url.searchParams.get("busca") || "";
-  let regiao = $page.url.searchParams.get("regiao") || "";
-  let status = $page.url.searchParams.get("status") || "ativo";
-  let categoria = $page.url.searchParams.get("categoria") || "";
-
-  import { createClient } from '@supabase/supabase-js';
-  import { onMount } from 'svelte';
   
-  // Estado local
-  let isLoading = false;
-  let showNewModal = false;
-  let fornecedores: any[] = [];
-  let estatisticas = {
-    total_fornecedores: 0,
-    fornecedores_ativos: 0,
-    nota_media: 0,
-    prazo_medio: 0,
-  };
-
-  // Carregar dados reais do banco
+  import { onMount } from 'svelte';
+  import { FornecedoresAPI, type FornecedorComEstatisticas } from '$lib/api/fornecedores-api';
+  import GlassCard from '$lib/components/ui/GlassCard.svelte';
+  import PageHero from '$lib/components/layout/PageHero.svelte';
+  import { Package, Clock, Layers } from 'lucide-svelte';
+  
+  let fornecedores: FornecedorComEstatisticas[] = [];
+  let loading = true;
+  let error = '';
+  
   onMount(async () => {
-    try {
-      isLoading = true;
-      const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-      const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
-
-      if (!supabaseUrl || !supabaseKey) {
-        throw new Error('Missing Supabase environment variables');
-      }
-
-      const supabase = createClient(supabaseUrl, supabaseKey);
-      
-      // Buscar laboratórios usando a view pública
-      const { data, error } = await supabase
-        .from('vw_laboratorios_completo')
-        .select('*');
-
-      if (error) {
-        console.error('Erro ao carregar laboratórios:', error);
-      } else {
-        fornecedores = (data || []).map((lab: any) => ({
-          id: lab.id,
-          nome: lab.nome_fantasia,
-          codigo: lab.cnpj,
-          regiao: 'N/A',
-          categoria: lab.badge === 'QUALIFICADO' ? 'premium' : 'standard',
-          status: lab.ativo ? 'ativo' : 'inativo',
-          metricas: {
-            prazo_medio: lab.lead_time || 0,
-            preco_competitivo_pct: lab.score_preco || 0,
-            total_decisoes: 0,
-            prazo_cumprido_pct: lab.score_prazo || 0,
-            qualidade_media: lab.score_qualidade || 0,
-          },
-        }));
-
-        const ativos = fornecedores.filter(f => f.status === 'ativo');
-        const scores = ativos.map(f => f.metricas.qualidade_media).filter(s => s > 0);
-        const prazos = ativos.map(f => f.metricas.prazo_medio).filter(p => p > 0);
-        
-        estatisticas = {
-          total_fornecedores: fornecedores.length,
-          fornecedores_ativos: ativos.length,
-          nota_media: scores.length > 0 ? scores.reduce((a, b) => a + b, 0) / scores.length : 0,
-          prazo_medio: prazos.length > 0 ? prazos.reduce((a, b) => a + b, 0) / prazos.length : 0,
-        };
-      }
-    } catch (error) {
-      console.error('Erro ao carregar fornecedores:', error);
-    } finally {
-      isLoading = false;
-    }
+    await carregarFornecedores();
   });
-
-  const regioes = [
-    { codigo: "SP", nome: "São Paulo" },
-    { codigo: "RJ", nome: "Rio de Janeiro" },
-    { codigo: "MG", nome: "Minas Gerais" },
-  ];
-
-  // Formatadores
-  const formatCurrency = (value: number) => {
-    return new Intl.NumberFormat("pt-BR", {
-      style: "currency",
-      currency: "BRL",
-    }).format(value);
-  };
-
-  const formatPercentage = (value: number) => {
-    return `${value.toFixed(1)}%`;
-  };
-
-  const formatRating = (value: number) => {
-    return `${value.toFixed(1)}/5.0`;
-  };
-
-  // Opções para selects
-  const statusOptions = [
-    { value: "", label: "Todos os status" },
-    { value: "ativo", label: "Ativo" },
-    { value: "inativo", label: "Inativo" },
-    { value: "suspenso", label: "Suspenso" },
-  ];
-
-  const categoriaOptions = [
-    { value: "", label: "Todas as categorias" },
-    { value: "premium", label: "Premium" },
-    { value: "standard", label: "Standard" },
-    { value: "economico", label: "Econômico" },
-  ];
-
-  $: regiaoOptions = [
-    { value: "", label: "Todas as regiões" },
-    ...(regioes || []).map((reg: any) => ({
-      value: reg.codigo,
-      label: reg.nome,
-    })),
-  ];
-
-  // Headers da tabela
-  const tableHeaders = [
-    { key: "nome", label: "Laboratório" },
-    { key: "regiao", label: "Região" },
-    { key: "categoria", label: "Categoria" },
-    { key: "nota_qualidade", label: "Qualidade", align: "center" as const },
-    { key: "prazo_medio", label: "Prazo Médio", align: "center" as const },
-    {
-      key: "preco_competitivo",
-      label: "Competitividade",
-      align: "center" as const,
-    },
-    { key: "total_decisoes", label: "Decisões", align: "center" as const },
-    { key: "status", label: "Status" },
-    { key: "actions", label: "Ações", align: "center" as const },
-  ];
-
-  // Dados filtrados
-  $: fornecedoresFiltrados = filtrarFornecedores(fornecedores || []);
-
-  function filtrarFornecedores(fornecedores: any[]) {
-    return fornecedores.filter((fornecedor) => {
-      const matchBusca =
-        !busca ||
-        fornecedor.nome.toLowerCase().includes(busca.toLowerCase()) ||
-        fornecedor.codigo?.toLowerCase().includes(busca.toLowerCase());
-
-      const matchRegiao = !regiao || fornecedor.regiao === regiao;
-      const matchStatus = !status || fornecedor.status === status;
-      const matchCategoria = !categoria || fornecedor.categoria === categoria;
-
-      return matchBusca && matchRegiao && matchStatus && matchCategoria;
-    });
-  }
-
-  // Aplicar filtros
-  function aplicarFiltros() {
-    const params = new URLSearchParams();
-
-    if (busca) params.set("busca", busca);
-    if (regiao) params.set("regiao", regiao);
-    if (status) params.set("status", status);
-    if (categoria) params.set("categoria", categoria);
-
-    goto(`/fornecedores?${params.toString()}`);
-  }
-
-  // Limpar filtros
-  function limparFiltros() {
-    busca = "";
-    regiao = "";
-    status = "";
-    categoria = "";
-    goto("/fornecedores");
-  }
-
-  // Funções de cor
-  function getStatusColor(status: string) {
-    switch (status) {
-      case "ativo":
-        return "success";
-      case "inativo":
-        return "neutral";
-      case "suspenso":
-        return "danger";
-      default:
-        return "neutral";
+  
+  async function carregarFornecedores() {
+    loading = true;
+    error = '';
+    
+    try {
+      const response = await FornecedoresAPI.buscarFornecedores();
+      
+      if (response.success && response.data) {
+        fornecedores = response.data;
+        console.log('✅ Fornecedores carregados:', fornecedores.length);
+      } else {
+        error = response.error || 'Erro ao carregar fornecedores';
+      }
+    } catch (err) {
+      error = err instanceof Error ? err.message : 'Erro ao carregar dados';
+      console.error('❌ Erro ao carregar fornecedores:', err);
+    } finally {
+      loading = false;
     }
   }
-
-  function getCategoriaColor(categoria: string) {
-    switch (categoria) {
-      case "premium":
-        return "gold";
-      case "standard":
-        return "blue";
-      case "economico":
-        return "green";
-      default:
-        return "neutral";
-    }
-  }
-
-  function getQualidadeColor(nota: number) {
-    if (nota >= 4.5) return "success";
-    if (nota >= 3.5) return "warning";
-    return "danger";
-  }
-
-  // Calcular nota de qualidade
-  function calcularNotaQualidade(metricas: any) {
-    if (!metricas) return 0;
-    const cumprimentoPrazo = metricas.prazo_cumprido_pct || 0;
-    const qualidadeProdutos = metricas.qualidade_media || 0;
-    return ((cumprimentoPrazo * 0.6 + qualidadeProdutos * 20 * 0.4) / 100) * 5;
+  
+  function formatarPrazo(dias: number | null | undefined): string {
+    if (!dias) return 'N/A';
+    return `${dias} dia${dias > 1 ? 's' : ''}`;
   }
 </script>
 
-<svelte:head>
-  <title>Fornecedores - SIS Lens</title>
-  <meta
-    name="description"
-    content="Gestão e acompanhamento de fornecedores/laboratórios"
+<div class="page-fornecedores">
+  <PageHero 
+    title="🏭 Fornecedores"
+    description="Gestão de laboratórios e fornecedores de lentes"
   />
-</svelte:head>
-
-<main>
-  <Container maxWidth="xl" padding="md">
-      <!-- Hero Section -->
-      <PageHero
-        badge="🏢 Sistema de Fornecedores"
-        title="Gestão de Fornecedores"
-        subtitle="Gerencie laboratórios e acompanhe métricas de performance"
-        alignment="center"
-        maxWidth="lg"
-      />
-
-      <!-- Estatísticas -->
-      {#if estatisticas}
-        <section class="mt-8">
-          <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
-            <StatsCard
-              title="Total Fornecedores"
-              value={estatisticas.total_fornecedores}
-              icon="🏢"
-              color="blue"
-            />
-
-            <StatsCard
-              title="Fornecedores Ativos"
-              value={estatisticas.fornecedores_ativos}
-              icon="✅"
-              color="green"
-            />
-
-            <StatsCard
-              title="Nota Média"
-              value={formatRating(estatisticas.nota_media)}
-              icon="⭐"
-              color="orange"
-            />
-
-            <StatsCard
-              title="Prazo Médio"
-              value={`${estatisticas.prazo_medio} dias`}
-              icon="⚡"
-              color="gold"
-            />
-          </div>
-        </section>
-      {/if}
-
-      <!-- Filtros -->
-      <section class="mt-12">
-        <div class="glass-panel rounded-xl p-6 shadow-xl">
-          <SectionHeader title="Filtros de Busca" />
-
-          <div class="space-y-6">
-            <!-- Busca Principal -->
-            <div class="grid grid-cols-1 lg:grid-cols-3 gap-4">
-              <div class="lg:col-span-2">
-                <Input
-                  label="Buscar fornecedores"
-                  placeholder="Nome do laboratório ou código..."
-                  bind:value={busca}
-                />
-              </div>
-              <div>
-                <Button
-                  variant="primary"
-                  size="md"
-                  fullWidth
-                  on:click={aplicarFiltros}
-                  disabled={isLoading}
-                >
-                  🔍 Filtrar
-                </Button>
-              </div>
-            </div>
-
-            <!-- Filtros Específicos -->
-            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
-              <Select
-                label="Região"
-                bind:value={regiao}
-                options={regiaoOptions}
-              />
-
-              <Select
-                label="Status"
-                bind:value={status}
-                options={statusOptions}
-              />
-
-              <Select
-                label="Categoria"
-                bind:value={categoria}
-                options={categoriaOptions}
-              />
-
-              <div class="flex items-end">
-                <Button
-                  variant="ghost"
-                  size="md"
-                  fullWidth
-                  on:click={limparFiltros}
-                >
-                  🗑️ Limpar
-                </Button>
-              </div>
-            </div>
-          </div>
-        </div>
-      </section>
-
-      <!-- Tabela de Fornecedores -->
-      <section class="mt-12">
-        <div class="glass-panel rounded-xl p-6 shadow-xl">
-          <SectionHeader
-            title="Fornecedores Cadastrados"
-            subtitle={fornecedoresFiltrados.length
-              ? `${fornecedoresFiltrados.length} fornecedores encontrados`
-              : ""}
-          actionLabel="+ Novo Fornecedor"
-          on:action={() => (showNewModal = true)}
-        />
-
-        {#if isLoading}
-          <div class="flex justify-center py-12">
-            <LoadingSpinner size="lg" />
-          </div>
-        {:else if fornecedoresFiltrados && fornecedoresFiltrados.length > 0}
-          <Table headers={tableHeaders} rows={fornecedoresFiltrados} hoverable>
-            <svelte:fragment slot="cell" let:row let:header>
-              {#if header.key === "categoria"}
-                <Badge variant={getCategoriaColor(row.categoria)} size="sm">
-                  {row.categoria || "N/A"}
-                </Badge>
-              {:else if header.key === "nota_qualidade"}
-                {@const nota = calcularNotaQualidade(row.metricas)}
-                <div class="text-center">
-                  <Badge variant={getQualidadeColor(nota)} size="sm">
-                    {formatRating(nota)}
-                  </Badge>
-                </div>
-              {:else if header.key === "prazo_medio"}
-                <Badge variant="info" size="sm">
-                  {row.metricas?.prazo_medio || 0} dias
-                </Badge>
-              {:else if header.key === "preco_competitivo"}
-                <div class="text-center">
-                  <span class="font-medium text-success">
-                    {formatPercentage(row.metricas?.preco_competitivo_pct || 0)}
-                  </span>
-                </div>
-              {:else if header.key === "total_decisoes"}
-                <div class="text-center">
-                  <span
-                    class="font-medium text-neutral-900 dark:text-neutral-100"
-                  >
-                    {row.metricas?.total_decisoes || 0}
-                  </span>
-                </div>
-              {:else if header.key === "status"}
-                <Badge variant={getStatusColor(row.status)} size="sm">
-                  {row.status}
-                </Badge>
-              {:else if header.key === "actions"}
-                <div class="flex gap-2 justify-center">
-                  <Button
-                    variant="primary"
-                    size="sm"
-                    on:click={() => goto(`/fornecedores/${row.id}`)}
-                  >
-                    📄 Ver
-                  </Button>
-                  <Button
-                    variant="secondary"
-                    size="sm"
-                    on:click={() => goto(`/fornecedores/${row.id}/editar`)}
-                  >
-                    ✏️ Editar
-                  </Button>
-                </div>
-              {:else}
-                {row[header.key] || "N/A"}
-              {/if}
-            </svelte:fragment>
-          </Table>
-        {:else}
-          <EmptyState
-            icon="🏢"
-            title="Nenhum fornecedor encontrado"
-            description="Não há fornecedores que correspondam aos filtros aplicados"
-            actionLabel="Limpar Filtros"
-            on:action={limparFiltros}
-          />
-        {/if}
-
-        </div>
-      </section>
-
-      <!-- Ações Rápidas -->
-      <section class="mt-12">
-        <SectionHeader title="Ações Rápidas" />
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-          <ActionCard
-            icon="➕"
-            title="Novo Fornecedor"
-            description="Cadastrar novo laboratório/fornecedor"
-            actionLabel="Cadastrar"
-            color="blue"
-            on:click={() => (showNewModal = true)}
-          />
-
-          <ActionCard
-            icon="📊"
-            title="Relatórios"
-            description="Ver relatórios de performance dos fornecedores"
-            actionLabel="Ver Relatórios"
-            color="green"
-            on:click={() => goto("/analytics?tab=fornecedores")}
-          />
-
-          <ActionCard
-            icon="⚙️"
-            title="Configurações"
-            description="Gerenciar configurações e critérios de avaliação"
-            actionLabel="Configurar"
-            color="orange"
-            on:click={() => goto("/configuracoes/fornecedores")}
-          />
-        </div>
-      </section>
-    </Container>
-  </main>
-
-<!-- Modal Novo Fornecedor -->
-{#if showNewModal}
-  <div class="fixed inset-0 z-50 flex items-center justify-center">
-    <!-- Backdrop -->
-    <button
-      type="button"
-      class="absolute inset-0 bg-black/50"
-      on:click={() => (showNewModal = false)}
-      aria-label="Fechar modal"
-    ></button>
-
-    <!-- Modal -->
-    <div
-      class="relative bg-white dark:bg-neutral-800 rounded-xl max-w-md w-full mx-4 p-6"
-    >
-      <div class="text-center">
-        <div
-          class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-blue-100 dark:bg-blue-900/20 mb-4"
-        >
-          <svg
-            class="h-6 w-6 text-blue-600 dark:text-blue-400"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 6v6m0 0v6m0-6h6m-6 0H6"
-            />
-          </svg>
-        </div>
-
-        <h3
-          class="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-2"
-        >
-          Novo Fornecedor
-        </h3>
-
-        <p class="text-sm text-neutral-600 dark:text-neutral-400 mb-6">
-          Para cadastrar um novo fornecedor, acesse a página de administração ou
-          entre em contato com nosso suporte.
-        </p>
-
-        <div class="flex gap-3">
-          <Button
-            variant="secondary"
-            size="md"
-            fullWidth
-            on:click={() => (showNewModal = false)}
-          >
-            Cancelar
-          </Button>
-
-          <Button
-            variant="primary"
-            size="md"
-            fullWidth
-            on:click={() => {
-              showNewModal = false;
-              goto("/contato");
-            }}
-          >
-            Contato
-          </Button>
-        </div>
-      </div>
+  
+  {#if loading}
+    <div class="loading">
+      <GlassCard variant="light" blur="md" padding="lg">
+        <p>Carregando fornecedores...</p>
+      </GlassCard>
     </div>
-  </div>
-{/if}
+  {:else if error}
+    <div class="error">
+      <GlassCard variant="light" blur="md" padding="lg">
+        <p class="error-message">❌ {error}</p>
+      </GlassCard>
+    </div>
+  {:else if fornecedores.length === 0}
+    <div class="empty">
+      <GlassCard variant="light" blur="md" padding="lg">
+        <p>Nenhum fornecedor encontrado</p>
+      </GlassCard>
+    </div>
+  {:else}
+    <div class="content">
+      
+      <!-- Estatísticas Gerais -->
+      <div class="stats-grid">
+        <GlassCard variant="light" blur="md" padding="md">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <Package size={24} />
+            </div>
+            <div class="stat-info">
+              <h3 class="stat-value">{fornecedores.length}</h3>
+              <p class="stat-label">Fornecedores Ativos</p>
+            </div>
+          </div>
+        </GlassCard>
+        
+        <GlassCard variant="light" blur="md" padding="md">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <Layers size={24} />
+            </div>
+            <div class="stat-info">
+              <h3 class="stat-value">
+                {fornecedores.reduce((sum, f) => sum + f.total_lentes, 0)}
+              </h3>
+              <p class="stat-label">Total de Lentes</p>
+            </div>
+          </div>
+        </GlassCard>
+        
+        <GlassCard variant="light" blur="md" padding="md">
+          <div class="stat-card">
+            <div class="stat-icon">
+              <Clock size={24} />
+            </div>
+            <div class="stat-info">
+              <h3 class="stat-value">
+                {Math.round(
+                  fornecedores
+                    .filter(f => f.prazo_visao_simples)
+                    .reduce((sum, f) => sum + (f.prazo_visao_simples || 0), 0) / 
+                  fornecedores.filter(f => f.prazo_visao_simples).length
+                ) || 0}
+              </h3>
+              <p class="stat-label">Prazo Médio (dias)</p>
+            </div>
+          </div>
+        </GlassCard>
+      </div>
+      
+      <!-- Lista de Fornecedores -->
+      <section class="fornecedores-section">
+        <h2 class="section-title">Lista de Fornecedores</h2>
+        
+        <div class="fornecedores-grid">
+          {#each fornecedores as fornecedor}
+            <GlassCard variant="light" blur="md" padding="lg" className="fornecedor-card">
+              
+              <!-- Header -->
+              <div class="fornecedor-header">
+                <div class="fornecedor-info">
+                  <h3 class="fornecedor-nome">{fornecedor.nome}</h3>
+                  {#if fornecedor.codigo}
+                    <p class="fornecedor-codigo">Código: {fornecedor.codigo}</p>
+                  {/if}
+                </div>
+                <span class="fornecedor-badge {fornecedor.ativo ? 'ativo' : 'inativo'}">
+                  {fornecedor.ativo ? '✓ Ativo' : '⊗ Inativo'}
+                </span>
+              </div>
+              
+              <!-- Estatísticas -->
+              <div class="fornecedor-stats">
+                <div class="stat-item">
+                  <span class="stat-icon-small">📦</span>
+                  <span class="stat-text">{fornecedor.total_lentes} lentes</span>
+                </div>
+                <div class="stat-item">
+                  <span class="stat-icon-small">🏷️</span>
+                  <span class="stat-text">{fornecedor.marcas_diferentes_usadas} marcas</span>
+                </div>
+              </div>
+              
+              <!-- Marcas -->
+              {#if fornecedor.marcas_lista && fornecedor.marcas_lista.length > 0}
+                <div class="fornecedor-marcas">
+                  <h4 class="marcas-title">Marcas:</h4>
+                  <div class="marcas-list">
+                    {#each fornecedor.marcas_lista.slice(0, 5) as marca}
+                      <span class="marca-badge">{marca}</span>
+                    {/each}
+                    {#if fornecedor.marcas_lista.length > 5}
+                      <span class="marca-badge more">+{fornecedor.marcas_lista.length - 5}</span>
+                    {/if}
+                  </div>
+                </div>
+              {/if}
+              
+              <!-- Prazos -->
+              <div class="fornecedor-prazos">
+                <h4 class="prazos-title">Prazos de Entrega:</h4>
+                <div class="prazos-grid">
+                  <div class="prazo-item">
+                    <span class="prazo-label">Visão Simples</span>
+                    <span class="prazo-value">{formatarPrazo(fornecedor.prazo_visao_simples)}</span>
+                  </div>
+                  <div class="prazo-item">
+                    <span class="prazo-label">Multifocal</span>
+                    <span class="prazo-value">{formatarPrazo(fornecedor.prazo_multifocal)}</span>
+                  </div>
+                  <div class="prazo-item">
+                    <span class="prazo-label">Surfaçada</span>
+                    <span class="prazo-value">{formatarPrazo(fornecedor.prazo_surfacada)}</span>
+                  </div>
+                  <div class="prazo-item">
+                    <span class="prazo-label">Free Form</span>
+                    <span class="prazo-value">{formatarPrazo(fornecedor.prazo_free_form)}</span>
+                  </div>
+                </div>
+              </div>
+              
+              <!-- Observações -->
+              {#if fornecedor.observacoes}
+                <div class="fornecedor-obs">
+                  <h4 class="obs-title">Observações:</h4>
+                  <p class="obs-text">{fornecedor.observacoes}</p>
+                </div>
+              {/if}
+              
+            </GlassCard>
+          {/each}
+        </div>
+      </section>
+      
+    </div>
+  {/if}
+</div>
+
+<style>
+  .page-fornecedores {
+    padding: 2rem;
+    min-height: 100vh;
+  }
+  
+  .content {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+    max-width: 1400px;
+    margin: 0 auto;
+  }
+  
+  .loading, .error, .empty {
+    display: flex;
+    justify-content: center;
+    padding: 4rem 2rem;
+  }
+  
+  .error-message {
+    color: #ef4444;
+    font-weight: 600;
+  }
+  
+  /* Stats Grid */
+  .stats-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  .stat-card {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+  }
+  
+  .stat-icon {
+    width: 48px;
+    height: 48px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+    border-radius: 0.75rem;
+    color: white;
+  }
+  
+  .stat-info {
+    flex: 1;
+  }
+  
+  .stat-value {
+    font-size: 1.75rem;
+    font-weight: 800;
+    color: var(--color-text-primary);
+    line-height: 1;
+    margin-bottom: 0.25rem;
+  }
+  
+  .stat-label {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+  
+  /* Fornecedores Section */
+  .fornecedores-section {
+    width: 100%;
+  }
+  
+  .section-title {
+    font-size: 1.5rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 1.5rem;
+  }
+  
+  .fornecedores-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(450px, 1fr));
+    gap: 1.5rem;
+  }
+  
+  /* Fornecedor Card */
+  :global(.fornecedor-card) {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    transition: all 0.3s ease;
+  }
+  
+  :global(.fornecedor-card:hover) {
+    transform: translateY(-4px);
+  }
+  
+  .fornecedor-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+  }
+  
+  .fornecedor-info {
+    flex: 1;
+  }
+  
+  .fornecedor-nome {
+    font-size: 1.25rem;
+    font-weight: 700;
+    color: var(--color-text-primary);
+    margin-bottom: 0.25rem;
+  }
+  
+  .fornecedor-codigo {
+    font-size: 0.875rem;
+    color: var(--color-text-secondary);
+  }
+  
+  .fornecedor-badge {
+    padding: 0.375rem 0.75rem;
+    border-radius: 999px;
+    font-size: 0.875rem;
+    font-weight: 600;
+  }
+  
+  .fornecedor-badge.ativo {
+    background: rgba(34, 197, 94, 0.2);
+    color: #16a34a;
+  }
+  
+  .fornecedor-badge.inativo {
+    background: rgba(239, 68, 68, 0.2);
+    color: #dc2626;
+  }
+  
+  /* Estatísticas */
+  .fornecedor-stats {
+    display: flex;
+    gap: 1.5rem;
+    padding: 0.75rem;
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 0.5rem;
+  }
+  
+  .stat-item {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+  }
+  
+  .stat-icon-small {
+    font-size: 1.125rem;
+  }
+  
+  .stat-text {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-primary);
+  }
+  
+  /* Marcas */
+  .fornecedor-marcas {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+  
+  .marcas-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+  
+  .marcas-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+  }
+  
+  .marca-badge {
+    padding: 0.25rem 0.625rem;
+    background: rgba(59, 130, 246, 0.15);
+    color: #2563eb;
+    border-radius: 999px;
+    font-size: 0.75rem;
+    font-weight: 600;
+  }
+  
+  .marca-badge.more {
+    background: rgba(107, 114, 128, 0.15);
+    color: #6b7280;
+  }
+  
+  /* Prazos */
+  .fornecedor-prazos {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+  }
+  
+  .prazos-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: var(--color-text-secondary);
+  }
+  
+  .prazos-grid {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 0.75rem;
+  }
+  
+  .prazo-item {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    padding: 0.5rem;
+    background: rgba(0, 0, 0, 0.03);
+    border-radius: 0.5rem;
+  }
+  
+  .prazo-label {
+    font-size: 0.75rem;
+    color: var(--color-text-secondary);
+  }
+  
+  .prazo-value {
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--color-primary);
+  }
+  
+  /* Observações */
+  .fornecedor-obs {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    padding: 1rem;
+    background: rgba(234, 179, 8, 0.1);
+    border-left: 3px solid #eab308;
+    border-radius: 0.5rem;
+  }
+  
+  .obs-title {
+    font-size: 0.875rem;
+    font-weight: 600;
+    color: #854d0e;
+  }
+  
+  .obs-text {
+    font-size: 0.875rem;
+    color: #713f12;
+    line-height: 1.5;
+  }
+  
+  /* Responsive */
+  @media (max-width: 1024px) {
+    .fornecedores-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  
+  @media (max-width: 768px) {
+    .page-fornecedores {
+      padding: 1rem;
+    }
+    
+    .stats-grid {
+      grid-template-columns: 1fr;
+    }
+    
+    .prazos-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+</style>

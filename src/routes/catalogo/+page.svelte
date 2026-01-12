@@ -1,263 +1,374 @@
 <!--
-  📚 Catálogo - Lentes Canônicas Genéricas (187 grupos)
-  Dados reais da view vw_canonicas_genericas
+  🔍 Catálogo de Lentes - SIS Lens
+  Busca completa com filtros avançados e design premium
 -->
 <script lang="ts">
   import { onMount } from 'svelte';
+  import { fade, fly } from 'svelte/transition';
   import { CatalogoAPI } from '$lib/api/catalogo-api';
-  import type { CanonicaGenerica } from '$lib/types/database-views';
+  import type { LenteCatalogo } from '$lib/types/database-views';
+  
+  // Ícones
+  import { LayoutGrid, List, SlidersHorizontal, Search, ChevronDown } from 'lucide-svelte';
 
-  // Componentes padronizados
+  // Layout Components
   import Container from "$lib/components/layout/Container.svelte";
   import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
+  
+  // UI Components
+  import FilterPanel from "$lib/components/catalogo/FilterPanel.svelte";
   import Button from "$lib/components/ui/Button.svelte";
-  import Input from "$lib/components/forms/Input.svelte";
-  import Select from "$lib/components/forms/Select.svelte";
   import Badge from "$lib/components/ui/Badge.svelte";
   import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
+  import LenteCard from "$lib/components/catalogo/LenteCard.svelte";
+  import StatsCard from "$lib/components/cards/StatsCard.svelte";
 
   // State
-  let canonicas: CanonicaGenerica[] = [];
+  let lentes: LenteCatalogo[] = [];
   let loading = true;
   let error = '';
+  let total = 0;
+  let paginaAtual = 1;
+  const itensPorPagina = 12;
 
-  // Filtros
-  let filtroTipo = '';
-  let filtroMaterial = '';
-  let filtroBusca = '';
+  // Filtros (Estado Mestre)
+  let filters: any = {
+    busca: '',
+    tipos: [],
+    materiais: [],
+    indices: [],
+    marcas: [],
+    tratamentos: {}
+  };
 
-  // Carregar dados
+  // View Mode
+  let viewMode: 'grid' | 'list' = 'grid';
+  let showMobileFilters = false;
+  let showDesktopFilters = false;
+
+  // Carregar dados inicial
   onMount(async () => {
-    await carregarDados();
+    await carregarLentes();
   });
 
-  async function carregarDados() {
-    loading = true;
-    error = '';
-    
-    const resultado = await CatalogoAPI.listarCanonicasGenericas(
-      {
-        tipos: filtroTipo ? [filtroTipo as any] : undefined,
-        materiais: filtroMaterial ? [filtroMaterial as any] : undefined
-      },
-      { limite: 200, ordenar: 'nome_canonico', direcao: 'asc' }
-    );
+  async function carregarLentes() {
+    try {
+      loading = true;
+      error = '';
+      
+      const resultado = await CatalogoAPI.buscarLentes(
+        filters,
+        { 
+          pagina: paginaAtual, 
+          limite: itensPorPagina,
+          ordenar: 'preco_venda_sugerido', // Ordenação por preço (novo campo)
+          direcao: 'asc'
+        }
+      );
 
-    if (resultado.success && resultado.data) {
-      canonicas = resultado.data.dados;
-    } else {
-      error = resultado.error || 'Erro ao carregar catálogo';
+      if (resultado.success && resultado.data) {
+        lentes = resultado.data.dados;
+        total = resultado.data.paginacao.total;
+      } else {
+        error = resultado.error || 'Erro ao buscar lentes';
+        console.error('Erro ao buscar lentes:', error);
+      }
+    } catch (err) {
+      console.error('Erro ao carregar lentes:', err);
+      error = err instanceof Error ? err.message : 'Erro desconhecido';
+    } finally {
+      loading = false;
     }
-    
-    loading = false;
   }
 
-  // Filtro de busca local
-  $: filtradas = canonicas.filter(c => {
-    const busca = filtroBusca.toLowerCase();
-    if (!busca) return true;
-    return c.nome_canonico.toLowerCase().includes(busca);
-  });
+  // Event Handlers
+  function handleFilterChange(event: CustomEvent) {
+    filters = event.detail;
+    paginaAtual = 1;
+    carregarLentes();
+  }
+
+  function handleClearFilters() {
+    filters = {
+      busca: '',
+      tipos: [],
+      materiais: [],
+      indices: [],
+      marcas: [],
+      tratamentos: {}
+    };
+    paginaAtual = 1;
+    carregarLentes();
+  }
+
+  function toggleMobileFilters() {
+    showMobileFilters = !showMobileFilters;
+  }
+
 </script>
 
 <svelte:head>
   <title>Catálogo de Lentes - SIS Lens</title>
+  <meta name="description" content="Explore nosso catálogo completo de lentes com filtros avançados" />
 </svelte:head>
 
 <main>
-  <Container maxWidth="xl" padding="md">
-    <!-- Hero -->
-    <PageHero
-      badge="📚 Catálogo"
-      title="Lentes Canônicas"
-      subtitle="{canonicas.length} grupos normalizados disponíveis"
-    />
-
-    <!-- Filtros -->
-    <section class="glass-panel p-6 rounded-xl shadow-lg mb-8 mt-8">
-      <SectionHeader
-        title="🔍 Filtros"
-        subtitle="Refine sua busca por grupos canônicos"
+  <!-- Hero Section Premium -->
+  <div class="bg-gradient-to-br from-brand-blue-50 via-white to-brand-orange-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
+    <Container maxWidth="xl" padding="lg">
+      <PageHero
+        badge="🔍 Catálogo Completo"
+        title="Explore Todas as Lentes"
+        subtitle="{total.toLocaleString('pt-BR')} lentes disponíveis com filtros inteligentes"
+        alignment="center"
+        maxWidth="lg"
       />
-
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
-        <!-- Busca -->
-        <Input
-          label="Buscar"
-          bind:value={filtroBusca}
-          placeholder="Nome da lente..."
-        />
-
-        <!-- Tipo -->
-        <Select
-          label="Tipo"
-          bind:value={filtroTipo}
-          options={[
-            { value: "", label: "Todos" },
-            { value: "visao_simples", label: "Visão Simples" },
-            { value: "multifocal", label: "Multifocal" },
-            { value: "bifocal", label: "Bifocal" },
-          ]}
-          on:change={carregarDados}
-        />
-
-        <!-- Material -->
-        <Select
-          label="Material"
-          bind:value={filtroMaterial}
-          options={[
-            { value: "", label: "Todos" },
-            { value: "CR39", label: "CR39" },
-            { value: "POLICARBONATO", label: "Policarbonato" },
-            { value: "TRIVEX", label: "Trivex" },
-            { value: "HIGH_INDEX", label: "High Index" },
-          ]}
-          on:change={carregarDados}
-        />
+      
+      <!-- Stats Rápidos -->
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
+        <div class="glass-panel rounded-lg p-4 text-center">
+          <div class="text-2xl font-bold text-brand-blue-600 dark:text-brand-blue-400">{total}</div>
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">Lentes Total</div>
+        </div>
+        <div class="glass-panel rounded-lg p-4 text-center">
+          <div class="text-2xl font-bold text-brand-orange-600 dark:text-brand-orange-400">{lentes.length}</div>
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">Exibindo Agora</div>
+        </div>
+        <div class="glass-panel rounded-lg p-4 text-center">
+          <div class="text-2xl font-bold text-brand-gold-600 dark:text-brand-gold-400">{Math.ceil(total / itensPorPagina)}</div>
+          <div class="text-sm text-neutral-600 dark:text-neutral-400">Páginas</div>
+        </div>
       </div>
-    </section>
+    </Container>
+  </div>
 
-    <!-- Loading -->
-    {#if loading}
-      <div class="flex justify-center py-12">
-        <LoadingSpinner size="lg" />
-      </div>
-
-    <!-- Error -->
-    {:else if error}
-      <section class="glass-panel p-6 rounded-xl shadow-lg text-center">
-        <p class="text-red-600 dark:text-red-400 mb-4">⚠️ {error}</p>
-        <Button variant="danger" on:click={carregarDados}>
-          Tentar novamente
-        </Button>
-      </section>
-
-    <!-- Empty State -->
-    {:else if filtradas.length === 0}
-      <section class="glass-panel p-12 rounded-xl shadow-lg text-center">
-        <div class="text-6xl mb-4">🔍</div>
-        <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
-          Nenhuma lente encontrada
-        </h3>
-        <p class="text-neutral-600 dark:text-neutral-400">
-          Tente ajustar os filtros
-        </p>
-      </section>
-
-    <!-- Grid de Canônicas -->
-    {:else}
-      <section>
-        <SectionHeader
-          title="📦 Grupos Canônicos"
-          subtitle="{filtradas.length} grupos encontrados"
-        />
-
-        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 mt-6">
-          {#each filtradas as canonica}
-            <div class="glass-panel rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 overflow-hidden">
-            
-            <!-- Header -->
-            <div class="bg-gradient-to-r from-violet-500 to-purple-600 p-4">
-              <h3 class="font-semibold text-white text-lg leading-tight">
-                {canonica.nome_canonico}
-              </h3>
+  <Container maxWidth="xl" padding="lg">
+    <div class="space-y-6">
+      
+      <!-- Filtros Expansíveis (Desktop) -->
+      <div class="hidden md:block">
+        <div
+          class="w-full glass-panel rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
+        >
+          <div 
+            class="flex items-center gap-3 flex-1"
+            on:click={() => showDesktopFilters = !showDesktopFilters}
+            on:keydown={(e) => e.key === 'Enter' && (showDesktopFilters = !showDesktopFilters)}
+            role="button"
+            tabindex="0"
+          >
+            <div class="p-2 rounded-lg bg-brand-blue-50 dark:bg-brand-blue-800 text-brand-blue-600 dark:text-brand-blue-300 group-hover:scale-110 transition-transform">
+              <SlidersHorizontal class="w-5 h-5" />
             </div>
-
-            <!-- Corpo -->
-            <div class="p-5 space-y-3">
-              <!-- Specs -->
-              <div class="grid grid-cols-2 gap-2 text-sm">
-                <div class="bg-slate-50 px-3 py-2 rounded-lg">
-                  <div class="text-slate-500 text-xs">Tipo</div>
-                  <div class="font-medium text-slate-900 capitalize">
-                    {canonica.tipo_lente.replace('_', ' ')}
-                  </div>
-                </div>
-                
-                <div class="bg-slate-50 px-3 py-2 rounded-lg">
-                  <div class="text-slate-500 text-xs">Material</div>
-                  <div class="font-medium text-slate-900">{canonica.material}</div>
-                </div>
-
-                <div class="bg-slate-50 px-3 py-2 rounded-lg">
-                  <div class="text-slate-500 text-xs">Índice</div>
-                  <div class="font-medium text-slate-900">{canonica.indice_refracao}</div>
-                </div>
-
-                <div class="bg-slate-50 px-3 py-2 rounded-lg">
-                  <div class="text-slate-500 text-xs">Categoria</div>
-                  <div class="font-medium text-slate-900 capitalize text-xs">
-                    {canonica.categoria.replace('_', ' ')}
-                  </div>
-                </div>
-              </div>
-
-              <!-- Tratamentos -->
-              {#if canonica.ar || canonica.blue || canonica.fotossensivel || canonica.polarizado}
-                <div class="flex flex-wrap gap-2">
-                  {#if canonica.ar}
-                    <Badge variant="primary" size="sm">AR</Badge>
-                  {/if}
-                  {#if canonica.blue}
-                    <Badge variant="info" size="sm">Blue</Badge>
-                  {/if}
-                  {#if canonica.fotossensivel}
-                    <Badge variant="warning" size="sm">Foto</Badge>
-                  {/if}
-                  {#if canonica.polarizado}
-                    <Badge variant="purple" size="sm">Polar</Badge>
-                  {/if}
-                </div>
-              {/if}
-
-              <!-- Stats -->
-              <div class="pt-3 border-t border-slate-200">
-                <div class="grid grid-cols-3 gap-2 text-center">
-                  <div>
-                    <div class="text-xs text-slate-500">Lentes</div>
-                    <div class="text-lg font-bold text-violet-600">{canonica.lentes_ativas || 0}</div>
-                  </div>
-                  <div>
-                    <div class="text-xs text-slate-500">Marcas</div>
-                    <div class="text-lg font-bold text-violet-600">{canonica.total_marcas || 0}</div>
-                  </div>
-                  <div>
-                    <div class="text-xs text-slate-500">Preço</div>
-                    <div class="text-sm font-bold text-emerald-600">
-                      {canonica.preco_medio ? `R$ ${canonica.preco_medio.toFixed(0)}` : '-'}
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              <!-- Marcas -->
-              {#if canonica.marcas_disponiveis && canonica.marcas_disponiveis.length > 0}
-                <div class="text-xs text-slate-600 pt-2 border-t">
-                  <strong>Marcas:</strong> {canonica.marcas_disponiveis.join(', ')}
-                </div>
-              {/if}
-            </div>
-
-            <!-- Footer -->
-            <div class="px-5 pb-4">
-              <Button
-                variant="primary"
-                fullWidth
-                on:click={() => window.location.href = `/catalogo/${canonica.id}`}
-              >
-                Comparar Laboratórios →
-              </Button>
+            <div class="text-left">
+              <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Filtros Avançados</h3>
+              <p class="text-sm text-neutral-600 dark:text-neutral-400">
+                {showDesktopFilters ? 'Clique para recolher' : 'Clique para expandir e refinar sua busca'}
+              </p>
             </div>
           </div>
-        {/each}
+          <div class="flex items-center gap-4">
+            <!-- Toggle de Visualização -->
+            <div class="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
+              <button 
+                class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
+                on:click={() => viewMode = 'grid'}
+                title="Visualização em Grade"
+              >
+                <LayoutGrid class="w-4 h-4" />
+              </button>
+              <button 
+                class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
+                on:click={() => viewMode = 'list'}
+                title="Visualização em Lista"
+              >
+                <List class="w-4 h-4" />
+              </button>
+            </div>
+            <!-- Chevron de Expansão -->
+            <div 
+              class="transform transition-transform duration-300 {showDesktopFilters ? 'rotate-180' : ''}"
+              on:click={() => showDesktopFilters = !showDesktopFilters}
+              on:keydown={(e) => e.key === 'Enter' && (showDesktopFilters = !showDesktopFilters)}
+              role="button"
+              tabindex="0"
+            >
+              <ChevronDown class="w-6 h-6 text-neutral-500 dark:text-neutral-400" />
+            </div>
+          </div>
         </div>
+        
+        {#if showDesktopFilters}
+          <div transition:slide={{ duration: 300 }} class="mt-4">
+            <FilterPanel 
+              {filters} 
+              {loading} 
+              totalResults={total} 
+              on:change={handleFilterChange}
+              on:clear={handleClearFilters}
+            />
+          </div>
+        {/if}
+      </div>
 
-        <!-- Contador -->
-        <div class="mt-8 text-center text-neutral-600 dark:text-neutral-400">
-          Exibindo {filtradas.length} de {canonicas.length} grupos canônicos
-        </div>
-      </section>
-    {/if}
+      <!-- Mobile Filters Overlay -->
+      {#if showMobileFilters}
+        <div class="fixed inset-0 z-40 bg-black/60 backdrop-blur-sm md:hidden" transition:fade on:click={toggleMobileFilters} role="button" tabindex="0" on:keydown={(e) => e.key === 'Enter' && toggleMobileFilters()}></div>
+        <aside class="fixed inset-y-0 right-0 z-50 w-full max-w-md glass-panel shadow-2xl overflow-y-auto md:hidden" 
+               transition:fly={{ x: 300, duration: 300 }}>
+          <div class="sticky top-0 z-10 glass-panel border-b border-neutral-200 dark:border-neutral-700 p-6">
+            <div class="flex items-center justify-between">
+              <div>
+                <h2 class="text-xl font-bold text-neutral-900 dark:text-neutral-100">Filtros & Visualização</h2>
+                <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">{total} lentes disponíveis</p>
+              </div>
+              <button 
+                on:click={toggleMobileFilters} 
+                class="p-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 text-neutral-500 dark:text-neutral-400 transition-colors"
+                aria-label="Fechar filtros"
+              >
+                ✕
+              </button>
+            </div>
+            <!-- Toggle de Visualização Mobile -->
+            <div class="flex items-center gap-2 mt-4">
+              <span class="text-sm text-neutral-600 dark:text-neutral-400">Visualizar como:</span>
+              <div class="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
+                <button 
+                  class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500'}"
+                  on:click={() => viewMode = 'grid'}
+                  title="Grade"
+                >
+                  <LayoutGrid class="w-4 h-4" />
+                </button>
+                <button 
+                  class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500'}"
+                  on:click={() => viewMode = 'list'}
+                  title="Lista"
+                >
+                  <List class="w-4 h-4" />
+                </button>
+              </div>
+            </div>
+          </div>
+          <div class="p-6">
+            <FilterPanel 
+              {filters} 
+              {loading} 
+              totalResults={total} 
+              on:change={handleFilterChange}
+              on:clear={handleClearFilters}
+            />
+          </div>
+        </aside>
+      {/if}
+
+      <!-- Grid de Resultados -->
+      <div class="space-y-6">
+        
+        {#if loading && lentes.length === 0}
+          <div class="glass-panel rounded-xl p-20 flex flex-col items-center justify-center">
+            <LoadingSpinner size="lg" />
+            <p class="mt-4 text-neutral-600 dark:text-neutral-400">Carregando lentes...</p>
+          </div>
+        {:else if error}
+          <div class="glass-panel rounded-xl p-8 text-center border-2 border-error">
+            <div class="text-5xl mb-4">⚠️</div>
+            <h3 class="text-xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">Erro ao Carregar</h3>
+            <p class="text-error mb-6">{error}</p>
+            <Button variant="primary" on:click={carregarLentes}>Tentar Novamente</Button>
+          </div>
+        {:else if lentes.length === 0}
+          <div class="glass-panel rounded-xl p-12 text-center">
+            <div class="text-6xl mb-4">🔍</div>
+            <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3">Nenhuma Lente Encontrada</h3>
+            <p class="text-neutral-600 dark:text-neutral-400 mb-6 max-w-md mx-auto">Tente ajustar seus filtros para encontrar o que procura.</p>
+            <Button variant="primary" on:click={handleClearFilters}>Limpar Todos os Filtros</Button>
+          </div>
+        {:else}
+          <SectionHeader
+            title="Resultados"
+            subtitle="{lentes.length} lentes na página {paginaAtual} de {Math.ceil(total / itensPorPagina)}"
+          />
+          <div class={viewMode === 'grid' 
+            ? "grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6" 
+            : "flex flex-col gap-4"
+          }>
+            {#each lentes as lente (lente.id)}
+              <div class="h-full">
+                <!-- Usando o card estilizado -->
+                <LenteCard 
+                  lente={{
+                    ...lente,
+                    preco: lente.preco_tabela // Normalização de preço
+                  }}
+                  compact={viewMode === 'list'}
+                />
+              </div>
+            {/each}
+          </div>
+
+          <!-- Paginação Premium -->
+          {#if total > itensPorPagina}
+            <div class="glass-panel rounded-xl p-6 mt-8">
+              <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+                <div class="text-sm text-neutral-600 dark:text-neutral-400">
+                  Mostrando <span class="font-semibold text-neutral-900 dark:text-neutral-100">{((paginaAtual - 1) * itensPorPagina) + 1}</span> a <span class="font-semibold text-neutral-900 dark:text-neutral-100">{Math.min(paginaAtual * itensPorPagina, total)}</span> de <span class="font-semibold text-neutral-900 dark:text-neutral-100">{total}</span> lentes
+                </div>
+                <div class="flex items-center gap-2">
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    disabled={paginaAtual === 1}
+                    on:click={() => { paginaAtual--; carregarLentes(); }}
+                  >
+                    ← Anterior
+                  </Button>
+                  <div class="flex items-center gap-1">
+                    {#each Array(Math.min(5, Math.ceil(total / itensPorPagina))) as _, i}
+                      {@const pageNum = i + 1}
+                      <button
+                        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
+                        class:bg-brand-blue-600={pageNum === paginaAtual}
+                        class:text-white={pageNum === paginaAtual}
+                        class:hover:bg-brand-blue-600={pageNum === paginaAtual}
+                        class:bg-neutral-100={pageNum !== paginaAtual}
+                        class:dark:bg-neutral-800={pageNum !== paginaAtual}
+                        class:text-neutral-700={pageNum !== paginaAtual}
+                        class:dark:text-neutral-300={pageNum !== paginaAtual}
+                        class:hover:bg-neutral-200={pageNum !== paginaAtual}
+                        class:dark:hover:bg-neutral-700={pageNum !== paginaAtual}
+                        on:click={() => { paginaAtual = pageNum; carregarLentes(); }}
+                      >
+                        {pageNum}
+                      </button>
+                    {/each}
+                  </div>
+                  <Button 
+                    variant="outline" 
+                    size="sm"
+                    disabled={paginaAtual >= Math.ceil(total / itensPorPagina)}
+                    on:click={() => { paginaAtual++; carregarLentes(); }}
+                  >
+                    Próxima →
+                  </Button>
+                </div>
+              </div>
+            </div>
+          {/if}
+        {/if}
+      </div>
+
+    </div>
   </Container>
+  
+  <!-- Botão Flutuante Mobile (FAB) -->
+  <button
+    on:click={toggleMobileFilters}
+    class="md:hidden fixed bottom-6 right-6 z-30 p-4 rounded-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110"
+    aria-label="Abrir filtros"
+  >
+    <SlidersHorizontal class="w-6 h-6" />
+  </button>
 </main>

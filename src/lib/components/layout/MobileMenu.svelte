@@ -13,7 +13,7 @@
   export let currentPage = '';
   
   const navItems = [
-    { id: 'buscar', label: 'Buscar Lentes', href: '/buscar', icon: '🔍' },
+    { id: 'catalogo', label: 'Catálogo', href: '/catalogo', icon: '🔍' },
     { id: 'ranking', label: 'Ranking', href: '/ranking', icon: '📊' },
     { id: 'historico', label: 'Histórico', href: '/historico', icon: '📋' },
     { id: 'config', label: 'Configurações', href: '/config', icon: '⚙️' }

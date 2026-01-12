@@ -1,11 +1,11 @@
 <script lang="ts">
-	import type { VwBuscarLentes } from '$lib/types/views';
+	import type { VLenteCatalogo } from '$lib/types/database-views';
 	
-	export let lente: VwBuscarLentes;
+	export let lente: VLenteCatalogo;
 	export let mostrarFornecedor = true;
-	export let mostrarAlternativas = true;
-	export let onSelecionar: ((lente: VwBuscarLentes) => void) | undefined = undefined;
-	export let onCompararFornecedores: ((lente: VwBuscarLentes) => void) | undefined = undefined;
+	export let mostrarAlternativas = false; // Desabilitado por padrão (campos não existem)
+	export let onSelecionar: ((lente: VLenteCatalogo) => void) | undefined = undefined;
+	export let onCompararFornecedores: ((lente: VLenteCatalogo) => void) | undefined = undefined;
 	
 	function formatarPreco(preco: number): string {
 		return new Intl.NumberFormat('pt-BR', {
@@ -23,15 +23,6 @@
 		};
 		return cores[categoria] || cores.intermediaria;
 	}
-	
-	function calcularEconomia(): number | null {
-		if (!lente.preco_medio_grupo || lente.preco_tabela >= lente.preco_medio_grupo) {
-			return null;
-		}
-		return ((lente.preco_medio_grupo - lente.preco_tabela) / lente.preco_medio_grupo) * 100;
-	}
-	
-	const economia = calcularEconomia();
 </script>
 
 <div class="lente-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
@@ -40,7 +31,7 @@
 		<div class="flex items-start justify-between">
 			<div class="flex-1">
 				<h3 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
-					{lente.nome_comercial}
+					{lente.nome_lente}
 				</h3>
 				<div class="flex items-center gap-2 mt-1">
 					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {obterCorCategoria(lente.categoria)}">
@@ -53,14 +44,6 @@
 					{/if}
 				</div>
 			</div>
-			
-			{#if economia !== null && economia > 0}
-				<div class="ml-2 bg-green-100 dark:bg-green-900 rounded-full px-2 py-1">
-					<span class="text-xs font-bold text-green-800 dark:text-green-200">
-						-{economia.toFixed(0)}%
-					</span>
-				</div>
-			{/if}
 		</div>
 	</div>
 	
@@ -70,12 +53,12 @@
 		<div class="flex items-center justify-between text-sm">
 			<div>
 				<span class="text-gray-500 dark:text-gray-400">Marca:</span>
-				<strong class="ml-1 text-gray-900 dark:text-white">{lente.marca}</strong>
+				<strong class="ml-1 text-gray-900 dark:text-white">{lente.marca_nome}</strong>
 			</div>
-			{#if mostrarFornecedor}
+			{#if mostrarFornecedor && lente.fornecedor_nome}
 				<div class="text-right">
 					<span class="text-gray-500 dark:text-gray-400">Fornecedor:</span>
-					<strong class="ml-1 text-gray-900 dark:text-white">{lente.fornecedor}</strong>
+					<strong class="ml-1 text-gray-900 dark:text-white">{lente.fornecedor_nome}</strong>
 				</div>
 			{/if}
 		</div>
@@ -99,31 +82,26 @@
 		</div>
 		
 		<!-- Tratamentos -->
-		{#if lente.ar || lente.blue || lente.fotossensivel !== 'nenhum' || lente.polarizado || lente.uv400}
+		{#if lente.tratamento_antirreflexo || lente.tratamento_blue_light || lente.tratamento_fotossensiveis !== 'nenhum' || lente.tratamento_uv}
 			<div class="flex flex-wrap gap-1.5">
-				{#if lente.ar}
+				{#if lente.tratamento_antirreflexo}
 					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
 						AR
 					</span>
 				{/if}
-				{#if lente.blue}
+				{#if lente.tratamento_blue_light}
 					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300">
 						Blue Light
 					</span>
 				{/if}
-				{#if lente.fotossensivel !== 'nenhum'}
+				{#if lente.tratamento_fotossensiveis !== 'nenhum'}
 					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300">
-						{lente.fotossensivel}
+						{lente.tratamento_fotossensiveis}
 					</span>
 				{/if}
-				{#if lente.polarizado}
-					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-600 text-white">
-						Polarizado
-					</span>
-				{/if}
-				{#if lente.uv400}
+				{#if lente.tratamento_uv}
 					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300">
-						UV400
+						UV
 					</span>
 				{/if}
 			</div>
@@ -134,11 +112,11 @@
 			<div class="grid grid-cols-2 gap-2">
 				<div>
 					<span class="font-medium">Esférico:</span>
-					{lente.esferico_min > 0 ? '+' : ''}{lente.esferico_min} a {lente.esferico_max > 0 ? '+' : ''}{lente.esferico_max}
+					{lente.grau_esferico_min > 0 ? '+' : ''}{lente.grau_esferico_min} a {lente.grau_esferico_max > 0 ? '+' : ''}{lente.grau_esferico_max}
 				</div>
 				<div>
 					<span class="font-medium">Cilíndrico:</span>
-					{lente.cilindrico_min} a {lente.cilindrico_max}
+					{lente.grau_cilindrico_min} a {lente.grau_cilindrico_max}
 				</div>
 			</div>
 			{#if lente.adicao_min !== null && lente.adicao_max !== null}
@@ -149,56 +127,39 @@
 			{/if}
 		</div>
 		
-		<!-- Alternativas -->
-		{#if mostrarAlternativas && lente.alternativas_disponiveis > 1}
-			<div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded px-3 py-2">
-				<div class="flex items-center justify-between">
-					<div class="text-xs text-blue-800 dark:text-blue-200">
-						<strong>{lente.alternativas_disponiveis - 1}</strong> alternativa{lente.alternativas_disponiveis - 1 === 1 ? '' : 's'} disponível{lente.alternativas_disponiveis - 1 === 1 ? '' : 'is'}
-					</div>
-					{#if onCompararFornecedores}
-						<button
-							class="text-xs text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 font-medium underline"
-							on:click={() => onCompararFornecedores?.(lente)}
-						>
-							Comparar preços
-						</button>
-					{/if}
-				</div>
-				<div class="mt-1 text-xs text-blue-700 dark:text-blue-300">
-					Faixa: {formatarPreco(lente.preco_min_grupo)} - {formatarPreco(lente.preco_max_grupo)}
-				</div>
-			</div>
-		{/if}
 	</div>
 	
 	<!-- Footer -->
 	<div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
 		<div class="flex items-center justify-between">
 			<div>
-				<div class="text-xs text-gray-500 dark:text-gray-400">Preço Tabela</div>
+				<div class="text-xs text-gray-500 dark:text-gray-400">Preço Sugerido</div>
 				<div class="text-2xl font-bold text-gray-900 dark:text-white">
-					{formatarPreco(lente.preco_tabela)}
+					{formatarPreco(lente.preco_venda_sugerido)}
 				</div>
-				{#if lente.preco_medio_grupo && lente.preco_tabela < lente.preco_medio_grupo}
+				{#if lente.preco_custo && lente.margem_lucro}
 					<div class="text-xs text-green-600 dark:text-green-400">
-						Abaixo da média ({formatarPreco(lente.preco_medio_grupo)})
+						Margem: {lente.margem_lucro.toFixed(0)}%
 					</div>
 				{/if}
 			</div>
 			
-			{#if onSelecionar}
-				<button
-					class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-					on:click={() => onSelecionar?.(lente)}
+			<div class="flex gap-2">
+				<a
+					href="/catalogo/{lente.id}"
+					class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
 				>
-					Selecionar
-				</button>
-			{/if}
-		</div>
-		
-		<div class="mt-2 text-xs text-gray-500 dark:text-gray-400">
-			SKU: <code class="bg-gray-200 dark:bg-gray-800 px-1 rounded">{lente.sku}</code>
+					Ver Detalhes
+				</a>
+				{#if onSelecionar}
+					<button
+						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
+						on:click={() => onSelecionar?.(lente)}
+					>
+						Selecionar
+					</button>
+				{/if}
+			</div>
 		</div>
 	</div>
 </div>

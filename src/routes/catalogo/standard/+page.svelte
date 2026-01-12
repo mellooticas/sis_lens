@@ -1,6 +1,6 @@
 <!--
-  ✨ Catálogo Premium - SIS Lens
-  Grupos canônicos de lentes premium (marcas e tecnologias avançadas)
+  ��� Catálogo Standard - SIS Lens
+  Grupos canônicos de lentes standard (não premium)
 -->
 <script lang="ts">
   import { onMount } from 'svelte';
@@ -9,7 +9,7 @@
   import type { VGruposCanonico } from '$lib/types/database-views';
   
   // Ícones
-  import { LayoutGrid, List, SlidersHorizontal, Crown } from 'lucide-svelte';
+  import { LayoutGrid, List, SlidersHorizontal, Package, DollarSign, Layers } from 'lucide-svelte';
 
   // Layout Components
   import Container from "$lib/components/layout/Container.svelte";
@@ -60,15 +60,15 @@
       loading = true;
       error = '';
       
-      console.log('🔍 Carregando grupos premium...', { filters, pagina: paginaAtual, limite: itensPorPagina });
+      console.log('🔍 Carregando grupos standard...', { filters, pagina: paginaAtual, limite: itensPorPagina });
       
-      const resultado = await CatalogoAPI.buscarGruposCanonicosPremium(
+      const resultado = await CatalogoAPI.buscarGruposCanonicosStandard(
         filters,
         { 
           pagina: paginaAtual, 
           limite: itensPorPagina,
           ordenar: 'preco_medio',
-          direcao: 'desc' // Premium ordena do maior para o menor preço
+          direcao: 'asc'
         }
       );
 
@@ -115,22 +115,23 @@
 </script>
 
 <svelte:head>
-  <title>Catálogo Premium - SIS Lens</title>
+  <title>Catálogo Standard - SIS Lens</title>
 </svelte:head>
 
-<PageHero title="Catálogo Premium" subtitle="Lentes de marcas renomadas com tecnologias avançadas e design exclusivo">
-  <div slot="badge" class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gradient-to-r from-amber-500 to-orange-500 text-white font-semibold text-sm">
-    <Crown class="w-4 h-4" />
-    Premium Collection
-  </div>
-</PageHero>
+<PageHero title="Catálogo Standard" subtitle="Grupos canônicos de lentes organizadas por especificações técnicas" />
 
 <Container maxWidth="full" padding="lg">
   <div class="space-y-6">
     <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-      <StatsCard title="Grupos Premium" value={stats.totalGrupos.toString()} icon="👑" color="orange" />
-      <StatsCard title="Preço Médio" value={formatarPreco(stats.precoMedio)} icon="💎" color="blue" />
-      <StatsCard title="Total de Lentes" value={stats.totalLentes.toString()} icon="✨" color="orange" />
+      <StatsCard title="Grupos Disponíveis" value={stats.totalGrupos.toString()} color="blue">
+        <Package slot="icon" class="w-6 h-6" />
+      </StatsCard>
+      <StatsCard title="Preço Médio" value={formatarPreco(stats.precoMedio)} color="orange">
+        <DollarSign slot="icon" class="w-6 h-6" />
+      </StatsCard>
+      <StatsCard title="Total de Lentes" value={stats.totalLentes.toString()} color="blue">
+        <Layers slot="icon" class="w-6 h-6" />
+      </StatsCard>
     </div>
 
     <div class="glass-panel p-6 rounded-xl">
@@ -145,7 +146,7 @@
               <List class="w-4 h-4" />
             </button>
           </div>
-          <button class="md:hidden p-2 rounded-lg bg-amber-600 text-white" on:click={() => showMobileFilters = !showMobileFilters}>
+          <button class="md:hidden p-2 rounded-lg bg-brand-blue-600 text-white" on:click={() => showMobileFilters = !showMobileFilters}>
             <SlidersHorizontal class="w-5 h-5" />
           </button>
         </div>
@@ -165,7 +166,7 @@
     <div class="glass-panel p-6 rounded-xl">
       <div class="flex items-center justify-between mb-6">
         <h3 class="text-lg font-semibold text-gray-900 dark:text-white">
-          {loading ? 'Carregando...' : `${total} grupo${total !== 1 ? 's' : ''} premium encontrado${total !== 1 ? 's' : ''}`}
+          {loading ? 'Carregando...' : `${total} grupo${total !== 1 ? 's' : ''} encontrado${total !== 1 ? 's' : ''}`}
         </h3>
       </div>
 
@@ -179,15 +180,15 @@
         </div>
       {:else if grupos.length === 0}
         <div class="text-center py-20">
-          <div class="text-5xl mb-4">👑</div>
-          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhum grupo premium encontrado</h3>
+          <div class="text-5xl mb-4">���</div>
+          <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhum grupo encontrado</h3>
           <p class="text-gray-600 dark:text-gray-400 mb-6">Tente ajustar os filtros</p>
           <Button variant="secondary" on:click={handleClearFilters}>Limpar Filtros</Button>
         </div>
       {:else}
         <div class="grid gap-6 {viewMode === 'grid' ? 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4' : 'grid-cols-1'}" in:fade>
           {#each grupos as grupo (grupo.id)}
-            <div in:fade><GrupoCanonicoCard {grupo} variant="premium" /></div>
+            <div in:fade><GrupoCanonicoCard {grupo} /></div>
           {/each}
         </div>
       {/if}

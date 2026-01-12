@@ -324,7 +324,7 @@
             description="Testar configurações no sistema de busca"
             actionLabel="Testar Busca"
             color="orange"
-            on:click={() => goto("/buscar")}
+            on:click={() => goto("/catalogo")}
           />
         </div>
       </section>

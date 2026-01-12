@@ -30,7 +30,11 @@
       color
     ]}"
   >
-    <span class="text-2xl">{icon}</span>
+    {#if $$slots.icon}
+      <slot name="icon" />
+    {:else}
+      <span class="text-2xl">{icon}</span>
+    {/if}
   </div>
 
   <!-- Content -->

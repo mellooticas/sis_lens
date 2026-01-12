@@ -340,7 +340,7 @@
                 <Button
                   variant="ghost"
                   size="sm"
-                  on:click={() => goto("/buscar")}
+                  on:click={() => goto("/catalogo")}
                 >
                   🔍 Sistema de Busca
                 </Button>

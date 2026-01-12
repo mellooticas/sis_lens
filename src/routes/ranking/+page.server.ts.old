@@ -75,7 +75,7 @@ export const load: PageServerLoad = async ({ url, locals }) => {
       }
       
       // Navegação normal: redirecionar para buscar com mensagem informativa
-      throw redirect(302, '/buscar?info=ranking_needs_lens');
+      throw redirect(302, '/catalogo?info=ranking_needs_lens');
     }
     
     // Validar critério
