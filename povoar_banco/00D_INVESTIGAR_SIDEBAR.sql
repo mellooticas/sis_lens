@@ -747,3 +747,14 @@ SELECT
     'Grupos Premium' as recurso,
     (SELECT COUNT(*) FROM public.v_grupos_premium) as total,
     'v_grupos_premium' as tabela;
+
+| recurso                  | total | tabela                        |
+| ------------------------ | ----- | ----------------------------- |
+| Fornecedores             | 11    | core.fornecedores             |
+| Marcas                   | 17    | lens_catalog.marcas           |
+| Lentes Individuais       | 1411  | lens_catalog.lentes           |
+| Grupos Canônicos (Todos) | 461   | lens_catalog.grupos_canonicos |
+| Grupos Standard          | 401   | v_grupos_canonicos (standard) |
+| Grupos Premium           | 60    | v_grupos_premium              |
+
+

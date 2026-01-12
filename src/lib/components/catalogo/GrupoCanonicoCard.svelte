@@ -3,6 +3,7 @@
   
   export let grupo: VGruposCanonico;
   export let variant: 'standard' | 'premium' = 'standard';
+  export let compact = false; // Modo lista compacto
 
   function formatarPreco(preco: number): string {
     return new Intl.NumberFormat('pt-BR', {
@@ -35,11 +36,24 @@
 
 <a
   href="{linkBase}/{grupo.id}"
-  class="grupo-card glass-panel p-6 rounded-xl hover:shadow-xl transition-all duration-200 hover:scale-[1.02] block"
+  class="grupo-card glass-panel rounded-xl hover:shadow-xl transition-all duration-200 hover:scale-[1.02] block"
+  class:p-6={!compact}
+  class:p-4={compact}
+  class:flex={compact}
+  class:items-center={compact}
+  class:gap-4={compact}
 >
   <!-- Header -->
-  <div class="mb-4">
-    <h3 class="text-lg font-bold text-gray-900 dark:text-white mb-2 line-clamp-2">
+  <div 
+    class:mb-4={!compact} 
+    class:flex-shrink-0={compact}
+    style={compact ? 'width: 33%;' : ''}
+  >
+    <h3 
+      class="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2"
+      class:text-lg={!compact}
+      class:text-base={compact}
+    >
       {grupo.nome_grupo}
     </h3>
     <div class="flex flex-wrap gap-2">
@@ -55,7 +69,11 @@
   </div>
 
   <!-- Especificações Técnicas -->
-  <div class="grid grid-cols-3 gap-2 mb-4 text-xs">
+  <div class="gap-2 mb-4 text-xs flex-1"
+       class:grid={!compact}
+       class:grid-cols-3={!compact}
+       class:flex={compact}
+       class:flex-wrap={compact}>
     <div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
       <div class="text-gray-500 dark:text-gray-400">Material</div>
       <div class="font-medium text-gray-900 dark:text-white">{grupo.material}</div>
@@ -74,7 +92,9 @@
 
   <!-- Tratamentos -->
   {#if grupo.tratamento_antirreflexo || grupo.tratamento_blue_light || grupo.tratamento_fotossensiveis !== 'nenhum' || grupo.tratamento_uv}
-    <div class="flex flex-wrap gap-1.5 mb-4">
+    <div class="flex flex-wrap gap-1.5"
+         class:mb-4={!compact}
+         class:flex-shrink-0={compact}>
       {#if grupo.tratamento_antirreflexo}
         <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
           AR
@@ -98,6 +118,7 @@
     </div>
   {/if}
 
+  {#if !compact}
   <!-- Faixas Ópticas -->
   <div class="border-t border-gray-200 dark:border-gray-700 pt-3 mb-4 text-xs text-gray-600 dark:text-gray-400">
     <div class="grid grid-cols-2 gap-2">
@@ -131,16 +152,30 @@
       </div>
     </div>
   </div>
+  {/if}
 
   <!-- Preços -->
-  <div class="border-t border-gray-200 dark:border-gray-700 pt-3">
-    <div class="flex items-center justify-between mb-2">
+  <div class:border-t={!compact}
+       class:border-l={compact}
+       class:border-gray-200={!compact}
+       class:dark:border-gray-700={!compact}
+       class:pt-3={!compact}
+       class:pl-4={compact}
+       class:flex-shrink-0={compact}>
+    <div class="flex items-center justify-between mb-2"
+         class:flex-col={compact}
+         class:items-end={compact}>
       <span class="text-xs text-gray-500 dark:text-gray-400">Preço Médio</span>
-      <span class="text-xl font-bold text-brand-blue-600">
+      <span class="font-bold text-brand-blue-600"
+            class:text-xl={!compact}
+            class:text-2xl={compact}>
         {formatarPreco(grupo.preco_medio || 0)}
       </span>
     </div>
-    <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400">
+    <div class="flex items-center justify-between text-xs text-gray-600 dark:text-gray-400"
+         class:flex-col={compact}
+         class:items-end={compact}
+         class:gap-1={compact}>
       <span>Faixa:</span>
       <span>
         {formatarPreco(grupo.preco_minimo || 0)} - {formatarPreco(grupo.preco_maximo || 0)}

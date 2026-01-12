@@ -12,14 +12,14 @@
 |-------|-------|------|--------|------------|
 | 🏠 | Dashboard | `/dashboard` | ✅ **MANTER** | Página principal com visão geral |
 | 🔍 | Catálogo | `/catalogo` | ✅ **MANTER** | Módulo principal - agora tem 3 subpáginas |
-| ⚖️ | Comparar | `/comparar` | 🔄 **REVISAR** | Precisa adaptação para novos dados |
-| 🏆 | Ranking | `/ranking` | 🔄 **REVISAR** | Precisa usar v_grupos_canonicos |
-| 📜 | Histórico | `/historico` | 🔄 **REVISAR** | Verificar se usa dados corretos |
-| 📦 | Catálogo | `/catalogo` | ⚠️ **DUPLICADO** | Mesmo que linha 2 |
-| 🏭 | Fornecedores | `/fornecedores` | ✅ **MANTER** | Gestão de fornecedores |
-| 💼 | Comercial | `/comercial` | ❓ **AVALIAR** | Verificar funcionalidade |
-| 📊 | Analytics | `/analytics` | ❓ **AVALIAR** | Verificar se tem dados |
-| ⚙️ | Configurações | `/configuracoes` | ✅ **MANTER** | Configurações do sistema |
+| ⚖️ | Comparar | `/comparar` | 🔄 **REVISAR** | Precisa adaptação para novos dados | não temos porque continuar com isso, depois te explico
+| 🏆 | Ranking | `/ranking` | 🔄 **REVISAR** | Precisa usar v_grupos_canonicos | perfeito pode implementar para eu ver se faz sentido
+| 📜 | Histórico | `/historico` | 🔄 **REVISAR** | Verificar se usa dados corretos | acho que vamos ter aqui um controle das vendas de lentes e valores da venda com o desconto e etc, vai fazer mais centido, e isso vai ter que vir do sistema de pdv que vendas, e informa a compra e entrega da lente assim teremos um controle de historico, financeiro e quantitativos das lentes
+| 📦 | Catálogo | `/catalogo` | ⚠️ **DUPLICADO** | Mesmo que linha 2 | só tems que ter 1
+| 🏭 | Fornecedores | `/fornecedores` | ✅ **MANTER** | Gestão de fornecedores | já temos os dados no banco e não trouxemos ainda
+| 💼 | Comercial | `/comercial` | ❓ **AVALIAR** | Verificar funcionalidade | não faz mais sentido com o pdv já rodanto
+| 📊 | Analytics | `/analytics` | ❓ **AVALIAR** | Verificar se tem dados | juntar com o historico para termso tudo em um unico lugar, um bi completo
+| ⚙️ | Configurações | `/configuracoes` | ✅ **MANTER** | Configurações do sistema | ok
 
 ---
 

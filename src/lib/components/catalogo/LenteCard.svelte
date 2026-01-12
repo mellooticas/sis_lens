@@ -6,6 +6,7 @@
 	export let mostrarAlternativas = false; // Desabilitado por padrão (campos não existem)
 	export let onSelecionar: ((lente: VLenteCatalogo) => void) | undefined = undefined;
 	export let onCompararFornecedores: ((lente: VLenteCatalogo) => void) | undefined = undefined;
+	export let compact = false; // Modo lista compacto
 	
 	function formatarPreco(preco: number): string {
 		return new Intl.NumberFormat('pt-BR', {
@@ -25,15 +26,24 @@
 	}
 </script>
 
-<div class="lente-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200">
+<div class="lente-card bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg overflow-hidden hover:shadow-lg transition-shadow duration-200"
+     class:flex={compact}
+     class:flex-row={compact}
+     class:items-center={compact}>
 	<!-- Header -->
-	<div class="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700">
+	<div 
+	  class="px-4 py-3 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-gray-900 dark:to-gray-800 border-b border-gray-200 dark:border-gray-700"
+	  class:border-b-0={compact}
+	  class:border-r={compact}
+	  class:flex-shrink-0={compact}
+	  style={compact ? 'width: 40%;' : ''}
+	>
 		<div class="flex items-start justify-between">
 			<div class="flex-1">
 				<h3 class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2">
 					{lente.nome_lente}
 				</h3>
-				<div class="flex items-center gap-2 mt-1">
+				<div class="flex items-center gap-2 mt-1 flex-wrap">
 					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {obterCorCategoria(lente.categoria)}">
 						{lente.categoria.replace('_', ' ')}
 					</span>
@@ -48,7 +58,15 @@
 	</div>
 	
 	<!-- Corpo -->
-	<div class="px-4 py-3 space-y-3">
+	<div class="px-4 py-3 space-y-3 flex-1"
+	     class:flex={compact}
+	     class:flex-row={compact}
+	     class:items-center={compact}
+	     class:justify-between={compact}
+	     class:space-y-0={compact}
+	     class:gap-4={compact}>
+		
+		{#if !compact}
 		<!-- Marca e Fornecedor -->
 		<div class="flex items-center justify-between text-sm">
 			<div>
@@ -62,9 +80,19 @@
 				</div>
 			{/if}
 		</div>
+		{/if}
 		
 		<!-- Especificações Técnicas -->
-		<div class="grid grid-cols-3 gap-2 text-xs">
+		<div class="grid gap-2 text-xs"
+		     class:grid-cols-3={!compact}
+		     class:grid-cols-5={compact}
+		     class:flex-shrink-0={compact}>
+			{#if compact}
+			<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
+				<div class="text-gray-500 dark:text-gray-400">Marca</div>
+				<div class="font-medium text-gray-900 dark:text-white">{lente.marca_nome}</div>
+			</div>
+			{/if}
 			<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
 				<div class="text-gray-500 dark:text-gray-400">Material</div>
 				<div class="font-medium text-gray-900 dark:text-white">{lente.material}</div>
@@ -79,11 +107,18 @@
 					{lente.tipo_lente.replace('_', ' ')}
 				</div>
 			</div>
+			{#if compact && lente.fornecedor_nome}
+			<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
+				<div class="text-gray-500 dark:text-gray-400">Fornecedor</div>
+				<div class="font-medium text-gray-900 dark:text-white">{lente.fornecedor_nome}</div>
+			</div>
+			{/if}
 		</div>
 		
 		<!-- Tratamentos -->
 		{#if lente.tratamento_antirreflexo || lente.tratamento_blue_light || lente.tratamento_fotossensiveis !== 'nenhum' || lente.tratamento_uv}
-			<div class="flex flex-wrap gap-1.5">
+			<div class="flex flex-wrap gap-1.5"
+			     class:flex-shrink-0={compact}>
 				{#if lente.tratamento_antirreflexo}
 					<span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300">
 						AR
@@ -107,6 +142,7 @@
 			</div>
 		{/if}
 		
+		{#if !compact}
 		<!-- Faixas Ópticas -->
 		<div class="border-t border-gray-200 dark:border-gray-700 pt-2 text-xs text-gray-600 dark:text-gray-400">
 			<div class="grid grid-cols-2 gap-2">
@@ -126,15 +162,24 @@
 				</div>
 			{/if}
 		</div>
+		{/if}
 		
 	</div>
 	
 	<!-- Footer -->
-	<div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700">
-		<div class="flex items-center justify-between">
-			<div>
+	<div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700"
+	     class:border-t-0={compact}
+	     class:border-l={compact}
+	     class:flex-shrink-0={compact}>
+		<div class="flex items-center justify-between"
+		     class:flex-col={compact}
+		     class:items-end={compact}
+		     class:gap-3={compact}>
+			<div class:text-center={compact}>
 				<div class="text-xs text-gray-500 dark:text-gray-400">Preço Sugerido</div>
-				<div class="text-2xl font-bold text-gray-900 dark:text-white">
+				<div class="font-bold text-gray-900 dark:text-white"
+				     class:text-2xl={!compact}
+				     class:text-xl={compact}>
 					{formatarPreco(lente.preco_venda_sugerido)}
 				</div>
 				{#if lente.preco_custo && lente.margem_lucro}

@@ -13,6 +13,14 @@ FROM pg_enum
 WHERE enumtypid = 'lens_catalog.tipo_lente'::regtype
 ORDER BY enumsortorder;
 
+| valor         | ordem |
+| ------------- | ----- |
+| visao_simples | 1     |
+| multifocal    | 2     |
+| bifocal       | 3     |
+| leitura       | 4     |
+| ocupacional   | 5     |
+
 -- RESULTADO:
 -- | valor | ordem |
 -- |-------|-------|
@@ -25,10 +33,14 @@ FROM pg_enum
 WHERE enumtypid = 'lens_catalog.material_lente'::regtype
 ORDER BY enumsortorder;
 
--- RESULTADO:
--- | valor | ordem |
--- |-------|-------|
--- |       |       |
+| valor         | ordem |
+| ------------- | ----- |
+| CR39          | 1     |
+| POLICARBONATO | 2     |
+| TRIVEX        | 3     |
+| HIGH_INDEX    | 4     |
+| VIDRO         | 5     |
+| ACRILICO      | 6     |
 
 
 -- Query 1.3: Categoria de Lente
@@ -37,10 +49,12 @@ FROM pg_enum
 WHERE enumtypid = 'lens_catalog.categoria_lente'::regtype
 ORDER BY enumsortorder;
 
--- RESULTADO:
--- | valor | ordem |
--- |-------|-------|
--- |       |       |
+| valor         | ordem |
+| ------------- | ----- |
+| economica     | 1     |
+| intermediaria | 2     |
+| premium       | 3     |
+| super_premium | 4     |
 
 
 -- Query 1.4: Tratamento Fotossensível
@@ -49,11 +63,12 @@ FROM pg_enum
 WHERE enumtypid = 'lens_catalog.tratamento_foto'::regtype
 ORDER BY enumsortorder;
 
--- RESULTADO:
--- | valor | ordem |
--- |-------|-------|
--- |       |       |
-
+| valor         | ordem |
+| ------------- | ----- |
+| nenhum        | 1     |
+| transitions   | 2     |
+| fotocromático | 3     |
+| polarizado    | 4     |
 
 -- =========================================
 -- 2. CONTADORES - Verificar dados reais
@@ -68,10 +83,11 @@ WHERE ativo = true AND deleted_at IS NULL
 GROUP BY tipo_lente
 ORDER BY total DESC;
 
--- RESULTADO:
--- | tipo_lente | total |
--- |------------|-------|
--- |            |       |
+| tipo_lente    | total |
+| ------------- | ----- |
+| multifocal    | 957   |
+| visao_simples | 452   |
+| bifocal       | 2     |
 
 
 -- Query 2.2: Total por material
@@ -83,10 +99,10 @@ WHERE ativo = true AND deleted_at IS NULL
 GROUP BY material
 ORDER BY total DESC;
 
--- RESULTADO:
--- | material | total |
--- |----------|-------|
--- |          |       |
+| material      | total |
+| ------------- | ----- |
+| CR39          | 1057  |
+| POLICARBONATO | 354   |
 
 
 -- Query 2.3: Total por categoria
@@ -98,11 +114,10 @@ WHERE ativo = true AND deleted_at IS NULL
 GROUP BY categoria
 ORDER BY total DESC;
 
--- RESULTADO:
--- | categoria | total |
--- |-----------|-------|
--- |           |       |
-
+| categoria     | total |
+| ------------- | ----- |
+| intermediaria | 963   |
+| economica     | 448   |
 
 -- Query 2.4: Total por índice de refração
 SELECT 
@@ -113,10 +128,14 @@ WHERE ativo = true AND deleted_at IS NULL
 GROUP BY indice_refracao
 ORDER BY indice_refracao;
 
--- RESULTADO:
--- | indice_refracao | total |
--- |-----------------|-------|
--- |                 |       |
+| indice_refracao | total |
+| --------------- | ----- |
+| 1.50            | 335   |
+| 1.56            | 182   |
+| 1.59            | 358   |
+| 1.61            | 20    |
+| 1.67            | 286   |
+| 1.74            | 230   |
 
 
 -- =========================================
@@ -133,11 +152,9 @@ SELECT
 FROM lens_catalog.lentes 
 WHERE ativo = true AND deleted_at IS NULL;
 
--- RESULTADO:
--- | com_ar | com_blue | com_uv | com_antirrisco | com_foto |
--- |--------|----------|--------|----------------|----------|
--- |        |          |        |                |          |
-
+| com_ar | com_blue | com_uv | com_antirrisco | com_foto |
+| ------ | -------- | ------ | -------------- | -------- |
+| 620    | 466      | 1411   | 0              | 382      |
 
 -- =========================================
 -- 4. GRUPOS CANÔNICOS - Premium vs Standard
@@ -151,10 +168,10 @@ FROM lens_catalog.grupos_canonicos
 WHERE ativo = true
 GROUP BY is_premium;
 
--- RESULTADO:
--- | is_premium | total |
--- |------------|-------|
--- |            |       |
+| is_premium | total |
+| ---------- | ----- |
+| false      | 401   |
+| true       | 60    |
 
 
 -- Query 4.2: Marcas premium
@@ -165,10 +182,10 @@ FROM lens_catalog.marcas
 WHERE ativo = true
 GROUP BY is_premium;
 
--- RESULTADO:
--- | is_premium | total |
--- |------------|-------|
--- |            |       |
+| is_premium | total |
+| ---------- | ----- |
+| false      | 8     |
+| true       | 9     |
 
 
 -- =========================================
@@ -191,7 +208,18 @@ WHERE table_schema = 'lens_catalog'
   )
 ORDER BY column_name;
 
--- RESULTADO:
--- | column_name | data_type | udt_name |
--- |-------------|-----------|----------|
--- |             |           |          |
+| column_name               | data_type                | udt_name        |
+| ------------------------- | ------------------------ | --------------- |
+| ativo                     | boolean                  | bool            |
+| categoria                 | USER-DEFINED             | categoria_lente |
+| deleted_at                | timestamp with time zone | timestamptz     |
+| grupo_canonico_id         | uuid                     | uuid            |
+| indice_refracao           | USER-DEFINED             | indice_refracao |
+| material                  | USER-DEFINED             | material_lente  |
+| preco_venda_sugerido      | numeric                  | numeric         |
+| tipo_lente                | USER-DEFINED             | tipo_lente      |
+| tratamento_antirreflexo   | boolean                  | bool            |
+| tratamento_antirrisco     | boolean                  | bool            |
+| tratamento_blue_light     | boolean                  | bool            |
+| tratamento_fotossensiveis | USER-DEFINED             | tratamento_foto |
+| tratamento_uv             | boolean                  | bool            |
