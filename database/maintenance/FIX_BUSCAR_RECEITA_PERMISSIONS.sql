@@ -15,7 +15,6 @@ CREATE OR REPLACE FUNCTION public.buscar_lentes_por_receita(
 )
 RETURNS TABLE (
     id UUID,
-    nome_lente TEXT,
     nome_comercial TEXT,
     tipo_lente TEXT,
     categoria TEXT,
@@ -23,52 +22,49 @@ RETURNS TABLE (
     indice_refracao TEXT,
     preco_tabela NUMERIC,
     marca_nome TEXT,
-    fornecedor_nome TEXT,
-    tratamento_antirreflexo BOOLEAN,
-    tratamento_blue_light BOOLEAN,
-    tratamento_fotossensiveis TEXT,
-    tratamento_uv BOOLEAN,
-    grau_esferico_min NUMERIC,
-    grau_esferico_max NUMERIC,
-    grau_cilindrico_min NUMERIC,
-    grau_cilindrico_max NUMERIC,
+    marca_premium BOOLEAN,
+    ar BOOLEAN,
+    blue BOOLEAN,
+    fotossensivel BOOLEAN,
+    uv400 BOOLEAN,
+    esferico_min NUMERIC,
+    esferico_max NUMERIC,
+    cilindrico_min NUMERIC,
+    cilindrico_max NUMERIC,
     adicao_min NUMERIC,
-    adicao_max NUMERIC,
-    marca_premium BOOLEAN
+    adicao_max NUMERIC
 ) AS $$
 BEGIN
     RETURN QUERY
     SELECT 
         v.id,
-        v.nome_lente,
-        v.nome_lente as nome_comercial, -- alias para compatibilidade
+        v.nome_comercial,
         v.tipo_lente,
         v.categoria,
         v.material,
         v.indice_refracao,
         v.preco_tabela,
         v.marca_nome,
-        v.fornecedor_nome,
-        v.tratamento_antirreflexo,
-        v.tratamento_blue_light,
-        v.tratamento_fotossensiveis,
-        v.tratamento_uv,
-        v.grau_esferico_min,
-        v.grau_esferico_max,
-        v.grau_cilindrico_min,
-        v.grau_cilindrico_max,
+        v.marca_premium,
+        v.ar,
+        v.blue,
+        v.fotossensivel,
+        v.uv400,
+        v.esferico_min,
+        v.esferico_max,
+        v.cilindrico_min,
+        v.cilindrico_max,
         v.adicao_min,
-        v.adicao_max,
-        v.marca_premium
+        v.adicao_max
     FROM public.vw_lentes_catalogo v
     WHERE 
         -- Validação do esférico
-        (v.grau_esferico_min IS NULL OR p_esferico >= v.grau_esferico_min)
-        AND (v.grau_esferico_max IS NULL OR p_esferico <= v.grau_esferico_max)
+        (v.esferico_min IS NULL OR p_esferico >= v.esferico_min)
+        AND (v.esferico_max IS NULL OR p_esferico <= v.esferico_max)
         
         -- Validação do cilíndrico
-        AND (v.grau_cilindrico_min IS NULL OR p_cilindrico >= v.grau_cilindrico_min)
-        AND (v.grau_cilindrico_max IS NULL OR p_cilindrico <= v.grau_cilindrico_max)
+        AND (v.cilindrico_min IS NULL OR p_cilindrico >= v.cilindrico_min)
+        AND (v.cilindrico_max IS NULL OR p_cilindrico <= v.cilindrico_max)
         
         -- Validação da adição (apenas para multifocal/bifocal)
         AND (
@@ -115,6 +111,6 @@ SELECT COUNT(*) as total_multifocal
 FROM public.buscar_lentes_por_receita(-2.00, -0.50, 2.00, 'multifocal');
 
 -- Teste 3: Ver algumas lentes
-SELECT nome_lente, tipo_lente, material, indice_refracao, preco_tabela
+SELECT nome_comercial, tipo_lente, material, indice_refracao, preco_tabela
 FROM public.buscar_lentes_por_receita(-2.00, -0.50, NULL, 'visao_simples')
 LIMIT 5;
