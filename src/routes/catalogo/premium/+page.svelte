@@ -9,7 +9,8 @@
   import type { VGruposCanonico } from '$lib/types/database-views';
   
   // Ícones
-  import { LayoutGrid, List, SlidersHorizontal, Crown } from 'lucide-svelte';
+  import { LayoutGrid, List, SlidersHorizontal, Crown, ChevronDown, RotateCcw } from 'lucide-svelte';
+  import { slide } from 'svelte/transition';
 
   // Layout Components
   import Container from "$lib/components/layout/Container.svelte";
@@ -44,6 +45,7 @@
   // View Mode
   let viewMode: 'grid' | 'list' = 'grid';
   let showMobileFilters = false;
+  let showDesktopFilters = false;
 
   // Stats
   let stats = {
@@ -134,30 +136,78 @@
       <StatsCard title="Total de Lentes" value={stats.totalLentes.toString()} icon="✨" color="orange" />
     </div>
 
-    <div class="glass-panel p-6 rounded-xl">
-      <div class="flex items-center justify-between mb-4">
-        <SectionHeader title="Filtros" subtitle="Refine sua busca" />
-        <div class="flex items-center gap-2">
-          <div class="hidden md:flex items-center gap-1 bg-gray-100 dark:bg-gray-800 rounded-lg p-1">
-            <button class="p-2 rounded transition-colors {viewMode === 'grid' ? 'bg-white dark:bg-gray-700 shadow' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}" on:click={() => viewMode = 'grid'}>
+    <div class="glass-panel rounded-xl">
+      <div
+        class="w-full p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
+      >
+        <div 
+          class="flex items-center gap-3 flex-1"
+          on:click={() => showDesktopFilters = !showDesktopFilters}
+          on:keydown={(e) => e.key === 'Enter' && (showDesktopFilters = !showDesktopFilters)}
+          role="button"
+          tabindex="0"
+        >
+          <div class="p-2 rounded-lg bg-amber-50 dark:bg-amber-800 text-amber-600 dark:text-amber-300 group-hover:scale-110 transition-transform">
+            <SlidersHorizontal class="w-5 h-5" />
+          </div>
+          <div class="text-left">
+            <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">Filtros Avançados Premium</h3>
+            <p class="text-sm text-neutral-600 dark:text-neutral-400">
+              {showDesktopFilters ? 'Clique para recolher' : 'Clique para expandir e refinar sua busca'}
+            </p>
+          </div>
+        </div>
+        <div class="flex items-center gap-4">
+          <!-- Toggle de Visualização -->
+          <div class="hidden md:flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
+            <button 
+              class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-amber-600 dark:text-amber-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
+              on:click={() => viewMode = 'grid'}
+              title="Visualização em Grade"
+            >
               <LayoutGrid class="w-4 h-4" />
             </button>
-            <button class="p-2 rounded transition-colors {viewMode === 'list' ? 'bg-white dark:bg-gray-700 shadow' : 'hover:bg-gray-200 dark:hover:bg-gray-700'}" on:click={() => viewMode = 'list'}>
+            <button 
+              class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-amber-600 dark:text-amber-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
+              on:click={() => viewMode = 'list'}
+              title="Visualização em Lista"
+            >
               <List class="w-4 h-4" />
             </button>
           </div>
+          <!-- Chevron de Expansão -->
+          <div 
+            class="hidden md:block transform transition-transform duration-300 {showDesktopFilters ? 'rotate-180' : ''}"
+            on:click={() => showDesktopFilters = !showDesktopFilters}
+            on:keydown={(e) => e.key === 'Enter' && (showDesktopFilters = !showDesktopFilters)}
+            role="button"
+            tabindex="0"
+          >
+            <ChevronDown class="w-6 h-6 text-neutral-500 dark:text-neutral-400" />
+          </div>
+          <!-- Mobile Button -->
           <button class="md:hidden p-2 rounded-lg bg-amber-600 text-white" on:click={() => showMobileFilters = !showMobileFilters}>
             <SlidersHorizontal class="w-5 h-5" />
           </button>
         </div>
       </div>
 
-      <div class="hidden md:block">
-        <FilterPanel {filters} {loading} totalResults={total} on:change={handleFilterChange} on:clear={handleClearFilters} />
-      </div>
+      {#if showDesktopFilters}
+        <div transition:slide={{ duration: 300 }} class="px-4 pb-4">
+          <div class="hidden md:block">
+            <FilterPanel {filters} {loading} totalResults={total} on:change={handleFilterChange} on:clear={handleClearFilters} />
+          </div>
+          <div class="mt-4 flex justify-end">
+            <Button variant="primary" size="sm" on:click={handleClearFilters}>
+              <RotateCcw class="w-4 h-4 mr-2" />
+              Limpar Todos os Filtros
+            </Button>
+          </div>
+        </div>
+      {/if}
 
       {#if showMobileFilters}
-        <div class="md:hidden" transition:fade>
+        <div class="md:hidden px-4 pb-4" transition:slide={{ duration: 300 }}>
           <FilterPanel {filters} {loading} totalResults={total} on:change={handleFilterChange} on:clear={handleClearFilters} />
         </div>
       {/if}
