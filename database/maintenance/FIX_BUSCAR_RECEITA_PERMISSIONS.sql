@@ -80,9 +80,10 @@ BEGIN
     ORDER BY 
         v.marca_premium DESC NULLS LAST,
         CASE 
-            WHEN v.indice_refracao IN ('1.67', '1.74', '1.76') THEN 1
-            WHEN v.indice_refracao IN ('1.60', '1.61') THEN 2
-            ELSE 3
+            WHEN v.indice_refracao::TEXT IN ('1.67', '1.74') THEN 1
+            WHEN v.indice_refracao::TEXT IN ('1.59', '1.61') THEN 2
+            WHEN v.indice_refracao::TEXT = '1.56' THEN 3
+            ELSE 4
         END,
         v.preco_tabela ASC NULLS LAST
     LIMIT 100;
