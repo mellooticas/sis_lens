@@ -1,12 +1,12 @@
 -- ============================================
 -- Função buscar_lentes_por_receita 
--- Usa VIEW v_lentes_catalogo (mesmo padrão do frontend)
+-- Usa VIEW vw_lentes_catalogo (a que tem os campos corretos)
 -- ============================================
 
 -- Remove função antiga se existir
 DROP FUNCTION IF EXISTS public.buscar_lentes_por_receita(NUMERIC, NUMERIC, NUMERIC, TEXT);
 
--- Cria função usando a mesma view que o frontend usa
+-- Cria função usando vw_lentes_catalogo (view com todos os campos)
 CREATE OR REPLACE FUNCTION public.buscar_lentes_por_receita(
     p_esferico NUMERIC,
     p_cilindrico NUMERIC,
@@ -39,17 +39,17 @@ SECURITY DEFINER
 AS $$
     SELECT 
         v.id,
-        v.nome_lente::TEXT as nome_comercial,
+        v.nome_comercial,
         v.tipo_lente::TEXT,
         v.categoria::TEXT,
         v.material::TEXT,
         v.indice_refracao::TEXT,
-        v.preco_venda_sugerido as preco_tabela,
+        v.preco_tabela,
         v.marca_nome::TEXT,
         v.marca_premium,
         v.ar,
         v.blue,
-        v.fotossensivel::TEXT,
+        v.fotossensivel,
         v.uv400,
         v.esferico_min,
         v.esferico_max,
@@ -57,7 +57,7 @@ AS $$
         v.cilindrico_max,
         v.adicao_min,
         v.adicao_max
-    FROM public.v_lentes_catalogo v
+    FROM public.vw_lentes_catalogo v
     WHERE 
         -- Validação do esférico
         (v.esferico_min IS NULL OR p_esferico >= v.esferico_min)
@@ -86,7 +86,7 @@ AS $$
             WHEN v.indice_refracao::TEXT = '1.56' THEN 3
             ELSE 4
         END,
-        v.preco_venda_sugerido ASC NULLS LAST
+        v.preco_tabela ASC NULLS LAST
     LIMIT 100;
 $$;
 
