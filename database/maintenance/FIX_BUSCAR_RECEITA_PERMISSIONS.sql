@@ -1,12 +1,12 @@
 -- ============================================
--- Função buscar_lentes_por_receita usando VIEW pública
--- Resolve erro: permission denied for schema lens_catalog
+-- Função buscar_lentes_por_receita 
+-- Padrão: Igual a public.buscar_lentes (já funciona)
 -- ============================================
 
 -- Remove função antiga se existir
 DROP FUNCTION IF EXISTS public.buscar_lentes_por_receita(NUMERIC, NUMERIC, NUMERIC, TEXT);
 
--- Cria nova função usando vw_lentes_catalogo (view pública)
+-- Cria função com acesso direto ao schema (padrão buscar_lentes)
 CREATE OR REPLACE FUNCTION public.buscar_lentes_por_receita(
     p_esferico NUMERIC,
     p_cilindrico NUMERIC,
@@ -25,7 +25,7 @@ RETURNS TABLE (
     marca_premium BOOLEAN,
     ar BOOLEAN,
     blue BOOLEAN,
-    fotossensivel BOOLEAN,
+    fotossensivel TEXT,
     uv400 BOOLEAN,
     esferico_min NUMERIC,
     esferico_max NUMERIC,
@@ -33,71 +33,77 @@ RETURNS TABLE (
     cilindrico_max NUMERIC,
     adicao_min NUMERIC,
     adicao_max NUMERIC
-) AS $$
+)
+SECURITY DEFINER
+SET search_path = public, lens_catalog
+LANGUAGE plpgsql
+AS $$
 BEGIN
     RETURN QUERY
     SELECT 
-        v.id,
-        v.nome_comercial,
-        v.tipo_lente::TEXT,
-        v.categoria::TEXT,
-        v.material::TEXT,
-        v.indice_refracao::TEXT,
-        v.preco_tabela,
-        v.marca_nome,
-        v.marca_premium,
-        v.ar,
-        v.blue,
-        v.fotossensivel::TEXT,
-        v.uv400,
-        v.esferico_min,
-        v.esferico_max,
-        v.cilindrico_min,
-        v.cilindrico_max,
-        v.adicao_min,
-        v.adicao_max
-    FROM public.vw_lentes_catalogo v
+        l.id,
+        l.nome_comercial,
+        l.tipo_lente::TEXT,
+        l.categoria::TEXT,
+        l.material::TEXT,
+        l.indice_refracao::TEXT,
+        l.preco_tabela,
+        m.nome::TEXT as marca_nome,
+        m.is_premium as marca_premium,
+        l.ar,
+        l.blue,
+        l.fotossensivel::TEXT,
+        l.uv400,
+        l.esferico_min,
+        l.esferico_max,
+        l.cilindrico_min,
+        l.cilindrico_max,
+        l.adicao_min,
+        l.adicao_max
+    FROM lens_catalog.lentes l
+    LEFT JOIN lens_catalog.marcas m ON l.marca_id = m.id
     WHERE 
         -- Validação do esférico
-        (v.esferico_min IS NULL OR p_esferico >= v.esferico_min)
-        AND (v.esferico_max IS NULL OR p_esferico <= v.esferico_max)
+        (l.esferico_min IS NULL OR p_esferico >= l.esferico_min)
+        AND (l.esferico_max IS NULL OR p_esferico <= l.esferico_max)
         
         -- Validação do cilíndrico
-        AND (v.cilindrico_min IS NULL OR p_cilindrico >= v.cilindrico_min)
-        AND (v.cilindrico_max IS NULL OR p_cilindrico <= v.cilindrico_max)
+        AND (l.cilindrico_min IS NULL OR p_cilindrico >= l.cilindrico_min)
+        AND (l.cilindrico_max IS NULL OR p_cilindrico <= l.cilindrico_max)
         
         -- Validação da adição (apenas para multifocal/bifocal)
         AND (
             p_adicao IS NULL 
-            OR v.tipo_lente::TEXT = 'visao_simples'
-            OR (v.adicao_min IS NOT NULL AND p_adicao >= v.adicao_min AND p_adicao <= v.adicao_max)
+            OR l.tipo_lente::TEXT = 'visao_simples'
+            OR (l.adicao_min IS NOT NULL AND p_adicao >= l.adicao_min AND p_adicao <= l.adicao_max)
         )
         
-        -- Validação do tipo de lente (cast para comparação)
-        AND (p_tipo_lente IS NULL OR v.tipo_lente::TEXT = p_tipo_lente)
+        -- Validação do tipo de lente
+        AND (p_tipo_lente IS NULL OR l.tipo_lente::TEXT = p_tipo_lente)
+        
+        -- Apenas lentes ativas
+        AND l.status = 'ativo'
     
     -- Ordenação: premium primeiro, depois por índice, depois por preço
     ORDER BY 
-        v.marca_premium DESC NULLS LAST,
+        m.is_premium DESC NULLS LAST,
         CASE 
-            WHEN v.indice_refracao::TEXT IN ('1.67', '1.74') THEN 1
-            WHEN v.indice_refracao::TEXT IN ('1.59', '1.61') THEN 2
-            WHEN v.indice_refracao::TEXT = '1.56' THEN 3
+            WHEN l.indice_refracao::TEXT IN ('1.67', '1.74', '1.90') THEN 1
+            WHEN l.indice_refracao::TEXT IN ('1.59', '1.61') THEN 2
+            WHEN l.indice_refracao::TEXT = '1.56' THEN 3
             ELSE 4
         END,
-        v.preco_tabela ASC NULLS LAST
+        l.preco_tabela ASC NULLS LAST
     LIMIT 100;
 END;
-$$ LANGUAGE plpgsql SECURITY DEFINER;
+$$;
 
 -- Garante permissões para usuários anônimos e autenticados
 GRANT EXECUTE ON FUNCTION public.buscar_lentes_por_receita TO anon, authenticated;
 
 -- Comentário da função
 COMMENT ON FUNCTION public.buscar_lentes_por_receita IS 
-'Busca lentes compatíveis com uma receita oftalmológica. 
-Usa a view pública vw_lentes_catalogo para evitar problemas de permissão.
-Retorna até 100 resultados ordenados por qualidade e preço.';
+'Busca lentes compatíveis com receita oftalmológica - IMPLEMENTAÇÃO DIRETA (padrão buscar_lentes)';
 
 -- ============================================
 -- TESTE DA FUNÇÃO
