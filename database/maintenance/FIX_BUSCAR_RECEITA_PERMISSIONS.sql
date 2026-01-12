@@ -1,62 +1,23 @@
 -- ============================================
 -- Função buscar_lentes_por_receita 
--- Usa VIEW vw_lentes_catalogo (a que tem os campos corretos)
+-- Retorna TODOS os campos compatíveis com VLenteCatalogo
 -- ============================================
 
 -- Remove função antiga se existir
 DROP FUNCTION IF EXISTS public.buscar_lentes_por_receita(NUMERIC, NUMERIC, NUMERIC, TEXT);
 
--- Cria função usando vw_lentes_catalogo (view com todos os campos)
+-- Cria função retornando campos compatíveis com frontend
 CREATE OR REPLACE FUNCTION public.buscar_lentes_por_receita(
     p_esferico NUMERIC,
     p_cilindrico NUMERIC,
     p_adicao NUMERIC DEFAULT NULL,
     p_tipo_lente TEXT DEFAULT NULL
 )
-RETURNS TABLE (
-    id UUID,
-    nome_comercial TEXT,
-    tipo_lente TEXT,
-    categoria TEXT,
-    material TEXT,
-    indice_refracao TEXT,
-    preco_tabela NUMERIC,
-    marca_nome TEXT,
-    marca_premium BOOLEAN,
-    ar BOOLEAN,
-    blue BOOLEAN,
-    fotossensivel TEXT,
-    uv400 BOOLEAN,
-    esferico_min NUMERIC,
-    esferico_max NUMERIC,
-    cilindrico_min NUMERIC,
-    cilindrico_max NUMERIC,
-    adicao_min NUMERIC,
-    adicao_max NUMERIC
-)
+RETURNS SETOF public.vw_lentes_catalogo
 LANGUAGE SQL
 SECURITY DEFINER
 AS $$
-    SELECT 
-        v.id,
-        v.nome_comercial,
-        v.tipo_lente::TEXT,
-        v.categoria::TEXT,
-        v.material::TEXT,
-        v.indice_refracao::TEXT,
-        v.preco_tabela,
-        v.marca_nome::TEXT,
-        v.marca_premium,
-        v.ar,
-        v.blue,
-        v.fotossensivel,
-        v.uv400,
-        v.esferico_min,
-        v.esferico_max,
-        v.cilindrico_min,
-        v.cilindrico_max,
-        v.adicao_min,
-        v.adicao_max
+    SELECT *
     FROM public.vw_lentes_catalogo v
     WHERE 
         -- Validação do esférico
@@ -95,7 +56,7 @@ GRANT EXECUTE ON FUNCTION public.buscar_lentes_por_receita TO anon, authenticate
 
 -- Comentário da função
 COMMENT ON FUNCTION public.buscar_lentes_por_receita IS 
-'Busca lentes compatíveis com receita oftalmológica - IMPLEMENTAÇÃO DIRETA (padrão buscar_lentes)';
+'Busca lentes compatíveis com receita oftalmológica - Retorna TODOS os campos da view vw_lentes_catalogo';
 
 -- ============================================
 -- TESTE DA FUNÇÃO
@@ -105,11 +66,29 @@ COMMENT ON FUNCTION public.buscar_lentes_por_receita IS
 SELECT COUNT(*) as total_visao_simples
 FROM public.buscar_lentes_por_receita(-2.00, -0.50, NULL, 'visao_simples');
 
+
+| total_visao_simples |
+| ------------------- |
+| 100                 |
+
 -- Teste 2: Multifocal com adição
 SELECT COUNT(*) as total_multifocal
 FROM public.buscar_lentes_por_receita(-2.00, -0.50, 2.00, 'multifocal');
+
+| total_multifocal |
+| ---------------- |
+| 100              |
 
 -- Teste 3: Ver algumas lentes
 SELECT nome_comercial, tipo_lente, material, indice_refracao, preco_tabela
 FROM public.buscar_lentes_por_receita(-2.00, -0.50, NULL, 'visao_simples')
 LIMIT 5;
+
+
+| nome_comercial | tipo_lente    | material | indice_refracao | preco_tabela |
+| -------------- | ------------- | -------- | --------------- | ------------ |
+| null           | visao_simples | CR39     | 1.74            | 0.00         |
+| null           | visao_simples | CR39     | 1.67            | 0.00         |
+| null           | visao_simples | CR39     | 1.67            | 0.00         |
+| null           | visao_simples | CR39     | 1.67            | 0.00         |
+| null           | visao_simples | CR39     | 1.74            | 0.00         |
