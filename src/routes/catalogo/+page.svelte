@@ -9,7 +9,8 @@
   import type { LenteCatalogo } from '$lib/types/database-views';
   
   // Ícones
-  import { LayoutGrid, List, SlidersHorizontal, Search, ChevronDown } from 'lucide-svelte';
+  import { LayoutGrid, List, SlidersHorizontal, Search, ChevronDown, RotateCcw } from 'lucide-svelte';
+  import { slide } from 'svelte/transition';
 
   // Layout Components
   import Container from "$lib/components/layout/Container.svelte";
@@ -23,6 +24,7 @@
   import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
   import LenteCard from "$lib/components/catalogo/LenteCard.svelte";
   import StatsCard from "$lib/components/cards/StatsCard.svelte";
+  import Pagination from "$lib/components/ui/Pagination.svelte";
 
   // State
   let lentes: LenteCatalogo[] = [];
@@ -208,6 +210,12 @@
               on:change={handleFilterChange}
               on:clear={handleClearFilters}
             />
+            <div class="mt-4 flex justify-end">
+              <Button variant="outline" size="sm" on:click={handleClearFilters}>
+                <RotateCcw class="w-4 h-4 mr-2" />
+                Limpar Todos os Filtros
+              </Button>
+            </div>
           </div>
         {/if}
       </div>
@@ -309,54 +317,14 @@
             {/each}
           </div>
 
-          <!-- Paginação Premium -->
-          {#if total > itensPorPagina}
-            <div class="glass-panel rounded-xl p-6 mt-8">
-              <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
-                <div class="text-sm text-neutral-600 dark:text-neutral-400">
-                  Mostrando <span class="font-semibold text-neutral-900 dark:text-neutral-100">{((paginaAtual - 1) * itensPorPagina) + 1}</span> a <span class="font-semibold text-neutral-900 dark:text-neutral-100">{Math.min(paginaAtual * itensPorPagina, total)}</span> de <span class="font-semibold text-neutral-900 dark:text-neutral-100">{total}</span> lentes
-                </div>
-                <div class="flex items-center gap-2">
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    disabled={paginaAtual === 1}
-                    on:click={() => { paginaAtual--; carregarLentes(); }}
-                  >
-                    ← Anterior
-                  </Button>
-                  <div class="flex items-center gap-1">
-                    {#each Array(Math.min(5, Math.ceil(total / itensPorPagina))) as _, i}
-                      {@const pageNum = i + 1}
-                      <button
-                        class="px-3 py-1.5 rounded-lg text-sm font-medium transition-all"
-                        class:bg-brand-blue-600={pageNum === paginaAtual}
-                        class:text-white={pageNum === paginaAtual}
-                        class:hover:bg-brand-blue-600={pageNum === paginaAtual}
-                        class:bg-neutral-100={pageNum !== paginaAtual}
-                        class:dark:bg-neutral-800={pageNum !== paginaAtual}
-                        class:text-neutral-700={pageNum !== paginaAtual}
-                        class:dark:text-neutral-300={pageNum !== paginaAtual}
-                        class:hover:bg-neutral-200={pageNum !== paginaAtual}
-                        class:dark:hover:bg-neutral-700={pageNum !== paginaAtual}
-                        on:click={() => { paginaAtual = pageNum; carregarLentes(); }}
-                      >
-                        {pageNum}
-                      </button>
-                    {/each}
-                  </div>
-                  <Button 
-                    variant="outline" 
-                    size="sm"
-                    disabled={paginaAtual >= Math.ceil(total / itensPorPagina)}
-                    on:click={() => { paginaAtual++; carregarLentes(); }}
-                  >
-                    Próxima →
-                  </Button>
-                </div>
-              </div>
-            </div>
-          {/if}
+          <!-- Paginação -->
+          <Pagination 
+            currentPage={paginaAtual}
+            totalPages={Math.ceil(total / itensPorPagina)}
+            totalItems={total}
+            itemsPerPage={itensPorPagina}
+            on:change={(e) => { paginaAtual = e.detail; carregarLentes(); }}
+          />
         {/if}
       </div>
 

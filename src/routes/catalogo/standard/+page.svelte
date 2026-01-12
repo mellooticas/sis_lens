@@ -22,6 +22,7 @@
   import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
   import GrupoCanonicoCard from "$lib/components/catalogo/GrupoCanonicoCard.svelte";
   import StatsCard from "$lib/components/cards/StatsCard.svelte";
+  import Pagination from "$lib/components/ui/Pagination.svelte";
 
   // State
   let grupos: VGruposCanonico[] = [];
@@ -153,12 +154,12 @@
       </div>
 
       <div class="hidden md:block">
-        <FilterPanel bind:filters {loading} totalResults={total} on:change={handleFilterChange} on:clear={handleClearFilters} />
+        <FilterPanel {filters} {loading} totalResults={total} on:change={handleFilterChange} on:clear={handleClearFilters} />
       </div>
 
       {#if showMobileFilters}
         <div class="md:hidden" transition:fade>
-          <FilterPanel bind:filters {loading} totalResults={total} on:change={handleFilterChange} on:clear={handleClearFilters} />
+          <FilterPanel {filters} {loading} totalResults={total} on:change={handleFilterChange} on:clear={handleClearFilters} />
         </div>
       {/if}
     </div>
@@ -190,6 +191,17 @@
           {#each grupos as grupo (grupo.id)}
             <div in:fade><GrupoCanonicoCard {grupo} /></div>
           {/each}
+        </div>
+        
+        <!-- Paginação -->
+        <div class="mt-6">
+          <Pagination 
+            currentPage={paginaAtual}
+            totalPages={totalPaginas}
+            totalItems={total}
+            itemsPerPage={itensPorPagina}
+            on:change={(e) => { paginaAtual = e.detail; carregarGrupos(); }}
+          />
         </div>
       {/if}
     </div>
