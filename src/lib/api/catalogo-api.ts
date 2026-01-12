@@ -979,6 +979,161 @@ export class CatalogoAPI {
     }
   }
 
+  /**
+   * Obter estatísticas de tratamentos e tecnologias
+   */
+  static async obterEstatisticasTratamentos(): Promise<ApiResponse<{
+    total_com_ar: number;
+    total_com_blue: number;
+    total_fotossensiveis: number;
+    total_polarizados: number;
+    total_free_form: number;
+    total_digitais: number;
+  }>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_lentes_catalogo')
+        .select('tratamento_antirreflexo, tratamento_blue_light, tratamento_fotossensiveis, tratamento_polarizado, free_form, digital');
+
+      if (error) throw error;
+
+      const stats = {
+        total_com_ar: (data || []).filter(item => item.tratamento_antirreflexo === true).length,
+        total_com_blue: (data || []).filter(item => item.tratamento_blue_light === true).length,
+        total_fotossensiveis: (data || []).filter(item => item.tratamento_fotossensiveis && item.tratamento_fotossensiveis !== 'nenhum').length,
+        total_polarizados: (data || []).filter(item => item.tratamento_polarizado === true).length,
+        total_free_form: (data || []).filter(item => item.free_form === true).length,
+        total_digitais: (data || []).filter(item => item.digital === true).length
+      };
+
+      return {
+        success: true,
+        data: stats
+      };
+    } catch (error) {
+      console.error('Erro ao obter estatísticas de tratamentos:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  /**
+   * Obter estatísticas por tipo de lente
+   */
+  static async obterEstatisticasTipos(): Promise<ApiResponse<{
+    total_visao_simples: number;
+    total_multifocal: number;
+    total_bifocal: number;
+  }>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_lentes_catalogo')
+        .select('tipo_lente');
+
+      if (error) throw error;
+
+      const stats = {
+        total_visao_simples: (data || []).filter(item => item.tipo_lente === 'visao_simples').length,
+        total_multifocal: (data || []).filter(item => item.tipo_lente === 'multifocal').length,
+        total_bifocal: (data || []).filter(item => item.tipo_lente === 'bifocal').length
+      };
+
+      return {
+        success: true,
+        data: stats
+      };
+    } catch (error) {
+      console.error('Erro ao obter estatísticas de tipos:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  /**
+   * Obter estatísticas por material
+   */
+  static async obterEstatisticasMateriais(): Promise<ApiResponse<{
+    total_cr39: number;
+    total_policarbonato: number;
+    total_trivex: number;
+    total_high_index: number;
+  }>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_lentes_catalogo')
+        .select('material');
+
+      if (error) throw error;
+
+      const stats = {
+        total_cr39: (data || []).filter(item => item.material === 'cr39').length,
+        total_policarbonato: (data || []).filter(item => item.material === 'policarbonato').length,
+        total_trivex: (data || []).filter(item => item.material === 'trivex').length,
+        total_high_index: (data || []).filter(item => item.material === 'high_index').length
+      };
+
+      return {
+        success: true,
+        data: stats
+      };
+    } catch (error) {
+      console.error('Erro ao obter estatísticas de materiais:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
+  /**
+   * Obter faixas de preço
+   */
+  static async obterFaixasPreco(): Promise<ApiResponse<{
+    preco_minimo: number;
+    preco_medio: number;
+    preco_maximo: number;
+  }>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_lentes_catalogo')
+        .select('preco_venda_sugerido');
+
+      if (error) throw error;
+
+      const precos = (data || [])
+        .map(item => item.preco_venda_sugerido)
+        .filter(preco => preco != null && preco > 0);
+
+      if (precos.length === 0) {
+        return {
+          success: true,
+          data: { preco_minimo: 0, preco_medio: 0, preco_maximo: 0 }
+        };
+      }
+
+      const stats = {
+        preco_minimo: Math.min(...precos),
+        preco_maximo: Math.max(...precos),
+        preco_medio: precos.reduce((a, b) => a + b, 0) / precos.length
+      };
+
+      return {
+        success: true,
+        data: stats
+      };
+    } catch (error) {
+      console.error('Erro ao obter faixas de preço:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
   // ============================================================================
   // UTILITÁRIOS
   // ============================================================================

@@ -33,6 +33,35 @@
   let topPopulares: any[] = [];
   let fornecedoresAtivos = 0;
   let loadingExtras = true;
+  
+  // Estatísticas detalhadas
+  let statsTratamentos = {
+    total_com_ar: 0,
+    total_com_blue: 0,
+    total_fotossensiveis: 0,
+    total_polarizados: 0,
+    total_free_form: 0,
+    total_digitais: 0
+  };
+  
+  let statsTipos = {
+    total_visao_simples: 0,
+    total_multifocal: 0,
+    total_bifocal: 0
+  };
+  
+  let statsMateriais = {
+    total_cr39: 0,
+    total_policarbonato: 0,
+    total_trivex: 0,
+    total_high_index: 0
+  };
+  
+  let statsPrecos = {
+    preco_minimo: 0,
+    preco_medio: 0,
+    preco_maximo: 0
+  };
 
   // Estado local
   let currentTime = new Date();
@@ -54,10 +83,22 @@
     loadingExtras = true;
     try {
       // Buscar top 5 mais caros e populares
-      const [resCaros, resPopulares, resFornecedores] = await Promise.all([
+      const [
+        resCaros, 
+        resPopulares, 
+        resFornecedores, 
+        resTratamentos,
+        resTipos,
+        resMateriais,
+        resPrecos
+      ] = await Promise.all([
         CatalogoAPI.buscarTopCaros(5),
         CatalogoAPI.buscarTopPopulares(5),
-        FornecedoresAPI.buscarFornecedores()
+        FornecedoresAPI.buscarFornecedores(),
+        CatalogoAPI.obterEstatisticasTratamentos(),
+        CatalogoAPI.obterEstatisticasTipos(),
+        CatalogoAPI.obterEstatisticasMateriais(),
+        CatalogoAPI.obterFaixasPreco()
       ]);
       
       if (resCaros.success && resCaros.data) topCaros = resCaros.data;
@@ -65,6 +106,10 @@
       if (resFornecedores.success && resFornecedores.data) {
         fornecedoresAtivos = resFornecedores.data.length;
       }
+      if (resTratamentos.success && resTratamentos.data) statsTratamentos = resTratamentos.data;
+      if (resTipos.success && resTipos.data) statsTipos = resTipos.data;
+      if (resMateriais.success && resMateriais.data) statsMateriais = resMateriais.data;
+      if (resPrecos.success && resPrecos.data) statsPrecos = resPrecos.data;
     } catch (err) {
       console.error('Erro ao carregar dados extras:', err);
     } finally {
@@ -231,21 +276,21 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <StatsCard
             title="Visão Simples"
-            value={formatNumber(stats?.total_visao_simples || 0)}
+            value={formatNumber(statsTipos.total_visao_simples)}
             icon="👓"
             color="blue"
           />
 
           <StatsCard
             title="Multifocais"
-            value={formatNumber(stats?.total_multifocal || 0)}
+            value={formatNumber(statsTipos.total_multifocal)}
             icon="🔄"
             color="green"
           />
 
           <StatsCard
             title="Bifocais"
-            value={formatNumber(stats?.total_bifocal || 0)}
+            value={formatNumber(statsTipos.total_bifocal)}
             icon="👁️"
             color="orange"
           />
@@ -262,28 +307,28 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
           <StatsCard
             title="CR-39"
-            value={formatNumber(stats?.total_cr39 || 0)}
+            value={formatNumber(statsMateriais.total_cr39)}
             icon="🔵"
             color="blue"
           />
 
           <StatsCard
             title="Policarbonato"
-            value={formatNumber(stats?.total_policarbonato || 0)}
+            value={formatNumber(statsMateriais.total_policarbonato)}
             icon="💪"
             color="green"
           />
 
           <StatsCard
             title="Trivex"
-            value={formatNumber(stats?.total_trivex || 0)}
+            value={formatNumber(statsMateriais.total_trivex)}
             icon="⚡"
             color="purple"
           />
 
           <StatsCard
             title="High Index"
-            value={formatNumber(stats?.total_high_index || 0)}
+            value={formatNumber(statsMateriais.total_high_index)}
             icon="✨"
             color="gold"
           />
@@ -300,28 +345,28 @@
         <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mt-6">
           <StatsCard
             title="Anti-Reflexo"
-            value={formatNumber(stats?.total_com_ar || 0)}
+            value={formatNumber(statsTratamentos.total_com_ar)}
             icon="💎"
             color="blue"
           />
 
           <StatsCard
             title="Blue Light"
-            value={formatNumber(stats?.total_com_blue || 0)}
+            value={formatNumber(statsTratamentos.total_com_blue)}
             icon="🔵"
             color="cyan"
           />
 
           <StatsCard
             title="Fotossensíveis"
-            value={formatNumber(stats?.total_fotossensiveis || 0)}
+            value={formatNumber(statsTratamentos.total_fotossensiveis)}
             icon="☀️"
             color="orange"
           />
 
           <StatsCard
             title="Polarizadas"
-            value={formatNumber(stats?.total_polarizados || 0)}
+            value={formatNumber(statsTratamentos.total_polarizados)}
             icon="🕶️"
             color="purple"
           />
@@ -338,14 +383,14 @@
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <StatsCard
             title="Free-Form"
-            value={formatNumber(stats?.total_free_form || 0)}
+            value={formatNumber(statsTratamentos.total_free_form)}
             icon="🔧"
             color="blue"
           />
 
           <StatsCard
             title="Digitais"
-            value={formatNumber(stats?.total_digitais || 0)}
+            value={formatNumber(statsTratamentos.total_digitais)}
             icon="💻"
             color="green"
           />
@@ -362,21 +407,21 @@
         <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mt-6">
           <StatsCard
             title="Preço Mínimo"
-            value={stats?.preco_minimo ? `R$ ${stats.preco_minimo.toFixed(2)}` : '-'}
+            value={formatarPreco(statsPrecos.preco_minimo)}
             icon="⬇️"
             color="green"
           />
 
           <StatsCard
             title="Preço Médio"
-            value={stats?.preco_medio ? `R$ ${stats.preco_medio.toFixed(2)}` : '-'}
+            value={formatarPreco(statsPrecos.preco_medio)}
             icon="📊"
             color="blue"
           />
 
           <StatsCard
             title="Preço Máximo"
-            value={stats?.preco_maximo ? `R$ ${stats.preco_maximo.toFixed(2)}` : '-'}
+            value={formatarPreco(statsPrecos.preco_maximo)}
             icon="⬆️"
             color="orange"
           />
