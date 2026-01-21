@@ -87,6 +87,7 @@ export class CatalogoAPI {
 
       // Filtros de tratamentos (nomes corretos da view v_lentes)
       if (filtros.tratamentos) {
+        console.log('🔍 DEBUG - Filtros de tratamentos:', filtros.tratamentos);
         if (filtros.tratamentos.ar === true) query = query.eq('tem_ar', true);
         if (filtros.tratamentos.blue === true) query = query.eq('tem_blue', true);
         if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_foto', 'nenhum');
