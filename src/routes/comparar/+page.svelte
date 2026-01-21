@@ -150,14 +150,14 @@
                       </td>
                       <td class="p-4">
                         <p class="text-sm font-mono">{opcao.sku}</p>
-                        <p class="text-xs text-neutral-600 dark:text-neutral-400">{opcao.nome_comercial}</p>
+                        <p class="text-xs text-neutral-600 dark:text-neutral-400">{opcao.nome_lente}</p>
                       </td>
                       <td class="p-4 text-right">
                         <p class="font-medium text-green-600 dark:text-green-400">
-                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(opcao.preco_tabela || 0)}
+                          {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(opcao.preco_venda_sugerido || 0)}
                         </p>
                         <p class="text-xs text-neutral-600 dark:text-neutral-400">
-                          Custo: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(opcao.custo_base || 0)}
+                          Custo: {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(opcao.preco_custo || 0)}
                         </p>
                       </td>
                     </tr>

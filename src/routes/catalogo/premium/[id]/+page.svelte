@@ -59,9 +59,9 @@
   }, {} as Record<string, DetalhePremium[]>);
 
   $: marcas = Object.keys(lentesAgrupadas).sort();
-  $: precoMinimo = Math.min(...lentes.map(l => l.preco_tabela));
-  $: precoMaximo = Math.max(...lentes.map(l => l.preco_tabela));
-  $: precoMedio = lentes.reduce((sum, l) => sum + l.preco_tabela, 0) / lentes.length;
+  $: precoMinimo = Math.min(...lentes.map(l => l.preco_venda_sugerido));
+  $: precoMaximo = Math.max(...lentes.map(l => l.preco_venda_sugerido));
+  $: precoMedio = lentes.reduce((sum, l) => sum + l.preco_venda_sugerido, 0) / lentes.length;
 
   function formatarPreco(valor: number): string {
     return `R$ ${valor.toFixed(2)}`;
@@ -192,7 +192,7 @@
                 <div class="bg-slate-50 rounded-lg p-4 hover:shadow-md transition-shadow">
                   <!-- Nome -->
                   <h4 class="font-semibold text-slate-900 mb-2 leading-tight">
-                    {lente.nome_comercial}
+                    {lente.nome_lente}
                   </h4>
 
                   {#if lente.linha_produto}
@@ -201,12 +201,12 @@
 
                   <!-- Tratamentos -->
                   <div class="flex flex-wrap gap-1 mb-3">
-                    {#if lente.ar}<Badge variant="blue" size="sm">AR</Badge>{/if}
-                    {#if lente.blue}<Badge variant="cyan" size="sm">Blue</Badge>{/if}
-                    {#if lente.fotossensivel !== 'nenhum'}<Badge variant="orange" size="sm">Foto</Badge>{/if}
-                    {#if lente.polarizado}<Badge variant="purple" size="sm">Polar</Badge>{/if}
-                    {#if lente.digital}<Badge variant="green" size="sm">Digital</Badge>{/if}
-                    {#if lente.free_form}<Badge variant="gold" size="sm">Free-Form</Badge>{/if}
+                    {#if lente.tem_ar}<Badge variant="blue" size="sm">AR</Badge>{/if}
+                    {#if lente.tem_blue}<Badge variant="cyan" size="sm">Blue</Badge>{/if}
+                    {#if lente.tratamento_foto !== 'nenhum'}<Badge variant="orange" size="sm">Foto</Badge>{/if}
+                    {#if lente.tem_polarizado}<Badge variant="purple" size="sm">Polar</Badge>{/if}
+                    {#if lente.tem_digital}<Badge variant="green" size="sm">Digital</Badge>{/if}
+                    {#if lente.tem_free_form}<Badge variant="gold" size="sm">Free-Form</Badge>{/if}
                   </div>
 
                   <!-- Especificações -->
@@ -236,7 +236,7 @@
                     <div class="flex items-center justify-between mb-2">
                       <div>
                         <div class="text-2xl font-bold text-indigo-700">
-                          {formatarPreco(lente.preco_tabela)}
+                          {formatarPreco(lente.preco_venda_sugerido)}
                         </div>
                         {#if lente.preco_fabricante}
                           <div class="text-xs text-slate-500">

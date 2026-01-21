@@ -309,7 +309,7 @@
                 <LenteCard 
                   lente={{
                     ...lente,
-                    preco: lente.preco_tabela // Normalização de preço
+                    preco: lente.preco_venda_sugerido // Normalização de preço
                   }}
                   compact={viewMode === 'list'}
                 />

@@ -59,7 +59,7 @@
 </script>
 
 <svelte:head>
-  <title>{lente?.nome_comercial || 'Detalhes da Lente'} - SIS Lens</title>
+  <title>{lente?.nome_lente || 'Detalhes da Lente'} - SIS Lens</title>
 </svelte:head>
 
 <Container maxWidth="xl" padding="md">
@@ -219,35 +219,35 @@
     <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.ar ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tem_ar ? '✅' : '❌'}</span>
           <span class="text-sm">Anti-Reflexo</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.antirrisco ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tem_antirrisco ? '✅' : '❌'}</span>
           <span class="text-sm">Anti-Risco</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.hidrofobico ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tratamento_hidrofobico ? '✅' : '❌'}</span>
           <span class="text-sm">Hidrofóbico</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.antiembaçante ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tratamento_antiembacante ? '✅' : '❌'}</span>
           <span class="text-sm">Anti-Embaçante</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.blue ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tem_blue ? '✅' : '❌'}</span>
           <span class="text-sm">Blue Light</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.uv400 ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tem_uv ? '✅' : '❌'}</span>
           <span class="text-sm">UV400</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.fotossensivel !== 'nenhum' ? '✅' : '❌'}</span>
-          <span class="text-sm">Fotossensível ({lente.fotossensivel})</span>
+          <span class="text-2xl">{lente.tratamento_foto !== 'nenhum' ? '✅' : '❌'}</span>
+          <span class="text-sm">Fotossensível ({lente.tratamento_foto})</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.polarizado ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tem_polarizado ? '✅' : '❌'}</span>
           <span class="text-sm">Polarizado</span>
         </div>
       </div>
@@ -259,11 +259,11 @@
     <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.digital ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tem_digital ? '✅' : '❌'}</span>
           <span class="text-sm">Digital</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.free_form ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tem_free_form ? '✅' : '❌'}</span>
           <span class="text-sm">Free-Form</span>
         </div>
         <div class="flex items-center gap-2">
