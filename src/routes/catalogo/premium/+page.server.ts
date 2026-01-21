@@ -40,10 +40,10 @@ export const load: PageServerLoad = async ({ url }) => {
 
     // 2. Buscar marcas premium
     const { data: marcas } = await supabase
-      .from('vw_marcas')
-      .select('id, nome, produtos_premium')
-      .eq('tenant_id', TENANT_ID)
-      .gt('produtos_premium', 0)
+      .from('lens_catalog.marcas')
+      .select('id, nome')
+      .eq('ativo', true)
+      .eq('is_premium', true)
       .order('nome');
 
     // 3. Buscar tipos de lente disponíveis

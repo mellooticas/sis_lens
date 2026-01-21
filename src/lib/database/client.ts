@@ -65,12 +65,12 @@ export class DatabaseClient {
   ): Promise<DatabaseResponse<any>> {
     try {
       let query = supabase
-        .from('lens_catalog.lentes')
-        .select('familia, design, material, indice_refracao, tratamentos, categoria', { count: 'exact' });
+        .from('v_lentes')
+        .select('*', { count: 'exact' });
 
       // Aplicar filtros
       if (filtros.marca?.length) {
-        query = query.in('marca', filtros.marca);
+        query = query.in('marca_nome', filtros.marca);
       }
       if (filtros.categoria?.length) {
         query = query.in('categoria', filtros.categoria);
@@ -84,7 +84,9 @@ export class DatabaseClient {
       if (filtros.indice_max) {
         query = query.lte('indice_refracao', filtros.indice_max);
       }
-      // Removido filtro 'disponivel' pois não existe na view vw_lentes_catalogo
+      if (filtros.disponivel !== undefined) {
+        query = query.eq('disponivel', filtros.disponivel);
+      }
       if (filtros.status?.length) {
         query = query.in('status', filtros.status);
       }
@@ -93,7 +95,7 @@ export class DatabaseClient {
       const start = (page - 1) * limit;
       query = query
         .range(start, start + limit - 1)
-        .order('nome_comercial', { ascending: true });
+        .order('nome_lente', { ascending: true });
 
       const { data, error, count } = await query;
       if (error) throw error;
@@ -120,7 +122,7 @@ export class DatabaseClient {
   static async buscarLentePorId(id: string): Promise<SingleDatabaseResponse<any>> {
     try {
       const { data, error } = await supabase
-        .from('vw_lentes_catalogo')
+        .from('v_lentes')
         .select('*')
         .eq('id', id)
         .single();

@@ -63,17 +63,14 @@ export class LentesService {
   static async listarLentes(filtros: FiltrosLentes = {}, page = 1, limit = 20) {
     try {
       let query = supabase
-        .from('vw_lentes_catalogo')
+        .from('v_lentes')
         .select('*', { count: 'exact' });
-
-      // Aplicar filtros básicos
-      // Removido filtro 'disponivel' pois não existe na view vw_lentes_catalogo
 
       // Paginação
       const start = (page - 1) * limit;
       query = query
         .range(start, start + limit - 1)
-        .order('sku_fantasia', { ascending: true });
+        .order('nome_lente', { ascending: true });
 
       const { data, error, count } = await query;
 
@@ -103,7 +100,7 @@ export class LentesService {
   static async buscarLentePorId(id: string) {
     try {
       const { data, error } = await supabase
-        .from('vw_lentes_catalogo')
+        .from('v_lentes')
         .select('*')
         .eq('id', id)
         .single();

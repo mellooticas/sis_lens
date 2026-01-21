@@ -1,17 +1,15 @@
 /**
  * Hook para buscar lentes do catálogo
- * Usa a view vw_buscar_lentes do banco de dados
+ * Usa a view consolidada v_lentes do banco de dados
  */
 
 import { writable, derived, get } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
-import type {
-  VwBuscarLentes,
-  BuscarLentesParams
-} from '$lib/types/views';
+import type { VLente } from '$lib/types/database-views';
+import type { BuscarLentesParams } from '$lib/api/views-client';
 
 interface BuscarLentesState {
-  lentes: VwBuscarLentes[];
+  lentes: VLente[];
   loading: boolean;
   error: string | null;
   total: number;

@@ -39,14 +39,36 @@ dados: LenteResult[];
 erro?: string;
 }> {
 try {
-const { data, error } = await supabase.rpc('buscar_lentes', {
-p_query: params.query,
-p_categoria: params.categoria || null,
-p_material: params.material || null,
-p_indice_refracao: params.indice_refracao || null,
-p_tipo_lente: params.tipo_lente || null,
-p_limite: params.limite || 10
-});
+let query = supabase
+.from('v_lentes')
+.select('*');
+
+// Busca por texto usando search_text
+if (params.query) {
+query = query.ilike('search_text', `%${params.query}%`);
+}
+
+// Filtros adicionais
+if (params.categoria) {
+query = query.eq('categoria', params.categoria);
+}
+
+if (params.material) {
+query = query.eq('material', params.material);
+}
+
+if (params.indice_refracao) {
+query = query.eq('indice_refracao', params.indice_refracao.toString());
+}
+
+if (params.tipo_lente) {
+query = query.eq('tipo_lente', params.tipo_lente);
+}
+
+// Limite de resultados
+query = query.limit(params.limite || 10);
+
+const { data, error } = await query;
 
 if (error) {
 console.error('Erro ao buscar lentes:', error);
@@ -81,7 +103,7 @@ erro?: string;
 }> {
 try {
 const { data, error } = await supabase
-.from('vw_lentes_catalogo')
+.from('v_lentes')
 .select('*')
 .eq('id', lenteId)
 .single();

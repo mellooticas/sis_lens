@@ -5,11 +5,18 @@
 
 import { writable, get } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
-import type { VwMarcas } from '$lib/types/views';
+
+interface Marca {
+  id: string;
+  nome: string;
+  slug: string;
+  is_premium: boolean;
+  ativo: boolean;
+}
 
 interface MarcasState {
-  marcas: VwMarcas[];
-  marcasPremium: VwMarcas[];
+  marcas: Marca[];
+  marcasPremium: Marca[];
   loading: boolean;
   error: string | null;
 }
@@ -52,7 +59,7 @@ export function useMarcas() {
   /**
    * Obter marca por ID
    */
-  function obterMarcaPorId(marcaId: string): VwMarcas | undefined {
+  function obterMarcaPorId(marcaId: string): Marca | undefined {
     const currentState = get(state);
     return currentState.marcas.find(m => m.id === marcaId);
   }

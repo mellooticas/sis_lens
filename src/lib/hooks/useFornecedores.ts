@@ -5,10 +5,19 @@
 
 import { writable, get } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
-import type { VwFornecedores } from '$lib/types/views';
+
+interface Fornecedor {
+  id: string;
+  nome: string;
+  razao_social: string | null;
+  cnpj: string | null;
+  prazo_visao_simples: number | null;
+  prazo_multifocal: number | null;
+  ativo: boolean;
+}
 
 interface FornecedoresState {
-  fornecedores: VwFornecedores[];
+  fornecedores: Fornecedor[];
   loading: boolean;
   error: string | null;
 }
@@ -46,7 +55,7 @@ export function useFornecedores() {
   /**
    * Obter fornecedor por ID
    */
-  function obterFornecedorPorId(fornecedorId: string): VwFornecedores | undefined {
+  function obterFornecedorPorId(fornecedorId: string): Fornecedor | undefined {
     const currentState = get(state);
     return currentState.fornecedores.find(f => f.id === fornecedorId);
   }

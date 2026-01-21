@@ -32,8 +32,8 @@ export class NovaApiClient {
   // ============================================================================
   
   /**
-   * Buscar lentes usando a view principal vw_buscar_lentes
-   * Com agrupamento por canônicas e multi-lab
+   * Buscar lentes usando a view consolidada v_lentes
+   * Com agrupamento por grupos canônicos e suporte a múltiplos fornecedores
    */
   static async buscarLentes(
     tenantId: string,
@@ -88,12 +88,12 @@ export class NovaApiClient {
   ): Promise<ApiResponse<VwBuscarLentes[]>> {
     try {
       let query = supabase
-        .from('vw_buscar_lentes')
+        .from('v_lentes')
         .select('*')
         .eq('tenant_id', tenantId);
 
       if (filtros.tipo) {
-        query = query.eq('tipo', filtros.tipo);
+        query = query.eq('tipo_lente', filtros.tipo);
       }
       if (filtros.material) {
         query = query.eq('material', filtros.material);
@@ -102,15 +102,15 @@ export class NovaApiClient {
         query = query.eq('marca_id', filtros.marca_id);
       }
       if (filtros.laboratorio_id) {
-        query = query.eq('laboratorio_id', filtros.laboratorio_id);
+        query = query.eq('fornecedor_id', filtros.laboratorio_id);
       }
       if (filtros.apenas_premium) {
-        query = query.eq('tipo', 'PREMIUM');
+        query = query.eq('is_premium', true);
       }
 
       query = query
         .limit(filtros.limite || 50)
-        .order('nome_produto');
+        .order('nome_lente');
 
       const { data, error } = await query;
       if (error) throw error;

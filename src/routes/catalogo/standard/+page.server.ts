@@ -1,6 +1,6 @@
 /**
- * 📚 Catálogo de Lentes - Server Load (NOVA ESTRUTURA)
- * Usa vw_buscar_lentes com agrupamento por canônicas
+ * 📚 Catálogo de Lentes - Server Load
+ * Usa view consolidada v_lentes com agrupamento por grupos canônicos (v_grupos_canonicos)
  */
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabase';
@@ -24,11 +24,10 @@ export const load: PageServerLoad = async ({ url }) => {
       busca, tipo, tipo_lente, material, marca_id, laboratorio_id, pagina
     });
 
-    // 1. Buscar lentes usando a nova view vw_buscar_lentes
+    // 1. Buscar lentes usando a view consolidada v_lentes
     let query = supabase
-      .from('vw_buscar_lentes')
+      .from('v_lentes')
       .select('*', { count: 'exact' })
-      .eq('tenant_id', TENANT_ID)
       .eq('ativo', true);
 
     // Aplicar filtros
@@ -67,28 +66,21 @@ export const load: PageServerLoad = async ({ url }) => {
       throw error;
     }
 
-    // 2. Buscar marcas para filtro (vw_marcas)
+    // 2. Buscar marcas para filtro (tabela lens_catalog.marcas)
     const { data: marcas } = await supabase
-      .from('vw_marcas')
-      .select('id, nome, total_produtos')
-      .eq('tenant_id', TENANT_ID)
+      .from('lens_catalog.marcas')
+      .select('id, nome')
+      .eq('ativo', true)
       .order('nome');
 
-    // 3. Buscar laboratórios para filtro (vw_laboratorios)
+    // 3. Buscar fornecedores para filtro (tabela core.fornecedores)
     const { data: laboratorios } = await supabase
-      .from('vw_laboratorios')
-      .select('id, nome, total_produtos')
-      .eq('tenant_id', TENANT_ID)
+      .from('core.fornecedores')
+      .select('id, nome')
+      .eq('ativo', true)
       .order('nome');
 
-    // 4. Buscar filtros disponíveis (vw_filtros_disponiveis)
-    const { data: filtrosDisponiveis } = await supabase
-      .from('vw_filtros_disponiveis')
-      .select('*')
-      .eq('tenant_id', TENANT_ID)
-      .single();
-
-    // 5. Processar dados
+    // 4. Processar dados
     const totalPaginas = Math.ceil((count || 0) / limite);
 
     // Estatísticas calculadas

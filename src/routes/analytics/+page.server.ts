@@ -45,13 +45,13 @@ export const load: PageServerLoad = async ({ url }) => {
 
     // 3. Top fornecedores
     const { data: topFornecedores, error: topError } = await supabase
-      .from('vw_fornecedores')
+      .from('core.fornecedores')
       .select(`
         id,
         nome,
-        credibilidade_score,
-        total_produtos
+        ativo
       `)
+      .eq('ativo', true)
       .limit(10);
 
     if (topError) {
