@@ -85,11 +85,14 @@ export class CatalogoAPI {
         query = query.in('marca_nome', filtros.marcas);
       }
 
-      // Filtros de tratamentos (novos nomes de campos)
+      // Filtros de tratamentos (nomes corretos da view v_lentes)
       if (filtros.tratamentos) {
-        if (filtros.tratamentos.ar === true) query = query.eq('tratamento_antirreflexo', true);
-        if (filtros.tratamentos.blue === true) query = query.eq('tratamento_blue_light', true);
-        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_fotossensiveis', 'nenhum');
+        if (filtros.tratamentos.ar === true) query = query.eq('tem_ar', true);
+        if (filtros.tratamentos.blue === true) query = query.eq('tem_blue', true);
+        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_foto', 'nenhum');
+        if (filtros.tratamentos.polarizado === true) query = query.eq('tem_polarizado', true);
+        if (filtros.tratamentos.digital === true) query = query.eq('tem_digital', true);
+        if (filtros.tratamentos.free_form === true) query = query.eq('tem_free_form', true);
       }
 
       // Filtro de preço (novo nome de campo)
@@ -283,9 +286,9 @@ export class CatalogoAPI {
 
       // Filtros de tratamentos
       if (filtros.tratamentos) {
-        if (filtros.tratamentos.ar === true) query = query.eq('tratamento_antirreflexo', true);
-        if (filtros.tratamentos.blue === true) query = query.eq('tratamento_blue_light', true);
-        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_fotossensiveis', 'nenhum');
+        if (filtros.tratamentos.ar === true) query = query.eq('tem_ar', true);
+        if (filtros.tratamentos.blue === true) query = query.eq('tem_blue', true);
+        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_foto', 'nenhum');
       }
 
       // Filtro de preço (preço médio do grupo)
@@ -369,9 +372,9 @@ export class CatalogoAPI {
 
       // Filtros de tratamentos
       if (filtros.tratamentos) {
-        if (filtros.tratamentos.ar === true) query = query.eq('tratamento_antirreflexo', true);
-        if (filtros.tratamentos.blue === true) query = query.eq('tratamento_blue_light', true);
-        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_fotossensiveis', 'nenhum');
+        if (filtros.tratamentos.ar === true) query = query.eq('tem_ar', true);
+        if (filtros.tratamentos.blue === true) query = query.eq('tem_blue', true);
+        if (filtros.tratamentos.fotossensivel === true) query = query.neq('tratamento_foto', 'nenhum');
       }
 
       // Filtro de preço (preço médio do grupo)
