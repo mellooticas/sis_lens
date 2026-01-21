@@ -62,7 +62,7 @@ export class CatalogoAPI {
       }
 
       let query = supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('*', { count: 'exact' });
 
       // Aplicar filtros
@@ -225,7 +225,7 @@ export class CatalogoAPI {
   static async obterLente(id: string): Promise<ApiResponse<LenteCatalogo>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('*')
         .eq('id', id)
         .single();
@@ -608,7 +608,7 @@ export class CatalogoAPI {
   static async buscarLentesDoGrupo(grupoId: string): Promise<ApiResponse<import('$lib/types/database-views').VLenteCatalogo[]>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('*')
         .eq('grupo_id', grupoId)
         .order('preco_venda_sugerido', { ascending: true });
@@ -998,7 +998,7 @@ export class CatalogoAPI {
   }>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('ar, blue, fotossensivel');
 
       if (error) throw error;
@@ -1035,7 +1035,7 @@ export class CatalogoAPI {
   }>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('tipo_lente');
 
       if (error) throw error;
@@ -1070,7 +1070,7 @@ export class CatalogoAPI {
   }>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('material');
 
       if (error) throw error;
@@ -1105,7 +1105,7 @@ export class CatalogoAPI {
   }>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('preco_venda_sugerido');
 
       if (error) throw error;
@@ -1150,7 +1150,7 @@ export class CatalogoAPI {
   static async listarMarcas(): Promise<ApiResponse<string[]>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('marca_nome')
         .order('marca_nome');
 
@@ -1183,7 +1183,7 @@ export class CatalogoAPI {
   }>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('tipo_lente, material, indice_refracao, categoria');
 
       if (error) throw error;

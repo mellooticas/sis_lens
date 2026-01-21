@@ -69,13 +69,13 @@ export class FornecedoresAPI {
         fornecedores.map(async (fornecedor) => {
           // Contar lentes do fornecedor
           const { count: totalLentes } = await supabase
-            .from('v_lentes_catalogo')
+            .from('v_lentes')
             .select('*', { count: 'exact', head: true })
             .eq('fornecedor_id', fornecedor.id);
 
           // Buscar marcas distintas usadas pelo fornecedor
           const { data: lentesComMarca } = await supabase
-            .from('v_lentes_catalogo')
+            .from('v_lentes')
             .select('marca_nome')
             .eq('fornecedor_id', fornecedor.id);
 
@@ -126,12 +126,12 @@ export class FornecedoresAPI {
 
       // Buscar estatísticas
       const { count: totalLentes } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('*', { count: 'exact', head: true })
         .eq('fornecedor_id', id);
 
       const { data: lentesComMarca } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('marca_nome')
         .eq('fornecedor_id', id);
 
@@ -168,7 +168,7 @@ export class FornecedoresAPI {
   ): Promise<ApiResponse<any[]>> {
     try {
       const { data, error } = await supabase
-        .from('v_lentes_catalogo')
+        .from('v_lentes')
         .select('*')
         .eq('fornecedor_id', fornecedorId)
         .order('created_at', { ascending: false })
