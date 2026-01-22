@@ -360,10 +360,11 @@ export class CatalogoAPI {
       const offset = (pagina - 1) * limite;
 
       let query = supabase
-        .from('v_grupos_premium') // View específica para premium!
-        .select('*', { count: 'exact' });
+        .from('v_grupos_canonicos')
+        .select('*', { count: 'exact' })
+        .eq('is_premium', true); // Apenas grupos premium
       
-      console.log('📊 Query base criada: v_grupos_premium (view específica)');
+      console.log('📊 Query base criada: v_grupos_canonicos com is_premium=true');
 
       // Aplicar filtros
       if (filtros.tipos && filtros.tipos.length > 0) {
