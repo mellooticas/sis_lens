@@ -181,11 +181,12 @@
 
   </div>
 
-  <!-- Tratamentos (Checkboxes Horizontais) -->
+  <!-- Tratamentos (Checkboxes Horizontais com Indicador Premium) -->
   <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4">
     <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">Tratamentos</label>
     <div class="flex flex-wrap gap-3">
       
+      <!-- Antirreflexo (Standard + Premium) -->
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input 
           type="checkbox" 
@@ -193,9 +194,11 @@
           bind:checked={hasAR}
           on:change={applyFilters}
         />
-        <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">Antirreflexo</span>
+        <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">💨 Antirreflexo</span>
+        <span class="text-xs px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400">620</span>
       </label>
 
+      <!-- Blue Light (Standard + Premium) -->
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input 
           type="checkbox" 
@@ -203,9 +206,11 @@
           bind:checked={hasBlue}
           on:change={applyFilters}
         />
-        <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">Blue Light</span>
+        <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">🔵 Blue Light</span>
+        <span class="text-xs px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400">466</span>
       </label>
 
+      <!-- Fotossensível (Transitions + Acclimates = Premium) -->
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input 
           type="checkbox" 
@@ -213,9 +218,12 @@
           bind:checked={hasFoto}
           on:change={applyFilters}
         />
-        <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">Fotossensível</span>
+        <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">📷 Fotossensível</span>
+        <span class="text-xs px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-semibold">🔒 PREMIUM</span>
+        <span class="text-xs px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400">382</span>
       </label>
 
+      <!-- Polarizado (Standard + Premium) -->
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input 
           type="checkbox" 
@@ -223,9 +231,16 @@
           bind:checked={hasPolar}
           on:change={applyFilters}
         />
-        <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">Polarizado</span>
+        <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">😎 Polarizado</span>
+        <span class="text-xs px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400">60</span>
       </label>
 
+    </div>
+
+    <!-- Legenda de Tipos -->
+    <div class="mt-3 flex items-center gap-4 text-xs text-neutral-600 dark:text-neutral-400">
+      <span>💨 = Standard</span>
+      <span>🔒 = Premium</span>
     </div>
   </div>
 
