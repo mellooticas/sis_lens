@@ -1,6 +1,6 @@
 /**
- * 🏆 Produtos Premium - Server Load
- * Lista produtos premium agrupados por canonical
+ * 🏆 Catálogo Premium - Server Load
+ * Usa view consolidada v_grupos_canonicos com filtro is_premium = true
  */
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabase';
@@ -9,36 +9,55 @@ const TENANT_ID = 'cd311ba0-9e20-46c4-a65f-9b48fb4b36ec';
 
 export const load: PageServerLoad = async ({ url }) => {
   try {
-    const marca_id = url.searchParams.get('marca_id') || '';
+    // Parâmetros de busca e filtros
+    const busca = url.searchParams.get('busca') || '';
     const tipo_lente = url.searchParams.get('tipo_lente') || '';
+    const material = url.searchParams.get('material') || '';
+    const marca_id = url.searchParams.get('marca_id') || '';
+    const pagina = parseInt(url.searchParams.get('pagina') || '1');
+    const limite = 20;
+    const offset = (pagina - 1) * limite;
 
-    console.log('🏆 Premium: Carregando produtos premium');
+    console.log('🏆 Catálogo Premium: Carregando grupos premium com filtros:', {
+      busca, tipo_lente, material, marca_id, pagina
+    });
 
-    // 1. Buscar produtos premium usando vw_produtos_premium
+    // 1. Buscar grupos canônicos PREMIUM (is_premium = true) usando v_grupos_canonicos
     let query = supabase
-      .from('vw_produtos_premium')
-      .select('*')
-      .eq('tenant_id', TENANT_ID)
-      .eq('ativo', true);
+      .from('v_grupos_canonicos')
+      .select('*', { count: 'exact' })
+      .eq('ativo', true)
+      .eq('is_premium', true);
 
-    if (marca_id) {
-      query = query.eq('marca_id', marca_id);
+    // Aplicar filtros
+    if (busca) {
+      query = query.or(`nome_grupo.ilike.%${busca}%,slug.ilike.%${busca}%`);
     }
 
     if (tipo_lente) {
       query = query.eq('tipo_lente', tipo_lente);
     }
 
-    query = query.order('nome');
+    if (material) {
+      query = query.eq('material', material);
+    }
 
-    const { data: produtos, error } = await query;
+    if (marca_id) {
+      query = query.eq('marca_id', marca_id);
+    }
+
+    query = query
+      .order('nome_grupo', { ascending: true })
+      .range(offset, offset + limite - 1);
+
+    const { data: grupos, count, error } = await query;
 
     if (error) {
-      console.error('❌ Erro ao buscar produtos premium:', error);
+      console.error('❌ Erro ao buscar grupos premium:', error);
       throw error;
     }
 
-    // 2. Buscar marcas premium
+    // 2. Buscar marcas premium (compatível com grupos premium)
     const { data: marcas } = await supabase
       .from('lens_catalog.marcas')
       .select('id, nome')
@@ -46,65 +65,76 @@ export const load: PageServerLoad = async ({ url }) => {
       .eq('is_premium', true)
       .order('nome');
 
-    // 3. Buscar tipos de lente disponíveis
-    const { data: filtrosDisponiveis } = await supabase
-      .from('vw_filtros_disponiveis')
-      .select('tipos_lente')
-      .eq('tenant_id', TENANT_ID)
-      .single();
+    // 3. Processar dados
+    const totalPaginas = Math.ceil((count || 0) / limite);
+
+    // Dados consolidados
+    console.log('✅ Grupos Premium carregados:', {
+      total: count,
+      pagina,
+      grupos: grupos?.length
+    });
 
     return {
-      produtos: produtos || [],
-      total: produtos?.length || 0,
+      grupos: grupos || [],
+      total_resultados: count || 0,
+      pagina_atual: pagina,
+      total_paginas: totalPaginas,
+      has_more: pagina < totalPaginas,
       
       filtros: {
-        marca_id,
+        busca,
         tipo_lente,
+        material,
+        marca_id,
         opcoes: {
+          tipos_lente: [
+            { value: '', label: 'Todos os tipos de lente' }
+            // TODO: adicionar tipos_lente disponíveis para premium
+          ],
+          materiais: [
+            { value: '', label: 'Todos os materiais' }
+            // TODO: adicionar materiais disponíveis para premium
+          ],
           marcas: [
             { value: '', label: 'Todas as marcas' },
-            ...(marcas?.map(m => ({ 
-              value: m.id, 
-              label: `${m.nome} (${m.produtos_premium})` 
-            })) || [])
-          ],
-          tipos_lente: [
-            { value: '', label: 'Todos os tipos' },
-            ...(filtrosDisponiveis?.tipos_lente?.map(t => ({ 
-              value: t, 
-              label: t 
-            })) || [])
+            ...(marcas?.map(m => ({ value: m.id, label: m.nome })) || [])
           ]
         }
       },
       
       estatisticas: {
-        total_produtos: produtos?.length || 0,
-        total_marcas: marcas?.length || 0,
-        media_labs_por_produto: produtos?.length 
-          ? produtos.reduce((acc, p) => acc + (p.qtd_laboratorios || 0), 0) / produtos.length 
-          : 0
+        total_grupos: count || 0,
+        total_marcas: marcas?.length || 0
       },
       
       sucesso: true
     };
   } catch (error) {
-    console.error('❌ Erro ao carregar produtos premium:', error);
+    console.error('❌ Erro ao carregar catálogo premium:', error);
     return {
-      produtos: [],
-      total: 0,
+      grupos: [],
+      total_resultados: 0,
+      pagina_atual: 1,
+      total_paginas: 0,
+      has_more: false,
       filtros: {
-        marca_id: '',
+        busca: '',
         tipo_lente: '',
-        opcoes: { marcas: [], tipos_lente: [] }
+        material: '',
+        marca_id: '',
+        opcoes: {
+          tipos_lente: [],
+          materiais: [],
+          marcas: []
+        }
       },
       estatisticas: {
-        total_produtos: 0,
-        total_marcas: 0,
-        media_labs_por_produto: 0
+        total_grupos: 0,
+        total_marcas: 0
       },
       sucesso: false,
-      erro: 'Erro ao carregar produtos premium'
+      erro: 'Erro ao carregar catálogo premium'
     };
   }
 };

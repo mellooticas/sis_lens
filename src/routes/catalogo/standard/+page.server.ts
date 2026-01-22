@@ -1,6 +1,6 @@
 /**
- * 📚 Catálogo de Lentes - Server Load
- * Usa view consolidada v_lentes com agrupamento por grupos canônicos (v_grupos_canonicos)
+ * 📚 Catálogo Standard - Server Load
+ * Usa view consolidada v_grupos_canonicos com filtro is_premium = false
  */
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabase';
@@ -11,32 +11,27 @@ export const load: PageServerLoad = async ({ url }) => {
   try {
     // Parâmetros de busca e filtros
     const busca = url.searchParams.get('busca') || '';
-    const tipo = url.searchParams.get('tipo') || ''; // PREMIUM ou GENÉRICA
     const tipo_lente = url.searchParams.get('tipo_lente') || '';
     const material = url.searchParams.get('material') || '';
     const marca_id = url.searchParams.get('marca_id') || '';
-    const laboratorio_id = url.searchParams.get('laboratorio_id') || '';
     const pagina = parseInt(url.searchParams.get('pagina') || '1');
     const limite = 20;
     const offset = (pagina - 1) * limite;
 
-    console.log('📚 Catálogo NOVO: Carregando lentes com filtros:', {
-      busca, tipo, tipo_lente, material, marca_id, laboratorio_id, pagina
+    console.log('📚 Catálogo Standard: Carregando grupos não-premium com filtros:', {
+      busca, tipo_lente, material, marca_id, pagina
     });
 
-    // 1. Buscar lentes usando a view consolidada v_lentes
+    // 1. Buscar grupos canônicos STANDARD (is_premium = false) usando v_grupos_canonicos
     let query = supabase
-      .from('v_lentes')
+      .from('v_grupos_canonicos')
       .select('*', { count: 'exact' })
-      .eq('ativo', true);
+      .eq('ativo', true)
+      .eq('is_premium', false);
 
     // Aplicar filtros
     if (busca) {
-      query = query.or(`nome_produto.ilike.%${busca}%,sku.ilike.%${busca}%,marca.ilike.%${busca}%`);
-    }
-
-    if (tipo) {
-      query = query.eq('tipo', tipo);
+      query = query.or(`nome_grupo.ilike.%${busca}%,slug.ilike.%${busca}%`);
     }
 
     if (tipo_lente) {
@@ -51,44 +46,37 @@ export const load: PageServerLoad = async ({ url }) => {
       query = query.eq('marca_id', marca_id);
     }
 
-    if (laboratorio_id) {
-      query = query.eq('laboratorio_id', laboratorio_id);
-    }
-
     query = query
-      .order('nome_produto', { ascending: true })
+      .order('nome_grupo', { ascending: true })
       .range(offset, offset + limite - 1);
 
-    const { data: lentes, count, error } = await query;
+    const { data: grupos, count, error } = await query;
 
     if (error) {
-      console.error('❌ Erro ao buscar lentes:', error);
+      console.error('❌ Erro ao buscar grupos standard:', error);
       throw error;
     }
 
-    // 2. Buscar marcas para filtro (tabela lens_catalog.marcas)
+    // 2. Buscar marcas para filtro (tabela lens_catalog.marcas) - apenas não-premium
     const { data: marcas } = await supabase
       .from('lens_catalog.marcas')
       .select('id, nome')
       .eq('ativo', true)
+      .eq('is_premium', false)
       .order('nome');
 
-    // 3. Buscar fornecedores para filtro (tabela core.fornecedores)
-    const { data: laboratorios } = await supabase
-      .from('core.fornecedores')
-      .select('id, nome')
-      .eq('ativo', true)
-      .order('nome');
-
-    // 4. Processar dados
+    // 3. Processar dados
     const totalPaginas = Math.ceil((count || 0) / limite);
 
-    // Estatísticas calculadas
-    const totalPremium = lentes?.filter(l => l.tipo === 'PREMIUM').length || 0;
-    const totalGenerica = lentes?.filter(l => l.tipo === 'GENÉRICA').length || 0;
+    // Dados consolidados
+    console.log('✅ Grupos Standard carregados:', {
+      total: count,
+      pagina,
+      grupos: grupos?.length
+    });
 
     return {
-      lentes: lentes || [],
+      grupos: grupos || [],
       total_resultados: count || 0,
       pagina_atual: pagina,
       total_paginas: totalPaginas,
@@ -96,79 +84,58 @@ export const load: PageServerLoad = async ({ url }) => {
       
       filtros: {
         busca,
-        tipo,
         tipo_lente,
         material,
         marca_id,
-        laboratorio_id,
         opcoes: {
-          tipos: [
-            { value: '', label: 'Todos os tipos' },
-            { value: 'PREMIUM', label: 'Premium' },
-            { value: 'GENÉRICA', label: 'Genérica' }
-          ],
           tipos_lente: [
-            { value: '', label: 'Todos os tipos de lente' },
-            ...(filtrosDisponiveis?.tipos_lente?.map(t => ({ value: t, label: t })) || [])
+            { value: '', label: 'Todos os tipos de lente' }
+            // TODO: adicionar tipos_lente disponíveis para standard
           ],
           materiais: [
-            { value: '', label: 'Todos os materiais' },
-            ...(filtrosDisponiveis?.materiais?.map(m => ({ value: m, label: m })) || [])
+            { value: '', label: 'Todos os materiais' }
+            // TODO: adicionar materiais disponíveis para standard
           ],
           marcas: [
             { value: '', label: 'Todas as marcas' },
-            ...(marcas?.map(m => ({ value: m.id, label: `${m.nome} (${m.total_produtos})` })) || [])
-          ],
-          laboratorios: [
-            { value: '', label: 'Todos os laboratórios' },
-            ...(laboratorios?.map(l => ({ value: l.id, label: `${l.nome} (${l.total_produtos})` })) || [])
+            ...(marcas?.map(m => ({ value: m.id, label: m.nome })) || [])
           ]
         }
       },
       
       estatisticas: {
-        total_lentes: count || 0,
-        total_premium: totalPremium,
-        total_generica: totalGenerica,
-        total_marcas: marcas?.length || 0,
-        total_labs: laboratorios?.length || 0
+        total_grupos: count || 0,
+        total_marcas: marcas?.length || 0
       },
       
       sucesso: true,
       erro: null
     };
   } catch (error) {
-    console.error('❌ Erro ao carregar catálogo:', error);
+    console.error('❌ Erro ao carregar catálogo standard:', error);
     return {
-      lentes: [],
+      grupos: [],
       total_resultados: 0,
       pagina_atual: 1,
       total_paginas: 0,
       has_more: false,
       filtros: {
         busca: '',
-        tipo: '',
         tipo_lente: '',
         material: '',
         marca_id: '',
-        laboratorio_id: '',
         opcoes: {
-          tipos: [],
           tipos_lente: [],
           materiais: [],
-          marcas: [],
-          laboratorios: []
+          marcas: []
         }
       },
       estatisticas: {
-        total_lentes: 0,
-        total_premium: 0,
-        total_generica: 0,
-        total_marcas: 0,
-        total_labs: 0
+        total_grupos: 0,
+        total_marcas: 0
       },
       sucesso: false,
-      erro: 'Erro ao carregar catálogo de lentes'
+      erro: 'Erro ao carregar catálogo standard'
     };
   }
 };

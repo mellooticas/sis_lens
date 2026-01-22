@@ -432,15 +432,21 @@ export class CatalogoAPI {
   }
 
   /**
-   * Obter um grupo canônico específico por ID
+   * Obter um grupo canônico específico por ID (com validação opcional de is_premium)
    */
-  static async obterGrupoCanonico(id: string): Promise<ApiResponse<import('$lib/types/database-views').VGruposCanonico>> {
+  static async obterGrupoCanonico(id: string, is_premium?: boolean): Promise<ApiResponse<import('$lib/types/database-views').VGruposCanonico>> {
     try {
-      const { data, error } = await supabase
+      let query = supabase
         .from('v_grupos_canonicos')
         .select('*')
-        .eq('id', id)
-        .single();
+        .eq('id', id);
+
+      // Se is_premium foi especificado, adicionar filtro
+      if (is_premium !== undefined) {
+        query = query.eq('is_premium', is_premium);
+      }
+
+      const { data, error } = await query.single();
 
       if (error) throw error;
 
@@ -620,6 +626,7 @@ export class CatalogoAPI {
         .from('v_lentes')
         .select('*')
         .eq('grupo_id', grupoId)
+        .eq('ativo', true)
         .order('preco_venda_sugerido', { ascending: true });
 
       if (error) throw error;
