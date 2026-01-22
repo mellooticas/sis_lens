@@ -85,6 +85,11 @@ export class CatalogoAPI {
         query = query.in('marca_nome', filtros.marcas);
       }
 
+      // Filtro de marca premium
+      if (filtros.marca_premium !== undefined) {
+        query = query.eq('marca_premium', filtros.marca_premium);
+      }
+
       // Filtros de tratamentos (nomes corretos da view v_lentes)
       if (filtros.tratamentos) {
         console.log('🔍 DEBUG - Filtros de tratamentos:', filtros.tratamentos);

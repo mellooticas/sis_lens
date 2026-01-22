@@ -49,6 +49,7 @@
   let hasBlue = false;
   let hasFoto = false;
   let hasPolar = false;
+  let onlyPremium = false;
 
   // Aplicar filtros quando mudar
   function applyFilters() {
@@ -57,6 +58,11 @@
     if (selectedType) newFilters.tipos = [selectedType];
     if (selectedMaterial) newFilters.materiais = [selectedMaterial];
     if (selectedIndex) newFilters.indices = [selectedIndex];
+    
+    // Filtro Premium
+    if (onlyPremium) {
+      newFilters.marca_premium = true;
+    }
     
     if (selectedPriceRange !== 'all') {
       if (selectedPriceRange === '1000+') {
@@ -94,10 +100,11 @@
     hasBlue = false;
     hasFoto = false;
     hasPolar = false;
+    onlyPremium = false;
     dispatch('clear');
   }
 
-  $: hasActiveFilters = selectedType || selectedMaterial || selectedIndex || selectedPriceRange !== 'all' || searchText || hasAR || hasBlue || hasFoto || hasPolar;
+  $: hasActiveFilters = selectedType || selectedMaterial || selectedIndex || selectedPriceRange !== 'all' || searchText || hasAR || hasBlue || hasFoto || hasPolar || onlyPremium;
 
 </script>
 
@@ -186,6 +193,17 @@
     <label class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3">Tratamentos</label>
     <div class="flex flex-wrap gap-3">
       
+      <!-- Filtro Premium (Destaque) -->
+      <label class="inline-flex items-center gap-2 cursor-pointer group px-3 py-2 rounded-lg bg-amber-50 dark:bg-amber-900/20 border border-amber-200 dark:border-amber-800/50">
+        <input 
+          type="checkbox" 
+          class="w-4 h-4 rounded border-amber-300 dark:border-amber-700 text-amber-600 focus:ring-2 focus:ring-amber-500/20 transition-all cursor-pointer"
+          bind:checked={onlyPremium}
+          on:change={applyFilters}
+        />
+        <span class="text-sm font-semibold text-amber-700 dark:text-amber-400 group-hover:text-amber-800 dark:group-hover:text-amber-300 transition-colors">🔒 Apenas Premium</span>
+      </label>
+
       <!-- Antirreflexo (Standard + Premium) -->
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input 
