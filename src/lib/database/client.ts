@@ -151,7 +151,7 @@ export class DatabaseClient {
   ): Promise<DatabaseResponse<any>> {
     try {
       let query = supabase
-        .from('vw_fornecedores')
+        .from('v_fornecedores')
         .select('*', { count: 'exact' });
 
       if (filtros.nome) {
@@ -191,7 +191,7 @@ export class DatabaseClient {
   static async buscarFornecedorPorId(id: string): Promise<SingleDatabaseResponse<any>> {
     try {
       const { data, error } = await supabase
-        .from('vw_fornecedores')
+        .from('v_fornecedores')
         .select('*')
         .eq('id', id)
         .single();

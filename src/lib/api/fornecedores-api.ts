@@ -47,9 +47,9 @@ export class FornecedoresAPI {
     try {
       console.log('🏭 API: buscarFornecedores chamada');
       
-      // Usar a view do schema public
+      // Usar a view v_fornecedores do schema public
       const { data: fornecedores, error: errorFornecedores } = await supabase
-        .from('v_fornecedores_catalogo')
+        .from('v_fornecedores')
         .select('*')
         .eq('ativo', true)
         .order('nome', { ascending: true });
@@ -116,7 +116,7 @@ export class FornecedoresAPI {
   static async obterFornecedor(id: string): Promise<ApiResponse<FornecedorComEstatisticas>> {
     try {
       const { data: fornecedor, error: errorFornecedor } = await supabase
-        .from('v_fornecedores_catalogo')
+        .from('v_fornecedores')
         .select('*')
         .eq('id', id)
         .single();
