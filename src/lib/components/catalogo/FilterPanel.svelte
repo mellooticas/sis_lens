@@ -237,7 +237,6 @@
           on:change={applyFilters}
         />
         <span class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors">📷 Fotossensível</span>
-        <span class="text-xs px-1.5 py-0.5 rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-semibold">🔒 PREMIUM</span>
         <span class="text-xs px-1.5 py-0.5 rounded-full bg-neutral-100 dark:bg-neutral-700 text-neutral-600 dark:text-neutral-400">382</span>
       </label>
 
