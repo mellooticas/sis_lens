@@ -233,25 +233,49 @@ export interface VGruposCanonico {
   adicao_max: number | null;
   descricao_ranges: string | null;
   
-  // Tratamentos
-  tratamento_antirreflexo: boolean;
-  tratamento_antirrisco: boolean;
-  tratamento_uv: boolean;
-  tratamento_blue_light: boolean;
-  tratamento_fotossensiveis: TratamentoFoto;
+  // Tratamentos (nomes corrigidos conforme a view)
+  tem_antirreflexo: boolean;
+  tem_antirrisco: boolean;
+  tem_uv: boolean;
+  tem_blue_light: boolean;
+  tratamento_foto: TratamentoFoto;
   
   // Precificação (agregada)
   preco_minimo: number | null;
   preco_maximo: number | null;
   preco_medio: number | null;
   
+  // Custos (calculados na view)
+  custo_medio: number | null;
+  custo_minimo: number | null;
+  custo_maximo: number | null;
+  
+  // Análise Financeira (calculados na view)
+  margem_percentual: number | null;
+  lucro_unitario: number | null;
+  markup: number | null;
+  faixa_preco: string | null;
+  categoria_preco: string | null;
+  
   // Estatísticas
   total_lentes: number;
   total_marcas: number;
+  total_fornecedores: number;
+  prazo_medio_dias: number | null;
   peso: number | null;
+  
+  // Agregações JSONB
+  fornecedores_disponiveis: any; // JSONB com [{id, nome, prazo_visao_simples, prazo_multifocal}]
+  marcas_disponiveis: any; // JSONB com [{marca_id, marca_nome, marca_slug, is_premium}]
+  marcas_nomes: string | null; // String com nomes separados por vírgula
   
   // Classificação
   is_premium: boolean;
+  
+  // Metadata
+  ativo: boolean;
+  created_at: string;
+  updated_at: string;
 }
 
 // Alias para compatibilidade

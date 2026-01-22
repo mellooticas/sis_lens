@@ -1,67 +1,24 @@
 <script lang="ts">
-  import { onMount } from 'svelte';
+  import type { PageData } from './$types';
   import Container from '$lib/components/layout/Container.svelte';
   import PageHero from '$lib/components/layout/PageHero.svelte';
   import SectionHeader from '$lib/components/layout/SectionHeader.svelte';
-  import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
   import DonutChart from '$lib/components/charts/DonutChart.svelte';
   import BarChart from '$lib/components/charts/BarChart.svelte';
   import MetricCard from '$lib/components/charts/MetricCard.svelte';
   import InsightCard from '$lib/components/charts/InsightCard.svelte';
-  import { CatalogoAPI } from '$lib/api/catalogo-api';
-  import { FornecedoresAPI } from '$lib/api/fornecedores-api';
-  import { useStatsCatalogo } from '$lib/hooks/useStatsCatalogo';
+  
+  // Dados do servidor
+  export let data: PageData;
+  
+  $: stats = data.stats;
+  $: topCaros = data.topCaros || [];
+  $: topPremium = data.topPremium || [];
+  $: fornecedores = data.fornecedores || [];
+  $: distribuicaoTipo = data.distribuicaoTipo || [];
+  $: distribuicaoMaterial = data.distribuicaoMaterial || [];
   
   let activeTab: 'overview' | 'distribuicao' | 'comparativo' | 'insights' = 'overview';
-  
-  let loading = true;
-  let loadingExtras = true;
-  
-  let stats = {
-    total_lentes: 0,
-    total_premium: 0,
-    total_standard: 0,
-    preco_medio: 0,
-    preco_medio_premium: 0,
-    preco_medio_standard: 0
-  };
-  
-  let topCaros: any[] = [];
-  let topPopulares: any[] = [];
-  let topPremium: any[] = [];
-  let fornecedores: any[] = [];
-  let distribuicaoTipo: any[] = [];
-  let distribuicaoMaterial: any[] = [];
-
-  onMount(async () => {
-    try {
-      const statsResult = await useStatsCatalogo();
-      stats = statsResult;
-      loading = false;
-      
-      const [caros, populares, premium, fornecedoresData, tipos, materiais] = await Promise.all([
-        CatalogoAPI.getTopCaros(10),
-        CatalogoAPI.getTopPopulares(10),
-        CatalogoAPI.getTopPremium(10),
-        FornecedoresAPI.listarFornecedores(),
-        CatalogoAPI.getDistribuicaoTipo(),
-        CatalogoAPI.getDistribuicaoMaterial()
-      ]);
-      
-      topCaros = caros || [];
-      topPopulares = populares || [];
-      topPremium = premium || [];
-      fornecedores = fornecedoresData || [];
-      distribuicaoTipo = tipos || [];
-      distribuicaoMaterial = materiais || [];
-      
-      loadingExtras = false;
-    } catch (error) {
-      console.error('Erro ao carregar dados do BI:', error);
-      loading = false;
-      loadingExtras = false;
-    }
-  });
 
   function formatarPreco(valor: number): string {
     if (!valor) return 'R$ 0,00';
@@ -82,10 +39,10 @@
   }
 
   // Gerar insights automáticos
-  $: insights = generateInsights();
+  $: insights = generateInsights(stats, fornecedores, distribuicaoTipo, distribuicaoMaterial);
 
-  function generateInsights() {
-    if (!stats || loadingExtras) return [];
+  function generateInsights(stats: any, fornecedores: any[], distribuicaoTipo: any[], distribuicaoMaterial: any[]) {
+    if (!stats) return [];
     
     const results = [];
     
@@ -218,15 +175,9 @@
     }));
 
   $: topCarosChart = topCaros.slice(0, 5).map((item, index) => ({
-    label: item.nome_exibicao || 'Sem nome',
-    value: item.preco_base || 0,
+    label: item.nome_exibicao || item.nome_lente || 'Sem nome',
+    value: item.preco_venda_sugerido || 0,
     color: ['#f59e0b', '#eab308', '#facc15', '#fde047', '#fef08a'][index]
-  }));
-
-  $: topPopularesChart = topPopulares.slice(0, 5).map((item, index) => ({
-    label: item.nome_exibicao || 'Sem nome',
-    value: item.visualizacoes || 0,
-    color: ['#10b981', '#14b8a6', '#22c55e', '#4ade80', '#86efac'][index]
   }));
 </script>
 
@@ -239,17 +190,12 @@
   <Container>
     <PageHero
       title="📊 Business Intelligence"
-      description="Dashboard executivo com insights e análises em tempo real"
+      subtitle="Dashboard executivo com insights e análises em tempo real"
     />
 
-    {#if loading || loadingExtras}
-      <div class="flex justify-center items-center py-20">
-        <LoadingSpinner size="lg" />
-      </div>
-    {:else}
-      <!-- Tabs Navigation -->
-      <div class="mt-8 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
-        <div class="flex flex-wrap border-b border-neutral-200 dark:border-neutral-700">
+    <!-- Tabs Navigation -->
+    <div class="mt-8 bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+      <div class="flex flex-wrap border-b border-neutral-200 dark:border-neutral-700">
           <button
             on:click={() => activeTab = 'overview'}
             class="flex-1 min-w-[120px] px-6 py-4 text-sm font-medium transition-colors {activeTab === 'overview' ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-700 dark:text-blue-400 border-b-2 border-blue-600' : 'text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-700/50'}"
@@ -316,9 +262,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Container>
                 <SectionHeader
-                  title="Distribuição por Tipo"
+                  title="📊 Distribuição por Tipo"
                   subtitle="Categorias de lentes no catálogo"
-                  icon="📊"
                 />
                 {#if chartDataTipo.length > 0}
                   <div class="flex justify-center py-4">
@@ -331,9 +276,8 @@
 
               <Container>
                 <SectionHeader
-                  title="Distribuição por Material"
-                  subtitle="Materiais mais utilizados"
-                  icon="🔬"
+                  title="🔬 Distribuição por Material"
+                  subtitle="Materiais disponíveis"
                 />
                 {#if chartDataMaterial.length > 0}
                   <div class="flex justify-center py-4">
@@ -348,9 +292,8 @@
             <!-- Top Fornecedores Bar Chart -->
             <Container>
               <SectionHeader
-                title="Top 5 Fornecedores"
+                title="🏆 Top 5 Fornecedores"
                 subtitle="Parceiros com maior volume de lentes cadastradas"
-                icon="🏆"
               />
               {#if topFornecedoresChart.length > 0}
                 <div class="py-4">
@@ -367,9 +310,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
               <Container>
                 <SectionHeader
-                  title="Tipos de Lentes"
+                  title="📊 Tipos de Lentes"
                   subtitle="Distribuição completa por categoria"
-                  icon="📊"
                 />
                 {#if chartDataTipo.length > 0}
                   <div class="flex justify-center py-4">
@@ -406,9 +348,8 @@
 
               <Container>
                 <SectionHeader
-                  title="Materiais"
+                  title="🔬 Materiais"
                   subtitle="Distribuição completa por material"
-                  icon="🔬"
                 />
                 {#if chartDataMaterial.length > 0}
                   <div class="flex justify-center py-4">
@@ -448,9 +389,8 @@
             <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
               <Container>
                 <SectionHeader
-                  title="Top 5 Mais Caros"
+                  title="💎 Top 5 Mais Caros"
                   subtitle="Lentes com maior preço base"
-                  icon="💎"
                 />
                 {#if topCarosChart.length > 0}
                   <div class="py-4">
@@ -461,20 +401,6 @@
                 {/if}
               </Container>
 
-              <Container>
-                <SectionHeader
-                  title="Top 5 Mais Populares"
-                  subtitle="Lentes mais visualizadas"
-                  icon="🔥"
-                />
-                {#if topPopularesChart.length > 0}
-                  <div class="py-4">
-                    <BarChart data={topPopularesChart} height={250} showValues={true} />
-                  </div>
-                {:else}
-                  <p class="text-neutral-500 dark:text-neutral-400 text-center py-8">Nenhum dado disponível</p>
-                {/if}
-              </Container>
             </div>
           {/if}
 
@@ -510,9 +436,8 @@
             <!-- Comparação de Preços -->
             <Container>
               <SectionHeader
-                title="Análise de Preços: Premium vs Standard"
+                title="💰 Análise de Preços: Premium vs Standard"
                 subtitle="Comparação de valores médios"
-                icon="💰"
               />
               <div class="grid grid-cols-1 md:grid-cols-3 gap-6 py-6">
                 <div class="text-center p-6 bg-purple-50 dark:bg-purple-900/20 rounded-lg">
@@ -542,9 +467,8 @@
             {#if fornecedores.length > 0}
               <Container>
                 <SectionHeader
-                  title="Volume por Fornecedor"
+                  title="🏭 Volume por Fornecedor"
                   subtitle="Ranking completo de fornecedores"
-                  icon="🏭"
                 />
                 <div class="py-4">
                   <BarChart 
@@ -595,7 +519,6 @@
                 <SectionHeader
                   title="📈 Recomendações Estratégicas"
                   subtitle="Ações sugeridas para otimização do catálogo"
-                  icon="🎯"
                 />
                 <div class="space-y-4 py-4">
                   {#if (stats.total_premium || 0) / (stats.total_lentes || 1) < 0.2}
@@ -645,6 +568,5 @@
           {/if}
         </div>
       </div>
-    {/if}
   </Container>
 </main>

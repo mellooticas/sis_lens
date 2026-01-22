@@ -98,17 +98,25 @@
             {#if lente.destaque}
               <Badge variant="gold">⭐ Destaque</Badge>
             {/if}
-            {#if lente.novidade}
-              <Badge variant="blue">🆕 Novidade</Badge>
-            {/if}
           </div>
           
           <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
             {lente.nome_lente}
           </h1>
           
-          {#if lente.nome_grupo}
-            <p class="text-lg text-slate-600 mb-4">Grupo: {lente.nome_grupo}</p>
+          {#if lente.grupo_nome && lente.grupo_canonico_id}
+            <p class="text-lg text-slate-600 mb-4">
+              📦 Grupo Canônico: 
+              <a 
+                href="/catalogo/standard/{lente.grupo_canonico_id}" 
+                class="text-indigo-600 hover:text-indigo-800 hover:underline font-medium transition-colors"
+              >
+                {lente.grupo_nome}
+              </a>
+            </p>
+          {/if}
+          {#if lente.fornecedor_razao_social}
+            <p class="text-sm text-slate-500">Fornecedor: {lente.fornecedor_razao_social} ({lente.fornecedor_cnpj || 'CNPJ não informado'})</p>
           {/if}
         </div>
 
@@ -166,7 +174,7 @@
           </div>
           <div class="flex justify-between">
             <span class="text-slate-600">Peso Aproximado:</span>
-            <span class="font-medium">{lente.peso_aproximado ? `${lente.peso_aproximado} g` : '-'}</span>
+            <span class="font-medium">{lente.peso ? `${lente.peso} g` : '-'}</span>
           </div>
         </div>
       </div>
@@ -180,16 +188,16 @@
           <div class="flex justify-between">
             <span class="text-slate-600">Esférico:</span>
             <span class="font-medium">
-              {lente.esferico_min != null && lente.esferico_max != null 
-                ? `${lente.esferico_min} a ${lente.esferico_max}` 
+              {lente.grau_esferico_min != null && lente.grau_esferico_max != null 
+                ? `${lente.grau_esferico_min} a ${lente.grau_esferico_max}` 
                 : '-'}
             </span>
           </div>
           <div class="flex justify-between">
             <span class="text-slate-600">Cilíndrico:</span>
             <span class="font-medium">
-              {lente.cilindrico_min != null && lente.cilindrico_max != null 
-                ? `${lente.cilindrico_min} a ${lente.cilindrico_max}` 
+              {lente.grau_cilindrico_min != null && lente.grau_cilindrico_max != null 
+                ? `${lente.grau_cilindrico_min} a ${lente.grau_cilindrico_max}` 
                 : '-'}
             </span>
           </div>
@@ -227,11 +235,11 @@
           <span class="text-sm">Anti-Risco</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.tratamento_hidrofobico ? '✅' : '❌'}</span>
+          <span class="text-2xl">{lente.tem_hidrofobico ? '✅' : '❌'}</span>
           <span class="text-sm">Hidrofóbico</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.tratamento_antiembacante ? '✅' : '❌'}</span>
+          <span class="text-2xl">❌</span>
           <span class="text-sm">Anti-Embaçante</span>
         </div>
         <div class="flex items-center gap-2">
@@ -259,67 +267,46 @@
     <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
       <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.tem_digital ? '✅' : '❌'}</span>
+          <span class="text-2xl">❌</span>
           <span class="text-sm">Digital</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.tem_free_form ? '✅' : '❌'}</span>
+          <span class="text-2xl">❌</span>
           <span class="text-sm">Free-Form</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.indoor ? '✅' : '❌'}</span>
+          <span class="text-2xl">❌</span>
           <span class="text-sm">Indoor</span>
         </div>
         <div class="flex items-center gap-2">
-          <span class="text-2xl">{lente.drive ? '✅' : '❌'}</span>
+          <span class="text-2xl">❌</span>
           <span class="text-sm">Drive</span>
         </div>
       </div>
     </div>
 
-    <!-- Descrição Completa -->
-    {#if lente.descricao_completa}
-      <SectionHeader title="📝 Descrição Completa" />
+    <!-- Informações do Fornecedor -->
+    {#if lente.fornecedor_nome}
+      <SectionHeader title="🏢 Informações do Fornecedor" />
       <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
-        <p class="text-slate-700 whitespace-pre-wrap">{lente.descricao_completa}</p>
-      </div>
-    {/if}
-
-    <!-- Benefícios -->
-    {#if lente.beneficios && lente.beneficios.length > 0}
-      <SectionHeader title="⭐ Benefícios" />
-      <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
-        <ul class="space-y-2">
-          {#each lente.beneficios as beneficio}
-            <li class="flex items-start gap-2">
-              <span class="text-green-600 mt-1">✓</span>
-              <span class="text-slate-700">{beneficio}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {/if}
-
-    <!-- Indicações -->
-    {#if lente.indicacoes && lente.indicacoes.length > 0}
-      <SectionHeader title="👍 Indicações" />
-      <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
-        <ul class="space-y-2">
-          {#each lente.indicacoes as indicacao}
-            <li class="flex items-start gap-2">
-              <span class="text-blue-600 mt-1">→</span>
-              <span class="text-slate-700">{indicacao}</span>
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {/if}
-
-    <!-- Contraindicações -->
-    {#if lente.contraindicacoes}
-      <SectionHeader title="⚠️ Contraindicações" />
-      <div class="glass-panel p-6 rounded-xl mb-8 mt-6 bg-amber-50">
-        <p class="text-slate-700">{lente.contraindicacoes}</p>
+        <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+          <div>
+            <div class="text-sm text-slate-600 mb-1">Fornecedor</div>
+            <div class="text-lg font-semibold">{lente.fornecedor_nome}</div>
+          </div>
+          {#if lente.fornecedor_razao_social}
+            <div>
+              <div class="text-sm text-slate-600 mb-1">Razão Social</div>
+              <div class="text-lg font-semibold">{lente.fornecedor_razao_social}</div>
+            </div>
+          {/if}
+          {#if lente.fornecedor_cnpj}
+            <div>
+              <div class="text-sm text-slate-600 mb-1">CNPJ</div>
+              <div class="font-mono text-sm">{lente.fornecedor_cnpj}</div>
+            </div>
+          {/if}
+        </div>
       </div>
     {/if}
 
@@ -331,24 +318,19 @@
         <div>
           <div class="text-sm text-slate-600 mb-1">Prazo de Entrega</div>
           <div class="text-lg font-semibold">
-            {lente.prazo_entrega ? `${lente.prazo_entrega} dias` : '-'}
-          </div>
-          {#if lente.obs_prazo}
-            <div class="text-xs text-slate-500 mt-1">{lente.obs_prazo}</div>
-          {/if}
-        </div>
-        <div>
-          <div class="text-sm text-slate-600 mb-1">Peso Frete</div>
-          <div class="text-lg font-semibold">
-            {lente.peso_frete ? `${lente.peso_frete} kg` : '-'}
+            {lente.prazo_dias ? `${lente.prazo_dias} dias` : '-'}
           </div>
         </div>
         <div>
-          <div class="text-sm text-slate-600 mb-1">Receita Especial</div>
+          <div class="text-sm text-slate-600 mb-1">Peso Aproximado</div>
           <div class="text-lg font-semibold">
-            {lente.exige_receita_especial !== null 
-              ? (lente.exige_receita_especial ? '✅ Requerido' : '❌ Não requerido')
-              : '-'}
+            {lente.peso ? `${lente.peso} g` : '-'}
+          </div>
+        </div>
+        <div>
+          <div class="text-sm text-slate-600 mb-1">Fornecedor</div>
+          <div class="text-lg font-semibold">
+            {lente.fornecedor_nome || '-'}
           </div>
         </div>
       </div>
@@ -361,7 +343,7 @@
       <div class="grid grid-cols-1 md:grid-cols-4 gap-6">
         <div>
           <div class="text-sm text-slate-600 mb-1">SKU Fornecedor</div>
-          <div class="font-mono text-sm">{lente.sku_fornecedor}</div>
+          <div class="font-mono text-sm">{lente.sku_fornecedor || '-'}</div>
         </div>
         {#if lente.codigo_original}
           <div>
@@ -370,47 +352,29 @@
           </div>
         {/if}
         <div>
-          <div class="text-sm text-slate-600 mb-1">Custo Base</div>
-          <div class="text-lg font-semibold">{formatarPreco(lente.custo_base)}</div>
+          <div class="text-sm text-slate-600 mb-1">Custo</div>
+          <div class="text-lg font-semibold">{formatarPreco(lente.preco_custo)}</div>
         </div>
         <div>
           <div class="text-sm text-slate-600 mb-1">Status</div>
           <div>
-            <Badge variant={lente.status === 'ativo' ? 'success' : 'neutral'}>
-              {lente.status}
+            <Badge variant={lente.ativo ? 'success' : 'neutral'}>
+              {lente.ativo ? 'Ativo' : 'Inativo'}
             </Badge>
           </div>
         </div>
       </div>
     </div>
 
-    <!-- Observações -->
-    {#if lente.observacoes}
-      <SectionHeader title="📌 Observações" />
-      <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
-        <p class="text-slate-700 whitespace-pre-wrap">{lente.observacoes}</p>
-      </div>
-    {/if}
-
     <!-- Datas -->
     <div class="glass-panel p-4 rounded-xl mb-8 bg-slate-50">
-      <div class="grid grid-cols-2 md:grid-cols-4 gap-4 text-xs text-slate-600">
+      <div class="grid grid-cols-2 gap-4 text-xs text-slate-600">
         <div>
           <span class="font-medium">Cadastro:</span> {new Date(lente.created_at).toLocaleDateString('pt-BR')}
         </div>
         <div>
           <span class="font-medium">Atualização:</span> {new Date(lente.updated_at).toLocaleDateString('pt-BR')}
         </div>
-        {#if lente.data_lancamento}
-          <div>
-            <span class="font-medium">Lançamento:</span> {new Date(lente.data_lancamento).toLocaleDateString('pt-BR')}
-          </div>
-        {/if}
-        {#if lente.data_descontinuacao}
-          <div>
-            <span class="font-medium">Descontinuação:</span> {new Date(lente.data_descontinuacao).toLocaleDateString('pt-BR')}
-          </div>
-        {/if}
       </div>
     </div>
 

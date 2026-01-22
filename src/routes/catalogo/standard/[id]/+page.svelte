@@ -1,221 +1,336 @@
-<!--
-  ��� Detalhes Grupo Canônico Standard - SIS Lens
-  Mostra todas as lentes pertencentes a este grupo
--->
 <script lang="ts">
-  import { page } from '$app/stores';
   import { goto } from '$app/navigation';
-  import { onMount } from 'svelte';
   import { fade } from 'svelte/transition';
-  import { CatalogoAPI } from '$lib/api/catalogo-api';
-  import type { VGruposCanonico, VLenteCatalogo } from '$lib/types/database-views';
-
-  // Ícones
-  import { ArrowLeft, Package, Users, TrendingUp, Eye } from 'lucide-svelte';
+  import type { PageData } from './$types';
 
   // Componentes
   import Container from "$lib/components/layout/Container.svelte";
-  import PageHero from "$lib/components/layout/PageHero.svelte";
   import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
   import Button from "$lib/components/ui/Button.svelte";
   import Badge from "$lib/components/ui/Badge.svelte";
-  import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
   import LenteCard from "$lib/components/catalogo/LenteCard.svelte";
-  import StatsCard from "$lib/components/cards/StatsCard.svelte";
 
-  // State
-  let grupo: VGruposCanonico | null = null;
-  let lentes: VLenteCatalogo[] = [];
-  let loading = true;
-  let error = '';
+  // Dados vindos do servidor (+page.server.ts)
+  export let data: PageData;
+  
+  $: grupo = data.grupo;
+  $: lentes = data.lentes || [];
 
-  const grupoId = $page.params.id;
-
-  onMount(async () => {
-    await carregarDetalhes();
-  });
-
-  async function carregarDetalhes() {
-    try {
-      loading = true;
-      error = '';
-      
-      if (!grupoId) {
-        error = 'ID do grupo não encontrado';
-        return;
-      }
-      
-      // Buscar detalhes do grupo
-      const resultadoGrupo = await CatalogoAPI.obterGrupoCanonico(grupoId);
-
-      if (resultadoGrupo.success && resultadoGrupo.data) {
-        grupo = resultadoGrupo.data;
-      } else {
-        error = 'Grupo não encontrado';
-        return;
-      }
-
-      // Buscar lentes do grupo
-      const resultadoLentes = await CatalogoAPI.buscarLentesDoGrupo(grupoId);
-
-      if (resultadoLentes.success && resultadoLentes.data) {
-        lentes = resultadoLentes.data;
-      }
-
-    } catch (err) {
-      error = err instanceof Error ? err.message : 'Erro desconhecido';
-    } finally {
-      loading = false;
-    }
+  function formatarPreco(valor: number | null): string {
+    if (!valor) return '-';
+    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   }
 
-  function formatarPreco(preco: number): string {
-    return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', minimumFractionDigits: 0 }).format(preco);
-  }
-
-  function voltarCatalogo() {
-    goto('/catalogo/standard');
-  }
-
-  function getIndiceLabel(indice: string): string {
-    const map: Record<string, string> = {
-      '1.50': 'Standard (1.50)',
-      '1.53': 'Médio (1.53)',
-      '1.56': 'Médio Alto (1.56)',
-      '1.59': 'Alto (1.59)',
-      '1.60': 'Alto (1.60)',
-      '1.67': 'Super Alto (1.67)',
-      '1.70': 'Ultra Alto (1.70)',
-      '1.74': 'Ultra Alto (1.74)',
-      '1.76': 'Ultra Alto (1.76)'
-    };
-    return map[indice] || indice;
+  function formatarPercentual(valor: number | null): string {
+    if (!valor) return '-';
+    return `${valor.toFixed(2)}%`;
   }
 </script>
 
 <svelte:head>
-  <title>{grupo?.nome_grupo || 'Grupo Canônico'} - SIS Lens</title>
+  <title>{grupo?.nome_grupo || 'Grupo Canônico Standard'} - SIS Lens</title>
 </svelte:head>
 
-{#if loading}
-  <Container maxWidth="full" padding="lg">
-    <div class="flex items-center justify-center py-20">
-      <LoadingSpinner size="lg" />
-    </div>
-  </Container>
-{:else if error || !grupo}
-  <Container maxWidth="full" padding="lg">
-    <div class="text-center py-20">
-      <div class="text-5xl mb-4">⚠️</div>
-      <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Grupo não encontrado</h3>
-      <p class="text-gray-600 dark:text-gray-400 mb-6">{error}</p>
-      <Button variant="primary" on:click={voltarCatalogo}>
-        <ArrowLeft class="w-4 h-4" />
-        Voltar ao Catálogo
-      </Button>
-    </div>
-  </Container>
-{:else}
-  <div in:fade>
-    <PageHero title={grupo.nome_grupo} subtitle={grupo.categoria_predominante || 'Grupo Canônico Standard'} />
+<Container maxWidth="xl" padding="md">
+  <!-- Botão Voltar -->
+  <div class="mb-6">
+    <Button variant="secondary" on:click={() => goto('/catalogo/standard')}>
+      ← Voltar ao Catálogo Standard
+    </Button>
+  </div>
 
-    <Container maxWidth="full" padding="lg">
-      <div class="space-y-6">
-        <div class="flex items-center justify-between">
-          <Button variant="secondary" size="sm" on:click={voltarCatalogo}>
-            <ArrowLeft class="w-4 h-4" />
-            Voltar
-          </Button>
-          <div class="flex items-center gap-2">
-            <Badge variant="info">Standard</Badge>
-            {#if grupo.tratamento_antirreflexo}
-              <Badge variant="info">AR</Badge>
-            {/if}
-            {#if grupo.tratamento_blue_light}
-              <Badge variant="info">Blue Light</Badge>
-            {/if}
-            {#if grupo.tratamento_fotossensiveis}
-              <Badge variant="warning">Fotossensível</Badge>
-            {/if}
-            {#if grupo.tratamento_uv}
-              <Badge variant="success">UV</Badge>
-            {/if}
-          </div>
+  <!-- Header -->
+  <div class="glass-panel rounded-2xl p-8 mb-8 bg-gradient-to-br from-blue-50 to-indigo-50">
+    <div class="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+      <div class="flex-1">
+        <div class="flex flex-wrap gap-2 mb-4">
+          <Badge variant="primary">Standard</Badge>
+          <Badge variant="neutral">{grupo.tipo_lente?.replace('_', ' ')}</Badge>
+          <Badge variant="info">{grupo.categoria_preco || grupo.categoria_predominante}</Badge>
+          {#if grupo.tem_antirreflexo}
+            <Badge variant="success">AR</Badge>
+          {/if}
+          {#if grupo.tem_blue_light}
+            <Badge variant="blue">Blue Light</Badge>
+          {/if}
+          {#if grupo.tratamento_foto !== 'nenhum'}
+            <Badge variant="warning">Fotossensível</Badge>
+          {/if}
+          {#if grupo.tem_uv}
+            <Badge variant="success">UV</Badge>
+          {/if}
         </div>
+        
+        <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
+          {grupo.nome_grupo}
+        </h1>
+        
+        {#if grupo.descricao_ranges}
+          <p class="text-lg text-slate-600">{grupo.descricao_ranges}</p>
+        {/if}
+      </div>
 
-        <div class="grid grid-cols-1 md:grid-cols-4 gap-4">
-          <StatsCard title="Total de Lentes" value={grupo.total_lentes.toString()} icon="���" color="blue" />
-          <StatsCard title="Marcas Diferentes" value={grupo.total_marcas.toString()} icon="🏢" color="blue" />
-          <StatsCard title="Preço Médio" value={formatarPreco(grupo.preco_medio || 0)} icon="���" color="orange" />
-          <StatsCard title="Faixa de Preço" value={`${formatarPreco(grupo.preco_minimo || 0)} - ${formatarPreco(grupo.preco_maximo || 0)}`} icon="���" color="green" />
-        </div>
-
-        <div class="glass-panel p-6 rounded-xl">
-          <SectionHeader title="Especificações Técnicas" subtitle="Características do grupo" />
-          
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 mt-6">
-            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Material</div>
-              <div class="text-lg font-semibold text-gray-900 dark:text-white">{grupo.material || 'N/A'}</div>
-            </div>
-
-            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Índice de Refração</div>
-              <div class="text-lg font-semibold text-gray-900 dark:text-white">{getIndiceLabel(grupo.indice_refracao)}</div>
-            </div>
-
-            <div class="bg-gray-50 dark:bg-gray-800 p-4 rounded-lg">
-              <div class="text-sm text-gray-600 dark:text-gray-400 mb-1">Tipo</div>
-              <div class="text-lg font-semibold text-gray-900 dark:text-white">{grupo.tipo_lente || 'N/A'}</div>
-            </div>
+      <div class="text-right">
+        <div class="bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl p-6 min-w-[200px]">
+          <div class="text-sm opacity-90 mb-1">Preço Médio</div>
+          <div class="text-3xl font-bold">{formatarPreco(grupo.preco_medio)}</div>
+          <div class="text-xs opacity-75 mt-2">
+            De {formatarPreco(grupo.preco_minimo)} até {formatarPreco(grupo.preco_maximo)}
           </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-4">
-            <div class="bg-gradient-to-br from-blue-50 to-blue-100 dark:from-blue-900/30 dark:to-blue-800/30 p-4 rounded-lg border border-blue-200 dark:border-blue-700">
-              <div class="text-sm text-blue-700 dark:text-blue-300 mb-1 font-medium">Grau Esférico</div>
-              <div class="text-lg font-bold text-blue-900 dark:text-blue-100">
-                {grupo.grau_esferico_min || 0} a {grupo.grau_esferico_max || 0}
-              </div>
-            </div>
-
-            <div class="bg-gradient-to-br from-purple-50 to-purple-100 dark:from-purple-900/30 dark:to-purple-800/30 p-4 rounded-lg border border-purple-200 dark:border-purple-700">
-              <div class="text-sm text-purple-700 dark:text-purple-300 mb-1 font-medium">Grau Cilíndrico</div>
-              <div class="text-lg font-bold text-purple-900 dark:text-purple-100">
-                {grupo.grau_cilindrico_min || 0} a {grupo.grau_cilindrico_max || 0}
-              </div>
-            </div>
-
-            <div class="bg-gradient-to-br from-orange-50 to-orange-100 dark:from-orange-900/30 dark:to-orange-800/30 p-4 rounded-lg border border-orange-200 dark:border-orange-700">
-              <div class="text-sm text-orange-700 dark:text-orange-300 mb-1 font-medium">Adição</div>
-              <div class="text-lg font-bold text-orange-900 dark:text-orange-100">
-                {grupo.adicao_min || 0} a {grupo.adicao_max || 0}
-              </div>
-            </div>
-          </div>
-        </div>
-
-        <div class="glass-panel p-6 rounded-xl">
-          <div class="flex items-center justify-between mb-6">
-            <SectionHeader title="Lentes Disponíveis" subtitle={`${lentes.length} lente${lentes.length !== 1 ? 's' : ''} neste grupo`} />
-          </div>
-
-          {#if lentes.length === 0}
-            <div class="text-center py-20">
-              <div class="text-5xl mb-4">���</div>
-              <h3 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Nenhuma lente encontrada</h3>
-              <p class="text-gray-600 dark:text-gray-400">Este grupo ainda não possui lentes cadastradas</p>
-            </div>
-          {:else}
-            <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-              {#each lentes as lente (lente.id)}
-                <div in:fade>
-                  <LenteCard {lente} />
-                </div>
-              {/each}
-            </div>
+          {#if grupo.faixa_preco}
+            <div class="text-xs opacity-75 mt-1">{grupo.faixa_preco}</div>
           {/if}
         </div>
       </div>
-    </Container>
+    </div>
   </div>
-{/if}
+
+  <!-- Estatísticas Gerais -->
+  <SectionHeader title="📊 Estatísticas Gerais" subtitle="Resumo do grupo" />
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
+    <div class="glass-panel p-6 rounded-xl text-center">
+      <div class="text-4xl font-bold text-blue-600 mb-2">{grupo.total_lentes || 0}</div>
+      <div class="text-sm text-slate-600">Lentes</div>
+    </div>
+    <div class="glass-panel p-6 rounded-xl text-center">
+      <div class="text-4xl font-bold text-purple-600 mb-2">{grupo.total_marcas || 0}</div>
+      <div class="text-sm text-slate-600">Marcas</div>
+    </div>
+    <div class="glass-panel p-6 rounded-xl text-center">
+      <div class="text-4xl font-bold text-green-600 mb-2">{grupo.total_fornecedores || 0}</div>
+      <div class="text-sm text-slate-600">Fornecedores</div>
+    </div>
+    <div class="glass-panel p-6 rounded-xl text-center">
+      <div class="text-4xl font-bold text-orange-600 mb-2">{grupo.prazo_medio_dias || 0}</div>
+      <div class="text-sm text-slate-600">Prazo Médio (dias)</div>
+    </div>
+  </div>
+
+  <!-- Especificações Técnicas -->
+  <SectionHeader title="🔬 Especificações Técnicas" subtitle="Características ópticas" />
+  
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-6">
+    <div class="glass-panel p-6 rounded-xl">
+      <h3 class="font-semibold text-slate-900 mb-4">📏 Material e Índice</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-600">Material:</span>
+          <span class="font-medium">{grupo.material}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Índice Refração:</span>
+          <span class="font-medium">{grupo.indice_refracao}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Tipo:</span>
+          <span class="font-medium capitalize">{grupo.tipo_lente.replace('_', ' ')}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-panel p-6 rounded-xl">
+      <h3 class="font-semibold text-slate-900 mb-4">🎯 Faixas de Graus</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-600">Esférico:</span>
+          <span class="font-medium">
+            {grupo.grau_esferico_min ?? '-'} a {grupo.grau_esferico_max ?? '-'}
+          </span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Cilíndrico:</span>
+          <span class="font-medium">
+            {grupo.grau_cilindrico_min ?? '-'} a {grupo.grau_cilindrico_max ?? '-'}
+          </span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Adição:</span>
+          <span class="font-medium">
+            {grupo.adicao_min ?? '-'} a {grupo.adicao_max ?? '-'}
+          </span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-panel p-6 rounded-xl">
+      <h3 class="font-semibold text-slate-900 mb-4">✨ Tratamentos</h3>
+      <div class="space-y-2 text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-600">Anti-Reflexo:</span>
+          <span>{grupo.tem_antirreflexo ? '✅' : '❌'}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Anti-Risco:</span>
+          <span>{grupo.tem_antirrisco ? '✅' : '❌'}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Blue Light:</span>
+          <span>{grupo.tem_blue_light ? '✅' : '❌'}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">UV:</span>
+          <span>{grupo.tem_uv ? '✅' : '❌'}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Fotossensível:</span>
+          <span class="font-medium capitalize">{grupo.tratamento_foto}</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Análise Financeira -->
+  <SectionHeader title="💰 Análise Financeira" subtitle="Custos, margens e lucratividade" />
+  
+  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
+    <div class="glass-panel p-6 rounded-xl">
+      <h4 class="text-sm text-slate-600 mb-2">Preços</h4>
+      <div class="space-y-1 text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Mínimo:</span>
+          <span class="font-medium">{formatarPreco(grupo.preco_minimo)}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Médio:</span>
+          <span class="font-semibold text-blue-600">{formatarPreco(grupo.preco_medio)}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Máximo:</span>
+          <span class="font-medium">{formatarPreco(grupo.preco_maximo)}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-panel p-6 rounded-xl">
+      <h4 class="text-sm text-slate-600 mb-2">Custos</h4>
+      <div class="space-y-1 text-sm">
+        <div class="flex justify-between">
+          <span class="text-slate-500">Mínimo:</span>
+          <span class="font-medium">{formatarPreco(grupo.custo_minimo)}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Médio:</span>
+          <span class="font-semibold text-orange-600">{formatarPreco(grupo.custo_medio)}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-500">Máximo:</span>
+          <span class="font-medium">{formatarPreco(grupo.custo_maximo)}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="glass-panel p-6 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50">
+      <h4 class="text-sm text-green-800 mb-2 font-medium">Lucro Unitário</h4>
+      <div class="text-3xl font-bold text-green-700">
+        {formatarPreco(grupo.lucro_unitario)}
+      </div>
+      <div class="text-xs text-green-600 mt-1">Por lente vendida</div>
+    </div>
+
+    <div class="glass-panel p-6 rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50">
+      <h4 class="text-sm text-purple-800 mb-2 font-medium">Margem</h4>
+      <div class="text-3xl font-bold text-purple-700">
+        {formatarPercentual(grupo.margem_percentual)}
+      </div>
+      <div class="text-xs text-purple-600 mt-1">Markup: {grupo.markup || '-'}x</div>
+    </div>
+  </div>
+
+  <!-- Marcas -->
+  {#if grupo.marcas_disponiveis && Array.isArray(grupo.marcas_disponiveis) && grupo.marcas_disponiveis.length > 0}
+    <SectionHeader title="🏷️ Marcas" subtitle={`${grupo.marcas_disponiveis.length} marca${grupo.marcas_disponiveis.length !== 1 ? 's' : ''} neste grupo`} />
+    
+    <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+      <div class="flex flex-wrap gap-3">
+        {#each grupo.marcas_disponiveis as marca}
+          <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
+            <span class="font-medium text-slate-900">{typeof marca === 'string' ? marca : marca.marca_nome}</span>
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
+
+  <!-- Fornecedores -->
+  {#if grupo.fornecedores_disponiveis && Array.isArray(grupo.fornecedores_disponiveis) && grupo.fornecedores_disponiveis.length > 0}
+    <SectionHeader title="🚚 Fornecedores" subtitle="Opções de fornecimento" />
+    
+    <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+        {#each grupo.fornecedores_disponiveis as fornecedor}
+          <div class="bg-white p-4 rounded-lg border border-slate-200">
+            <div class="font-semibold text-slate-900 mb-2">{typeof fornecedor === 'string' ? fornecedor : fornecedor.nome}</div>
+            {#if typeof fornecedor === 'object' && fornecedor.prazo_visao_simples}
+              <div class="text-xs text-slate-600 space-y-1">
+                <div>Visão Simples: {fornecedor.prazo_visao_simples || 0} dias</div>
+                <div>Multifocal: {fornecedor.prazo_multifocal || 0} dias</div>
+              </div>
+            {/if}
+          </div>
+        {/each}
+      </div>
+    </div>
+  {/if}
+
+  <!-- Lentes -->
+  <SectionHeader 
+    title="🔍 Lentes" 
+    subtitle={`${lentes.length} lente${lentes.length !== 1 ? 's' : ''} cadastrada${lentes.length !== 1 ? 's' : ''}`} 
+  />
+  
+  <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
+    {#if lentes.length === 0}
+      <div class="text-center py-20">
+        <div class="text-5xl mb-4">📭</div>
+        <h3 class="text-xl font-semibold text-slate-900 mb-2">Nenhuma lente encontrada</h3>
+        <p class="text-slate-600">Este grupo ainda não possui lentes cadastradas</p>
+      </div>
+    {:else}
+      <div class="grid gap-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+        {#each lentes as lente (lente.id)}
+          <div in:fade>
+            <LenteCard {lente} isPremium={false} />
+          </div>
+        {/each}
+      </div>
+    {/if}
+  </div>
+
+  <!-- Metadata -->
+  <div class="glass-panel p-4 rounded-xl mb-8 bg-slate-50">
+    <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs text-slate-600">
+      <div>
+        <span class="font-medium">ID:</span> 
+        <span class="font-mono">{grupo.id.slice(0, 8)}...</span>
+      </div>
+      <div>
+        <span class="font-medium">Slug:</span> {grupo.slug}
+      </div>
+      <div>
+        <span class="font-medium">Peso:</span> {grupo.peso}
+      </div>
+      <div>
+        <span class="font-medium">Cadastro:</span> 
+        {new Date(grupo.created_at).toLocaleDateString('pt-BR')}
+      </div>
+      <div>
+        <span class="font-medium">Atualização:</span> 
+        {new Date(grupo.updated_at).toLocaleDateString('pt-BR')}
+      </div>
+      <div>
+        <span class="font-medium">Status:</span> 
+        <Badge variant={grupo.ativo ? 'success' : 'neutral'} size="sm">
+          {grupo.ativo ? 'Ativo' : 'Inativo'}
+        </Badge>
+      </div>
+    </div>
+  </div>
+
+  <!-- Ações -->
+  <div class="flex gap-4 justify-center">
+    <Button variant="secondary" on:click={() => goto('/catalogo/standard')}>
+      ← Voltar ao Catálogo
+    </Button>
+  </div>
+</Container>
