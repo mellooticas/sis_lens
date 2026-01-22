@@ -476,11 +476,13 @@ export class CatalogoAPI {
       const { data, error } = await supabase
         .from('v_grupos_canonicos')
         .select('*')
+        .eq('ativo', true)
         .order('preco_medio', { ascending: false })
         .limit(limite);
 
       if (error) throw error;
 
+      console.log('✅ Top caros carregados:', data?.length || 0, 'grupos');
       return {
         success: true,
         data: data || []
@@ -502,11 +504,13 @@ export class CatalogoAPI {
       const { data, error } = await supabase
         .from('v_grupos_canonicos')
         .select('*')
+        .eq('ativo', true)
         .order('total_lentes', { ascending: false })
         .limit(limite);
 
       if (error) throw error;
 
+      console.log('✅ Top populares carregados:', data?.length || 0, 'grupos');
       return {
         success: true,
         data: data || []
@@ -526,13 +530,16 @@ export class CatalogoAPI {
   static async buscarTopPremium(limite: number = 10): Promise<ApiResponse<import('$lib/types/database-views').VGruposCanonico[]>> {
     try {
       const { data, error } = await supabase
-        .from('v_grupos_premium')
+        .from('v_grupos_canonicos')
         .select('*')
+        .eq('ativo', true)
+        .eq('is_premium', true)
         .order('preco_medio', { ascending: false })
         .limit(limite);
 
       if (error) throw error;
 
+      console.log('✅ Top premium carregados:', data?.length || 0, 'grupos');
       return {
         success: true,
         data: data || []
