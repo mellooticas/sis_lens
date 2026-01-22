@@ -10,11 +10,23 @@ SELECT
   COUNT(*) FILTER (WHERE tem_ar = true) as com_true
 FROM v_lentes;
 
+| tratamento | total_com_true | com_true |
+| ---------- | -------------- | -------- |
+| tem_ar     | 1411           | 0        |
+
+
+
+
 SELECT 
   'tem_antirrisco' as tratamento,
   COUNT(*) as total_registros,
   COUNT(*) FILTER (WHERE tem_antirrisco = true) as com_true
 FROM v_lentes;
+
+| tratamento     | total_registros | com_true |
+| -------------- | --------------- | -------- |
+| tem_antirrisco | 1411            | 0        |
+
 
 SELECT 
   'tem_blue' as tratamento,
@@ -22,11 +34,23 @@ SELECT
   COUNT(*) FILTER (WHERE tem_blue = true) as com_true
 FROM v_lentes;
 
+
+| tratamento | total_registros | com_true |
+| ---------- | --------------- | -------- |
+| tem_blue   | 1411            | 0        |
+
+
 SELECT 
   'tem_uv' as tratamento,
   COUNT(*) as total_registros,
   COUNT(*) FILTER (WHERE tem_uv = true) as com_true
 FROM v_lentes;
+
+
+| tratamento | total_registros | com_true |
+| ---------- | --------------- | -------- |
+| tem_uv     | 1411            | 0        |
+
 
 SELECT 
   'tem_polarizado' as tratamento,
@@ -34,17 +58,34 @@ SELECT
   COUNT(*) FILTER (WHERE tem_polarizado = true) as com_true
 FROM v_lentes;
 
+
+| tratamento     | total_registros | com_true |
+| -------------- | --------------- | -------- |
+| tem_polarizado | 1411            | 0        |
+
 SELECT 
   'tem_hidrofobico' as tratamento,
   COUNT(*) as total_registros,
   COUNT(*) FILTER (WHERE tem_hidrofobico = true) as com_true
 FROM v_lentes;
 
+
+| tratamento      | total_registros | com_true |
+| --------------- | --------------- | -------- |
+| tem_hidrofobico | 1411            | 0        |
+
+
 SELECT 
   'tratamento_foto' as tratamento,
   COUNT(*) as total_registros,
   COUNT(*) FILTER (WHERE tratamento_foto != 'nenhum') as com_valor_diferente_nenhum
 FROM v_lentes;
+
+
+| tratamento      | total_registros | com_valor_diferente_nenhum |
+| --------------- | --------------- | -------------------------- |
+| tratamento_foto | 1411            | 0                          |
+
 
 SELECT 
   'tem_digital' as tratamento,
