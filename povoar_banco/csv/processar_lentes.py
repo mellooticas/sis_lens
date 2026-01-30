@@ -205,8 +205,14 @@ def main():
     # Processar NewLentes
     lentes_newlentes = processar_csv(root_dir / 'newlentes.csv', ID_FORNECEDOR_NEWLENTES)
     print(f"NewLentes: {len(lentes_newlentes)} registros.")
+
+    # Processar Solótica (Loja Oficial)
+    # ID gerado para Solótica Distribuidora
+    ID_FORNECEDOR_SOLOTICA = '189e3428-1b20-4246-86d3-25501e51147a' 
+    lentes_solotica = processar_csv(root_dir / 'banco' / 'solótica.csv', ID_FORNECEDOR_SOLOTICA)
+    print(f"Solótica (Oficial): {len(lentes_solotica)} registros.")
     
-    all_lentes = lentes_lentenet + lentes_newlentes
+    all_lentes = lentes_lentenet + lentes_newlentes + lentes_solotica
     
     # --- GERAR CSV DE MARCAS ---
     marcas_vistas = {}

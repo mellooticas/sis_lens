@@ -41,6 +41,10 @@ export class ContactLensAPI {
         query = query.in('fabricante_nome', filtros.fabricantes);
       }
 
+      if (filtros.fornecedores && filtros.fornecedores.length > 0) {
+        query = query.in('fornecedor_nome', filtros.fornecedores);
+      }
+
       if (filtros.precoMin !== undefined) {
         query = query.gte('preco_tabela', filtros.precoMin);
       }
@@ -75,26 +79,24 @@ export class ContactLensAPI {
   }
 
   /**
-   * Busca opções para os filtros (Marcas, Fabricantes)
+   * Busca opções para os filtros (Marcas, Fabricantes, Fornecedores)
    */
   static async buscarOpcoesFiltro() {
     try {
-      // Buscar marcas únicas
-      const { data: marcas } = await supabase
+      // Buscar marcas únicas e fornecedores únicos
+      const { data } = await supabase
         .from('v_lentes_contato')
-        .select('marca_nome')
-        .neq('marca_nome', null);
+        .select('marca_nome, fornecedor_nome');
 
-      // Buscar tipos únicos
-      // (Isso poderia ser hardcoded, mas vamos pegar do banco se possível ou usar os enums)
-      
-      const uniqueMarcas = [...new Set(marcas?.map(m => m.marca_nome))].sort();
+      const uniqueMarcas = [...new Set(data?.map(m => m.marca_nome))].filter(Boolean).sort();
+      const uniqueFornecedores = [...new Set(data?.map(m => m.fornecedor_nome))].filter(Boolean).sort();
 
       return {
-        marcas: uniqueMarcas
+        marcas: uniqueMarcas,
+        fornecedores: uniqueFornecedores
       };
     } catch (error) {
-      return { marcas: [] };
+      return { marcas: [], fornecedores: [] };
     }
   }
   /**
@@ -117,6 +119,34 @@ export class ContactLensAPI {
     } catch (error) {
       console.error('Erro ao buscar detalhes da lente:', error);
       return { success: false, error: 'Falha ao carregar detalhes' };
+    }
+  }
+  /**
+   * Atualizar preços e status de uma lente de contato
+   */
+  static async atualizarLente(params: {
+    id: string;
+    preco_custo: number;
+    preco_tabela: number;
+    ativo: boolean;
+  }): Promise<{ success: boolean; error?: string }> {
+    try {
+      const { error } = await supabase.rpc('update_lente_contact', {
+        p_id: params.id,
+        p_preco_custo: params.preco_custo,
+        p_preco_tabela: params.preco_tabela,
+        p_ativo: params.ativo
+      });
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao atualizar lente de contato:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
     }
   }
 }

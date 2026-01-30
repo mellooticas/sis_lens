@@ -41,6 +41,7 @@ export interface LenteContato {
   
   // Metadata
   disponivel: boolean;
+  ativo: boolean;
   descricao_curta: string;
   imagem_url?: string;
   
@@ -54,6 +55,7 @@ export interface FiltrosLentesContato {
   finalidades?: FinalidadeContato[];
   marcas?: string[];
   fabricantes?: string[];
+  fornecedores?: string[];
   precoMin?: number;
   precoMax?: number;
 }

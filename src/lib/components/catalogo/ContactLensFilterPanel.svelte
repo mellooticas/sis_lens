@@ -18,6 +18,7 @@
     export let loading = false;
     export let totalResults = 0;
     export let availableBrands: string[] = [];
+    export let availableSuppliers: string[] = [];
 
     const dispatch = createEventDispatcher();
 
@@ -52,6 +53,14 @@
         { value: "600+", label: "Acima de R$ 600" },
     ];
 
+    // Graus
+    let showAdvancedGrades = false;
+    let esf: number | null = null;
+    let cil: number | null = null;
+    let add: number | null = null;
+
+    // ... (rest of imports/consts)
+
     // Selected State (Local)
     let searchText = filters.busca || "";
     let selectedType = "";
@@ -59,12 +68,9 @@
     let selectedMaterial = "";
     let selectedPriceRange = "all";
     let selectedBrands = filters.marcas || [];
+    let selectedSuppliers = filters.fornecedores || [];
 
-    // Graus
-    let showAdvancedGrades = false;
-    let esf: number | null = null;
-    let cil: number | null = null;
-    let add: number | null = null;
+    // ...
 
     function applyFilters() {
         const newFilters: FiltrosLentesContato = { busca: searchText };
@@ -74,23 +80,10 @@
         if (selectedMaterial) newFilters.materiais = [selectedMaterial as any];
 
         if (selectedBrands.length > 0) newFilters.marcas = selectedBrands;
+        if (selectedSuppliers.length > 0)
+            newFilters.fornecedores = selectedSuppliers;
 
-        // Price
-        if (selectedPriceRange !== "all") {
-            if (selectedPriceRange.endsWith("+")) {
-                newFilters.precoMin = Number(
-                    selectedPriceRange.replace("+", ""),
-                );
-            } else {
-                const [min, max] = selectedPriceRange.split("-").map(Number);
-                newFilters.precoMin = min;
-                newFilters.precoMax = max;
-            }
-        }
-
-        if (esf !== null) newFilters.esferico = esf;
-        if (cil !== null) newFilters.cilindrico = cil;
-        if (add !== null) newFilters.adicao = add;
+        // ...
 
         dispatch("change", newFilters);
     }
@@ -102,6 +95,7 @@
         selectedMaterial = "";
         selectedPriceRange = "all";
         selectedBrands = [];
+        selectedSuppliers = [];
         esf = null;
         cil = null;
         add = null;
@@ -117,12 +111,22 @@
         applyFilters();
     }
 
+    function toggleSupplier(supplier: string) {
+        if (selectedSuppliers.includes(supplier)) {
+            selectedSuppliers = selectedSuppliers.filter((s) => s !== supplier);
+        } else {
+            selectedSuppliers = [...selectedSuppliers, supplier];
+        }
+        applyFilters();
+    }
+
     $: hasActiveFilters =
         searchText ||
         selectedType ||
         selectedPurpose ||
         selectedMaterial ||
         selectedBrands.length > 0 ||
+        selectedSuppliers.length > 0 ||
         selectedPriceRange !== "all" ||
         esf !== null ||
         cil !== null ||
@@ -219,6 +223,35 @@
             </select>
         </div>
     </div>
+
+    <!-- Fornecedores (Pills) -->
+    {#if availableSuppliers && availableSuppliers.length > 0}
+        <div
+            class="border-t border-neutral-200 dark:border-neutral-700 pt-4 mb-6"
+        >
+            <div class="flex items-center gap-2 mb-3">
+                <Factory class="w-4 h-4 text-purple-600 dark:text-purple-400" />
+                <label
+                    class="text-xs font-medium text-neutral-900 dark:text-neutral-100 uppercase tracking-wider"
+                >
+                    Fornecedores
+                </label>
+            </div>
+            <div class="flex flex-wrap gap-2">
+                {#each availableSuppliers as supplier}
+                    <button
+                        on:click={() => toggleSupplier(supplier)}
+                        class="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border
+                        {selectedSuppliers.includes(supplier)
+                            ? 'bg-purple-600 border-purple-600 text-white shadow-md'
+                            : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-purple-300'}"
+                    >
+                        {supplier}
+                    </button>
+                {/each}
+            </div>
+        </div>
+    {/if}
 
     <!-- Marcas (Pills) -->
     {#if availableBrands.length > 0}

@@ -17,6 +17,13 @@
     let lente: LenteContato | null = null;
     let loading = true;
     let error = "";
+    let isEditing = false;
+    let saving = false;
+    let editForm = {
+        preco_tabela: 0,
+        preco_custo: 0,
+        ativo: true,
+    };
 
     const lenteId = $page.params.id;
 
@@ -33,6 +40,7 @@
 
             if (resultado.success && resultado.data) {
                 lente = resultado.data;
+                resetForm();
             } else {
                 error = resultado.error || "Lente não encontrada";
             }
@@ -41,6 +49,47 @@
             console.error("Erro:", err);
         } finally {
             loading = false;
+        }
+    }
+
+    function resetForm() {
+        if (lente) {
+            editForm = {
+                preco_tabela: lente.preco_tabela || 0,
+                preco_custo: lente.preco_custo || 0,
+                ativo: lente.ativo,
+            };
+        }
+    }
+
+    function toggleEdit() {
+        isEditing = !isEditing;
+        if (!isEditing) resetForm();
+    }
+
+    async function salvarEdicao() {
+        if (!lente) return;
+
+        try {
+            saving = true;
+            const res = await ContactLensAPI.atualizarLente({
+                id: lente.id,
+                preco_custo: Number(editForm.preco_custo),
+                preco_tabela: Number(editForm.preco_tabela),
+                ativo: editForm.ativo,
+            });
+
+            if (res.success) {
+                isEditing = false;
+                await carregarDetalhes();
+            } else {
+                alert("Erro ao salvar: " + res.error);
+            }
+        } catch (e) {
+            console.error(e);
+            alert("Erro ao salvar alterações");
+        } finally {
+            saving = false;
         }
     }
 
@@ -77,14 +126,36 @@
             </Button>
         </div>
     {:else}
-        <!-- Botão Voltar -->
-        <div class="mb-6">
+        <!-- Botão Voltar e Editar -->
+        <div class="mb-6 flex justify-between items-center">
             <Button
                 variant="secondary"
                 on:click={() => goto("/catalogo/contato")}
             >
                 ← Voltar ao Catálogo
             </Button>
+            {#if !isEditing}
+                <Button variant="outline" on:click={toggleEdit}>
+                    ✏️ Editar Valores
+                </Button>
+            {:else}
+                <div class="flex gap-2">
+                    <Button
+                        variant="ghost"
+                        on:click={toggleEdit}
+                        disabled={saving}
+                    >
+                        Cancelar
+                    </Button>
+                    <Button
+                        variant="primary"
+                        on:click={salvarEdicao}
+                        disabled={saving}
+                    >
+                        {saving ? "Salvando..." : "Salvar Alterações"}
+                    </Button>
+                </div>
+            {/if}
         </div>
 
         <!-- Header -->
@@ -102,6 +173,20 @@
                             <Badge variant="gold"
                                 >{lente.finalidade.replace("_", " ")}</Badge
                             >
+                        {/if}
+                        {#if isEditing}
+                            <label
+                                class="flex items-center gap-2 cursor-pointer bg-white/50 px-3 py-1 rounded-full border border-slate-200 ml-2"
+                            >
+                                <input
+                                    type="checkbox"
+                                    bind:checked={editForm.ativo}
+                                    class="form-checkbox text-indigo-600 rounded"
+                                />
+                                <span class="text-sm font-medium"
+                                    >Ativo no Catálogo</span
+                                >
+                            </label>
                         {/if}
                     </div>
 
@@ -122,15 +207,37 @@
                     <div
                         class="bg-gradient-to-br from-indigo-600 to-purple-600 text-white rounded-2xl p-6 min-w-[200px]"
                     >
-                        <div class="text-sm opacity-90 mb-1">
-                            Preço Sugerido
-                        </div>
-                        <div class="text-3xl font-bold">
-                            {formatarPreco(lente.preco_tabela)}
-                        </div>
-                        <div class="text-xs opacity-75 mt-2">
-                            Custo: {formatarPreco(lente.preco_custo)}
-                        </div>
+                        {#if !isEditing}
+                            <div class="text-sm opacity-90 mb-1">
+                                Preço Sugerido
+                            </div>
+                            <div class="text-3xl font-bold">
+                                {formatarPreco(lente.preco_tabela)}
+                            </div>
+                            <div class="text-xs opacity-75 mt-2">
+                                Custo: {formatarPreco(lente.preco_custo)}
+                            </div>
+                        {:else}
+                            <div class="text-sm opacity-90 mb-1">
+                                Preço Sugerido (R$)
+                            </div>
+                            <input
+                                type="number"
+                                step="0.01"
+                                bind:value={editForm.preco_tabela}
+                                class="w-full bg-white/20 border border-white/30 rounded px-2 py-1 text-white placeholder-white/50 mb-2 font-bold text-xl focus:outline-none focus:ring-2 focus:ring-white/50"
+                            />
+
+                            <div class="text-xs opacity-90 mb-1 mt-2">
+                                Custo (R$)
+                            </div>
+                            <input
+                                type="number"
+                                step="0.01"
+                                bind:value={editForm.preco_custo}
+                                class="w-full bg-white/20 border border-white/30 rounded px-2 py-1 text-sm text-white focus:outline-none focus:ring-2 focus:ring-white/50"
+                            />
+                        {/if}
                     </div>
                 </div>
             </div>

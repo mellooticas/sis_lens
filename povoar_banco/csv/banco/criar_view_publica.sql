@@ -48,6 +48,7 @@ SELECT
     l.unidades_por_caixa,
     l.dias_uso,            -- Ex: 30 para mensal
     l.disponivel,
+    l.ativo,
     
     -- Cálculos (On-the-fly)
     CASE 

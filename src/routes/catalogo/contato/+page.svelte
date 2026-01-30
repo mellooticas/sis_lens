@@ -49,6 +49,7 @@
     let showDesktopFilters = false; // Começa fechado para limpar o visual inicial e destacar os KPIs, igual ao original
     let viewMode: "grid" | "list" = "grid";
     let availableBrands: string[] = [];
+    let availableSuppliers: string[] = [];
 
     onMount(async () => {
         await loadOptions();
@@ -58,6 +59,7 @@
     async function loadOptions() {
         const opts = await ContactLensAPI.buscarOpcoesFiltro();
         availableBrands = opts.marcas || [];
+        availableSuppliers = opts.fornecedores || [];
     }
 
     async function loadLenses() {
@@ -248,6 +250,7 @@
                             {filters}
                             {loading}
                             {availableBrands}
+                            {availableSuppliers}
                             totalResults={total}
                             on:change={handleFilterChange}
                             on:clear={handleClearFilters}
@@ -339,6 +342,7 @@
                             {filters}
                             {loading}
                             {availableBrands}
+                            {availableSuppliers}
                             totalResults={total}
                             on:change={handleFilterChange}
                             on:clear={handleClearFilters}

@@ -273,6 +273,35 @@ export class CatalogoAPI {
     }
   }
 
+  /**
+   * Atualizar preços e status de uma lente oftálmica
+   */
+  static async atualizarLente(params: {
+    id: string;
+    preco_custo: number;
+    preco_venda: number;
+    ativo: boolean;
+  }): Promise<ApiResponse<void>> {
+    try {
+      const { error } = await supabase.rpc('update_lente_catalog', {
+        p_id: params.id,
+        p_preco_custo: params.preco_custo,
+        p_preco_venda: params.preco_venda,
+        p_ativo: params.ativo
+      });
+
+      if (error) throw error;
+
+      return { success: true };
+    } catch (error) {
+      console.error('Erro ao atualizar lente:', error);
+      return {
+        success: false,
+        error: error instanceof Error ? error.message : 'Erro desconhecido'
+      };
+    }
+  }
+
   // ============================================================================
   // MÓDULO: STANDARD (v_grupos_canonicos - ~187 grupos standard)
   // ============================================================================
