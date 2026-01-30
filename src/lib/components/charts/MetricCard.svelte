@@ -1,50 +1,113 @@
 <script lang="ts">
+  import { TrendingUp, TrendingDown, Minus } from "lucide-svelte";
+
   export let title: string;
   export let value: string | number;
-  export let trend: 'up' | 'down' | 'neutral' = 'neutral';
-  export let trendValue: string = '';
-  export let icon: string = '📊';
-  export let color: 'blue' | 'green' | 'amber' | 'purple' | 'red' = 'blue';
-  
+  export let trend: "up" | "down" | "neutral" = "neutral";
+  export let trendValue: string = "";
+  export let icon: string = "📊";
+  export let color: "blue" | "green" | "amber" | "purple" | "red" = "blue";
+
   const colorClasses = {
-    blue: 'from-blue-500 to-blue-600',
-    green: 'from-green-500 to-green-600',
-    amber: 'from-amber-500 to-amber-600',
-    purple: 'from-purple-500 to-purple-600',
-    red: 'from-red-500 to-red-600'
+    blue: {
+      gradient: "from-brand-blue-500 to-brand-blue-600",
+      bg: "bg-brand-blue-50 dark:bg-brand-blue-900/20",
+      border: "border-brand-blue-200 dark:border-brand-blue-700/50",
+      text: "text-brand-blue-600 dark:text-brand-blue-400",
+    },
+    green: {
+      gradient: "from-green-500 to-green-600",
+      bg: "bg-green-50 dark:bg-green-900/20",
+      border: "border-green-200 dark:border-green-700/50",
+      text: "text-green-600 dark:text-green-400",
+    },
+    amber: {
+      gradient: "from-amber-500 to-amber-600",
+      bg: "bg-amber-50 dark:bg-amber-900/20",
+      border: "border-amber-200 dark:border-amber-700/50",
+      text: "text-amber-600 dark:text-amber-400",
+    },
+    purple: {
+      gradient: "from-purple-500 to-purple-600",
+      bg: "bg-purple-50 dark:bg-purple-900/20",
+      border: "border-purple-200 dark:border-purple-700/50",
+      text: "text-purple-600 dark:text-purple-400",
+    },
+    red: {
+      gradient: "from-red-500 to-red-600",
+      bg: "bg-red-50 dark:bg-red-900/20",
+      border: "border-red-200 dark:border-red-700/50",
+      text: "text-red-600 dark:text-red-400",
+    },
   };
-  
-  const trendColors = {
-    up: 'text-green-600 dark:text-green-400',
-    down: 'text-red-600 dark:text-red-400',
-    neutral: 'text-neutral-600 dark:text-neutral-400'
+
+  const trendConfig = {
+    up: {
+      icon: TrendingUp,
+      color: "text-green-600 dark:text-green-400",
+      bg: "bg-green-100 dark:bg-green-900/30",
+    },
+    down: {
+      icon: TrendingDown,
+      color: "text-red-600 dark:text-red-400",
+      bg: "bg-red-100 dark:bg-red-900/30",
+    },
+    neutral: {
+      icon: Minus,
+      color: "text-neutral-600 dark:text-neutral-400",
+      bg: "bg-neutral-100 dark:bg-neutral-700/30",
+    },
   };
+
+  $: currentColor = colorClasses[color];
+  $: currentTrend = trendConfig[trend];
 </script>
 
-<div class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
-  <div class="bg-gradient-to-r {colorClasses[color]} px-4 py-3">
-    <div class="flex items-center gap-2 text-white">
-      <span class="text-2xl">{icon}</span>
-      <span class="text-sm font-medium opacity-90">{title}</span>
+<div
+  class="glass-panel rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300 border {currentColor.border}"
+>
+  <!-- Header com gradiente -->
+  <div
+    class="bg-gradient-to-r {currentColor.gradient} px-5 py-4 relative overflow-hidden"
+  >
+    <!-- Efeito de brilho no hover -->
+    <div
+      class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500"
+    ></div>
+
+    <div class="flex items-center gap-3 text-white relative z-10">
+      <span class="text-3xl drop-shadow-md">{icon}</span>
+      <span class="text-sm font-semibold opacity-95 uppercase tracking-wider"
+        >{title}</span
+      >
     </div>
   </div>
-  <div class="p-6">
-    <div class="text-3xl font-bold text-neutral-900 dark:text-white mb-2">
+
+  <!-- Corpo do card -->
+  <div class="p-6 {currentColor.bg}">
+    <!-- Valor principal -->
+    <div
+      class="text-4xl font-bold {currentColor.text} mb-3 font-mono tracking-tight"
+    >
       {value}
     </div>
+
+    <!-- Trend indicator -->
     {#if trendValue}
-      <div class="flex items-center gap-2">
-        {#if trend === 'up'}
-          <span class="text-lg">📈</span>
-        {:else if trend === 'down'}
-          <span class="text-lg">📉</span>
-        {:else}
-          <span class="text-lg">➡️</span>
-        {/if}
-        <span class="text-sm {trendColors[trend]} font-medium">
+      <div
+        class="flex items-center gap-2 {currentTrend.bg} px-3 py-2 rounded-lg w-fit"
+      >
+        <svelte:component
+          this={currentTrend.icon}
+          class="w-4 h-4 {currentTrend.color}"
+        />
+        <span class="text-sm {currentTrend.color} font-semibold">
           {trendValue}
         </span>
       </div>
     {/if}
   </div>
+
+  <!-- Borda inferior decorativa -->
+  <div class="h-1 bg-gradient-to-r {currentColor.gradient} opacity-50"></div>
 </div>

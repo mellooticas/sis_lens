@@ -1,0 +1,18 @@
+
+--- AS 5 LENTES MAIS BARATAS (MENOR CUSTO) ---
+CUSTO      | LENTE                                              | LABORATÓRIO
+------------------------------------------------------------------------------------------
+3.50       | VARILUX LIBERTY DIGITAL AIRWEAR CLEAR (Crizal_Prev | brascor_final.csv
+3.50       | VARILUX LIBERTY DIGITAL ORMA CLEAR (Crizal_Prevenc | brascor_final.csv
+3.50       | VARILUX LIBERTY DIGITAL ORMA BLUE UV (Crizal_Preve | brascor_final.csv
+3.50       | VARILUX LIBERTY TRADICIONAL AIRWEAR CLEAR (Crizal_ | brascor_final.csv
+3.50       | VARILUX LIBERTY DIGITAL ORMA TRANSITIONS GEN S (Cr | brascor_final.csv
+
+--- AS 5 LENTES MAIS CARAS (MAIOR CUSTO) ---
+CUSTO      | LENTE                                              | LABORATÓRIO
+------------------------------------------------------------------------------------------
+7115.00    | HOYA WORKSTYLE V+ Workstyle V+ 1.74 LongLife       | hoya_final.csv
+7115.00    | HOYA WORKSTYLE V+ Workstyle V+ 1.74 BlueControl    | hoya_final.csv
+6845.00    | HOYA WORKSTYLE V+ Workstyle V+ 1.74 No-Risk BlueCo | hoya_final.csv
+6845.00    | HOYA WORKSTYLE V+ Workstyle V+ 1.74 No-Risk        | hoya_final.csv
+6550.00    | HOYA SPORTIVE Hoylux Sportive 1.74 BlueControl     | hoya_final.csv

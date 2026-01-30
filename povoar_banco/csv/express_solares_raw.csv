@@ -1,0 +1,6 @@
+﻿fornecedor,linha,familia,produto,tipo_lente,processo,design,material,indice,esf_min,esf_max,cil_min,cil_max,ar,blue,foto,marca_foto,diametro_mm,codigo_web,valor,observacoes
+Lentes Express,Express,Solar,SOLAR CR 1.50,VISAO_SIMPLES,ACABADA,ESF,CR,1.5,-4.0,4.0,0.0,-2.0,NAO,NAO,NAO,,65/70,,49.0,Solar comum
+Lentes Express,Express,Solar,SOLAR CR 1.50 CIL EXT,VISAO_SIMPLES,ACABADA,ESF,CR,1.5,-4.0,4.0,0.0,-4.0,NAO,NAO,NAO,,65/70,,79.0,Solar + cilindro estendido
+Lentes Express,Express,Solar,SOLAR CR 1.50 POLARIZADO,VISAO_SIMPLES,ACABADA,ESF,CR,1.5,-4.0,4.0,0.0,-2.0,NAO,NAO,NAO,,65/70,,129.0,Polarizado
+Lentes Express,Express,Solar,SOLAR POLI 1.59,VISAO_SIMPLES,ACABADA,ESF,POLI,1.59,-6.0,6.0,0.0,-2.0,NAO,NAO,NAO,,65/70,,89.0,Solar policarbonato
+Lentes Express,Express,Solar,SOLAR POLI 1.59 POLARIZADO,VISAO_SIMPLES,ACABADA,ESF,POLI,1.59,-6.0,6.0,0.0,-2.0,NAO,NAO,NAO,,65/70,,189.0,Polarizado

@@ -1,0 +1,56 @@
+﻿nome_completo_lente,material,indice_refracao,tratamento,esf_min,esf_max,cil_min,cil_max,observacoes,preco_custo
+Lente Ac. 1.49 Incolor,Acetato,1.49,Incolor,-4.0,6.0,0.0,-2.0,,18.5
+Lente Ac. 1.49 Incolor Cil. Estendido,Acetato,1.49,Incolor,-4.0,4.0,-2.25,-4.0,Cilindrico Estendido,26.0
+Lente Ac. 1.56 Blue Verniz Tintável,Acetato,1.56,Blue Verniz Tintável,-4.0,4.0,0.0,-2.0,,24.0
+Lente Ac. 1.56 Blue Verniz Tintável Cil. Estendido,Acetato,1.56,Blue Verniz Tintável,-4.0,4.0,-2.25,-4.0,Cilindrico Estendido,34.0
+Lente Ac. com AR 1.49,Acetato,1.49,AR,-4.0,4.0,0.0,-2.0,,13.5
+Lente Ac. com AR 1.56,Acetato,1.56,AR,-8.0,4.0,0.0,-2.0,,12.8
+Lente Ac. com AR 1.56 Cil. Estendido,Acetato,1.56,AR,-6.0,4.0,-2.25,-4.0,Cilindrico Estendido,27.0
+Lente Ac. Policarbonato Incolor HC,Policarbonato,1.59,Incolor HC,-6.0,4.0,0.0,-2.0,,17.4
+Lente Ac. Policarbonato Incolor HC Estendido,Policarbonato,1.59,Incolor HC,-6.0,2.0,0.0,-4.0,Cilindrico Estendido,44.0
+Lente Ac. Policarbonato com AR,Policarbonato,1.59,AR,-8.0,6.0,0.0,-2.0,,22.1
+Lente Ac. Policarbonato com AR Ext. Cil.,Policarbonato,1.59,AR,-6.0,4.0,-2.25,-4.0,Cilindrico Estendido,48.0
+Lente Ac. 1.61 com AR Super Hidrofóbico,Acetato,1.61,AR Super Hidrofóbico,-10.0,4.0,0.0,-2.0,,64.0
+Lente Ac. 1.61 com AR Super Hidrofóbico Estendido,Acetato,1.61,AR Super Hidrofóbico,0.0,-5.0,-4.0,-5.25,Cilindrico Estendido,64.0
+Lente Ac. 1.61 com AR Super Hidrofóbico (Esférica Pura),Acetato,1.61,AR Super Hidrofóbico,-12.5,-15.0,0.0,0.0,Apenas Esférica,64.0
+Lente Ac. 1.67 com AR Super Hidrofóbico,Acetato,1.67,AR Super Hidrofóbico,6.0,-12.0,0.0,-2.0,,98.0
+Lente Ac. 1.67 com AR Super Hidrofóbico (Esférica Pura),Acetato,1.67,AR Super Hidrofóbico,-12.5,-15.0,0.0,0.0,Apenas Esférica,98.0
+Lente Ac. 1.67 com AR Super Hidrofóbico Cil. Estendido,Acetato,1.67,AR Super Hidrofóbico,0.0,-8.0,-2.25,-4.0,Cilindrico Estendido,98.0
+Lente Ac. 1.74 com AR Super Hidrofóbico,Acetato,1.74,AR Super Hidrofóbico,-2.0,-12.0,0.0,-2.0,,368.0
+Lente Ac. 1.74 com AR Super Hidrofóbico (Esférica Pura),Acetato,1.74,AR Super Hidrofóbico,-12.5,-15.0,0.0,0.0,Apenas Esférica,368.0
+Lente Ac. 1.74 com AR Super Hidrofóbico Cil. Estendido,Acetato,1.74,AR Super Hidrofóbico,-2.0,-8.0,-2.25,-4.0,Cilindrico Estendido,368.0
+Lente Ac. 1.56 Foto com AR,Acetato,1.56,Fotossensível com AR,-6.0,4.0,0.0,-2.0,,48.0
+Lente Ac. 1.56 Foto com AR Cil. Estendido,Acetato,1.56,Fotossensível com AR,-4.0,4.0,-2.25,-4.0,Cilindrico Estendido,65.0
+Lente Ac. 1.50 Transitions Gen.8 com AR,Acetato,1.5,Transitions Gen 8 com AR,-2.0,2.0,0.0,-2.0,,195.0
+Lente Ac. 1.50 Transitions Gen.8 com AR (Esférica Estendida),Acetato,1.5,Transitions Gen 8 com AR,2.25,4.0,0.0,0.0,Apenas Esférica,195.0
+Lente Ac. 1.50 Transitions Gen.8 com AR (Esférica Estendida Negativa),Acetato,1.5,Transitions Gen 8 com AR,-2.25,-4.0,0.0,0.0,Apenas Esférica,195.0
+Lente Ac. 1.56 AR Verde,Acetato,1.56,AR Verde,-4.0,4.0,-4.25,-6.0,Cilindrico até -6.00,85.0
+Lente Ac. 1.56 Blue AR Verde,Acetato,1.56,Blue AR Verde,-4.0,4.0,-4.25,-6.0,Cilindrico até -6.00,98.0
+Lente 1.56 Ac. com AR Verde,Acetato,1.56,AR Verde,-8.0,4.0,0.0,-2.0,,26.0
+Lente 1.56 Ac. com AR Verde Cil. Estendido,Acetato,1.56,AR Verde,-6.0,4.0,-2.25,-4.0,Cilindrico Estendido,36.0
+Lente 1.56 Ac. com AR Azul,Acetato,1.56,AR Azul,-8.0,4.0,0.0,-2.0,,26.0
+Lente 1.56 Ac. com AR Azul Cil. Estendido,Acetato,1.56,AR Azul,-6.0,4.0,-2.25,-4.0,Cilindrico Estendido,36.0
+Lente 1.56 Ac. com AR Verde Super Hidrofóbico,Acetato,1.56,AR Verde Super Hidrofóbico,-6.0,4.0,0.0,-2.0,,44.0
+Lente 1.56 Ac. com AR Verde Super Hidrofóbico Cil. Estendido,Acetato,1.56,AR Verde Super Hidrofóbico,-6.0,4.0,-2.25,-4.0,Cilindrico Estendido,56.0
+Lente Ac. Policarbonato Blue Incolor HC,Policarbonato,1.59,Blue Incolor HC,-6.0,4.0,0.0,-2.0,,32.0
+Lente Ac. Policarbonato Blue Incolor HC Estendido,Policarbonato,1.59,Blue Incolor HC,-6.0,2.0,-2.25,-4.0,Cilindrico Estendido,47.0
+Lente Ac. Policarbonato com AR Azul,Policarbonato,1.59,AR Azul,-6.0,6.0,0.0,-2.0,,85.0
+Lente Ac. Policarbonato com AR Azul Cil. Estendido,Policarbonato,1.59,AR Azul,-6.0,6.0,-2.25,-4.0,Cilindrico Estendido,100.0
+Lente Ac. Policarbonato com AR Verde,Policarbonato,1.59,AR Verde,-8.0,6.0,0.0,-2.0,,37.0
+Lente Ac. Policarbonato com AR Verde Cil. Estendido,Policarbonato,1.59,AR Verde,-6.0,2.0,-2.25,-4.0,Cilindrico Estendido,55.0
+Lente Ac. Policarbonato com AR Verde Super Hidrofóbico,Policarbonato,1.59,AR Verde Super Hidrofóbico,-8.0,6.0,0.0,-2.0,,50.0
+Lente Ac. Policarbonato com AR Verde Super Hidrofóbico Cil. Estendido,Policarbonato,1.59,AR Verde Super Hidrofóbico,-6.0,2.0,-2.25,-4.0,Cilindrico Estendido,65.0
+Lente Ac. 1.61 Blue AR Azul,Acetato,1.61,Blue AR Azul,6.0,-10.0,0.0,-2.0,,75.0
+Lente Ac. 1.61 Blue AR Azul Estendido,Acetato,1.61,Blue AR Azul,0.0,-8.0,-2.25,-4.0,Cilindrico Estendido,90.0
+Lente Ac. 1.67 com AR Super Hidro,Acetato,1.67,AR Super Hidrofóbico,6.0,-12.0,0.0,-2.0,,140.0
+Lente Ac. 1.67 com AR Super Hidro (Esférica Pura),Acetato,1.67,AR Super Hidrofóbico,-12.5,-15.0,0.0,0.0,Apenas Esférica,140.0
+Lente Ac. 1.67 com AR Super Hidro Estendido,Acetato,1.67,AR Super Hidrofóbico,0.0,-8.0,-2.25,-4.0,Cilindrico Estendido,140.0
+Lente Ac. 1.70 Blue AR Verde Super Hidro,Acetato,1.7,Blue AR Verde Super Hidrofóbico,-3.0,-18.0,0.0,-2.0,,320.0
+Lente Ac. 1.70 Blue AR Verde Super Hidro (Esférica Pura),Acetato,1.7,Blue AR Verde Super Hidrofóbico,-18.5,-24.0,0.0,0.0,Apenas Esférica,320.0
+Lente Ac. 1.74 com AR Super Hidro,Acetato,1.74,AR Super Hidrofóbico,-2.0,-12.0,0.0,-2.0,,380.0
+Lente Ac. 1.74 com AR Super Hidro (Esférica Pura),Acetato,1.74,AR Super Hidrofóbico,-12.5,-15.0,0.0,0.0,Apenas Esférica,380.0
+Lente Ac. 1.74 com AR Super Hidro Estendido,Acetato,1.74,AR Super Hidrofóbico,-2.0,-8.0,-2.25,-4.0,Cilindrico Estendido,380.0
+Lente Ac. 1.56 Foto com AR Verde Super Hidro,Acetato,1.56,Fotossensível AR Verde Super Hidrofóbico,-4.0,3.0,0.0,-2.0,,66.0
+Lente Ac. 1.56 Fotossensível com AR Verde Super Hidro Cil. Estendido,Acetato,1.56,Fotossensível AR Verde Super Hidrofóbico,-4.0,3.0,-2.25,-4.0,Cilindrico Estendido,80.0
+Lente Ac. 1.61 Foto com AR Verde Super Hidro,Acetato,1.61,Fotossensível AR Verde Super Hidrofóbico,-10.0,6.0,0.0,-2.0,,150.0
+Lente Ac. 1.61 Foto com AR Verde Super Hidro Estendido,Acetato,1.61,Fotossensível AR Verde Super Hidrofóbico,-6.0,6.0,-2.25,-4.0,Cilindrico Estendido,150.0

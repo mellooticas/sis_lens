@@ -526,6 +526,13 @@ export interface FiltrosLentes {
     max?: number;
   };
   busca?: string;
+  fornecedores?: string[];
+  marca_premium?: boolean;
+  graus?: {
+    esferico?: number;
+    cilindrico?: number;
+    adicao?: number;
+  };
   // Filtros de Receita (Opcionais)
   receita?: {
     esferico: number;

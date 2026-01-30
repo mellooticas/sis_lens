@@ -84,6 +84,25 @@ export class CatalogoAPI {
       if (filtros.marcas && filtros.marcas.length > 0) {
         query = query.in('marca_nome', filtros.marcas);
       }
+      if (filtros.fornecedores && filtros.fornecedores.length > 0) {
+        query = query.in('fornecedor_nome', filtros.fornecedores);
+      }
+
+      // Filtros de Graus (Range Match)
+      if (filtros.graus) {
+        if (filtros.graus.esferico !== undefined) {
+          query = query.lte('grau_esferico_min', filtros.graus.esferico)
+                       .gte('grau_esferico_max', filtros.graus.esferico);
+        }
+        if (filtros.graus.cilindrico !== undefined) {
+          query = query.lte('grau_cilindrico_min', filtros.graus.cilindrico)
+                       .gte('grau_cilindrico_max', filtros.graus.cilindrico);
+        }
+        if (filtros.graus.adicao !== undefined) {
+          query = query.lte('adicao_min', filtros.graus.adicao)
+                       .gte('adicao_max', filtros.graus.adicao);
+        }
+      }
 
       // Filtro de marca premium
       if (filtros.marca_premium !== undefined) {

@@ -1,0 +1,313 @@
+
+--- Analisando: brascor.xlsx ---
+Abas: ['multi_dig', 'bifocais', 'vs_surf', 'vs_pronta', 'color', 'multi_essilor', 'multi_essilor_color', 'vs_essilor', 'vs_kids', 'vs_essilor_pronta', 'vs_surfacada_essilor', 'promocoes_completas', 'vs_essilor_solares', 'vs_essilor_coloracao', 'multi_kodak', 'ocupacional_kodak', 'vs_kodak', 'vs_pront_kodak', 'vs_kodak_polarizada', 'vs_kodak_coloridas', 'multi_kodak_polarizada', 'multi_kodak_colorida', 'multi_espace']
+
+Sheet [multi_dig] - Colunas:
+['Código', 'Nome completo da lente', 'Material', 'Índice', 'Diâmetro', 'Esf Min', 'Esf Max', 'Cil Max', 'Add Min', 'Add Max', 'Alt Min', 'Alt Max', 'AWAY', 'CLARUS', 'BLUE PROT', 'CLEAN', 'WHITE', 'INCOLOR']
+Primeiras linhas:
+   Código                Nome completo da lente Material  Índice  Diâmetro  Esf Min  Esf Max  Cil Max  Add Min  Add Max  Alt Min  Alt Max   AWAY  CLARUS  BLUE PROT  CLEAN  WHITE  INCOLOR
+0    9227  PRODIGE PLATINUM DIGITAL RESINA 1.50   Resina     1.5        70     -4.0      4.0     -4.0      0.5      4.0       17       20  474.0   414.0      409.0  429.0  369.0    294.0
+1    9754  PRODIGE PLATINUM DIGITAL RESINA 1.50   Resina     1.5        80     -4.0      4.0     -4.0      0.5      4.0       17       20  500.0   440.0      435.0  455.0  395.0    320.0
+
+Sheet [bifocais] - Colunas:
+['codigo_fornecedor', 'nome_completo_lente', 'material', 'indice', 'diametro', 'esf_min', 'esf_max', 'cil_max', 'adicao_min', 'adicao_max', 'away', 'clarus', 'blue_prot', 'clean', 'white', 'incolor']
+Primeiras linhas:
+   codigo_fornecedor                nome_completo_lente material  indice diametro  esf_min  esf_max  cil_max  adicao_min  adicao_max   away  clarus  blue_prot  clean  white  incolor
+0               5144     Bifocal Flat Top CR-39 Incolor   Resina    1.50        —      5.5     -4.0     -4.0         1.0         3.0  301.0   241.0      236.0  256.0  196.0    121.0
+1               5259  Bifocal Flat Top CR-39 Foto Cinza   Resina    1.56        —      5.5     -6.0     -4.0         1.0         3.0  330.0   270.0      265.0  285.0  225.0    150.0
+
+Sheet [vs_surf] - Colunas:
+['codigo_fornecedor', 'nome_completo_lente', 'material', 'indice', 'diametro', 'esf_min', 'esf_max', 'cil_max', 'away', 'clarus', 'blue_prot', 'clean', 'white', 'incolor']
+Primeiras linhas:
+   codigo_fornecedor                nome_completo_lente material  indice diametro  esf_min  esf_max  cil_max   away  clarus  blue_prot  clean  white  incolor
+0               5288  Visão Simples Resina 1.50 Chave 1   Resina     1.5     70mm      6.0     10.0     -6.0  269.0   209.0      204.0  224.0  164.0     89.0
+1               5295  Visão Simples Resina 1.50 Chave 2   Resina     1.5     80mm      6.0     10.0     -6.0  282.0   222.0      217.0  237.0  177.0    102.0
+
+Sheet [vs_pronta] - Colunas:
+['codigo_fornecedor', 'nome_completo_lente', 'material', 'indice', 'diametro', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'valor']
+Primeiras linhas:
+   codigo_fornecedor           nome_completo_lente material  indice diametro  esf_min  esf_max  cil_min  cil_max  valor
+0               1090  Pronta Resina Blue Cut Verde   Resina    1.56  65/70mm     -6.0      6.0      0.0     -2.0   30.0
+1               1390   Pronta Resina Blue Cut Azul   Resina    1.56  65/70mm     -6.0      6.0      0.0     -2.0   33.0
+
+Sheet [color] - Colunas:
+['codigo_fornecedor', 'nome_completo_lente', 'tipo_solar', 'material', 'cor_descricao', 'base', 'diametro', 'valor']
+Primeiras linhas:
+   codigo_fornecedor          nome_completo_lente tipo_solar material cor_descricao  base diametro  valor
+0               1060  Visão Simples Solar Incolor    Incolor  Resinex       Incolor   6.0     76mm   22.0
+1               1062  Visão Simples Solar Incolor    Incolor  Resinex       Incolor   8.0     76mm   25.0
+
+Sheet [multi_essilor] - Colunas:
+['codigo_item', 'nome_completo_lente', 'material', 'indice', 'marcacao', 'esf_min', 'esf_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Prevencia', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog']
+Primeiras linhas:
+            codigo_item                    nome_completo_lente material  indice marcacao  esf_min  esf_max  add_min  add_max  alt_min  alt_max  Crizal_Prevencia  Crizal_Sapphire_HR  Crizal_Rock  Crizal_Easy_Pro  Optifog
+0        ESS_XRPRO_ORMA                    Varilux XR Pro Orma   Resina     NaN       4D    -10.0      6.0      1.0      4.0       14      NaN              3336                3336            0                0     3122
+1  ESS_XRPRO_ORMA_TGENS  Varilux XR Pro Orma Transitions Gen S   Resina     NaN       4D    -10.0      6.0      1.0      4.0       14      NaN              3794                3794            0                0     3580
+
+Sheet [multi_essilor_color] - Colunas:
+['codigo_item', 'nome_completo_lente', 'material', 'indice', 'marcacao', 'esf_min', 'esf_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Sapphire_HR', 'Optifog', 'Verniz_HC']
+Primeiras linhas:
+               codigo_item                     nome_completo_lente material indice marcacao esf_min esf_max add_min add_max alt_min alt_max Crizal_Sapphire_HR Optifog  Verniz_HC
+0     ESS_XRPRO_SOLAR_ORMA               Varilux XR Pro Solar Orma   Resina   1.56       4D  -10.00   +6.00    1.00    3.50      14     NaN               3528    3533     3125.0
+1  ESS_XRPRO_SOLAR_AIRWEAR  Varilux XR Pro Solar Airwear PolyPower     Poli   1.59     P 4D  -10.00   +6.00    1.00    3.50      14     NaN               3652    3657     3249.0
+
+Sheet [vs_essilor] - Colunas:
+['codigo_item', 'nome_completo_lente', 'linha', 'modelo', 'nivel_eyezen', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Prevenica', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog', 'Trio_Easy_Clean', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+      codigo_item                              nome_completo_lente   linha modelo  nivel_eyezen           tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  Crizal_Prevenica  Crizal_Sapphire_HR  Crizal_Rock  Crizal_Easy_Pro  Optifog  Trio_Easy_Clean  Verniz_HC  preco_custo
+0      EZB04-ORMA                    ESSILOR EYEZEN BOOST 0.4 ORMA  EYEZEN  BOOST           0.4  VISAO_SIMPLES     ORMA     1.5     SIM         NAO        E    -10.0      6.0     -4.0      0.0      0.4      0.4       14      NaN             847.0               847.0        680.0            464.0    633.0              NaN        NaN        847.0
+1  EZB04-ORMA-TRS  ESSILOR EYEZEN BOOST 0.4 ORMA TRANSITIONS GEN S  EYEZEN  BOOST           0.4  VISAO_SIMPLES     ORMA     1.5     SIM       GEN_S        E    -10.0      6.0     -4.0      0.0      0.4      0.4       14      NaN            1370.0              1370.0       1203.0            987.0   1156.0              NaN        NaN       1370.0
+
+Sheet [vs_kids] - Colunas:
+['codigo_item', 'nome_completo_lente', 'linha', 'modelo', 'nivel_eyezen', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Prevenica', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog', 'Trio_Easy_Clean', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+  codigo_item                      nome_completo_lente   linha modelo nivel_eyezen           tipo material indice blue_uv transitions marcacao esf_min esf_max cil_min cil_max add_min add_max alt_min alt_max Crizal_Prevenica Crizal_Sapphire_HR Crizal_Rock Crizal_Easy_Pro Optifog Trio_Easy_Clean Verniz_HC preco_custo
+0  EK-STD-AIR              ESSILOR EYEZEN KIDS AIRWEAR  EYEZEN   KIDS          0.0  VISAO_SIMPLES  AIRWEAR   1.59     SIM         NAO      EKP  -10.00   +6.00   -4.00    0.00    0.00    0.00      14     NaN           804.00             804.00      637.00          421.00  590.00             NaN       NaN      804.00
+1   EK-TR-AIR  ESSILOR EYEZEN KIDS AIRWEAR TRANSITIONS  EYEZEN   KIDS          0.0  VISAO_SIMPLES  AIRWEAR   1.59     SIM         SIM     EKP_     NaN     NaN     NaN     NaN     NaN     NaN     NaN     NaN              NaN                NaN         NaN             NaN     NaN             NaN       NaN         NaN
+
+Sheet [vs_essilor_pronta] - Colunas:
+['codigo_item', 'nome_produto', 'linha', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'preco_custo']
+Primeiras linhas:
+   codigo_item                                        nome_produto         linha   tipo material  indice blue_uv transitions          tratamento  esf_min  esf_max  cil_min  cil_max  preco_custo
+0  EZS-STK-160  ESSILOR EYEZEN START STOCK 1.60 CRIZAL SAPPHIRE HR  EYEZEN_START  STOCK     ORMA    1.60     SIM         NAO  CRIZAL SAPPHIRE HR     -6.0      3.0     -2.0      0.0        777.0
+1  EZS-STK-174        ESSILOR STYLIS 1.74 STOCK CRIZAL SAPPHIRE HR  EYEZEN_START  STOCK   STYLIS    1.74     SIM         NAO  CRIZAL SAPPHIRE HR    -10.0     -4.0     -2.0      0.0        850.0
+
+Sheet [vs_surfacada_essilor] - Colunas:
+['codigo_item', 'nome_completo_lente', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'Crizal_Prevenica', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog', 'No_Reflexo', 'Trio_Easy_Clean', 'Sem_AR', 'preco_custo', 'Unnamed: 23']
+Primeiras linhas:
+  codigo_item                 nome_completo_lente   linha   modelo           tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  Crizal_Prevenica  Crizal_Sapphire_HR  Crizal_Rock  Crizal_Easy_Pro  Optifog  No_Reflexo  Trio_Easy_Clean  Sem_AR  preco_custo  Unnamed: 23
+0     VS-ORMA          ESSILOR VISAO SIMPLES ORMA  OUTRAS  VS_SURF  VISAO_SIMPLES     ORMA     1.5     NAO         NAO        E    -10.0      7.5      0.0     -6.0             754.0               754.0        587.0            371.0    540.0       281.0            279.0     NaN        754.0          NaN
+1  VS-ORMA-BU  ESSILOR VISAO SIMPLES ORMA BLUE UV  OUTRAS  VS_SURF  VISAO_SIMPLES     ORMA     1.5     SIM         NAO        E    -10.0      6.5      0.0     -6.0             766.0               766.0        599.0            383.0    552.0       293.0            291.0     NaN        766.0          NaN
+
+Sheet [promocoes_completas] - Colunas:
+['codigo_item', 'nome_lente', 'indice', 'tratamento', 'preco_promocional']
+Primeiras linhas:
+   codigo_item                          nome_lente  indice    tratamento  preco_promocional
+0         1039  Kodak City Transitions Gen S Cinza    1.50  Antirreflexo              227.0
+1         1377                         Kodak Intro    1.56  Antirreflexo               21.9
+
+Sheet [vs_essilor_solares] - Colunas:
+['codigo_item', 'nome_completo_lente', 'linha', 'modelo', 'nivel_eyezen', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Prevenica', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog', 'Trio_Easy_Clean', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+       codigo_item                               nome_completo_lente   linha modelo  nivel_eyezen           tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  Crizal_Prevenica  Crizal_Sapphire_HR  Crizal_Rock  Crizal_Easy_Pro  Optifog  Trio_Easy_Clean  Verniz_HC  preco_custo
+0      EZB085-ORMA                    ESSILOR EYEZEN BOOST 0.85 ORMA  EYEZEN  BOOST          0.85  VISAO_SIMPLES     ORMA     1.5     SIM         NAO        E    -10.0      6.0     -4.0      0.0     0.85     0.85     14.0      NaN             847.0               847.0        680.0            464.0    633.0              NaN        NaN        847.0
+1  EZB085-ORMA-TRS  ESSILOR EYEZEN BOOST 0.85 ORMA TRANSITIONS GEN S  EYEZEN  BOOST          0.85  VISAO_SIMPLES     ORMA     1.5     SIM         SIM        E    -10.0      6.0     -4.0      0.0     0.85     0.85     14.0      NaN            1370.0              1370.0       1203.0            987.0   1156.0              NaN        NaN       1370.0
+
+Sheet [vs_essilor_coloracao] - Colunas:
+['codigo_item', 'nome_completo_lente', 'linha', 'modelo', 'nivel_eyezen', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Prevenica', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog', 'Trio_Easy_Clean', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+      codigo_item                           nome_completo_lente   linha modelo nivel_eyezen           tipo material indice blue_uv transitions marcacao esf_min esf_max cil_min cil_max add_min add_max alt_min alt_max Crizal_Prevenica Crizal_Sapphire_HR Crizal_Rock Crizal_Easy_Pro Optifog Trio_Easy_Clean Verniz_HC preco_custo
+0  EZB-COL-ORMA-P    ESSILOR EYEZEN BOOST COLORACAO ORMA PADRAO  EYEZEN  BOOST    COLORACAO  VISAO_SIMPLES     ORMA   1.50     SIM         NAO        E  -10.00   +6.00   -4.00    0.00    0.00    0.00      14     NaN                -                  -           -               -       -             NaN    439.00      439.00
+1  EZB-COL-ORMA-E  ESSILOR EYEZEN BOOST COLORACAO ORMA ESPECIAL  EYEZEN  BOOST    COLORACAO  VISAO_SIMPLES     ORMA   1.50     SIM         NAO        E  -10.00   +6.00   -4.00    0.00    0.00    0.00      14     NaN                -                  -           -               -       -             NaN    470.00      470.00
+
+Sheet [multi_kodak] - Colunas:
+['codigo_item', 'nome_completo_lente', 'marca', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Prevenica', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog', 'No_Reflex', 'Trio_Easy_Clean', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+        codigo_item                           nome_completo_lente  marca       linha           modelo        tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  Crizal_Prevenica  Crizal_Sapphire_HR  Crizal_Rock  Crizal_Easy_Pro  Optifog  No_Reflex  Trio_Easy_Clean  Verniz_HC  preco_custo
+0      KOD-UINF-150                    KODAK UNIQUE INFINITE 1.50  KODAK  MULTIFOCAL  UNIQUE_INFINITE  MULTIFOCAL     ORMA     1.5     SIM         NAO     KuHD    -10.0     5.25      0.0     -2.0      NaN      NaN       14      NaN            1119.0              1119.0        952.0            736.0    905.0      646.0            644.0      497.0       1119.0
+1  KOD-UINF-150-TRS  KODAK UNIQUE INFINITE 1.50 TRANSITIONS GEN S  KODAK  MULTIFOCAL  UNIQUE_INFINITE  MULTIFOCAL     ORMA     1.5     SIM         SIM     KuHD    -10.0     5.25      0.0     -2.0      NaN      NaN       14      NaN            1620.0              1620.0       1453.0           1237.0   1406.0     1147.0           1145.0      998.0       1620.0
+
+Sheet [ocupacional_kodak] - Colunas:
+['KOD-SOFT-150', 'KODAK SOFTWEAR 1.50', 'KODAK', 'OCUPACIONAL', 'SOFTWEAR', 'OCUPACIONAL.1', 'ORMA', '1.50', 'SIM', 'NAO', 'Kw', '-10.00', '+5.00', '0.00', '-6.00', '1.00', '3.50', 17, 'NULL', '861.00', '861.00.1', '694.00', '478.00', '647.00', '388.00', '386.00', '239.00', '861.00.2']
+Primeiras linhas:
+    KOD-SOFT-150  KODAK SOFTWEAR 1.50  KODAK  OCUPACIONAL  SOFTWEAR OCUPACIONAL.1    ORMA  1.50  SIM  NAO   Kw  -10.00  +5.00  0.00  -6.00  1.00  3.50  17  NULL  861.00  861.00.1  694.00  478.00  647.00  388.00  386.00  239.00  861.00.2
+0  KOD-SOFT-POLY  KODAK SOFTWEAR POLY  KODAK  OCUPACIONAL  SOFTWEAR   OCUPACIONAL    POLY  1.59  SIM  NAO  KwP   -10.0    6.0   0.0   -6.0   1.0   3.5  17   NaN   976.0     976.0   809.0   593.0   762.0   503.0   501.0   354.0     976.0
+1   KOD-SOFT-167  KODAK SOFTWEAR 1.67  KODAK  OCUPACIONAL  SOFTWEAR   OCUPACIONAL  STYLIS  1.67  SIM  NAO  KwI   -14.0    8.0   0.0   -6.0   1.0   3.5  17   NaN  1617.0    1617.0  1450.0  1234.0  1403.0  1144.0  1142.0     NaN    1617.0
+
+Sheet [vs_kodak] - Colunas:
+['codigo_item', 'nome_completo_lente', 'marca', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Prevenica', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog', 'No_Reflex', 'Trio_Easy_Clean', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+          codigo_item                  nome_completo_lente  marca          linha  modelo           tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  Crizal_Prevenica  Crizal_Sapphire_HR  Crizal_Rock  Crizal_Easy_Pro  Optifog  No_Reflex  Trio_Easy_Clean  Verniz_HC  preco_custo
+0      KOD-SINGLE-150                    KODAK SINGLE 1.50  KODAK  VISAO_SIMPLES  SINGLE  VISAO_SIMPLES     ORMA     1.5     SIM         NAO        K    -10.0      6.0      0.0     -6.0      NaN      NaN      NaN      NaN             818.0               818.0        651.0            435.0    604.0      345.0            343.0      196.0        818.0
+1  KOD-SINGLE-150-TRS  KODAK SINGLE 1.50 TRANSITIONS GEN S  KODAK  VISAO_SIMPLES  SINGLE  VISAO_SIMPLES     ORMA     1.5     SIM         SIM        K    -10.0      6.0      0.0     -6.0      NaN      NaN      NaN      NaN            1318.0              1318.0       1151.0            935.0   1104.0      845.0            843.0      696.0       1318.0
+
+Sheet [vs_pront_kodak] - Colunas:
+['codigo_item', 'nome_completo_lente', 'marca', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'preco_custo']
+Primeiras linhas:
+     codigo_item nome_completo_lente  marca  linha modelo           tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  preco_custo
+0   KOD-CITY-167     KODAK CITY 1.67  KODAK  STOCK   CITY  VISAO_SIMPLES   STYLIS    1.67     SIM         NAO        K    -10.0      0.0      0.0     -2.0      NaN      NaN      NaN      NaN        403.0
+1  KOD-CITY-POLY     KODAK CITY POLY  KODAK  STOCK   CITY  VISAO_SIMPLES     POLY    1.59     SIM         NAO        K     -8.0      4.0      0.0     -2.0      NaN      NaN      NaN      NaN        228.0
+
+Sheet [vs_kodak_polarizada] - Colunas:
+['codigo_item', 'nome_completo_lente', 'marca', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Sapphire_HR', 'Optifog', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+               codigo_item               nome_completo_lente  marca  linha      modelo           tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  Crizal_Sapphire_HR  Optifog  Verniz_HC  preco_custo
+0   KOD-SINGLE-SUN-150-POL  KODAK SINGLE SUN POLARIZADA 1.50  KODAK  SOLAR  SINGLE_SUN  VISAO_SIMPLES     ORMA    1.50     NAO         NAO        K    -10.0      6.0      0.0     -2.0      NaN      NaN      NaN      NaN               897.0    902.0      494.0        897.0
+1  KOD-SINGLE-SUN-POLY-POL  KODAK SINGLE SUN POLARIZADA POLY  KODAK  SOLAR  SINGLE_SUN  VISAO_SIMPLES     POLY    1.59     NAO         NAO       KP    -10.0      6.0      0.0     -2.0      NaN      NaN      NaN      NaN              1013.0   1018.0      610.0       1013.0
+
+Sheet [vs_kodak_coloridas] - Colunas:
+['codigo_item', 'nome_completo_lente', 'marca', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+          codigo_item                      nome_completo_lente  marca     linha      modelo           tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  Verniz_HC  preco_custo
+0  KOD-VS-COL-150-PAD    KODAK SINGLE SUN COLORIDA PADRAO 1.50  KODAK  COLORIDA  SINGLE_SUN  VISAO_SIMPLES     ORMA     1.5     NAO         NAO        K    -10.0      6.0      0.0     -2.0      NaN      NaN      NaN    384.0      384.0          NaN
+1  KOD-VS-COL-150-ESP  KODAK SINGLE SUN COLORIDA ESPECIAL 1.50  KODAK  COLORIDA  SINGLE_SUN  VISAO_SIMPLES     ORMA     1.5     NAO         NAO        K    -10.0      6.0      0.0     -2.0      NaN      NaN      NaN    415.0      415.0          NaN
+
+Sheet [multi_kodak_polarizada] - Colunas:
+['codigo_item', 'nome_completo_lente', 'marca', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Crizal_Sapphire_HR', 'Optifog', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+               codigo_item                        nome_completo_lente  marca  linha    modelo        tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  Crizal_Sapphire_HR  Optifog  Verniz_HC  preco_custo
+0   KOD-EASYSUN-MF-150-POL  KODAK EASY SUN MULTIFOCAL POLARIZADA 1.50  KODAK  SOLAR  EASY_SUN  MULTIFOCAL     ORMA    1.50     NAO         NAO      Kz+   -10.25     5.25      0.0     -2.0      1.0      3.5       14      NaN               955.0    960.0      552.0        955.0
+1  KOD-EASYSUN-MF-POLY-POL  KODAK EASY SUN MULTIFOCAL POLARIZADA POLY  KODAK  SOLAR  EASY_SUN  MULTIFOCAL     POLY    1.59     NAO         NAO     KzP+   -10.25     5.25      0.0     -2.0      1.0      3.5       14      NaN              1071.0   1076.0      668.0       1071.0
+
+Sheet [multi_kodak_colorida] - Colunas:
+['codigo_item', 'nome_completo_lente', 'marca', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'Verniz_HC', 'preco_custo']
+Primeiras linhas:
+          codigo_item                               nome_completo_lente  marca     linha    modelo        tipo material  indice blue_uv transitions marcacao  esf_min  esf_max  cil_min  cil_max  add_min  add_max  alt_min  alt_max  Verniz_HC  preco_custo
+0  KOD-MF-COL-150-PAD    KODAK EASY SUN MULTIFOCAL COLORIDA PADRAO 1.50  KODAK  COLORIDA  EASY_SUN  MULTIFOCAL     ORMA     1.5     NAO         NAO      Kz+   -10.25     5.25      0.0     -2.0      1.0      3.5       14      NaN      437.0        437.0
+1  KOD-MF-COL-150-ESP  KODAK EASY SUN MULTIFOCAL COLORIDA ESPECIAL 1.50  KODAK  COLORIDA  EASY_SUN  MULTIFOCAL     ORMA     1.5     NAO         NAO      Kz+   -10.25     5.25      0.0     -2.0      1.0      3.5       14      NaN      468.0        468.0
+
+Sheet [multi_espace] - Colunas:
+['codigo_item', 'nome_completo_lente', 'linha', 'modelo', 'tipo', 'material', 'indice', 'blue_uv', 'transitions', 'bloco', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'Crizal_Prevenica', 'Crizal_Sapphire_HR', 'Crizal_Rock', 'Crizal_Easy_Pro', 'Optifog', 'Trio_Easy_Clean', 'Sem_AR', 'preco_custo']
+Primeiras linhas:
+            codigo_item                       nome_completo_lente   linha modelo        tipo material indice blue_uv transitions bloco marcacao esf_min esf_max cil_min cil_max add_min add_max alt_min Crizal_Prevenica Crizal_Sapphire_HR Crizal_Rock Crizal_Easy_Pro Optifog Trio_Easy_Clean  Sem_AR preco_custo
+0     ESP-PLUS-ORMA-UHD              ESSILOR ESPACE PLUS ORMA UHD  ESPACE   PLUS  MULTIFOCAL     ORMA   1.50     SIM         NAO   UHD      3SD  -10.25   +5.25    0.00   -2.00    1.00    3.50      16           868.00             868.00      701.00          485.00  654.00          393.00  246.00      868.00
+1  ESP-PLUS-ORMA-UHD-TR  ESSILOR ESPACE PLUS ORMA UHD TRANSITIONS  ESPACE   PLUS  MULTIFOCAL     ORMA   1.50     SIM         SIM   UHD       3S  -10.25   +5.25    0.00   -2.00    1.00    3.50      16          1160.00            1160.00      993.00          777.00  946.00          685.00  538.00     1160.00
+
+--- Analisando: hoya.xlsx ---
+Abas: ['vs', 'ocupacional', 'especiais']
+
+Sheet [vs] - Colunas:
+['fornecedor', 'linha', 'design', 'modelo', 'tipo_lente', 'cor', 'tratamento', 'ar', 'eyvia_1_74', 'eynoa_1_67', 'eyas_1_60', 'pnx_1_53', 'organic_1_50', 'esferico', 'cilindrico', 'adicao', 'diametros', 'observacoes']
+Primeiras linhas:
+  fornecedor  linha    design                             modelo     tipo_lente      cor   tratamento   ar  eyvia_1_74  eynoa_1_67  eyas_1_60  pnx_1_53  organic_1_50        esferico    cilindrico  adicao     diametros                                                observacoes
+0       HOYA  NULUX  Asférica  Miolight (neg) / Hiperlight (pos)  Visão Simples  Incolor  BlueControl  SIM         NaN      1320.0        NaN       NaN           NaN  -10,00 a +6,00  0,00 a -3,00     NaN  65 / 70 / 75  Miolight para graus negativos e Hiperlight para positivos
+1       HOYA  NULUX  Asférica  Miolight (neg) / Hiperlight (pos)  Visão Simples  Incolor  LongLife UV  SIM         NaN      1350.0     1050.0       NaN           NaN  -10,00 a +6,00  0,00 a -2,00     NaN  65 / 70 / 75                                                        NaN
+
+Sheet [ocupacional] - Colunas:
+['fornecedor', 'linha', 'design', 'modelo', 'tipo_lente', 'cor', 'tratamento', 'ar', 'eyvia_1_74', 'eynoa_1_67', 'eyas_1_60', 'pnx_1_53', 'organic_1_50', 'esferico', 'cilindrico', 'adicao', 'diametros', 'observacoes']
+Primeiras linhas:
+  fornecedor         linha                 design        modelo   tipo_lente      cor   tratamento   ar  eyvia_1_74  eynoa_1_67  eyas_1_60  pnx_1_53  organic_1_50        esferico    cilindrico       adicao diametros                                                                observacoes
+0       HOYA  WORKSTYLE V+  Digital personalizada  Workstyle V+  Ocupacional  Incolor  BlueControl  SIM      7115.0      5603.0     3821.0      3335          3011  -15,00 a +9,00  0,00 a -6,00  1,00 a 3,50    até 80  Lente ocupacional para trabalho; alturas 15–18mm; produção fora do Brasil
+1       HOYA  WORKSTYLE V+  Digital personalizada  Workstyle V+  Ocupacional  Incolor     LongLife  SIM      7115.0      5603.0     3821.0      3335          3011  -15,00 a +9,00  0,00 a -6,00  1,00 a 3,50    até 80  Lente ocupacional para trabalho; alturas 15–18mm; produção fora do Brasil
+
+Sheet [especiais] - Colunas:
+['fornecedor', 'linha', 'design', 'modelo', 'tipo_lente', 'cor', 'tratamento', 'ar', 'eyvia_1_74', 'eynoa_1_67', 'eyas_1_60', 'pnx_1_53', 'organic_1_50', 'esferico', 'cilindrico', 'adicao', 'diametros', 'observacoes']
+Primeiras linhas:
+  fornecedor      linha    design     modelo                     tipo_lente            cor tratamento   ar  eyvia_1_74  eynoa_1_67  eyas_1_60  pnx_1_53  organic_1_50      esferico    cilindrico adicao diametros                                                                 observacoes
+0       HOYA  MiYOSMART  Asférica  MiYOSMART  Especial – Controle de Miopia        Incolor  MiYOSMART  SIM         NaN         NaN     1989.0       NaN           NaN  -6,00 a 0,00  0,00 a -2,00    NaN    até 73  Lente especial para controle da progressão da miopia (D.I.M.S. Technology)
+1       HOYA  MiYOSMART  Asférica  MiYOSMART  Especial – Controle de Miopia  Fotossensível  MiYOSMART  SIM         NaN         NaN     2189.0       NaN           NaN  -6,00 a 0,00  0,00 a -2,00    NaN   60 a 75                                  Versão fotossensível disponível sob pedido
+
+--- Analisando: polilux.xlsx ---
+Abas: ['vs', 'multi', 'servicos', 'vs_surf', 'Planilha5', 'multi_surf', 'mulit_marcas', 'bifocais']
+
+Sheet [vs] - Colunas:
+['fornecedor', 'indice_refracao', 'tipo_lente', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'valor_custo']
+Primeiras linhas:
+  fornecedor  indice_refracao     tipo_lente tratamento  esf_min  esf_max  cil_min  cil_max  valor_custo
+0    POLYLUX             1.49  VISAO_SIMPLES         AR     -4.0      4.0     -2.0      0.0         10.0
+1    POLYLUX             1.56  VISAO_SIMPLES    INCOLOR     -6.0      6.0     -2.0      0.0         13.5
+
+Sheet [multi] - Colunas:
+['fornecedor', 'indice_refracao', 'tipo_lente', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'valor_custo']
+Primeiras linhas:
+  fornecedor  indice_refracao  tipo_lente      tratamento  esf_min  esf_max  cil_min  cil_max  add_min  add_max  valor_custo
+0    POLYLUX             1.56  MULTIFOCAL              AR     -2.0      3.0      NaN      NaN      1.0      3.0         40.0
+1    POLYLUX             1.56  MULTIFOCAL  FREE FORM + AR     -2.0      3.0      NaN      NaN      1.0      3.0         60.0
+
+Sheet [servicos] - Colunas:
+['fornecedor', 'codigo_servico', 'categoria_servico', 'descricao', 'valor_custo']
+Primeiras linhas:
+  fornecedor codigo_servico categoria_servico              descricao  valor_custo
+0    POLYLUX            M01          MONTAGEM       MONTAGEM SIMPLES         12.0
+1    POLYLUX            M02          MONTAGEM  MONTAGEM FIO DE NYLON         14.0
+
+Sheet [vs_surf] - Colunas:
+['fornecedor', 'bloco', 'linha_comercial', 'codigo_produto', 'indice_refracao', 'material', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'altura_min', 'altura_max', 'diametro_mm', 'valor_custo']
+Primeiras linhas:
+  fornecedor                    bloco        linha_comercial  codigo_produto  indice_refracao material tratamento  esf_min  esf_max  cil_min  cil_max  altura_min  altura_max  diametro_mm  valor_custo
+0    POLYLUX  VISAO SIMPLES SURFACADA  Visão Simples Digital            3001             1.49   RESINA    INCOLOR     -6.0      6.0     -4.0      0.0          80          80           80         72.0
+1    POLYLUX  VISAO SIMPLES SURFACADA  Visão Simples Digital            3002             1.49   RESINA         AR     -6.0      6.0     -4.0      0.0          80          80           80        131.0
+
+Sheet [Planilha5] - Colunas:
+[]
+Primeiras linhas:
+Empty DataFrame
+Columns: []
+Index: []
+
+Sheet [multi_surf] - Colunas:
+['fornecedor', 'bloco', 'linha_comercial', 'codigo_produto', 'indice_refracao', 'material', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'altura_min', 'altura_max', 'add_min', 'add_max', 'diametro_mm', 'valor_custo']
+Primeiras linhas:
+  fornecedor                     bloco linha_comercial codigo_produto indice_refracao material         tratamento esf_min esf_max cil_min cil_max altura_min altura_max add_min add_max diametro_mm valor_custo
+0    POLYLUX  MULTIFOCAIS DIGITAL PLUZ    Digital Pluz           1003            1.49       CR       BLUE AR AZUL   -4.00   +6.00   -4.00    0.00         16         20    1.00    3.50          75      122.00
+1    POLYLUX  MULTIFOCAIS DIGITAL PLUZ    Digital Pluz           1004            1.49       CR  BLUE FOTO AR AZUL   -4.00   +6.00   -4.00    0.00         16         20    1.00    3.50          75      158.00
+
+Sheet [mulit_marcas] - Colunas:
+['fornecedor', 'bloco', 'linha_comercial', 'codigo_produto', 'indice_refracao', 'material', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'altura_min', 'altura_max', 'add_min', 'add_max', 'diametro_mm', 'valor_custo']
+Primeiras linhas:
+  fornecedor                bloco           linha_comercial  codigo_produto  indice_refracao material   tratamento  esf_min  esf_max  cil_min  cil_max  altura_min  altura_max  add_min  add_max  diametro_mm  valor_custo
+0    POLYLUX  MULTIFOCAIS ESSILOR            Essilor Espace              13             1.49       CR      INCOLOR     -5.0      5.0     -4.0      0.0          20          20      1.0      3.5           75         77.0
+1    POLYLUX  MULTIFOCAIS ESSILOR  Essilor Espace Aclimates              14             1.49       CR  TRANSITIONS     -5.0      5.0     -4.0      0.0          20          20      1.0      3.5           75        278.0
+
+Sheet [bifocais] - Colunas:
+['fornecedor', 'bloco', 'linha_comercial', 'codigo_produto', 'indice_refracao', 'material', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'altura_min', 'altura_max', 'add_min', 'add_max', 'diametro_mm', 'valor_custo']
+Primeiras linhas:
+  fornecedor     bloco   linha_comercial  codigo_produto  indice_refracao material tratamento  esf_min  esf_max  cil_min  cil_max  altura_min  altura_max  add_min  add_max  diametro_mm  valor_custo
+0    POLYLUX  BIFOCAIS     Bifocal Ultex              34             1.49     CR39    INCOLOR     -4.0      4.0     -3.0      0.0          16          16      1.0      3.0           65         79.0
+1    POLYLUX  BIFOCAIS  Bifocal Flap Top              36             1.49     CR39    INCOLOR     -4.0      4.0     -3.0      0.0          16          16      1.0      3.0           65         95.0
+
+--- Analisando: sygma.xlsx ---
+Abas: ['vs', 'vs_surf', 'color', 'bifocais', 'multi', 'multi_surf', 'multi_dig', 'multi_essilor', 'servicos']
+
+Sheet [vs] - Colunas:
+['Categoria', 'Descrição da Lente', 'Cod. Web', 'Valor / Par', 'Grade', 'Æ']
+Primeiras linhas:
+          Categoria            Descrição da Lente  Cod. Web  Valor / Par                                 Grade         Æ
+0  Visão Simples CR            LT CR 1.49 Incolor         1         12.0   Esf. -6,00 a +6,00Cil. 0,00 a -2,00  Ø-70/+65
+1  Visão Simples CR  LT CR 1.49 Incolor Cil. Ext.      1929         15.5  Esf. -4,00 a +4,00Cil. -2,25 a -4,00  Ø-70/+65
+
+Sheet [vs_surf] - Colunas:
+['Descrição', 'Cód. Web', 'Valor / Par', 'Dioptria', 'Índice', 'Æ']
+Primeiras linhas:
+                          Descrição  Cód. Web  Valor / Par                        Dioptria  Índice   Æ
+0   Visão Simples CR (NÃO TINTÁVEL)      5034           40    -6,00 à +6,00 Cil. até -4,00    1.49  70
+1  Visão Simples CR Plus (TINTÁVEL)      5035           50  -10,00 à +10,00 Cil. até -6,00    1.50  76
+
+Sheet [color] - Colunas:
+['Categoria', 'Descrição da Lente', 'Valor / Par', 'Cores', 'Æ']
+Primeiras linhas:
+               Categoria           Descrição da Lente  Valor / Par                                   Cores         Æ
+0  Visão Simples Solares    LT Solar 1.50 Plana Total           20  Cinza, Cinza Black, G15, Verde, Marrom  Ø-70/+65
+1  Visão Simples Solares  LT Solar 1.50 Plana Degradê           18                    Cinza, Verde, Marrom  Ø-70/+65
+
+Sheet [bifocais] - Colunas:
+['Tipo', 'Cód. Web', 'Valor / Par', 'Dioptria', 'Adição', 'Altura', 'Índice', 'Æ']
+Primeiras linhas:
+          Tipo  Cód. Web  Valor / Par                      Dioptria       Adição  Altura  Índice   Æ
+0     Ultex CR      5016           50  -4,00 à +6,00 Cil. até -4,00  1,00 a 3,50      14    1.53  70
+1  Ultex Photo      5017           60  -4,00 à +6,00 Cil. até -4,00  1,00 a 3,50      14    1.56  70
+
+Sheet [multi] - Colunas:
+['Categoria', 'Descrição da Lente', 'Cod. Web', 'Valor / Par', 'Grade', 'Æ']
+Primeiras linhas:
+                 Categoria                     Descrição da Lente  Cod. Web  Valor / Par                                   Grade    Æ
+0  Lente Pronta Multifocal                    Multifocal CR 1.499      1344         22.5   Ad. +1,00 a +3,00 | Esf. 0,00 a +3,00  Ø75
+1  Lente Pronta Multifocal  Multifocal 1.56 C/AR (Residual Verde)        30         27.0  Ad. +1,00 a +3,00 | Esf. -3,00 a +3,00  Ø75
+
+Sheet [multi_surf] - Colunas:
+['Descrição', 'Cód. Web', 'Valor / Par', 'Dioptria', 'Adição', 'Altura', 'Índice', 'Æ']
+Primeiras linhas:
+                                    Descrição  Cód. Web  Valor / Par                      Dioptria       Adição  Altura  Índice   Æ
+0           Multifocal CR Plus (NÃO TINTÁVEL)      5000           50  -4,00 à +6,00 Cil. até -4,00  1,00 à 3,50      20    1.56  75
+1  Multifocal Incolor Importado HD (TINTÁVEL)      5002           55  -6,00 à +6,00 Cil. até -4,00  1,00 à 3,50      20    1.49  75
+
+Sheet [multi_dig] - Colunas:
+['Descrição', 'Marc.', 'Cód. Web', 'Valor / Par', 'Dioptria', 'Adição', 'Altura', 'Índice', 'Æ']
+Primeiras linhas:
+                Descrição Marc.  Cód. Web  Valor / Par                      Dioptria       Adição Altura  Índice   Æ
+0        Sygma Prime 1.50    SP      8537          100  -5,00 à +6,00 Cil. até -4,00  1,00 à 3,00  16/18     1.5  75
+1  Sygma Prime 1.50 Small    SP      8468          120  -5,00 à +6,00 Cil. até -4,00  1,00 à 3,00  16/18     1.5  75
+
+Sheet [multi_essilor] - Colunas:
+['Descrição', 'Cód. Web', 'Valor / Par', 'Dioptria', 'Adição', 'Altura', 'Índice', 'Æ']
+Primeiras linhas:
+                    Descrição  Cód. Web  Valor / Par                      Dioptria       Adição Altura  Índice      Æ
+0        No Line Orma / Small      8470           70  -6,00 à +8,00 Cil. até -6,00  1,00 à 3,00  16/20     1.5  80/85
+1  No Line Orma / Small C/ AR      8567          115  -6,00 à +8,00 Cil. até -6,00  1,00 à 3,00  16/20     1.5  80/85
+
+Sheet [servicos] - Colunas:
+['codigo', 'descricao', 'categoria', 'cor_residual', 'protecao', 'garantia_meses', 'valor_par']
+Primeiras linhas:
+  codigo      descricao      categoria cor_residual         protecao  garantia_meses  valor_par
+0    T01  AR Easy Green  TRATAMENTO_AR        Verde       Anti-Risco               3       70.0
+1    T02   AR Easy Blue  TRATAMENTO_AR         Azul  Verniz Tintável               3      220.0
