@@ -54,7 +54,8 @@ CREATE TABLE contact_lens.marcas (
   id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
   nome VARCHAR(100) NOT NULL UNIQUE,
   slug VARCHAR(100) NOT NULL UNIQUE,
-  fabricante VARCHAR(200), -- Ex: Alcon, Johnson & Johnson, Bausch+Lomb
+  fabricante VARCHAR(200), -- Nome textual (legado/exibição)
+  fabricante_id UUID REFERENCES core.fornecedores(id) ON DELETE SET NULL, -- FK oficial para Cruzamento
   pais_origem VARCHAR(100),
   website TEXT,
   logo_url TEXT,

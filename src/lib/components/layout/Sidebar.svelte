@@ -22,9 +22,9 @@
     color: string;
     submenu?: MenuItem[];
   };
-  
+
   let expandedMenus: Record<string, boolean> = {};
-  
+
   const menuItems: MenuItem[] = [
     {
       id: "home",
@@ -48,6 +48,13 @@
           color: "text-indigo-500",
         },
         {
+          id: "contact-lenses",
+          label: "Lentes de Contato",
+          href: "/catalogo/contato",
+          icon: "eye",
+          color: "text-cyan-500",
+        },
+        {
           id: "standard",
           label: "Standard",
           href: "/catalogo/standard",
@@ -61,7 +68,7 @@
           icon: "sparkles",
           color: "text-amber-500",
         },
-      ]
+      ],
     },
     {
       id: "ranking",
@@ -99,7 +106,7 @@
       color: "text-gray-500",
     },
   ];
-  
+
   function toggleSubmenu(itemId: string) {
     expandedMenus[itemId] = !expandedMenus[itemId];
   }
@@ -163,7 +170,7 @@
               title={collapsed ? item.label : ""}
             >
               <!-- Active Indicator Line -->
-              {#if isActive(item.href || '')}
+              {#if isActive(item.href || "")}
                 <div
                   class="absolute left-0 h-8 w-1 bg-brand-blue-500 rounded-r-full shadow-[0_0_10px_rgba(28,59,90,0.5)]"
                   transition:fly={{ x: -5, duration: 300 }}
@@ -211,17 +218,26 @@
                     {item.label}
                   </span>
                   <svg
-                    class="w-4 h-4 transition-transform duration-300 {expandedMenus[item.id] ? 'rotate-90' : ''}"
+                    class="w-4 h-4 transition-transform duration-300 {expandedMenus[
+                      item.id
+                    ]
+                      ? 'rotate-90'
+                      : ''}"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
                   >
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7" />
+                    <path
+                      stroke-linecap="round"
+                      stroke-linejoin="round"
+                      stroke-width="2"
+                      d="M9 5l7 7-7 7"
+                    />
                   </svg>
                 </div>
               {/if}
             </button>
-            
+
             {#if expandedMenus[item.id] && item.submenu}
               <div class="ml-4 space-y-1">
                 {#each item.submenu as subitem}
@@ -245,23 +261,75 @@
                       "
                     >
                       {#if subitem.icon === "search"}
-                        <svg class="w-4 h-4 {subitem.color}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        <svg
+                          class="w-4 h-4 {subitem.color}"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+                          />
                         </svg>
                       {:else if subitem.icon === "box"}
-                        <svg class="w-4 h-4 {subitem.color}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z" />
+                        <svg
+                          class="w-4 h-4 {subitem.color}"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M21 16V8a2 2 0 00-1-1.73l-7-4a2 2 0 00-2 0l-7 4A2 2 0 003 8v8a2 2 0 001 1.73l7 4a2 2 0 002 0l7-4A2 2 0 0021 16z"
+                          />
                         </svg>
                       {:else if subitem.icon === "sparkles"}
-                        <svg class="w-4 h-4 {subitem.color}" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                        <svg
+                          class="w-4 h-4 {subitem.color}"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z"
+                          />
+                        </svg>
+                      {:else if subitem.icon === "eye"}
+                        <svg
+                          class="w-4 h-4 {subitem.color}"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                          stroke="currentColor"
+                        >
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
+                          />
+                          <path
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                            stroke-width="2"
+                            d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
+                          />
                         </svg>
                       {/if}
                     </span>
-                    
+
                     {#if !collapsed}
                       <span
-                        class="whitespace-nowrap font-medium text-xs {isActive(subitem.href || '')
+                        class="whitespace-nowrap font-medium text-xs {isActive(
+                          subitem.href || '',
+                        )
                           ? 'text-brand-blue-600 dark:text-brand-blue-400'
                           : 'text-neutral-500 dark:text-neutral-400 group-hover:text-neutral-800 dark:group-hover:text-white'}"
                       >
@@ -286,7 +354,7 @@
             title={collapsed ? item.label : ""}
           >
             <!-- Active Indicator Line -->
-            {#if isActive(item.href || '')}
+            {#if isActive(item.href || "")}
               <div
                 class="absolute left-0 h-8 w-1 bg-brand-blue-500 rounded-r-full shadow-[0_0_10px_rgba(28,59,90,0.5)]"
                 transition:fly={{ x: -5, duration: 300 }}
@@ -336,7 +404,12 @@
                   viewBox="0 0 24 24"
                   stroke="currentColor"
                   ><rect x="1" y="3" width="15" height="13" stroke-width="2" />
-                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 8h4l3 3v5h-7V8z" />
+                  <path
+                    stroke-linecap="round"
+                    stroke-linejoin="round"
+                    stroke-width="2"
+                    d="M16 8h4l3 3v5h-7V8z"
+                  />
                   <circle cx="5.5" cy="18.5" r="2.5" />
                   <circle cx="18.5" cy="18.5" r="2.5" />
                 </svg>
