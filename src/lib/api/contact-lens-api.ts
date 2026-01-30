@@ -138,6 +138,9 @@ export class ContactLensAPI {
         p_ativo: params.ativo
       });
 
+      console.log('RPC update_lente_contact params:', params);
+      console.log('RPC response error:', error);
+
       if (error) throw error;
 
       return { success: true };

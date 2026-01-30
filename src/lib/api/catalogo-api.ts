@@ -290,6 +290,9 @@ export class CatalogoAPI {
         p_ativo: params.ativo
       });
 
+      console.log('RPC update_lente_catalog params:', params);
+      console.log('RPC response error:', error);
+
       if (error) throw error;
 
       return { success: true };
