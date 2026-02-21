@@ -1,4 +1,4 @@
-<!--
+﻿<!--
   👓 Simulador de Receita Oftalmológica
   Interface profissional para busca de lentes por prescrição
 -->
@@ -169,7 +169,7 @@
             <!-- OD - Olho Direito -->
             <div class="receita-card">
                 <div class="receita-header">
-                    <Eye class="text-brand-blue-500" size={24} />
+                    <Eye class="text-primary-500" size={24} />
                     <h3>OD - Olho Direito</h3>
                 </div>
 
@@ -235,7 +235,7 @@
             <!-- OE - Olho Esquerdo -->
             <div class="receita-card">
                 <div class="receita-header">
-                    <Eye class="text-brand-orange-500" size={24} />
+                    <Eye class="text-orange-500" size={24} />
                     <h3>OE - Olho Esquerdo</h3>
                     <label class="ml-auto flex items-center gap-2 text-sm cursor-pointer">
                         <input 

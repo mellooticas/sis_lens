@@ -1,33 +1,31 @@
 <!--
   📋 Detalhes Completos da Lente
-  View v_lentes + v_grupos_canonicos + alternativas do mesmo grupo
+  View v_catalog_lenses + v_catalog_lens_groups + alternativas do mesmo grupo
 -->
 <script lang="ts">
   import type { PageData } from './$types';
   import { formatarPreco } from '$lib/utils/formatters';
-  
+
   export let data: PageData;
-  
+
   const { lente, grupoCanonicos, alternativas } = data;
-  
+
   // Formatar tratamentos disponíveis
   const tratamentos: string[] = [];
-  if (lente.tem_ar) tratamentos.push('Antirreflexo');
-  if (lente.tem_blue) tratamentos.push('Blue Light');
-  if (lente.tem_uv) tratamentos.push('UV400');
-  if (lente.tem_antirrisco) tratamentos.push('Antirrisco');
-  if (lente.tratamento_hidrofobico) tratamentos.push('Hidrofóbico');
-  if (lente.tratamento_antiembacante) tratamentos.push('Antiembaçante');
-  if (lente.tem_polarizado) tratamentos.push('Polarizado');
-  if (lente.tratamento_foto !== 'nenhum') tratamentos.push(`Fotossensível (${lente.tratamento_foto})`);
-  if (lente.tem_digital) tratamentos.push('Digital');
-  if (lente.tem_free_form) tratamentos.push('Free Form');
-  if (lente.tem_indoor) tratamentos.push('Indoor');
-  if (lente.tem_drive) tratamentos.push('Drive');
+  if (lente.anti_reflective) tratamentos.push('Antirreflexo');
+  if (lente.blue_light) tratamentos.push('Blue Light');
+  if (lente.uv_filter) tratamentos.push('UV400');
+  if (lente.anti_scratch) tratamentos.push('Antirrisco');
+  if (lente.polarized) tratamentos.push('Polarizado');
+  if (lente.photochromic && lente.photochromic !== 'nenhum') tratamentos.push(`Fotossensível (${lente.photochromic})`);
+  if (lente.digital) tratamentos.push('Digital');
+  if (lente.free_form) tratamentos.push('Free Form');
+  if (lente.indoor) tratamentos.push('Indoor');
+  if (lente.drive) tratamentos.push('Drive');
 </script>
 
 <svelte:head>
-  <title>{lente.nome_lente} - Detalhes | SisLens</title>
+  <title>{lente.lens_name} - Detalhes | SisLens</title>
 </svelte:head>
 
 <div class="container mx-auto px-4 py-8">
@@ -35,46 +33,45 @@
   <nav class="text-sm mb-6">
     <a href="/buscar" class="text-blue-600 hover:underline">Buscar</a>
     <span class="mx-2">/</span>
-    <span class="text-gray-600">{lente.nome_lente}</span>
+    <span class="text-gray-600">{lente.lens_name}</span>
   </nav>
 
   <!-- Header da Lente -->
   <div class="bg-white dark:bg-gray-800 rounded-lg shadow-lg p-6 mb-6">
     <div class="flex justify-between items-start mb-4">
       <div class="flex-1">
-        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2 truncate max-w-xl" title={lente.nome_lente}>
-          {lente.nome_lente}
+        <h1 class="text-3xl font-bold text-gray-900 dark:text-white mb-2 truncate max-w-xl" title={lente.lens_name}>
+          {lente.lens_name}
         </h1>
         <div class="flex gap-2 text-xs text-gray-500 font-semibold mb-2">
-          <span class="uppercase">{lente.tipo_lente.replace('_', ' ')}</span>
+          <span class="uppercase">{(lente.lens_type || '').replace('_', ' ')}</span>
           <span>•</span>
-          <span class="capitalize">{lente.categoria.replace('_', ' ')}</span>
+          <span class="capitalize">{(lente.category || '').replace('_', ' ')}</span>
         </div>
         <p class="text-gray-600 dark:text-gray-300">
-          {lente.marca_nome} • {lente.fornecedor_nome}
+          {lente.brand_name} • {lente.supplier_name}
         </p>
       </div>
       <div class="text-right min-w-[180px]">
         <div class="text-sm text-gray-500">Preço Sugerido</div>
         <div class="text-4xl font-bold text-green-600">
-          {formatarPreco(lente.preco_venda_sugerido)}
+          {formatarPreco(lente.price_suggested)}
         </div>
         <div class="text-sm text-gray-600 mt-1">
-          Prazo: {lente.prazo_dias} dia{lente.prazo_dias > 1 ? 's' : ''}
+          Prazo: {lente.lead_time_days} dia{lente.lead_time_days > 1 ? 's' : ''}
         </div>
       </div>
     </div>
 
     <!-- Status Badges -->
     <div class="flex flex-wrap gap-2">
-      {#if lente.marca_premium}
+      {#if lente.is_premium}
         <span class="px-3 py-1 bg-yellow-100 text-yellow-800 rounded-full text-sm font-medium">Premium</span>
       {/if}
-      {#if lente.novidade}
-        <span class="px-3 py-1 bg-blue-100 text-blue-800 rounded-full text-sm font-medium">Novidade</span>
-      {/if}
-      {#if lente.destaque}
-        <span class="px-3 py-1 bg-purple-100 text-purple-800 rounded-full text-sm font-medium">Destaque</span>
+      {#if lente.status === 'active'}
+        <span class="px-3 py-1 bg-green-100 text-green-800 rounded-full text-sm font-medium">Ativo</span>
+      {:else}
+        <span class="px-3 py-1 bg-red-100 text-red-800 rounded-full text-sm font-medium">Inativo</span>
       {/if}
     </div>
   </div>
@@ -82,18 +79,18 @@
   <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
     <!-- Coluna Principal -->
     <div class="lg:col-span-2 space-y-6">
-      
+
       <!-- Características Técnicas -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 class="text-xl font-bold mb-4">Características Técnicas</h2>
         <div class="grid grid-cols-2 gap-4">
           <div>
             <span class="text-gray-600 dark:text-gray-400 block">Tipo de Lente</span>
-            <span class="font-medium capitalize">{lente.tipo_lente.replace('_', ' ')}</span>
+            <span class="font-medium capitalize">{(lente.lens_type || '').replace('_', ' ')}</span>
           </div>
           <div>
             <span class="text-gray-600 dark:text-gray-400 block">Categoria</span>
-            <span class="font-medium capitalize">{lente.categoria.replace('_', ' ')}</span>
+            <span class="font-medium capitalize">{(lente.category || '').replace('_', ' ')}</span>
           </div>
           <div>
             <span class="text-gray-600 dark:text-gray-400 block">Material</span>
@@ -101,14 +98,8 @@
           </div>
           <div>
             <span class="text-gray-600 dark:text-gray-400 block">Índice de Refração</span>
-            <span class="font-medium">{lente.indice_refracao}</span>
+            <span class="font-medium">{lente.refractive_index}</span>
           </div>
-          {#if lente.linha_produto}
-            <div class="col-span-2">
-              <span class="text-gray-600 dark:text-gray-400 block">Linha de Produto</span>
-              <span class="font-medium">{lente.linha_produto}</span>
-            </div>
-          {/if}
         </div>
       </div>
 
@@ -116,31 +107,25 @@
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 class="text-xl font-bold mb-4">Faixas Ópticas Disponíveis</h2>
         <div class="space-y-3">
-          {#if lente.grau_esferico_min !== null && lente.grau_esferico_max !== null}
+          {#if lente.spherical_min !== null && lente.spherical_max !== null}
             <div class="flex justify-between items-center">
               <span class="text-gray-600">Esférico</span>
               <span class="font-medium">
-                {lente.grau_esferico_min > 0 ? '+' : ''}{lente.grau_esferico_min} a 
-                {lente.grau_esferico_max > 0 ? '+' : ''}{lente.grau_esferico_max}
+                {lente.spherical_min > 0 ? '+' : ''}{lente.spherical_min} a
+                {lente.spherical_max > 0 ? '+' : ''}{lente.spherical_max}
               </span>
             </div>
           {/if}
-          {#if lente.grau_cilindrico_min !== null && lente.grau_cilindrico_max !== null}
+          {#if lente.cylindrical_min !== null && lente.cylindrical_max !== null}
             <div class="flex justify-between items-center">
               <span class="text-gray-600">Cilíndrico</span>
-              <span class="font-medium">{lente.grau_cilindrico_min} a {lente.grau_cilindrico_max}</span>
+              <span class="font-medium">{lente.cylindrical_min} a {lente.cylindrical_max}</span>
             </div>
           {/if}
-          {#if lente.adicao_min !== null && lente.adicao_max !== null}
+          {#if lente.addition_min !== null && lente.addition_max !== null}
             <div class="flex justify-between items-center">
               <span class="text-gray-600">Adição</span>
-              <span class="font-medium">+{lente.adicao_min} a +{lente.adicao_max}</span>
-            </div>
-          {/if}
-          {#if lente.dnp_min !== null && lente.dnp_max !== null}
-            <div class="flex justify-between items-center">
-              <span class="text-gray-600">DNP</span>
-              <span class="font-medium">{lente.dnp_min}mm a {lente.dnp_max}mm</span>
+              <span class="font-medium">+{lente.addition_min} a +{lente.addition_max}</span>
             </div>
           {/if}
         </div>
@@ -159,46 +144,11 @@
           </div>
         </div>
       {/if}
-
-      <!-- Descrições -->
-      {#if lente.descricao_completa || lente.beneficios || lente.indicacoes}
-        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
-          <h2 class="text-xl font-bold mb-4">Informações Adicionais</h2>
-          
-          {#if lente.descricao_completa}
-            <div class="mb-4">
-              <h3 class="font-semibold mb-2">Descrição</h3>
-              <p class="text-gray-600">{lente.descricao_completa}</p>
-            </div>
-          {/if}
-          
-          {#if lente.beneficios}
-            <div class="mb-4">
-              <h3 class="font-semibold mb-2">Benefícios</h3>
-              <p class="text-gray-600">{lente.beneficios}</p>
-            </div>
-          {/if}
-          
-          {#if lente.indicacoes}
-            <div class="mb-4">
-              <h3 class="font-semibold mb-2">Indicações</h3>
-              <p class="text-gray-600">{lente.indicacoes}</p>
-            </div>
-          {/if}
-
-          {#if lente.contraindicacoes}
-            <div class="mb-4">
-              <h3 class="font-semibold mb-2">Contraindicações</h3>
-              <p class="text-red-600">{lente.contraindicacoes}</p>
-            </div>
-          {/if}
-        </div>
-      {/if}
     </div>
 
     <!-- Coluna Lateral -->
     <div class="space-y-6">
-      
+
       <!-- Informações do Grupo Canônico -->
       {#if grupoCanonicos}
         <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
@@ -206,28 +156,35 @@
           <div class="space-y-3">
             <div>
               <span class="text-gray-600 block text-sm">Nome do Grupo</span>
-              <span class="font-medium">{grupoCanonicos.nome_grupo}</span>
+              <span class="font-medium">{grupoCanonicos.name}</span>
             </div>
             <div>
-              <span class="text-gray-600 block text-sm">Total de Lentes</span>
-              <span class="font-medium">{grupoCanonicos.total_lentes}</span>
+              <span class="text-gray-600 block text-sm">Tipo</span>
+              <span class="font-medium capitalize">{(grupoCanonicos.lens_type || '').replace('_', ' ')}</span>
             </div>
             <div>
-              <span class="text-gray-600 block text-sm">Faixa de Preço</span>
-              <span class="font-medium">
-                {formatarPreco(grupoCanonicos.preco_minimo)} - {formatarPreco(grupoCanonicos.preco_maximo)}
-              </span>
+              <span class="text-gray-600 block text-sm">Material</span>
+              <span class="font-medium">{grupoCanonicos.material}</span>
             </div>
             <div>
-              <span class="text-gray-600 block text-sm">Preço Médio</span>
-              <span class="font-medium text-lg text-green-600">
-                {formatarPreco(grupoCanonicos.preco_medio)}
-              </span>
+              <span class="text-gray-600 block text-sm">Índice</span>
+              <span class="font-medium">{grupoCanonicos.refractive_index}</span>
             </div>
-            {#if grupoCanonicos.total_fornecedores > 1}
-              <div>
-                <span class="text-gray-600 block text-sm">Fornecedores Disponíveis</span>
-                <span class="font-medium">{grupoCanonicos.total_fornecedores}</span>
+            <div>
+              <span class="text-gray-600 block text-sm">Status</span>
+              <span class="font-medium">{grupoCanonicos.is_active ? 'Ativo' : 'Inativo'}</span>
+            </div>
+            {#if grupoCanonicos.is_premium}
+              <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">⭐ Premium</span>
+            {/if}
+            {#if lente.group_id}
+              <div class="mt-2">
+                <a
+                  href="/catalogo/{grupoCanonicos.is_premium ? 'premium' : 'standard'}/{lente.group_id}"
+                  class="text-sm text-blue-600 hover:underline"
+                >
+                  Ver grupo completo →
+                </a>
               </div>
             {/if}
           </div>
@@ -239,45 +196,48 @@
         <h2 class="text-xl font-bold mb-4">Fornecedor</h2>
         <div class="space-y-2">
           <div>
-            <span class="font-medium text-lg">{lente.fornecedor_nome}</span>
+            <span class="font-medium text-lg">{lente.supplier_name}</span>
           </div>
-          {#if lente.fornecedor_razao_social}
-            <div class="text-sm text-gray-600">
-              {lente.fornecedor_razao_social}
-            </div>
-          {/if}
           <div class="text-sm">
             <span class="text-gray-600">Prazo de Entrega:</span>
-            <span class="font-medium">{lente.prazo_dias} dia{lente.prazo_dias > 1 ? 's' : ''}</span>
+            <span class="font-medium">{lente.lead_time_days} dia{lente.lead_time_days > 1 ? 's' : ''}</span>
           </div>
-          {#if lente.obs_prazo}
-            <div class="text-xs text-gray-500 mt-1">
-              {lente.obs_prazo}
-            </div>
-          {/if}
         </div>
       </div>
 
-      <!-- SKU e Códigos -->
+      <!-- SKU e Identificação -->
       <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
         <h2 class="text-xl font-bold mb-4">Identificação</h2>
         <div class="space-y-2 text-sm">
           <div>
-            <span class="text-gray-600 block">SKU Fornecedor</span>
-            <code class="bg-gray-100 px-2 py-1 rounded">{lente.sku_fornecedor}</code>
+            <span class="text-gray-600 block">SKU</span>
+            <code class="bg-gray-100 px-2 py-1 rounded">{lente.sku}</code>
           </div>
-          {#if lente.codigo_original}
-            <div>
-              <span class="text-gray-600 block">Código Original</span>
-              <code class="bg-gray-100 px-2 py-1 rounded">{lente.codigo_original}</code>
-            </div>
-          {/if}
           <div>
             <span class="text-gray-600 block">ID</span>
             <code class="bg-gray-100 px-2 py-1 rounded text-xs">{lente.id}</code>
           </div>
         </div>
       </div>
+
+      <!-- Estoque -->
+      {#if lente.stock_available !== null && lente.stock_available !== undefined}
+        <div class="bg-white dark:bg-gray-800 rounded-lg shadow p-6">
+          <h2 class="text-xl font-bold mb-4">Estoque</h2>
+          <div class="space-y-2 text-sm">
+            <div class="flex justify-between">
+              <span class="text-gray-600">Disponível:</span>
+              <span class="font-medium">{lente.stock_available}</span>
+            </div>
+            {#if lente.stock_minimum !== null && lente.stock_minimum !== undefined}
+              <div class="flex justify-between">
+                <span class="text-gray-600">Mínimo:</span>
+                <span class="font-medium">{lente.stock_minimum}</span>
+              </div>
+            {/if}
+          </div>
+        </div>
+      {/if}
     </div>
   </div>
 
@@ -287,20 +247,20 @@
       <h2 class="text-2xl font-bold mb-4">Alternativas do Mesmo Grupo</h2>
       <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
         {#each alternativas as alt}
-          <a 
+          <a
             href="/lentes/{alt.id}"
             class="block bg-white dark:bg-gray-800 rounded-lg shadow hover:shadow-lg transition p-4"
           >
-            <h3 class="font-medium mb-2">{alt.nome_lente}</h3>
+            <h3 class="font-medium mb-2">{alt.lens_name}</h3>
             <div class="text-sm text-gray-600 mb-2">
-              {alt.fornecedor_nome}
+              {alt.supplier_name}
             </div>
             <div class="flex justify-between items-center">
               <span class="text-lg font-bold text-green-600">
-                {formatarPreco(alt.preco_venda_sugerido)}
+                {formatarPreco(alt.price_suggested)}
               </span>
               <span class="text-sm text-gray-500">
-                {alt.prazo_dias}d
+                {alt.lead_time_days}d
               </span>
             </div>
           </a>

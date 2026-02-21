@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Componente Button SIS Lens
    * Botões padronizados com variantes
@@ -15,7 +15,7 @@
   
   // Variantes de estilo
   const variants = {
-    primary: 'bg-brand-blue-500 dark:bg-brand-blue-400 text-white hover:bg-brand-blue-600 dark:hover:bg-brand-blue-500 focus:ring-brand-blue-500 dark:focus:ring-brand-blue-400',
+    primary: 'bg-primary-500 dark:bg-primary-400 text-white hover:bg-primary-600 dark:hover:bg-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400',
     secondary: 'bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-300 dark:hover:bg-neutral-600 focus:ring-neutral-400 dark:focus:ring-neutral-500',
     ghost: 'bg-transparent text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800',
     success: 'bg-success dark:bg-success-dark text-white hover:bg-success-dark dark:hover:bg-success focus:ring-success dark:focus:ring-success-light',

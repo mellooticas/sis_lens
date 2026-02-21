@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * ActionCard - Card com ícone, título, descrição e CTA
    * Usado para ações principais (Buscar, Ranking, Histórico)
@@ -32,12 +32,12 @@
     <!-- Icon Container com classes condicionais -->
     <div
       class="p-3 rounded-lg"
-      class:bg-brand-blue-50={color === "blue"}
-      class:dark:bg-brand-blue-800={color === "blue"}
+      class:bg-primary-50={color === "blue"}
+      class:dark:bg-primary-800={color === "blue"}
       class:bg-success-light={color === "green"}
       class:dark:bg-success-dark={color === "green"}
-      class:bg-brand-orange-50={color === "orange"}
-      class:dark:bg-brand-orange-800={color === "orange"}
+      class:bg-orange-50={color === "orange"}
+      class:dark:bg-orange-800={color === "orange"}
       class:bg-brand-gold-50={color === "gold"}
       class:dark:bg-brand-gold-800={color === "gold"}
     >

@@ -13,10 +13,12 @@
   export let currentPage = '';
   
   const navItems = [
-    { id: 'catalogo', label: 'Catálogo', href: '/catalogo', icon: '🔍' },
-    { id: 'ranking', label: 'Ranking', href: '/ranking', icon: '📊' },
-    { id: 'historico', label: 'Histórico', href: '/historico', icon: '📋' },
-    { id: 'config', label: 'Configurações', href: '/config', icon: '⚙️' }
+    { id: 'home',          label: 'Dashboard',        href: '/',                   icon: '🏠' },
+    { id: 'catalogo',      label: 'Catálogo',          href: '/catalogo',           icon: '🔍' },
+    { id: 'simulador',     label: 'Simulador',         href: '/simulador/receita',  icon: '⚡' },
+    { id: 'ranking',       label: 'Ranking',           href: '/ranking',            icon: '🏆' },
+    { id: 'comparar',      label: 'Comparar Labs',     href: '/comparar',           icon: '⚖️' },
+    { id: 'tabela-precos', label: 'Tabela de Preços',  href: '/tabela-precos',      icon: '📋' },
   ];
   
   function handleClose() {
@@ -54,8 +56,7 @@
     on:keydown={handleKeydown}
     role="presentation"
   ></div>
-  />
-  
+
   <!-- Drawer -->
   <aside
     class="mobile-menu-drawer"
@@ -104,23 +105,19 @@
         <span class="footer-label">Tema</span>
         <ThemeToggle size="sm" />
       </div>
-      
-      <!-- User -->
-      <button class="user-btn">
-        <div class="user-avatar">👤</div>
-        <div class="user-info">
-          <div class="user-name">Minha Conta</div>
-          <div class="user-email">usuario@email.com</div>
+
+      <!-- User stub (aguarda SSO Gateway) -->
+      <div class="user-btn">
+        <div class="user-avatar">
+          <svg width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
         </div>
-      </button>
-      
-      <!-- Logout -->
-      <button class="logout-btn">
-        <svg width="20" height="20" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-        </svg>
-        <span>Sair</span>
-      </button>
+        <div class="user-info">
+          <div class="user-name">Usuário</div>
+          <div class="user-email">SIS Lens</div>
+        </div>
+      </div>
     </div>
   </aside>
 {/if}
@@ -167,10 +164,10 @@
   }
   
   .nav-item.active {
-    @apply bg-brand-blue-50 dark:bg-brand-blue-900/20;
-    @apply text-brand-blue-600 dark:text-brand-blue-400;
+    @apply bg-primary-50 dark:bg-primary-900/20;
+    @apply text-primary-700 dark:text-primary-300;
     @apply font-medium;
-    @apply border-r-4 border-brand-blue-500;
+    @apply border-r-4 border-primary-500;
   }
   
   .nav-icon {
@@ -206,9 +203,9 @@
   
   .user-avatar {
     @apply w-10 h-10 rounded-full;
-    @apply bg-brand-blue-100 dark:bg-brand-blue-900/30;
+    @apply bg-primary-600 text-white;
     @apply flex items-center justify-center;
-    @apply text-xl;
+    @apply shrink-0;
   }
   
   .user-info {
@@ -225,11 +222,4 @@
     @apply text-neutral-500 dark:text-neutral-400;
   }
   
-  .logout-btn {
-    @apply w-full flex items-center gap-3;
-    @apply px-2 py-2 rounded-lg;
-    @apply text-error;
-    @apply hover:bg-error/10;
-    @apply transition-colors;
-  }
 </style>

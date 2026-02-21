@@ -1,19 +1,16 @@
 /**
- * Hook para gerenciar grupos canônicos (genéricos e premium)
- * Usa as views vw_grupos_genericos e vw_grupos_premium do banco de dados
+ * Hook para gerenciar grupos canônicos
+ * NOVO BANCO: usa v_catalog_lens_groups (a criar) / fallback via v_catalog_lenses
  */
 
 import { writable, get } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
-import type {
-  VwGruposGenericos,
-  VwGruposPremium,
-  BuscarGruposParams
-} from '$lib/types/views';
+import type { VCatalogLensGroup } from '$lib/types/database-views';
+import type { BuscarGruposParams } from '$lib/api/views-client';
 
 interface GruposState {
-  gruposGenericos: VwGruposGenericos[];
-  gruposPremium: VwGruposPremium[];
+  gruposGenericos: VCatalogLensGroup[];
+  gruposPremium: VCatalogLensGroup[];
   loading: boolean;
   error: string | null;
   totalGenericos: number;
@@ -31,7 +28,7 @@ export function useGruposCanonicos() {
   });
 
   /**
-   * Carregar grupos genéricos
+   * Carregar grupos genéricos (is_premium = false)
    */
   async function carregarGruposGenericos(params: BuscarGruposParams = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
@@ -55,7 +52,7 @@ export function useGruposCanonicos() {
   }
 
   /**
-   * Carregar grupos premium
+   * Carregar grupos premium (is_premium = true)
    */
   async function carregarGruposPremium(params: BuscarGruposParams = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
@@ -79,7 +76,7 @@ export function useGruposCanonicos() {
   }
 
   /**
-   * Carregar todos os grupos (genéricos e premium)
+   * Carregar todos os grupos (genéricos e premium em paralelo)
    */
   async function carregarTodosGrupos(params: BuscarGruposParams = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
@@ -110,7 +107,7 @@ export function useGruposCanonicos() {
   /**
    * Obter grupo genérico por ID
    */
-  function obterGrupoGenericoPorId(grupoId: string): VwGruposGenericos | undefined {
+  function obterGrupoGenericoPorId(grupoId: string): VCatalogLensGroup | undefined {
     const currentState = get(state);
     return currentState.gruposGenericos.find(g => g.id === grupoId);
   }
@@ -118,7 +115,7 @@ export function useGruposCanonicos() {
   /**
    * Obter grupo premium por ID
    */
-  function obterGrupoPremiumPorId(grupoId: string): VwGruposPremium | undefined {
+  function obterGrupoPremiumPorId(grupoId: string): VCatalogLensGroup | undefined {
     const currentState = get(state);
     return currentState.gruposPremium.find(g => g.id === grupoId);
   }

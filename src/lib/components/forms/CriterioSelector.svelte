@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Seletor de Critério de Decisão
    * Urgência | Normal | Especial
@@ -69,12 +69,12 @@
   .criterio-option {
     @apply relative p-4 rounded-lg border-2 transition-all duration-200;
     @apply bg-white border-neutral-200;
-    @apply hover:border-brand-blue-300 hover:shadow-sm;
+    @apply hover:border-primary-300 hover:shadow-sm;
     @apply text-left;
   }
   
   .criterio-option.selected {
-    @apply border-brand-blue-500 bg-brand-blue-50;
+    @apply border-primary-500 bg-primary-50;
     @apply shadow-md;
   }
   
@@ -86,11 +86,11 @@
   }
   
   .criterio-option.selected .radio-indicator {
-    @apply border-brand-blue-500;
+    @apply border-primary-500;
   }
   
   .radio-dot {
     @apply w-3 h-3 rounded-full;
-    @apply bg-brand-blue-500;
+    @apply bg-primary-500;
   }
 </style>

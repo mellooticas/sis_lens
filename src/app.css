@@ -1,182 +1,119 @@
-@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&family=Montserrat:wght@700;800&display=swap');
+/* ============================================================================
+   SIS_LENS — Design System Global
+   Filosofia: "Base Neutra + Sotaque de Cor" (Ecossistema SIS_DIGIAI)
+   Cor primária: Violet (#7c3aed / violet-600)
+   Regras: Flat · Sóbrio · Focado em Dados
+   - SEM gradientes em backgrounds/buttons/cards
+   - SEM sombras pesadas (máximo shadow-md)
+   - SEM animações decorativas
+   - SEM glassmorphism
+   - Cores semânticas apenas em: ícone-badge, indicador de tendência, bordas de alerta
+============================================================================ */
+
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Montserrat:wght@700;800&display=swap');
 
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
 
+/* ============================================================================
+   CSS CUSTOM PROPERTIES
+============================================================================ */
 @layer base {
   :root {
-    /* ============================================ */
-    /* BRAND COLORS (Vibrant & Premium) */
-    /* ============================================ */
-    --color-brand-blue-50: #f0f7ff;
-    --color-brand-blue-100: #e0f0fe;
-    --color-brand-blue-200: #bae0fd;
-    --color-brand-blue-300: #7cc2fb;
-    --color-brand-blue-400: #36a2f7;
-    --color-brand-blue-500: #0b80e3;
-    --color-brand-blue-600: #0162c8;
-    --color-brand-blue-700: #024ea2;
-    --color-brand-blue-800: #064287;
-    --color-brand-blue-900: #0a376e;
+    /* Primary — SIS Lens Violet */
+    --primary-50:  #f5f3ff;
+    --primary-100: #ede9fe;
+    --primary-200: #ddd6fe;
+    --primary-300: #c4b5fd;
+    --primary-400: #a78bfa;
+    --primary-500: #8b5cf6;
+    --primary-600: #7c3aed;
+    --primary-700: #6d28d9;
+    --primary-800: #5b21b6;
+    --primary-900: #4c1d95;
 
-    --color-brand-orange-50: #fff6ed;
-    --color-brand-orange-100: #ffecd6;
-    --color-brand-orange-200: #ffd8ae;
-    --color-brand-orange-300: #ffbc7d;
-    --color-brand-orange-400: #fe954a;
-    --color-brand-orange-500: #fc7422;
-    --color-brand-orange-600: #ed5814;
-    --color-brand-orange-700: #c54011;
-    --color-brand-orange-800: #9c3315;
-    --color-brand-orange-900: #7d2d16;
+    /* Neutrals — Slate (padrão ecossistema) */
+    --neutral-50:  #f8fafc;
+    --neutral-100: #f1f5f9;
+    --neutral-200: #e2e8f0;
+    --neutral-300: #cbd5e1;
+    --neutral-400: #94a3b8;
+    --neutral-500: #64748b;
+    --neutral-600: #475569;
+    --neutral-700: #334155;
+    --neutral-800: #1e293b;
+    --neutral-900: #0f172a;
 
-    /* GOLD / PREMIUM ACCENTS */
-    --color-brand-gold-50: #fefce8;
-    --color-brand-gold-100: #fef9c3;
-    --color-brand-gold-200: #fef08a;
-    --color-brand-gold-300: #fde047;
-    --color-brand-gold-400: #facc15;
-    --color-brand-gold-500: #eab308;
-    --color-brand-gold-600: #ca8a04;
-    --color-brand-gold-700: #a16207;
-    --color-brand-gold-800: #854d0e;
-    --color-brand-gold-900: #713f12;
+    /* Semantic */
+    --success:       #10b981;
+    --success-light: #d1fae5;
+    --success-dark:  #047857;
+    --warning:       #f59e0b;
+    --warning-light: #fef3c7;
+    --warning-dark:  #b45309;
+    --error:         #ef4444;
+    --error-light:   #fee2e2;
+    --error-dark:    #b91c1c;
+    --info:          #3b82f6;
+    --info-light:    #dbeafe;
+    --info-dark:     #1d4ed8;
 
-    /* NEUTRALS (Clean & Sharp) */
-    --color-neutral-50: #f8fafc;
-    --color-neutral-100: #f1f5f9;
-    --color-neutral-200: #e2e8f0;
-    --color-neutral-300: #cbd5e1;
-    --color-neutral-400: #94a3b8;
-    --color-neutral-500: #64748b;
-    --color-neutral-600: #475569;
-    --color-neutral-700: #334155;
-    --color-neutral-800: #1e293b;
-    --color-neutral-900: #0f172a;
-
-    /* ============================================ */
-    /* SEMANTIC COLORS (High Visibility) */
-    /* ============================================ */
-    --color-success: #10b981;
-    --color-success-light: #d1fae5;
-    --color-success-dark: #047857;
-
-    --color-warning: #f59e0b;
-    --color-warning-light: #fef3c7;
-    --color-warning-dark: #b45309;
-
-    --color-error: #ef4444;
-    --color-error-light: #fee2e2;
-    --color-error-dark: #b91c1c;
-
-    /* ============================================ */
-    /* SHADOWS & GLASS */
-    /* ============================================ */
-    --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
-    --shadow-base: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
-    --shadow-md: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
-    --shadow-lg: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1);
-
-    --shadow-card: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 2px 8px rgba(0, 0, 0, 0.04);
-    --shadow-card-hover: 0 0 0 1px rgba(0, 0, 0, 0.03), 0 8px 16px rgba(0, 0, 0, 0.08);
-    --shadow-elevated: 0 20px 40px rgba(0, 0, 0, 0.12);
-
-    /* Glass Light */
-    --glass-border: rgba(255, 255, 255, 0.5);
-    --glass-surface: rgba(255, 255, 255, 0.7);
-    --glass-shadow: 0 8px 32px 0 rgba(100, 100, 111, 0.1);
-    --glass-blur: 12px;
-    
-    /* Contrast System - Light Mode defaults */
-    --text-opacity-light: 0.87;
-    --text-opacity-dark: 0.87;
-    --border-strength: 0.1;
-    --shadow-strength: 0.08;
-    --contrast-text: rgb(0, 0, 0);
-    --contrast-bg: rgb(255, 255, 255);
+    /* Shadows — flat e contidos */
+    --shadow-sm:   0 1px 2px 0 rgba(0,0,0,.05);
+    --shadow-card: 0 1px 3px 0 rgba(0,0,0,.07), 0 1px 2px -1px rgba(0,0,0,.05);
+    --shadow-md:   0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.05);
   }
 
-  /* Dark mode variables (High Contrast, Deep Blacks) */
+  /* Dark Mode */
   .dark {
-    /* Main Background: Almost Pure Black for modern OLED feel */
-    --color-neutral-50: #020617;
-    /* Very deep blue/black */
-    --color-neutral-100: #0f172a;
-    /* Card bg */
-    --color-neutral-200: #1e293b;
-    /* Borders */
-    --color-neutral-300: #334155;
-    --color-neutral-400: #64748b;
-    --color-neutral-500: #94a3b8;
-    /* Text muted */
-    --color-neutral-600: #cbd5e1;
-    --color-neutral-700: #e2e8f0;
-    --color-neutral-800: #f1f5f9;
-    /* Text main (inverted logic in tailwind classes needs care, but here we map specific vars) */
-    --color-neutral-900: #f8fafc;
-    /* Title text */
+    --neutral-50:  #020617;
+    --neutral-100: #0f172a;
+    --neutral-200: #1e293b;
+    --neutral-300: #334155;
+    --neutral-400: #475569;
+    --neutral-500: #64748b;
+    --neutral-600: #94a3b8;
+    --neutral-700: #cbd5e1;
+    --neutral-800: #e2e8f0;
+    --neutral-900: #f8fafc;
 
-    /* Make semantic colors pop on dark */
-    --color-success: #34d399;
-    --color-warning: #fbbf24;
-    --color-error: #f87171;
+    --success: #34d399;
+    --warning: #fbbf24;
+    --error:   #f87171;
+    --info:    #60a5fa;
 
-    /* Glass Dark */
-    --glass-border: rgba(255, 255, 255, 0.12);
-    /* Sharper border */
-    --glass-surface: rgba(15, 23, 42, 0.7);
-    /* Dark blue-ish surface */
-    --glass-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.6);
-
-    --shadow-card: 0 0 0 1px rgba(255, 255, 255, 0.08), 0 4px 6px -1px rgba(0, 0, 0, 0.4);
-    --shadow-card-hover: 0 0 0 1px rgba(6, 182, 212, 0.3), 0 10px 15px -3px rgba(0, 0, 0, 0.5);
-    /* Subtle cyber glow on hover */
-    --shadow-glow: 0 0 30px rgba(56, 189, 248, 0.15);
-    
-    /* Contrast System - Dark Mode defaults */
-    --contrast-text: rgb(255, 255, 255);
-    --contrast-bg: rgb(15, 23, 42);
+    --shadow-card: 0 1px 3px 0 rgba(0,0,0,.3), 0 1px 2px -1px rgba(0,0,0,.2);
   }
 
-  /* ============================================ */
-  /* BASE STYLES */
-  /* ============================================ */
+  /* ── Base ─────────────────────────────────────────────────────────────── */
   * {
-    @apply border-neutral-200;
+    @apply border-neutral-200 dark:border-neutral-700;
   }
 
-  .dark * {
-    @apply border-neutral-200/20;
+  html {
+    @apply scroll-smooth;
   }
 
   body {
-    @apply text-neutral-900;
+    @apply bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100;
     @apply font-sans antialiased;
-    /* Clean Light Mode Gradient */
-    background:
-      radial-gradient(circle at 15% 5%, rgba(6, 95, 236, 0.05) 0%, transparent 40%),
-      radial-gradient(circle at 85% 30%, rgba(246, 174, 45, 0.08) 0%, transparent 40%),
-      #f8fafc;
-    background-attachment: fixed;
+    /* Fundo plano — SEM gradientes animados, SEM orbs */
   }
 
-  .dark body {
-    @apply text-neutral-100;
-    /* Deep Modern Dark Mode Gradient */
-    background:
-      radial-gradient(circle at 50% 0%, rgba(56, 189, 248, 0.12) 0%, transparent 50%),
-      radial-gradient(circle at 0% 100%, rgba(15, 23, 42, 1) 0%, transparent 50%),
-      #020617;
-    background-attachment: fixed;
+  /* Tipografia */
+  h1, h2, h3, h4, h5, h6 {
+    /* SEM text-shadow */
+    @apply font-headline tracking-tight;
   }
 }
 
+/* ============================================================================
+   COMPONENTES REUTILIZÁVEIS
+============================================================================ */
 @layer components {
 
-  /* ============================================ */
-  /* TYPOGRAPHY UTILITIES */
-  /* ============================================ */
+  /* ── Typography ──────────────────────────────────────────────────────── */
   .heading {
     @apply font-headline font-bold tracking-tight;
   }
@@ -185,493 +122,147 @@
     text-wrap: balance;
   }
 
-  /* ============================================ */
-  /* BADGE STYLES */
-  /* ============================================ */
-  .badge {
-    @apply inline-flex items-center gap-1 rounded-full px-3 py-1 text-xs font-medium;
-  }
-
-  .badge-primary {
-    @apply bg-brand-blue-100 text-brand-blue-700;
-  }
-
-  .badge-success {
-    @apply bg-success/10 text-success-dark;
-  }
-
-  .badge-warning {
-    @apply bg-warning/10 text-warning-dark;
-  }
-
-  .badge-error {
-    @apply bg-error/10 text-error-dark;
-  }
-
-  .badge-gold {
-    @apply bg-brand-gold-100 text-brand-gold-700;
-  }
-
-  /* ============================================ */
-  /* RANKING BADGES */
-  /* ============================================ */
-  .badge-melhor-opcao {
-    @apply badge bg-brand-gold-500 text-white font-semibold;
-    @apply shadow-md;
-  }
-
-  .badge-promocao {
-    @apply badge bg-brand-orange-500 text-white;
-  }
-
-  .badge-entrega-expressa {
-    @apply badge bg-success text-white;
-  }
-
-  /* ============================================ */
-  /* CARD STYLES */
-  /* ============================================ */
+  /* ── Cards ───────────────────────────────────────────────────────────── */
+  /* Regra: fundo neutro, sem cores, sem gradiente */
   .card {
-    @apply rounded-xl bg-white p-6 shadow-card;
-    @apply transition-shadow duration-200;
+    @apply rounded-lg bg-white dark:bg-neutral-800
+           border border-neutral-200 dark:border-neutral-700
+           shadow-sm transition-shadow duration-150;
   }
 
   .card:hover {
-    @apply shadow-card-hover;
+    @apply shadow-md;
   }
 
-  .dark .card {
-    @apply bg-neutral-800;
+  /* Card de destaque (fornecedor selecionado, melhor opção) */
+  .card-highlight {
+    @apply card border-primary-500 dark:border-primary-400;
   }
 
-  .card-fornecedor {
-    @apply card relative;
-    @apply border-2 border-transparent;
-  }
-
-  .card-fornecedor.destaque {
-    @apply border-brand-gold-500 shadow-elevated;
-  }
-
-  /* ============================================ */
-  /* BUTTON UTILITIES */
-  /* ============================================ */
+  /* ── Botões ──────────────────────────────────────────────────────────── */
   .btn {
-    @apply inline-flex items-center justify-center gap-2;
-    @apply rounded-lg px-4 py-2 text-sm font-medium;
-    @apply transition-all duration-200;
-    @apply focus:outline-none focus:ring-2 focus:ring-offset-2;
-    @apply disabled:opacity-50 disabled:cursor-not-allowed;
+    @apply inline-flex items-center justify-center gap-2
+           rounded-lg px-4 py-2 text-sm font-medium
+           transition-colors duration-150
+           focus:outline-none focus:ring-2 focus:ring-offset-2
+           disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
+  /* Primary — violet (cor do SIS Lens) */
   .btn-primary {
-    @apply btn bg-brand-blue-500 text-white;
-    @apply hover:bg-brand-blue-600;
-    @apply focus:ring-brand-blue-500;
+    @apply btn bg-primary-600 text-white
+           hover:bg-primary-700
+           focus:ring-primary-500
+           dark:bg-primary-600 dark:hover:bg-primary-700;
   }
 
   .btn-secondary {
-    @apply btn bg-neutral-200 text-neutral-900;
-    @apply hover:bg-neutral-300;
-    @apply focus:ring-neutral-400;
+    @apply btn bg-neutral-100 dark:bg-neutral-700
+           text-neutral-700 dark:text-neutral-200
+           hover:bg-neutral-200 dark:hover:bg-neutral-600
+           border border-neutral-200 dark:border-neutral-600
+           focus:ring-neutral-400;
   }
 
   .btn-ghost {
-    @apply btn bg-transparent text-neutral-700;
-    @apply hover:bg-neutral-100;
+    @apply btn bg-transparent text-neutral-600 dark:text-neutral-400
+           hover:bg-neutral-100 dark:hover:bg-neutral-800
+           focus:ring-neutral-400;
   }
 
-  .btn-success {
-    @apply btn bg-success text-white;
-    @apply hover:bg-success-dark;
-    @apply focus:ring-success;
+  .btn-destructive {
+    @apply btn bg-error text-white hover:bg-error-dark focus:ring-error;
   }
 
-  /* ============================================ */
-  /* INPUT UTILITIES */
-  /* ============================================ */
+  /* Outline com cor primary */
+  .btn-outline {
+    @apply btn bg-transparent border border-primary-600 text-primary-600
+           hover:bg-primary-50 dark:hover:bg-primary-900/20
+           focus:ring-primary-500
+           dark:border-primary-400 dark:text-primary-400;
+  }
+
+  /* ── Inputs ──────────────────────────────────────────────────────────── */
   .input {
-    @apply w-full rounded-lg border border-neutral-300 bg-white;
-    @apply px-4 py-2 text-sm;
-    @apply focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-500/20;
-    @apply transition-all duration-200;
+    @apply w-full rounded-lg border border-neutral-300 dark:border-neutral-600
+           bg-white dark:bg-neutral-800
+           px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100
+           placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+           focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
+           dark:focus:border-primary-400 dark:focus:ring-primary-400/20
+           transition-colors duration-150;
   }
 
-  .dark .input {
-    @apply bg-neutral-800 border-neutral-700;
+  /* ── Badges ──────────────────────────────────────────────────────────── */
+  .badge {
+    @apply inline-flex items-center gap-1 rounded-full px-2.5 py-0.5 text-xs font-medium;
   }
 
-  /* ============================================ */
-  /* SCORE INDICATOR */
-  /* ============================================ */
-  .score-indicator {
-    @apply inline-flex items-center gap-1 text-sm font-medium;
+  /* Semânticos */
+  .badge-success  { @apply bg-green-100  text-green-700  dark:bg-green-900/30  dark:text-green-400; }
+  .badge-warning  { @apply bg-amber-100  text-amber-700  dark:bg-amber-900/30  dark:text-amber-400; }
+  .badge-error    { @apply bg-red-100    text-red-700    dark:bg-red-900/30    dark:text-red-400; }
+  .badge-info     { @apply bg-blue-100   text-blue-700   dark:bg-blue-900/30   dark:text-blue-400; }
+  .badge-primary  { @apply bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400; }
+  .badge-neutral  { @apply bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400; }
+
+  /* Ranking */
+  .badge-melhor-opcao    { @apply badge bg-amber-500  text-white font-semibold; }
+  .badge-entrega-expressa { @apply badge bg-green-500  text-white; }
+
+  /* ── Score indicators ────────────────────────────────────────────────── */
+  .score-high   { @apply text-green-600 dark:text-green-400 font-medium; }
+  .score-medium { @apply text-amber-600 dark:text-amber-400 font-medium; }
+  .score-low    { @apply text-red-600   dark:text-red-400   font-medium; }
+
+  /* ── AlertCard (borda esquerda semântica) ────────────────────────────── */
+  /* Regra: cor apenas na borda-left-2, fundo neutro */
+  .alert-card {
+    @apply card px-4 py-3 border-l-2;
   }
 
-  .score-high {
-    @apply text-success;
-  }
+  .alert-card-success { @apply alert-card border-l-green-500; }
+  .alert-card-warning { @apply alert-card border-l-amber-500; }
+  .alert-card-error   { @apply alert-card border-l-red-500; }
+  .alert-card-info    { @apply alert-card border-l-blue-500; }
+  .alert-card-primary { @apply alert-card border-l-primary-500; }
 
-  .score-medium {
-    @apply text-warning;
+  /* ── Scrollbar personalizado ─────────────────────────────────────────── */
+  .custom-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: theme('colors.neutral.300') transparent;
   }
-
-  .score-low {
-    @apply text-error;
+  .dark .custom-scrollbar {
+    scrollbar-color: theme('colors.neutral.700') transparent;
   }
 }
 
+/* ============================================================================
+   UTILITÁRIOS
+============================================================================ */
 @layer utilities {
 
-  /* Animações customizadas */
+  /* Animações de entrada (UX, não decorativas) */
   .animate-fade-in {
-    animation: fadeIn 0.3s ease-in;
+    animation: fadeIn 0.2s ease-out;
   }
 
   .animate-slide-up {
-    animation: slideUp 0.4s ease-out;
+    animation: slideUp 0.25s ease-out;
   }
 
   @keyframes fadeIn {
-    from {
-      opacity: 0;
-    }
-
-    to {
-      opacity: 1;
-    }
+    from { opacity: 0; }
+    to   { opacity: 1; }
   }
 
   @keyframes slideUp {
-    from {
-      transform: translateY(20px);
-      opacity: 0;
-    }
-
-    to {
-      transform: translateY(0);
-      opacity: 1;
-    }
+    from { transform: translateY(8px); opacity: 0; }
+    to   { transform: translateY(0);   opacity: 1; }
   }
 
-  /* Glassmorphism Utilities */
-  .glass-panel {
-    @apply backdrop-blur-md bg-white/70 dark:bg-neutral-900/70 border border-white/20 dark:border-white/5 shadow-xl;
-  }
-
-  .glass-sidebar {
-    @apply backdrop-blur-xl bg-white/80 dark:bg-neutral-900/80 border-r border-white/20 dark:border-white/5;
-  }
-
-  .text-glow {
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.5);
-  }
-
-  .dark .text-glow {
-    text-shadow: 0 0 20px rgba(255, 255, 255, 0.2);
-  }
-
-  .custom-scrollbar {
-    scrollbar-width: thin;
-    scrollbar-color: var(--color-neutral-300) transparent;
-  }
-
-  .dark .custom-scrollbar {
-    scrollbar-color: var(--color-neutral-700) transparent;
-  }
-
-  /* ============================================ */
-  /* GLASS EFFECT - Global Styles for All Pages */
-  /* ============================================ */
-  
-  /* Cards com efeito glass - Seletores abrangentes */
-  :is(
-    [class*="stats-card"], 
-    [class*="action-card"], 
-    [class*="card"],
-    [class*="Card"],
-    .glass-card,
-    [class*="panel"],
-    [class*="Panel"],
-    [class*="container-"],
-    [class*="box"],
-    [class*="Box"]
-  ):not(.bg-white):not([class*="bg-neutral"]):not([class*="bg-gradient"]) {
-    background: rgba(255, 255, 255, 0.15) !important;
-    backdrop-filter: blur(12px) !important;
-    -webkit-backdrop-filter: blur(12px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 
-      0 8px 32px rgba(0, 0, 0, 0.1),
-      inset 0 1px 0 rgba(255, 255, 255, 0.3) !important;
-  }
-
-  .dark :is(
-    [class*="stats-card"], 
-    [class*="action-card"], 
-    [class*="card"],
-    [class*="Card"],
-    .glass-card,
-    [class*="panel"],
-    [class*="Panel"],
-    [class*="container-"],
-    [class*="box"],
-    [class*="Box"]
-  ):not(.bg-white):not([class*="bg-neutral"]):not([class*="bg-gradient"]) {
-    background: rgba(0, 0, 0, 0.3) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 
-      0 8px 32px rgba(255, 255, 255, 0.08),
-      0 4px 16px rgba(255, 255, 255, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Tables com glass effect - Melhorado para pegar TODAS */
-  :is(
-    table, 
-    [class*="table"], 
-    [class*="Table"],
-    [role="table"],
-    .data-table,
-    .grid[role="grid"]
-  ) {
-    background: rgba(255, 255, 255, 0.10) !important;
-    backdrop-filter: blur(10px) !important;
-    -webkit-backdrop-filter: blur(10px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.2) !important;
-  }
-
-  .dark :is(
-    table, 
-    [class*="table"], 
-    [class*="Table"],
-    [role="table"],
-    .data-table,
-    .grid[role="grid"]
-  ) {
-    background: rgba(0, 0, 0, 0.25) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-    box-shadow: 
-      0 8px 32px rgba(255, 255, 255, 0.08),
-      0 4px 16px rgba(255, 255, 255, 0.05),
-      inset 0 1px 0 rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Table headers glass */
-  :is(thead, [class*="thead"], th, [role="columnheader"]) {
-    background: rgba(255, 255, 255, 0.2) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-  }
-
-  .dark :is(thead, [class*="thead"], th, [role="columnheader"]) {
-    background: rgba(255, 255, 255, 0.05) !important;
-    box-shadow: 
-      0 2px 8px rgba(255, 255, 255, 0.04),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-  }
-
-  /* Table rows hover */
-  :is(tbody tr, [class*="table"] tr, [role="row"]):hover {
-    background: rgba(255, 255, 255, 0.15) !important;
-  }
-
-  .dark :is(tbody tr, [class*="table"] tr, [role="row"]):hover {
-    background: rgba(255, 255, 255, 0.08) !important;
-    box-shadow: 0 2px 8px rgba(255, 255, 255, 0.05) !important;
-  }
-
-  /* Table cells */
-  :is(td, th, [role="cell"], [role="gridcell"]) {
-    border-color: rgba(255, 255, 255, 0.1) !important;
-  }
-
-  .dark :is(td, th, [role="cell"], [role="gridcell"]) {
-    border-color: rgba(255, 255, 255, 0.08) !important;
-  }
-
-  /* Forms e Inputs glass - Abrangente para TODOS os filtros */
-  :is(
-    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), 
-    textarea, 
-    select,
-    [class*="input"],
-    [class*="Input"],
-    [class*="select"],
-    [class*="Select"],
-    [class*="filter"],
-    [class*="Filter"],
-    [class*="search"],
-    [class*="Search"],
-    [role="search"] input,
-    [role="searchbox"]
-  ) {
-    background: rgba(255, 255, 255, 0.12) !important;
-    backdrop-filter: blur(8px) !important;
-    -webkit-backdrop-filter: blur(8px) !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
-  }
-
-  .dark :is(
-    input:not([type="checkbox"]):not([type="radio"]):not([type="file"]), 
-    textarea, 
-    select,
-    [class*="input"],
-    [class*="Input"],
-    [class*="select"],
-    [class*="Select"],
-    [class*="filter"],
-    [class*="Filter"],
-    [class*="search"],
-    [class*="Search"],
-    [role="search"] input,
-    [role="searchbox"]
-  ) {
-    background: rgba(0, 0, 0, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-    box-shadow: 
-      0 4px 16px rgba(255, 255, 255, 0.06),
-      inset 0 1px 0 rgba(255, 255, 255, 0.08) !important;
-  }
-
-  /* Inputs focus state */
-  :is(input, textarea, select):focus {
-    background: rgba(255, 255, 255, 0.18) !important;
-    border-color: rgba(255, 255, 255, 0.35) !important;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.1) !important;
-  }
-
-  .dark :is(input, textarea, select):focus {
-    background: rgba(0, 0, 0, 0.3) !important;
-    border-color: rgba(255, 255, 255, 0.25) !important;
-    box-shadow: 0 0 0 3px rgba(255, 255, 255, 0.05) !important;
-  }
-
-  /* Badges com glass */
-  [class*="badge"] {
-    backdrop-filter: blur(8px) !important;
-  }
-
-  /* Text shadows para melhor legibilidade */
-  h1, h2, h3, h4 {
-    text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  }
-
-  .dark h1, .dark h2, .dark h3, .dark h4 {
-    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
-  }
-
-  /* Alert/Message boxes glass */
-  [class*="alert"], [class*="message"], [class*="notification"] {
-    background: rgba(255, 255, 255, 0.12) !important;
-    backdrop-filter: blur(10px) !important;
-    border-color: rgba(255, 255, 255, 0.2) !important;
-  }
-
-  .dark [class*="alert"], .dark [class*="message"], .dark [class*="notification"] {
-    background: rgba(0, 0, 0, 0.25) !important;
-    border-color: rgba(255, 255, 255, 0.1) !important;
-  }
-
-  /* Modals e Overlays glass */
-  [class*="modal"], [class*="dialog"], [class*="dropdown"] {
-    background: rgba(255, 255, 255, 0.18) !important;
-    backdrop-filter: blur(16px) !important;
-    border: 1px solid rgba(255, 255, 255, 0.3) !important;
-  }
-
-  .dark [class*="modal"], .dark [class*="dialog"], .dark [class*="dropdown"] {
-    background: rgba(0, 0, 0, 0.35) !important;
-    border: 1px solid rgba(255, 255, 255, 0.15) !important;
-  }
-
-  /* ============================================ */
-  /* ANIMATED GRADIENT BACKGROUND */
-  /* ============================================ */
-  body {
-    position: relative;
-    overflow-x: hidden;
-  }
-
-  body::before {
-    content: '';
-    position: fixed;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    z-index: -1;
-    background: linear-gradient(
-      135deg,
-      #f0f7ff 0%,
-      #e0f0fe 25%,
-      #ffffff 50%,
-      #fef9c3 75%,
-      #f0f7ff 100%
-    );
-    background-size: 400% 400%;
-    animation: gradientMove 30s ease infinite;
-  }
-
-  .dark body::before {
-    background: linear-gradient(
-      135deg,
-      #0a376e 0%,
-      #024ea2 25%,
-      #1a1a1a 50%,
-      #713f12 75%,
-      #0a376e 100%
-    );
-    background-size: 400% 400%;
-    animation: gradientMove 30s ease infinite;
-  }
-
-  @keyframes gradientMove {
-    0% {
-      background-position: 0% 50%;
-    }
-    50% {
-      background-position: 100% 50%;
-    }
-    100% {
-      background-position: 0% 50%;
-    }
-  }
-
-  /* Orbs flutuantes para mais profundidade */
-  body::after {
-    content: '';
-    position: fixed;
-    top: -50%;
-    left: -50%;
-    width: 200%;
-    height: 200%;
-    z-index: -1;
-    opacity: 0.3;
-    background: 
-      radial-gradient(circle at 20% 30%, rgba(11, 128, 227, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 80% 70%, rgba(234, 179, 8, 0.15) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(1, 98, 200, 0.1) 0%, transparent 50%);
-    animation: orbsFloat 45s ease-in-out infinite;
-  }
-
-  .dark body::after {
-    opacity: 0.4;
-    background: 
-      radial-gradient(circle at 20% 30%, rgba(11, 128, 227, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 80% 70%, rgba(234, 179, 8, 0.2) 0%, transparent 50%),
-      radial-gradient(circle at 50% 50%, rgba(1, 98, 200, 0.15) 0%, transparent 50%);
-  }
-
-  @keyframes orbsFloat {
-    0%, 100% {
-      transform: translate(0, 0) rotate(0deg);
-    }
-    33% {
-      transform: translate(5%, 10%) rotate(120deg);
-    }
-    66% {
-      transform: translate(-5%, 5%) rotate(240deg);
-    }
-  }
+  /* Semáforo de prazo/preço */
+  .prazo-rapido { @apply text-green-600 dark:text-green-400; }
+  .prazo-medio  { @apply text-amber-600 dark:text-amber-400; }
+  .prazo-lento  { @apply text-red-600   dark:text-red-400; }
 }

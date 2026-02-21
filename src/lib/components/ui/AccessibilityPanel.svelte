@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Painel de Configurações de Acessibilidade
    * Controle completo de tema, contraste e cores
@@ -242,7 +242,7 @@
               <span class="text-sm font-semibold text-neutral-900 dark:text-neutral-100">
                 Contraste Texto/Fundo:
               </span>
-              <span class="text-2xl font-bold text-brand-blue-600 dark:text-brand-blue-400">
+              <span class="text-2xl font-bold text-primary-600 dark:text-primary-400">
                 {contrastInfo.ratio}:1
               </span>
             </div>
@@ -291,7 +291,7 @@
           </div>
           <button
             on:click={() => isOpen = false}
-            class="px-6 py-2 rounded-lg bg-brand-blue-500 hover:bg-brand-blue-600 text-white font-medium transition-colors"
+            class="px-6 py-2 rounded-lg bg-primary-500 hover:bg-primary-600 text-white font-medium transition-colors"
           >
             Fechar
           </button>

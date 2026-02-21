@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { ShieldCheck, TrendingUp, Info } from "lucide-svelte";
 
   // Props para receber os dados das duas opções
@@ -36,7 +36,7 @@
   <!-- Header de Controle (Vendedor vs Gerente) -->
   <div class="flex justify-end mb-4">
     <button
-      class="text-xs text-brand-blue-500 hover:text-brand-blue-700 flex items-center gap-1 transition-colors font-medium border border-brand-blue-200 px-3 py-1 rounded-full bg-brand-blue-50"
+      class="text-xs text-primary-500 hover:text-primary-700 flex items-center gap-1 transition-colors font-medium border border-primary-200 px-3 py-1 rounded-full bg-primary-50"
       on:click={() => (showMargins = !showMargins)}
     >
       <ShieldCheck size={14} />
@@ -66,7 +66,7 @@
         <h3 class="text-2xl font-bold text-gray-800 mt-1 font-headline">
           {brandOption.nome}
         </h3>
-        <p class="text-brand-blue-600 font-medium font-sans">
+        <p class="text-primary-600 font-medium font-sans">
           {brandOption.marca}
         </p>
       </div>
@@ -299,7 +299,7 @@
   <p class="text-center text-gray-400 text-xs mt-8 opacity-70">
     Comparação técnica baseada em índice de refração 1.67 e antirreflexo
     premium.<br />
-    <span class="font-bold text-brand-blue-900"
+    <span class="font-bold text-primary-900"
       >SIS Lens Intelligence System</span
     > v2.0
   </p>

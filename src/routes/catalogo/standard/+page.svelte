@@ -1,4 +1,4 @@
-<!--
+﻿<!--
   ��� Catálogo Standard - SIS Lens
   Grupos canônicos de lentes standard (não premium)
 -->
@@ -148,7 +148,7 @@
           role="button"
           tabindex="0"
         >
-          <div class="p-2 rounded-lg bg-brand-blue-50 dark:bg-brand-blue-800 text-brand-blue-600 dark:text-brand-blue-300 group-hover:scale-110 transition-transform">
+          <div class="p-2 rounded-lg bg-primary-50 dark:bg-primary-800 text-primary-600 dark:text-primary-300 group-hover:scale-110 transition-transform">
             <SlidersHorizontal class="w-5 h-5" />
           </div>
           <div class="text-left">
@@ -162,14 +162,14 @@
           <!-- Toggle de Visualização -->
           <div class="hidden md:flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
             <button 
-              class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
+              class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
               on:click={() => viewMode = 'grid'}
               title="Visualização em Grade"
             >
               <LayoutGrid class="w-4 h-4" />
             </button>
             <button 
-              class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
+              class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
               on:click={() => viewMode = 'list'}
               title="Visualização em Lista"
             >
@@ -187,7 +187,7 @@
             <ChevronDown class="w-6 h-6 text-neutral-500 dark:text-neutral-400" />
           </div>
           <!-- Mobile Button -->
-          <button class="md:hidden p-2 rounded-lg bg-brand-blue-600 text-white" on:click={() => showMobileFilters = !showMobileFilters}>
+          <button class="md:hidden p-2 rounded-lg bg-primary-600 text-white" on:click={() => showMobileFilters = !showMobileFilters}>
             <SlidersHorizontal class="w-5 h-5" />
           </button>
         </div>

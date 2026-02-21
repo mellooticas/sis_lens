@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Breadcrumbs Component
    * Navegação em migalhas de pão
@@ -54,7 +54,7 @@
   .breadcrumb-link {
     @apply text-sm font-medium;
     @apply text-neutral-600 dark:text-neutral-400;
-    @apply hover:text-brand-blue-600 dark:hover:text-brand-blue-400;
+    @apply hover:text-primary-600 dark:hover:text-primary-400;
     @apply transition-colors;
   }
   

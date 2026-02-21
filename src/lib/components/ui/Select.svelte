@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Select Component
    * Select field padronizado para o sistema
@@ -20,7 +20,7 @@
   $: selectClasses = `${baseClasses} ${
     error 
       ? 'border-error focus:border-error focus:ring-error/20' 
-      : 'border-neutral-300 dark:border-neutral-600 focus:border-brand-blue-500 focus:ring-brand-blue-500/20'
+      : 'border-neutral-300 dark:border-neutral-600 focus:border-primary-500 focus:ring-primary-500/20'
   }`;
   
   // Gerar ID único se não fornecido

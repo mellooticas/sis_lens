@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Table Component
    * Tabela de dados responsiva
@@ -129,7 +129,7 @@
   }
 
   th.active {
-    @apply text-brand-blue-600 dark:text-brand-blue-400;
+    @apply text-primary-600 dark:text-primary-400;
   }
 
   .th-content {

@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Select/Dropdown Component
    * Dropdown customizado com busca opcional
@@ -166,13 +166,13 @@
     @apply border border-neutral-300 dark:border-neutral-700;
     @apply text-sm text-left;
     @apply transition-all duration-200;
-    @apply hover:border-brand-blue-400 dark:hover:border-brand-blue-600;
-    @apply focus:outline-none focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500;
+    @apply hover:border-primary-400 dark:hover:border-primary-600;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500;
   }
   
   .select-trigger.open {
-    @apply border-brand-blue-500;
-    @apply ring-2 ring-brand-blue-500/20;
+    @apply border-primary-500;
+    @apply ring-2 ring-primary-500/20;
   }
   
   .select-trigger.error {
@@ -217,7 +217,7 @@
     @apply bg-neutral-50 dark:bg-neutral-900;
     @apply border border-neutral-200 dark:border-neutral-700;
     @apply text-sm;
-    @apply focus:outline-none focus:ring-2 focus:ring-brand-blue-500/20;
+    @apply focus:outline-none focus:ring-2 focus:ring-primary-500/20;
   }
   
   .select-options {
@@ -233,8 +233,8 @@
   }
   
   .select-option.selected {
-    @apply bg-brand-blue-50 dark:bg-brand-blue-900/20;
-    @apply text-brand-blue-700 dark:text-brand-blue-400;
+    @apply bg-primary-50 dark:bg-primary-900/20;
+    @apply text-primary-700 dark:text-primary-400;
     @apply font-medium;
   }
   

@@ -1,4 +1,4 @@
-<!--
+﻿<!--
   🔍 Catálogo de Lentes - SIS Lens
   Busca completa com filtros avançados e design premium
 -->
@@ -6,7 +6,7 @@
   import { onMount } from 'svelte';
   import { fade, fly } from 'svelte/transition';
   import { CatalogoAPI } from '$lib/api/catalogo-api';
-  import type { LenteCatalogo } from '$lib/types/database-views';
+  import type { VCatalogLens } from '$lib/types/database-views';
   
   // Ícones
   import { LayoutGrid, List, SlidersHorizontal, Search, ChevronDown, RotateCcw } from 'lucide-svelte';
@@ -27,7 +27,7 @@
   import Pagination from "$lib/components/ui/Pagination.svelte";
 
   // State
-  let lentes: LenteCatalogo[] = [];
+  let lentes: VCatalogLens[] = [];
   let loading = true;
   let error = '';
   let total = 0;
@@ -64,7 +64,7 @@
         { 
           pagina: paginaAtual, 
           limite: itensPorPagina,
-          ordenar: 'preco_venda_sugerido', // Ordenação por preço (novo campo)
+          ordenar: 'price_suggested',
           direcao: 'asc'
         }
       );
@@ -117,7 +117,7 @@
 
 <main>
   <!-- Hero Section Premium -->
-  <div class="bg-gradient-to-br from-brand-blue-50 via-white to-brand-orange-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
+  <div class="bg-gradient-to-br from-primary-50 via-white to-orange-50 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
     <Container maxWidth="xl" padding="lg">
       <PageHero
         badge="🔍 Catálogo Completo"
@@ -130,11 +130,11 @@
       <!-- Stats Rápidos -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
         <div class="glass-panel rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-brand-blue-600 dark:text-brand-blue-400">{total}</div>
+          <div class="text-2xl font-bold text-primary-600 dark:text-primary-400">{total}</div>
           <div class="text-sm text-neutral-600 dark:text-neutral-400">Lentes Total</div>
         </div>
         <div class="glass-panel rounded-lg p-4 text-center">
-          <div class="text-2xl font-bold text-brand-orange-600 dark:text-brand-orange-400">{lentes.length}</div>
+          <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">{lentes.length}</div>
           <div class="text-sm text-neutral-600 dark:text-neutral-400">Exibindo Agora</div>
         </div>
         <div class="glass-panel rounded-lg p-4 text-center">
@@ -160,7 +160,7 @@
             role="button"
             tabindex="0"
           >
-            <div class="p-2 rounded-lg bg-brand-blue-50 dark:bg-brand-blue-800 text-brand-blue-600 dark:text-brand-blue-300 group-hover:scale-110 transition-transform">
+            <div class="p-2 rounded-lg bg-primary-50 dark:bg-primary-800 text-primary-600 dark:text-primary-300 group-hover:scale-110 transition-transform">
               <SlidersHorizontal class="w-5 h-5" />
             </div>
             <div class="text-left">
@@ -174,14 +174,14 @@
             <!-- Toggle de Visualização -->
             <div class="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
               <button 
-                class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
+                class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
                 on:click={() => viewMode = 'grid'}
                 title="Visualização em Grade"
               >
                 <LayoutGrid class="w-4 h-4" />
               </button>
               <button 
-                class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
+                class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300'}"
                 on:click={() => viewMode = 'list'}
                 title="Visualização em Lista"
               >
@@ -244,14 +244,14 @@
               <span class="text-sm text-neutral-600 dark:text-neutral-400">Visualizar como:</span>
               <div class="flex items-center gap-2 bg-neutral-100 dark:bg-neutral-800 rounded-lg p-1">
                 <button 
-                  class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500'}"
+                  class="p-2 rounded-md transition-all {viewMode === 'grid' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500'}"
                   on:click={() => viewMode = 'grid'}
                   title="Grade"
                 >
                   <LayoutGrid class="w-4 h-4" />
                 </button>
                 <button 
-                  class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-brand-blue-600 dark:text-brand-blue-400' : 'text-neutral-500'}"
+                  class="p-2 rounded-md transition-all {viewMode === 'list' ? 'bg-white dark:bg-neutral-700 shadow-sm text-primary-600 dark:text-primary-400' : 'text-neutral-500'}"
                   on:click={() => viewMode = 'list'}
                   title="Lista"
                 >
@@ -309,7 +309,7 @@
                 <LenteCard 
                   lente={{
                     ...lente,
-                    preco: lente.preco_venda_sugerido // Normalização de preço
+                    preco: lente.price_suggested // Normalização de preço
                   }}
                   compact={viewMode === 'list'}
                 />
@@ -334,7 +334,7 @@
   <!-- Botão Flutuante Mobile (FAB) -->
   <button
     on:click={toggleMobileFilters}
-    class="md:hidden fixed bottom-6 right-6 z-30 p-4 rounded-full bg-brand-blue-600 hover:bg-brand-blue-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110"
+    class="md:hidden fixed bottom-6 right-6 z-30 p-4 rounded-full bg-primary-600 hover:bg-primary-700 text-white shadow-2xl hover:shadow-3xl transition-all duration-300 hover:scale-110"
     aria-label="Abrir filtros"
   >
     <SlidersHorizontal class="w-6 h-6" />

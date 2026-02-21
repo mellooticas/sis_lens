@@ -1,11 +1,11 @@
 /**
  * Página de Detalhes da Lente - Server Load
- * Carrega: lente completa (v_lentes) + grupo canônico (v_grupos_canonicos) + alternativas do grupo
+ * Novo banco: v_catalog_lenses + v_catalog_lens_groups + alternativas do mesmo grupo
  */
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
 import { supabase } from '$lib/supabase';
-import type { VLente, VGrupoCanonicos } from '$lib/types/database-views';
+import type { VCatalogLens, VCatalogLensGroup } from '$lib/types/database-views';
 
 export const load: PageServerLoad = async ({ params }) => {
   const { id } = params;
@@ -13,7 +13,7 @@ export const load: PageServerLoad = async ({ params }) => {
   try {
     // 1. Buscar dados completos da lente
     const { data: lente, error: lenteError } = await supabase
-      .from('v_lentes')
+      .from('v_catalog_lenses')
       .select('*')
       .eq('id', id)
       .single();
@@ -22,38 +22,40 @@ export const load: PageServerLoad = async ({ params }) => {
       throw error(404, 'Lente não encontrada');
     }
 
+    const lenteTyped = lente as VCatalogLens;
+
     // 2. Buscar grupo canônico (se existir)
-    let grupoCanonicos: VGrupoCanonicos | null = null;
-    if (lente.grupo_canonico_id) {
+    let grupoCanonicos: VCatalogLensGroup | null = null;
+    if (lenteTyped.group_id) {
       const { data: grupo, error: grupoError } = await supabase
-        .from('v_grupos_canonicos')
+        .from('v_catalog_lens_groups')
         .select('*')
-        .eq('id', lente.grupo_canonico_id)
+        .eq('id', lenteTyped.group_id)
         .single();
 
       if (!grupoError && grupo) {
-        grupoCanonicos = grupo as VGrupoCanonicos;
+        grupoCanonicos = grupo as VCatalogLensGroup;
       }
     }
 
     // 3. Buscar lentes alternativas do mesmo grupo canônico
-    let alternativas: VLente[] = [];
-    if (lente.grupo_canonico_id) {
+    let alternativas: VCatalogLens[] = [];
+    if (lenteTyped.group_id) {
       const { data: alt, error: altError } = await supabase
-        .from('v_lentes')
-        .select('*')
-        .eq('grupo_canonico_id', lente.grupo_canonico_id)
-        .neq('id', id) // Excluir a lente atual
-        .order('preco_venda_sugerido', { ascending: true })
+        .from('v_catalog_lenses')
+        .select('id, slug, lens_name, brand_name, supplier_name, price_suggested, lead_time_days, is_premium, lens_type, material, refractive_index, status')
+        .eq('group_id', lenteTyped.group_id)
+        .neq('id', id)
+        .order('price_suggested', { ascending: true })
         .limit(10);
 
       if (!altError && alt) {
-        alternativas = alt as VLente[];
+        alternativas = alt as VCatalogLens[];
       }
     }
 
     return {
-      lente: lente as VLente,
+      lente: lenteTyped,
       grupoCanonicos,
       alternativas
     };

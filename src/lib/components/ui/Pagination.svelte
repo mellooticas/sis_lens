@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Pagination Component
    * Paginação de dados
@@ -150,8 +150,8 @@
   }
   
   .pagination-btn.active {
-    @apply bg-brand-blue-500 border-brand-blue-500;
+    @apply bg-primary-500 border-primary-500;
     @apply text-white;
-    @apply hover:bg-brand-blue-600;
+    @apply hover:bg-primary-600;
   }
 </style>

@@ -21,13 +21,10 @@
 </script>
 
 <!-- Layout Principal (Sidebar + Header + Content) -->
-{#if $page.url.pathname.startsWith("/login")}
+<!-- Auth é controlada pelo hooks.server.ts via SIS Gateway SSO -->
+<MainLayout currentPage={$page.url.pathname}>
   <slot />
-{:else}
-  <MainLayout currentPage={$page.url.pathname}>
-    <slot />
-  </MainLayout>
-{/if}
+</MainLayout>
 
 <!-- Toast Container (global) -->
 <ToastContainer />

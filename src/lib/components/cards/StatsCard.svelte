@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * StatsCard Component
    * Card de estatísticas/métricas
@@ -13,11 +13,11 @@
   export let subtitle: string | undefined = undefined;
 
   const colors = {
-    blue: "bg-brand-blue-50 text-brand-blue-600 dark:bg-brand-blue-800 dark:text-brand-blue-300",
+    blue: "bg-primary-50 text-primary-600 dark:bg-primary-800 dark:text-primary-300",
     green:
       "bg-success-light text-success-dark dark:bg-success-dark dark:text-success-light",
     orange:
-      "bg-brand-orange-50 text-brand-orange-600 dark:bg-brand-orange-800 dark:text-brand-orange-300",
+      "bg-orange-50 text-orange-600 dark:bg-orange-800 dark:text-orange-300",
     gold: "bg-brand-gold-50 text-brand-gold-600 dark:bg-brand-gold-800 dark:text-brand-gold-300",
     cyan: "bg-cyan-50 text-cyan-600 dark:bg-cyan-800 dark:text-cyan-300",
     purple: "bg-purple-50 text-purple-600 dark:bg-purple-800 dark:text-purple-300",

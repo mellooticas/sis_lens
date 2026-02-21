@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Card de Fornecedor - Ranking
    * Mostra informações do laboratório e métricas
@@ -47,7 +47,7 @@
   <!-- Header com badge -->
   <div class="flex items-start justify-between mb-4">
     <div class="flex-1">
-      <h3 class="font-headline text-xl font-bold text-brand-blue-700 mb-1">
+      <h3 class="font-headline text-xl font-bold text-primary-700 mb-1">
         {laboratorio.nome}
       </h3>
       <p class="text-sm text-neutral-600">SKU: {laboratorio.sku}</p>
@@ -65,7 +65,7 @@
     <!-- Preço -->
     <div>
       <div class="text-sm text-neutral-600 mb-1">Preço Final</div>
-      <div class="text-2xl font-bold text-brand-blue-700">
+      <div class="text-2xl font-bold text-primary-700">
         R$ {laboratorio.preco_final.toFixed(2)}
       </div>
       <div class="text-xs text-neutral-500">
@@ -109,7 +109,7 @@
   {#if laboratorio.justificativa}
     <div class="bg-neutral-50 rounded-lg p-3 mb-4">
       <div class="text-sm text-neutral-700">
-        <strong class="text-brand-blue-700">Por que {destaque ? 'é a melhor opção' : `está na posição ${laboratorio.rank_posicao}`}?</strong><br>
+        <strong class="text-primary-700">Por que {destaque ? 'é a melhor opção' : `está na posição ${laboratorio.rank_posicao}`}?</strong><br>
         {laboratorio.justificativa}
       </div>
     </div>

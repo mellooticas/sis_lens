@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { TrendingUp, TrendingDown, Minus } from "lucide-svelte";
 
   export let title: string;
@@ -10,10 +10,10 @@
 
   const colorClasses = {
     blue: {
-      gradient: "from-brand-blue-500 to-brand-blue-600",
-      bg: "bg-brand-blue-50 dark:bg-brand-blue-900/20",
-      border: "border-brand-blue-200 dark:border-brand-blue-700/50",
-      text: "text-brand-blue-600 dark:text-brand-blue-400",
+      gradient: "from-primary-500 to-primary-600",
+      bg: "bg-primary-50 dark:bg-primary-900/20",
+      border: "border-primary-200 dark:border-primary-700/50",
+      text: "text-primary-600 dark:text-primary-400",
     },
     green: {
       gradient: "from-green-500 to-green-600",

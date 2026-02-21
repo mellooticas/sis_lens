@@ -1,17 +1,21 @@
 /**
  * Hook para gerenciar marcas
- * Usa a view vw_marcas do banco de dados
+ * NOVO BANCO: marcas são TEXT (brand_name) em v_catalog_lenses — sem tabela separada.
  */
 
 import { writable, get } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
 
-interface Marca {
-  id: string;
-  nome: string;
-  slug: string;
-  is_premium: boolean;
-  ativo: boolean;
+// Tipo que corresponde ao retorno de ViewsApiClient.listarMarcas()
+export interface Marca {
+  brand_name: string;
+  total: number;
+  // Compat legado
+  id?: string;
+  nome?: string;
+  slug?: string;
+  is_premium?: boolean;
+  ativo?: boolean;
 }
 
 interface MarcasState {
@@ -30,16 +34,29 @@ export function useMarcas() {
   });
 
   /**
-   * Carregar todas as marcas
+   * Carregar todas as marcas (DISTINCT brand_name de v_catalog_lenses)
    */
   async function carregarMarcas() {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const response = await viewsApi.listarMarcas();
+    const [resTodas, resPremium] = await Promise.all([
+      viewsApi.listarMarcas(),
+      viewsApi.listarMarcasPremium()
+    ]);
 
-    if (response.success && response.data) {
-      const marcas = response.data;
-      const marcasPremium = marcas.filter(m => m.is_premium);
+    if (resTodas.success) {
+      // Mapear para Marca com campos compat
+      const marcas: Marca[] = resTodas.data.map(m => ({
+        ...m,
+        id: m.brand_name,        // sem UUID no novo banco
+        nome: m.brand_name,
+        slug: m.brand_name.toLowerCase().replace(/\s+/g, '-'),
+        is_premium: resPremium.data?.some(p => p.brand_name === m.brand_name) ?? false,
+        ativo: true
+      }));
+
+      const premiumSet = new Set(resPremium.data?.map(p => p.brand_name) ?? []);
+      const marcasPremium = marcas.filter(m => premiumSet.has(m.brand_name));
 
       state.update(s => ({
         ...s,
@@ -51,23 +68,25 @@ export function useMarcas() {
       state.update(s => ({
         ...s,
         loading: false,
-        error: response.error || 'Erro ao carregar marcas'
+        error: resTodas.error || 'Erro ao carregar marcas'
       }));
     }
   }
 
   /**
-   * Obter marca por ID
+   * Obter marca por brand_name (substitui obterMarcaPorId)
    */
-  function obterMarcaPorId(marcaId: string): Marca | undefined {
+  function obterMarcaPorId(marcaIdOuNome: string): Marca | undefined {
     const currentState = get(state);
-    return currentState.marcas.find(m => m.id === marcaId);
+    return currentState.marcas.find(
+      m => m.id === marcaIdOuNome || m.brand_name === marcaIdOuNome
+    );
   }
 
   /**
    * Obter marca por slug
    */
-  function obterMarcaPorSlug(slug: string): VwMarcas | undefined {
+  function obterMarcaPorSlug(slug: string): Marca | undefined {
     const currentState = get(state);
     return currentState.marcas.find(m => m.slug === slug);
   }

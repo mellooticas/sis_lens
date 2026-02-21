@@ -1,14 +1,23 @@
 /**
  * Hook para gerenciar filtros disponíveis
- * Usa a view vw_filtros_disponiveis do banco de dados
+ * NOVO BANCO: usa obterFiltrosDisponiveis() que agrega de v_catalog_lenses
  */
 
 import { writable } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
-import type { VwFiltrosDisponiveis } from '$lib/types/views';
+
+// Tipo que corresponde ao retorno de ViewsApiClient.obterFiltrosDisponiveis()
+export interface FiltrosDisponiveis {
+  tipos_lente: { valor: string; total: number }[];
+  materiais: { valor: string; total: number }[];
+  indices_refracao: { valor: string; total: number }[];
+  categorias: { valor: string; total: number }[];
+  marcas: { nome: string; count: number }[];
+  fornecedores: { id: string; nome: string; count: number }[];
+}
 
 interface FiltrosState {
-  filtros: VwFiltrosDisponiveis | null;
+  filtros: FiltrosDisponiveis | null;
   loading: boolean;
   error: string | null;
 }
@@ -21,7 +30,7 @@ export function useFiltros() {
   });
 
   /**
-   * Carregar filtros disponíveis
+   * Carregar filtros disponíveis agregados de v_catalog_lenses
    */
   async function carregarFiltros() {
     state.update(s => ({ ...s, loading: true, error: null }));
@@ -31,7 +40,7 @@ export function useFiltros() {
     if (response.success && response.data) {
       state.update(s => ({
         ...s,
-        filtros: response.data || null,
+        filtros: response.data as FiltrosDisponiveis,
         loading: false
       }));
     } else {

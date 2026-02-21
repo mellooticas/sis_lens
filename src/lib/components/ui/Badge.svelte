@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Componente Badge SIS Lens
    * Badges para status e destaques
@@ -24,14 +24,14 @@
 
   // Variantes
   const variants = {
-    primary: "bg-brand-blue-100 text-brand-blue-700",
+    primary: "bg-primary-100 text-primary-700",
     success: "bg-success/10 text-success-dark",
     warning: "bg-warning/10 text-warning-dark",
     error: "bg-error/10 text-error-dark",
     gold: "bg-brand-gold-100 text-brand-gold-700",
-    orange: "bg-brand-orange-100 text-brand-orange-700",
+    orange: "bg-orange-100 text-orange-700",
     "melhor-opcao": "bg-brand-gold-500 text-white font-semibold shadow-md",
-    promocao: "bg-brand-orange-500 text-white",
+    promocao: "bg-orange-500 text-white",
     "entrega-expressa": "bg-success text-white",
     neutral:
       "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300",

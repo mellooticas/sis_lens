@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { cn } from "$lib/utils";
   import { theme } from "$lib/stores/theme";
 
@@ -31,8 +31,8 @@
   };
 
   const themeClasses = {
-    auto: "text-brand-blue-500 dark:text-white",
-    light: "text-brand-blue-500",
+    auto: "text-primary-500 dark:text-white",
+    light: "text-primary-500",
     dark: "text-white",
   };
 </script>

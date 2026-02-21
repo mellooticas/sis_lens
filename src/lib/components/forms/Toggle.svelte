@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Toggle Switch Component
    * Switch on/off customizado
@@ -76,11 +76,11 @@
   }
   
   .toggle-switch.checked {
-    @apply bg-brand-blue-500;
+    @apply bg-primary-500;
   }
   
   .toggle-input:focus + .toggle-label .toggle-switch {
-    @apply ring-2 ring-brand-blue-500/20;
+    @apply ring-2 ring-primary-500/20;
   }
   
   .toggle-dot {

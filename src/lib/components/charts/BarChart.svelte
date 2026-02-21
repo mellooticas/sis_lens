@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   export let data: Array<{ label: string; value: number; color: string }> = [];
   export let height: number = 300;
   export let showValues: boolean = true;
@@ -21,7 +21,7 @@
             #{index + 1}
           </span>
           <span
-            class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors"
+            class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
           >
             {item.label}
           </span>

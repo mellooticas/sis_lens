@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Radio Button Component
    * Radio button customizado
@@ -66,11 +66,11 @@
   }
   
   .radio-input:checked + .radio-label .radio-circle {
-    @apply border-brand-blue-500;
+    @apply border-primary-500;
   }
   
   .radio-input:focus + .radio-label .radio-circle {
-    @apply ring-2 ring-brand-blue-500/20;
+    @apply ring-2 ring-primary-500/20;
   }
   
   .radio-input:disabled + .radio-label .radio-circle {
@@ -79,7 +79,7 @@
   
   .radio-dot {
     @apply w-2.5 h-2.5 rounded-full;
-    @apply bg-brand-blue-500;
+    @apply bg-primary-500;
   }
   
   .radio-text {

@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * LoadingOverlay - Loading fullscreen
    */
@@ -53,7 +53,7 @@
   .spinner {
     @apply w-12 h-12;
     @apply border-4 border-neutral-200 dark:border-neutral-700;
-    @apply border-t-brand-blue-500;
+    @apply border-t-primary-500;
     @apply rounded-full;
     @apply animate-spin;
   }

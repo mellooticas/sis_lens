@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Textarea Component
    * Textarea com contador de caracteres opcional
@@ -63,7 +63,7 @@
     @apply text-sm text-neutral-900 dark:text-neutral-100;
     @apply placeholder:text-neutral-400 dark:placeholder:text-neutral-500;
     @apply transition-all duration-200;
-    @apply focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-500/20;
+    @apply focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
   }
   

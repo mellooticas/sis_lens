@@ -1,78 +1,50 @@
 /**
- * Página Principal - Server Load
- * Dashboard usando dados reais do banco
+ * SIS Lens — Dashboard Principal
+ * Dados reais de v_catalog_lenses + v_catalog_lens_groups
  */
-
-import { createClient } from '@supabase/supabase-js';
 import type { PageServerLoad } from './$types';
 
-export const load: PageServerLoad = async () => {
-  try {
-    const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
-    const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
+export const load: PageServerLoad = async ({ locals }) => {
+  const supabase = locals.supabase;
 
-    if (!supabaseUrl || !supabaseKey) {
-      throw new Error('Missing Supabase environment variables');
+  const [lentesResult, gruposResult] = await Promise.all([
+    supabase
+      .from('v_catalog_lenses')
+      .select('lens_type, is_premium, status, supplier_name, brand_name'),
+    supabase
+      .from('v_catalog_lens_groups')
+      .select('id, is_active, is_premium')
+  ]);
+
+  const lentes = lentesResult.data ?? [];
+  const grupos = gruposResult.data ?? [];
+
+  // KPIs principais
+  const total_lentes   = lentes.length;
+  const lentes_ativas  = lentes.filter(l => l.status === 'active').length;
+  const lentes_premium = lentes.filter(l => l.is_premium).length;
+  const grupos_ativos  = grupos.filter(g => g.is_active).length;
+
+  // Fornecedores/Labs e Marcas únicos
+  const fornecedores = [...new Set(lentes.map(l => l.supplier_name).filter(Boolean))];
+  const marcas       = [...new Set(lentes.map(l => l.brand_name).filter(Boolean))];
+
+  // Distribuição por tipo de lente
+  const por_tipo: Record<string, number> = {};
+  lentes.forEach(l => {
+    if (l.lens_type) por_tipo[l.lens_type] = (por_tipo[l.lens_type] || 0) + 1;
+  });
+
+  return {
+    stats: {
+      total_lentes,
+      lentes_ativas,
+      lentes_premium,
+      total_standard:    lentes.filter(l => !l.is_premium).length,
+      total_fornecedores: fornecedores.length,
+      total_marcas:       marcas.length,
+      grupos_ativos,
+      por_tipo
     }
-
-    const supabase = createClient(supabaseUrl, supabaseKey);
-    
-    // Buscar dados reais usando funções públicas
-    const [kpisResult, labsResult, decisoesResult] = await Promise.all([
-      supabase.rpc('obter_dashboard_kpis'),
-      supabase.from('vw_laboratorios_completo').select('*').limit(5),
-      supabase.from('vw_historico_decisoes').select('*').limit(5)
-    ]);
-
-    const kpis = kpisResult.data || { total_decisoes: 0, economia_total: 0, decisoes_mes: 0, labs_ativos: 0 };
-    const labs = labsResult.data || [];
-    const decisoes = decisoesResult.data || [];
-    
-    return { 
-      dashboard: {
-        total_decisoes_lentes: kpis.total_decisoes || 0,
-        economia_total_lentes: kpis.economia_total || 0,
-        total_vouchers_emitidos: 0,
-        total_usuarios_ativos: 1,
-        laboratorio_top_nome: labs[0]?.nome_fantasia || 'N/A',
-        economia_media_decisao: kpis.total_decisoes > 0 ? Math.round(kpis.economia_total / kpis.total_decisoes) : 0
-      },
-      decisoes_recentes: decisoes,
-      lentes_populares: [],
-      economia_fornecedores: labs.map(lab => ({
-        nome: lab.nome_fantasia,
-        economia: 0,
-        score: lab.score_geral || 0
-      })),
-      metricas_resumo: {
-        total_decisoes: kpis.total_decisoes || 0,
-        economia_mes: kpis.economia_total || 0,
-        fornecedores_ativos: labs.length
-      },
-      sucesso: true,
-      erro: null
-    };
-  } catch (error) {
-    console.error('Erro no load da página principal:', error);
-    return {
-      dashboard: {
-        total_decisoes_lentes: 0,
-        economia_total_lentes: 0,
-        total_vouchers_emitidos: 0,
-        total_usuarios_ativos: 0,
-        laboratorio_top_nome: 'N/A',
-        economia_media_decisao: 0
-      },
-      decisoes_recentes: [],
-      lentes_populares: [],
-      economia_fornecedores: [],
-      metricas_resumo: {
-        total_decisoes: 0,
-        economia_mes: 0,
-        fornecedores_ativos: 0
-      },
-      sucesso: false,
-      erro: 'Erro interno do servidor'
-    };
-  }
+  };
 };

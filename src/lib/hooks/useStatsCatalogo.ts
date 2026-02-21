@@ -5,10 +5,10 @@
 
 import { writable } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
-import type { VwStatsCatalogo } from '$lib/types/views';
+import type { VCatalogLensStats } from '$lib/types/database-views';
 
 interface StatsCatalogoState {
-  stats: VwStatsCatalogo | null;
+  stats: VCatalogLensStats | null;
   loading: boolean;
   error: string | null;
 }

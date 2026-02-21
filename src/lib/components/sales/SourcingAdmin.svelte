@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
     import {
         Building2,
         TrendingDown,
@@ -73,7 +73,7 @@
             <h3
                 class="text-lg font-bold text-gray-800 flex items-center gap-2 font-headline"
             >
-                <Building2 size={20} class="text-brand-blue-500" />
+                <Building2 size={20} class="text-primary-500" />
                 SIS Lens Sourcing
             </h3>
             <p class="text-sm text-gray-500">
@@ -84,7 +84,7 @@
         </div>
         <div class="text-right">
             <div
-                class="text-xs text-brand-blue-600 font-bold uppercase tracking-wider"
+                class="text-xs text-primary-600 font-bold uppercase tracking-wider"
             >
                 Custo Atual Otimizado
             </div>

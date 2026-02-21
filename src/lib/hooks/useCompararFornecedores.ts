@@ -5,10 +5,13 @@
 
 import { writable } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
-import type { VwCompararFornecedores } from '$lib/types/views';
+import type { VCatalogLensGroup } from '$lib/types/database-views';
+
+// NOVO BANCO: comparações agora são grupos canônicos (v_catalog_lens_groups / derivado de v_catalog_lenses)
+type Comparacao = VCatalogLensGroup;
 
 interface CompararFornecedoresState {
-  comparacoes: VwCompararFornecedores[];
+  comparacoes: Comparacao[];
   loading: boolean;
   error: string | null;
 }
@@ -31,7 +34,7 @@ export function useCompararFornecedores() {
     if (response.success && response.data) {
       state.update(s => ({
         ...s,
-        comparacoes: response.data || [],
+        comparacoes: (response.data || []) as Comparacao[],
         loading: false
       }));
     } else {
@@ -54,7 +57,7 @@ export function useCompararFornecedores() {
     if (response.success && response.data) {
       state.update(s => ({
         ...s,
-        comparacoes: response.data || [],
+        comparacoes: (response.data || []) as Comparacao[],
         loading: false
       }));
     } else {
@@ -77,7 +80,7 @@ export function useCompararFornecedores() {
     if (response.success && response.data) {
       state.update(s => ({
         ...s,
-        comparacoes: response.data || [],
+        comparacoes: (response.data || []) as Comparacao[],
         loading: false
       }));
     } else {
@@ -100,7 +103,7 @@ export function useCompararFornecedores() {
     if (response.success && response.data) {
       state.update(s => ({
         ...s,
-        comparacoes: response.data || [],
+        comparacoes: (response.data || []) as Comparacao[],
         loading: false
       }));
     } else {

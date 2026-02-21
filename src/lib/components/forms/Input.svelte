@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Componente Input SIS Lens
    * Input field padronizado
@@ -11,7 +11,7 @@
   export let error = '';
   export let icon: 'search' | 'none' = 'none';
   
-  const baseClasses = 'w-full rounded-lg border bg-white px-4 py-2 text-sm transition-all duration-200 focus:border-brand-blue-500 focus:ring-2 focus:ring-brand-blue-500/20 disabled:opacity-50 disabled:cursor-not-allowed';
+  const baseClasses = 'w-full rounded-lg border bg-white px-4 py-2 text-sm transition-all duration-200 focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20 disabled:opacity-50 disabled:cursor-not-allowed';
   
   $: inputClasses = `${baseClasses} ${error ? 'border-error' : 'border-neutral-300'} ${icon === 'search' ? 'pl-10' : ''}`;
 </script>

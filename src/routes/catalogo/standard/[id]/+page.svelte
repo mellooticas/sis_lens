@@ -12,23 +12,26 @@
 
   // Dados vindos do servidor (+page.server.ts)
   export let data: PageData;
-  
+
   $: grupo = data.grupo;
   $: lentes = data.lentes || [];
+
+  // Estatísticas computadas a partir das lentes (VCatalogLensGroup não tem stats agregados)
+  $: precos = lentes.map((l: any) => l.price_suggested).filter((p: number) => p > 0);
+  $: precoMin = precos.length > 0 ? Math.min(...precos) : 0;
+  $: precoMax = precos.length > 0 ? Math.max(...precos) : 0;
+  $: precoMedio = precos.length > 0 ? precos.reduce((a: number, b: number) => a + b, 0) / precos.length : 0;
+  $: marcas = [...new Set(lentes.map((l: any) => l.brand_name).filter(Boolean))];
+  $: fornecedores = [...new Set(lentes.map((l: any) => l.supplier_name).filter(Boolean))];
 
   function formatarPreco(valor: number | null): string {
     if (!valor) return '-';
     return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
   }
-
-  function formatarPercentual(valor: number | null): string {
-    if (!valor) return '-';
-    return `${valor.toFixed(2)}%`;
-  }
 </script>
 
 <svelte:head>
-  <title>{grupo?.nome_grupo || 'Grupo Canônico Standard'} - SIS Lens</title>
+  <title>{grupo?.name || 'Grupo Canônico Standard'} - SIS Lens</title>
 </svelte:head>
 
 <Container maxWidth="xl" padding="md">
@@ -45,72 +48,62 @@
       <div class="flex-1">
         <div class="flex flex-wrap gap-2 mb-4">
           <Badge variant="primary">Standard</Badge>
-          <Badge variant="neutral">{grupo.tipo_lente?.replace('_', ' ')}</Badge>
-          <Badge variant="info">{grupo.categoria_preco || grupo.categoria_predominante}</Badge>
-          {#if grupo.tem_antirreflexo}
-            <Badge variant="success">AR</Badge>
-          {/if}
-          {#if grupo.tem_blue_light}
-            <Badge variant="blue">Blue Light</Badge>
-          {/if}
-          {#if grupo.tratamento_foto !== 'nenhum'}
-            <Badge variant="warning">Fotossensível</Badge>
-          {/if}
-          {#if grupo.tem_uv}
-            <Badge variant="success">UV</Badge>
-          {/if}
+          <Badge variant="neutral">{grupo.lens_type?.replace('_', ' ')}</Badge>
+          <Badge variant="info">{grupo.material}</Badge>
+          <Badge variant={grupo.is_active ? 'success' : 'neutral'} size="sm">
+            {grupo.is_active ? 'Ativo' : 'Inativo'}
+          </Badge>
         </div>
-        
+
         <h1 class="text-3xl md:text-4xl font-bold text-slate-900 mb-2">
-          {grupo.nome_grupo}
+          {grupo.name}
         </h1>
-        
-        {#if grupo.descricao_ranges}
-          <p class="text-lg text-slate-600">{grupo.descricao_ranges}</p>
-        {/if}
+
+        <p class="text-lg text-slate-600">
+          {(grupo.lens_type || '').replace('_', ' ')} • {grupo.material} • Índice {grupo.refractive_index}
+        </p>
       </div>
 
       <div class="text-right">
-        <div class="bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl p-6 min-w-[200px]">
-          <div class="text-sm opacity-90 mb-1">Preço Médio</div>
-          <div class="text-3xl font-bold">{formatarPreco(grupo.preco_medio)}</div>
-          <div class="text-xs opacity-75 mt-2">
-            De {formatarPreco(grupo.preco_minimo)} até {formatarPreco(grupo.preco_maximo)}
+        {#if precos.length > 0}
+          <div class="bg-gradient-to-br from-blue-600 to-indigo-600 text-white rounded-2xl p-6 min-w-[200px]">
+            <div class="text-sm opacity-90 mb-1">Preço Médio</div>
+            <div class="text-3xl font-bold">{formatarPreco(precoMedio)}</div>
+            <div class="text-xs opacity-75 mt-2">
+              De {formatarPreco(precoMin)} até {formatarPreco(precoMax)}
+            </div>
           </div>
-          {#if grupo.faixa_preco}
-            <div class="text-xs opacity-75 mt-1">{grupo.faixa_preco}</div>
-          {/if}
-        </div>
+        {/if}
       </div>
     </div>
   </div>
 
-  <!-- Estatísticas Gerais -->
+  <!-- Estatísticas Gerais (computadas das lentes) -->
   <SectionHeader title="📊 Estatísticas Gerais" subtitle="Resumo do grupo" />
-  
+
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
     <div class="glass-panel p-6 rounded-xl text-center">
-      <div class="text-4xl font-bold text-blue-600 mb-2">{grupo.total_lentes || 0}</div>
+      <div class="text-4xl font-bold text-blue-600 mb-2">{lentes.length}</div>
       <div class="text-sm text-slate-600">Lentes</div>
     </div>
     <div class="glass-panel p-6 rounded-xl text-center">
-      <div class="text-4xl font-bold text-purple-600 mb-2">{grupo.total_marcas || 0}</div>
+      <div class="text-4xl font-bold text-purple-600 mb-2">{marcas.length}</div>
       <div class="text-sm text-slate-600">Marcas</div>
     </div>
     <div class="glass-panel p-6 rounded-xl text-center">
-      <div class="text-4xl font-bold text-green-600 mb-2">{grupo.total_fornecedores || 0}</div>
+      <div class="text-4xl font-bold text-green-600 mb-2">{fornecedores.length}</div>
       <div class="text-sm text-slate-600">Fornecedores</div>
     </div>
     <div class="glass-panel p-6 rounded-xl text-center">
-      <div class="text-4xl font-bold text-orange-600 mb-2">{grupo.prazo_medio_dias || 0}</div>
-      <div class="text-sm text-slate-600">Prazo Médio (dias)</div>
+      <div class="text-4xl font-bold text-orange-600 mb-2">{grupo.refractive_index}</div>
+      <div class="text-sm text-slate-600">Índice Refração</div>
     </div>
   </div>
 
   <!-- Especificações Técnicas -->
   <SectionHeader title="🔬 Especificações Técnicas" subtitle="Características ópticas" />
-  
-  <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-8 mt-6">
+
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mb-8 mt-6">
     <div class="glass-panel p-6 rounded-xl">
       <h3 class="font-semibold text-slate-900 mb-4">📏 Material e Índice</h3>
       <div class="space-y-2 text-sm">
@@ -120,132 +113,51 @@
         </div>
         <div class="flex justify-between">
           <span class="text-slate-600">Índice Refração:</span>
-          <span class="font-medium">{grupo.indice_refracao}</span>
+          <span class="font-medium">{grupo.refractive_index}</span>
         </div>
         <div class="flex justify-between">
           <span class="text-slate-600">Tipo:</span>
-          <span class="font-medium capitalize">{grupo.tipo_lente.replace('_', ' ')}</span>
+          <span class="font-medium capitalize">{(grupo.lens_type || '').replace('_', ' ')}</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Status:</span>
+          <Badge variant={grupo.is_active ? 'success' : 'neutral'} size="sm">
+            {grupo.is_active ? 'Ativo' : 'Inativo'}
+          </Badge>
         </div>
       </div>
     </div>
 
-    <div class="glass-panel p-6 rounded-xl">
-      <h3 class="font-semibold text-slate-900 mb-4">🎯 Faixas de Graus</h3>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between">
-          <span class="text-slate-600">Esférico:</span>
-          <span class="font-medium">
-            {grupo.grau_esferico_min ?? '-'} a {grupo.grau_esferico_max ?? '-'}
-          </span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-600">Cilíndrico:</span>
-          <span class="font-medium">
-            {grupo.grau_cilindrico_min ?? '-'} a {grupo.grau_cilindrico_max ?? '-'}
-          </span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-600">Adição:</span>
-          <span class="font-medium">
-            {grupo.adicao_min ?? '-'} a {grupo.adicao_max ?? '-'}
-          </span>
+    {#if precos.length > 0}
+      <div class="glass-panel p-6 rounded-xl">
+        <h3 class="font-semibold text-slate-900 mb-4">💰 Análise de Preços</h3>
+        <div class="space-y-2 text-sm">
+          <div class="flex justify-between">
+            <span class="text-slate-500">Mínimo:</span>
+            <span class="font-medium">{formatarPreco(precoMin)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Médio:</span>
+            <span class="font-semibold text-blue-600">{formatarPreco(precoMedio)}</span>
+          </div>
+          <div class="flex justify-between">
+            <span class="text-slate-500">Máximo:</span>
+            <span class="font-medium">{formatarPreco(precoMax)}</span>
+          </div>
         </div>
       </div>
-    </div>
-
-    <div class="glass-panel p-6 rounded-xl">
-      <h3 class="font-semibold text-slate-900 mb-4">✨ Tratamentos</h3>
-      <div class="space-y-2 text-sm">
-        <div class="flex justify-between">
-          <span class="text-slate-600">Anti-Reflexo:</span>
-          <span>{grupo.tem_antirreflexo ? '✅' : '❌'}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-600">Anti-Risco:</span>
-          <span>{grupo.tem_antirrisco ? '✅' : '❌'}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-600">Blue Light:</span>
-          <span>{grupo.tem_blue_light ? '✅' : '❌'}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-600">UV:</span>
-          <span>{grupo.tem_uv ? '✅' : '❌'}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-600">Fotossensível:</span>
-          <span class="font-medium capitalize">{grupo.tratamento_foto}</span>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- Análise Financeira -->
-  <SectionHeader title="💰 Análise Financeira" subtitle="Custos, margens e lucratividade" />
-  
-  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 mb-8 mt-6">
-    <div class="glass-panel p-6 rounded-xl">
-      <h4 class="text-sm text-slate-600 mb-2">Preços</h4>
-      <div class="space-y-1 text-sm">
-        <div class="flex justify-between">
-          <span class="text-slate-500">Mínimo:</span>
-          <span class="font-medium">{formatarPreco(grupo.preco_minimo)}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-500">Médio:</span>
-          <span class="font-semibold text-blue-600">{formatarPreco(grupo.preco_medio)}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-500">Máximo:</span>
-          <span class="font-medium">{formatarPreco(grupo.preco_maximo)}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="glass-panel p-6 rounded-xl">
-      <h4 class="text-sm text-slate-600 mb-2">Custos</h4>
-      <div class="space-y-1 text-sm">
-        <div class="flex justify-between">
-          <span class="text-slate-500">Mínimo:</span>
-          <span class="font-medium">{formatarPreco(grupo.custo_minimo)}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-500">Médio:</span>
-          <span class="font-semibold text-orange-600">{formatarPreco(grupo.custo_medio)}</span>
-        </div>
-        <div class="flex justify-between">
-          <span class="text-slate-500">Máximo:</span>
-          <span class="font-medium">{formatarPreco(grupo.custo_maximo)}</span>
-        </div>
-      </div>
-    </div>
-
-    <div class="glass-panel p-6 rounded-xl bg-gradient-to-br from-green-50 to-emerald-50">
-      <h4 class="text-sm text-green-800 mb-2 font-medium">Lucro Unitário</h4>
-      <div class="text-3xl font-bold text-green-700">
-        {formatarPreco(grupo.lucro_unitario)}
-      </div>
-      <div class="text-xs text-green-600 mt-1">Por lente vendida</div>
-    </div>
-
-    <div class="glass-panel p-6 rounded-xl bg-gradient-to-br from-purple-50 to-indigo-50">
-      <h4 class="text-sm text-purple-800 mb-2 font-medium">Margem</h4>
-      <div class="text-3xl font-bold text-purple-700">
-        {formatarPercentual(grupo.margem_percentual)}
-      </div>
-      <div class="text-xs text-purple-600 mt-1">Markup: {grupo.markup || '-'}x</div>
-    </div>
+    {/if}
   </div>
 
   <!-- Marcas -->
-  {#if grupo.marcas_disponiveis && Array.isArray(grupo.marcas_disponiveis) && grupo.marcas_disponiveis.length > 0}
-    <SectionHeader title="🏷️ Marcas" subtitle={`${grupo.marcas_disponiveis.length} marca${grupo.marcas_disponiveis.length !== 1 ? 's' : ''} neste grupo`} />
-    
+  {#if marcas.length > 0}
+    <SectionHeader title="🏷️ Marcas" subtitle={`${marcas.length} marca${marcas.length !== 1 ? 's' : ''} neste grupo`} />
+
     <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
       <div class="flex flex-wrap gap-3">
-        {#each grupo.marcas_disponiveis as marca}
+        {#each marcas as marca}
           <div class="flex items-center gap-2 bg-blue-50 px-4 py-2 rounded-lg border border-blue-200">
-            <span class="font-medium text-slate-900">{typeof marca === 'string' ? marca : marca.marca_nome}</span>
+            <span class="font-medium text-slate-900">{marca}</span>
           </div>
         {/each}
       </div>
@@ -253,20 +165,14 @@
   {/if}
 
   <!-- Fornecedores -->
-  {#if grupo.fornecedores_disponiveis && Array.isArray(grupo.fornecedores_disponiveis) && grupo.fornecedores_disponiveis.length > 0}
+  {#if fornecedores.length > 0}
     <SectionHeader title="🚚 Fornecedores" subtitle="Opções de fornecimento" />
-    
+
     <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
-      <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-        {#each grupo.fornecedores_disponiveis as fornecedor}
-          <div class="bg-white p-4 rounded-lg border border-slate-200">
-            <div class="font-semibold text-slate-900 mb-2">{typeof fornecedor === 'string' ? fornecedor : fornecedor.nome}</div>
-            {#if typeof fornecedor === 'object' && fornecedor.prazo_visao_simples}
-              <div class="text-xs text-slate-600 space-y-1">
-                <div>Visão Simples: {fornecedor.prazo_visao_simples || 0} dias</div>
-                <div>Multifocal: {fornecedor.prazo_multifocal || 0} dias</div>
-              </div>
-            {/if}
+      <div class="flex flex-wrap gap-3">
+        {#each fornecedores as fornecedor}
+          <div class="bg-white p-3 rounded-lg border border-slate-200">
+            <span class="font-medium text-slate-900">{fornecedor}</span>
           </div>
         {/each}
       </div>
@@ -274,11 +180,11 @@
   {/if}
 
   <!-- Lentes -->
-  <SectionHeader 
-    title="🔍 Lentes" 
-    subtitle={`${lentes.length} lente${lentes.length !== 1 ? 's' : ''} cadastrada${lentes.length !== 1 ? 's' : ''}`} 
+  <SectionHeader
+    title="🔍 Lentes"
+    subtitle={`${lentes.length} lente${lentes.length !== 1 ? 's' : ''} cadastrada${lentes.length !== 1 ? 's' : ''}`}
   />
-  
+
   <div class="glass-panel p-6 rounded-xl mb-8 mt-6">
     {#if lentes.length === 0}
       <div class="text-center py-20">
@@ -301,28 +207,16 @@
   <div class="glass-panel p-4 rounded-xl mb-8 bg-slate-50">
     <div class="grid grid-cols-2 md:grid-cols-3 gap-4 text-xs text-slate-600">
       <div>
-        <span class="font-medium">ID:</span> 
+        <span class="font-medium">ID:</span>
         <span class="font-mono">{grupo.id.slice(0, 8)}...</span>
       </div>
       <div>
-        <span class="font-medium">Slug:</span> {grupo.slug}
-      </div>
-      <div>
-        <span class="font-medium">Peso:</span> {grupo.peso}
-      </div>
-      <div>
-        <span class="font-medium">Cadastro:</span> 
+        <span class="font-medium">Cadastro:</span>
         {new Date(grupo.created_at).toLocaleDateString('pt-BR')}
       </div>
       <div>
-        <span class="font-medium">Atualização:</span> 
+        <span class="font-medium">Atualização:</span>
         {new Date(grupo.updated_at).toLocaleDateString('pt-BR')}
-      </div>
-      <div>
-        <span class="font-medium">Status:</span> 
-        <Badge variant={grupo.ativo ? 'success' : 'neutral'} size="sm">
-          {grupo.ativo ? 'Ativo' : 'Inativo'}
-        </Badge>
       </div>
     </div>
   </div>

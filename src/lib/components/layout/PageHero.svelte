@@ -1,4 +1,4 @@
- <script lang="ts">
+﻿ <script lang="ts">
   /**
    * PageHero - Hero section para topo de páginas
    * Badge + Título + Subtítulo + Destaque opcional
@@ -48,7 +48,7 @@
   {/if}
   
   {#if highlight}
-    <p class="text-lg text-brand-orange-600 dark:text-brand-orange-400 font-medium">
+    <p class="text-lg text-orange-600 dark:text-orange-400 font-medium">
       {highlight}
     </p>
   {/if}

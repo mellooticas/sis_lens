@@ -1,9 +1,10 @@
 /**
  * 💰 Tabela de Preços - Server Load
- * Tabela normalizada de lentes com filtros avançados para vouchers
+ * Novo banco: v_catalog_lenses
  */
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabase';
+import type { VCatalogLens } from '$lib/types/database-views';
 
 export const load: PageServerLoad = async ({ url }) => {
   try {
@@ -17,7 +18,7 @@ export const load: PageServerLoad = async ({ url }) => {
     const preco_max = parseFloat(url.searchParams.get('preco_max') || '99999');
     const busca = url.searchParams.get('busca') || '';
     const pagina = parseInt(url.searchParams.get('pagina') || '1');
-    const visualizacao = url.searchParams.get('view') || 'tabela'; // tabela ou cards
+    const visualizacao = url.searchParams.get('view') || 'tabela';
     const limite = visualizacao === 'cards' ? 12 : 20;
     const offset = (pagina - 1) * limite;
 
@@ -25,46 +26,33 @@ export const load: PageServerLoad = async ({ url }) => {
       marca, tipo_lente, material, indice, tratamento, preco_min, preco_max, busca, visualizacao
     });
 
-    // 1. Query principal de lentes
+    // 1. Query principal de lentes (v_catalog_lenses)
     let query = supabase
-      .from('lens_catalog.lentes')
+      .from('v_catalog_lenses')
       .select(`
-        id,
-        sku_canonico,
-        familia,
-        design,
-        material,
-        indice_refracao,
-        tipo_lente,
-        marca_nome,
-        descricao_completa,
-        tratamentos,
-        preco_base,
-        preco_promocional,
-        disponibilidade,
-        estoque_disponivel,
-        prazo_entrega,
-        categoria,
-        peso,
-        espessura_centro,
-        espessura_borda,
-        protecao_uv,
-        antirreflexo,
-        created_at,
-        updated_at
+        id, slug, sku, lens_name, brand_name, supplier_name, supplier_lab_id,
+        lens_type, material, refractive_index, category,
+        anti_reflective, anti_scratch, uv_filter, blue_light, photochromic, polarized,
+        digital, free_form,
+        spherical_min, spherical_max, cylindrical_min, cylindrical_max,
+        addition_min, addition_max,
+        price_cost, price_suggested,
+        stock_available, lead_time_days,
+        is_premium, status,
+        created_at, updated_at
       `, { count: 'exact' });
 
     // 2. Aplicar filtros
     if (busca) {
-      query = query.or(`familia.ilike.%${busca}%,marca_nome.ilike.%${busca}%,sku_canonico.ilike.%${busca}%,descricao_completa.ilike.%${busca}%`);
+      query = query.or(`lens_name.ilike.%${busca}%,brand_name.ilike.%${busca}%,sku.ilike.%${busca}%`);
     }
 
     if (marca) {
-      query = query.eq('marca_nome', marca);
+      query = query.eq('brand_name', marca);
     }
 
     if (tipo_lente) {
-      query = query.eq('tipo_lente', tipo_lente);
+      query = query.eq('lens_type', tipo_lente);
     }
 
     if (material) {
@@ -72,72 +60,78 @@ export const load: PageServerLoad = async ({ url }) => {
     }
 
     if (indice) {
-      query = query.eq('indice_refracao', indice);
+      query = query.eq('refractive_index', parseFloat(indice));
     }
 
+    // Filtro de tratamento (mapeamento para novo banco)
     if (tratamento) {
-      query = query.contains('tratamentos', [tratamento]);
+      const tratamentoMap: Record<string, string> = {
+        ar: 'anti_reflective',
+        antirrisco: 'anti_scratch',
+        blue: 'blue_light',
+        uv: 'uv_filter',
+        polarizado: 'polarized',
+        digital: 'digital',
+        free_form: 'free_form'
+      };
+      const campo = tratamentoMap[tratamento];
+      if (campo) {
+        query = query.eq(campo, true);
+      } else if (tratamento === 'fotossensivel' || tratamento === 'foto') {
+        query = query.neq('photochromic', 'nenhum');
+      }
     }
 
     query = query
-      .gte('preco_base', preco_min)
-      .lte('preco_base', preco_max)
-      .order('marca_nome', { ascending: true })
-      .order('familia', { ascending: true })
+      .gte('price_suggested', preco_min)
+      .lte('price_suggested', preco_max)
+      .order('brand_name', { ascending: true })
+      .order('lens_name', { ascending: true })
       .range(offset, offset + limite - 1);
 
-    const { data: lentes, count, error } = await query;
+    const { data: lentes, count, error: queryError } = await query;
 
-    if (error) {
-      console.error('❌ Erro ao buscar lentes:', error);
-      throw error;
+    if (queryError) {
+      console.error('❌ Erro ao buscar lentes:', queryError);
+      throw queryError;
     }
 
-    // 3. Buscar opções para filtros
-    const [marcasResult, tiposResult, materiaisResult, indicesResult, tratamentosResult] = await Promise.all([
-      // Marcas
-      supabase.from('lens_catalog.lentes')
-        .select('marca_nome')
-        .not('marca_nome', 'is', null)
-        .order('marca_nome'),
-      
-      // Tipos de lente
-      supabase.from('lens_catalog.lentes')
-        .select('tipo_lente')
-        .not('tipo_lente', 'is', null)
-        .order('tipo_lente'),
-      
-      // Materiais
-      supabase.from('lens_catalog.lentes')
-        .select('material')
-        .not('material', 'is', null)
-        .order('material'),
-      
-      // Índices de refração
-      supabase.from('lens_catalog.lentes')
-        .select('indice_refracao')
-        .not('indice_refracao', 'is', null)
-        .order('indice_refracao'),
-      
-      // Tratamentos (usar RPC para extrair array)
-      supabase.rpc('obter_tratamentos_unicos')
+    // 3. Buscar opções para filtros (DISTINCT de v_catalog_lenses)
+    const [marcasResult, tiposResult, materiaisResult, indicesResult] = await Promise.all([
+      supabase.from('v_catalog_lenses').select('brand_name').not('brand_name', 'is', null).order('brand_name'),
+      supabase.from('v_catalog_lenses').select('lens_type').not('lens_type', 'is', null).order('lens_type'),
+      supabase.from('v_catalog_lenses').select('material').not('material', 'is', null).order('material'),
+      supabase.from('v_catalog_lenses').select('refractive_index').not('refractive_index', 'is', null).order('refractive_index')
     ]);
 
     // 4. Processar opções para filtros
-    const marcasUnicas = [...new Set(marcasResult.data?.map(m => m.marca_nome).filter(Boolean))];
-    const tiposUnicos = [...new Set(tiposResult.data?.map(t => t.tipo_lente).filter(Boolean))];
+    const marcasUnicas = [...new Set(marcasResult.data?.map(m => m.brand_name).filter(Boolean))];
+    const tiposUnicos = [...new Set(tiposResult.data?.map(t => t.lens_type).filter(Boolean))];
     const materiaisUnicos = [...new Set(materiaisResult.data?.map(m => m.material).filter(Boolean))];
-    const indicesUnicos = [...new Set(indicesResult.data?.map(i => i.indice_refracao).filter(Boolean))];
-    const tratamentosUnicos = tratamentosResult.data || [];
+    const indicesUnicos = [...new Set(indicesResult.data?.map(i => i.refractive_index).filter(Boolean))];
 
-    // 5. Estatísticas da tabela
-    const { data: estatisticas } = await supabase
-      .rpc('obter_estatisticas_tabela_precos');
+    // Tratamentos disponíveis no novo banco (fixo)
+    const tratamentosUnicos = [
+      { value: 'ar', label: 'Anti-Reflexo' },
+      { value: 'blue', label: 'Blue Light' },
+      { value: 'uv', label: 'Proteção UV' },
+      { value: 'fotossensivel', label: 'Fotossensível' },
+      { value: 'polarizado', label: 'Polarizado' },
+      { value: 'digital', label: 'Digital' },
+      { value: 'free_form', label: 'Free Form' },
+      { value: 'antirrisco', label: 'Anti-Risco' }
+    ];
+
+    // 5. Estatísticas básicas
+    const { data: statsData } = await supabase
+      .from('v_catalog_lens_stats')
+      .select('total_lenses, price_min, price_max, price_avg')
+      .single();
 
     const totalPaginas = Math.ceil((count || 0) / limite);
 
     return {
-      lentes: lentes || [],
+      lentes: (lentes || []) as VCatalogLens[],
       total_resultados: count || 0,
       pagina_atual: pagina,
       total_paginas: totalPaginas,
@@ -154,24 +148,24 @@ export const load: PageServerLoad = async ({ url }) => {
         busca,
         opcoes: {
           marcas: marcasUnicas.map(m => ({ value: m, label: m })),
-          tipos: tiposUnicos.map(t => ({ value: t, label: t })),
+          tipos: tiposUnicos.map(t => ({ value: t, label: (t as string).replace('_', ' ') })),
           materiais: materiaisUnicos.map(m => ({ value: m, label: m })),
-          indices: indicesUnicos.map(i => ({ value: i, label: i })),
-          tratamentos: tratamentosUnicos.map(t => ({ value: t, label: t }))
+          indices: indicesUnicos.map(i => ({ value: String(i), label: String(i) })),
+          tratamentos: tratamentosUnicos
         }
       },
-      estatisticas: estatisticas?.[0] || {
+      estatisticas: {
         total_lentes: count || 0,
         total_marcas: marcasUnicas.length,
-        preco_medio: 0,
-        preco_min: 0,
-        preco_max: 0
+        preco_medio: statsData?.price_avg || 0,
+        preco_min: statsData?.price_min || 0,
+        preco_max: statsData?.price_max || 0
       },
       sucesso: true,
       erro: null
     };
-  } catch (error) {
-    console.error('❌ Erro ao carregar tabela de preços:', error);
+  } catch (err) {
+    console.error('❌ Erro ao carregar tabela de preços:', err);
     return {
       lentes: [],
       total_resultados: 0,

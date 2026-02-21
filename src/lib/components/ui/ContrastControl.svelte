@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * Controle de Contraste e Acessibilidade
    * Permite ajustar níveis de contraste para melhor legibilidade
@@ -68,7 +68,7 @@
             w-full flex items-center justify-between p-3 rounded-lg
             border-2 transition-all duration-200
             {currentLevel === level.value
-              ? 'border-brand-blue-500 bg-brand-blue-50 dark:bg-brand-blue-900/20'
+              ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20'
               : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'}
           "
         >
@@ -77,7 +77,7 @@
             <div class="
               w-5 h-5 rounded-full border-2 flex items-center justify-center
               {currentLevel === level.value
-                ? 'border-brand-blue-500 bg-brand-blue-500'
+                ? 'border-primary-500 bg-primary-500'
                 : 'border-neutral-300 dark:border-neutral-600'}
             ">
               {#if currentLevel === level.value}
@@ -101,7 +101,7 @@
               <div 
                 class="w-1 h-6 rounded-full transition-all duration-200
                   {i < levels.findIndex(l => l.value === level.value) + 1
-                    ? 'bg-brand-blue-500'
+                    ? 'bg-primary-500'
                     : 'bg-neutral-200 dark:bg-neutral-700'}"
               ></div>
             {/each}

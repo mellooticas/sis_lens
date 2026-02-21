@@ -1,38 +1,48 @@
-import { createClient } from '@supabase/supabase-js';
+// ============================================================================
+// SIS_LENS — Supabase Browser Client
+// Usa @supabase/ssr com PUBLIC_* (padrão SvelteKit + ecossistema SIS_DIGIAI)
+//
+// Para uso server-side: event.locals.supabase (criado em hooks.server.ts)
+// Para uso client-side: importar este módulo
+// ============================================================================
 
-// Obter variáveis de ambiente diretamente
-const SUPABASE_URL = import.meta.env.VITE_SUPABASE_URL || 'https://placeholder.supabase.co';
-const SUPABASE_ANON_KEY = import.meta.env.VITE_SUPABASE_ANON_KEY || 'placeholder-key';
+import { createBrowserClient } from '@supabase/ssr';
+import {
+  PUBLIC_SUPABASE_URL,
+  PUBLIC_SUPABASE_ANON_KEY
+} from '$env/static/public';
 
-// Durante o build, usar valores placeholder se as variáveis não estiverem definidas
-const isDevelopment = import.meta.env.DEV;
-const isProduction = import.meta.env.PROD;
+// Singleton browser client
+export const supabase = createBrowserClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY);
 
-// Validação das variáveis de ambiente apenas em desenvolvimento
-if (isDevelopment && (!import.meta.env.VITE_SUPABASE_URL || !import.meta.env.VITE_SUPABASE_ANON_KEY)) {
-  console.warn('⚠️ Supabase environment variables missing - using placeholders for build');
-}
-
-// Cliente Supabase singleton
-export const supabase = createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
-  auth: {
-    persistSession: true,
-    autoRefreshToken: true,
-    detectSessionInUrl: true
-  }
-});
-
-// Helper para verificar se está autenticado
+// Helper: sessão atual (client-side)
 export async function getSession() {
   const { data, error } = await supabase.auth.getSession();
   if (error) {
-    console.error('Erro ao buscar sessão:', error);
+    console.error('[supabase] Erro ao buscar sessão:', error);
     return null;
   }
   return data.session;
 }
 
-// Helper para pegar dados do tenant do JWT
-export function getTenantId(session: any) {
-  return session?.user?.user_metadata?.tenant_id || null;
+// Helper: tenant_id do JWT (sem chamada de API)
+export function getTenantId(session: { access_token?: string } | null): string | null {
+  if (!session?.access_token) return null;
+  try {
+    const payload = JSON.parse(atob(session.access_token.split('.')[1]));
+    return payload.tenant_id ?? null;
+  } catch {
+    return null;
+  }
+}
+
+// Helper: role_code do JWT (super_admin | admin | manager | staff)
+export function getRoleCode(session: { access_token?: string } | null): string {
+  if (!session?.access_token) return 'staff';
+  try {
+    const payload = JSON.parse(atob(session.access_token.split('.')[1]));
+    return payload.role_code ?? 'staff';
+  } catch {
+    return 'staff';
+  }
 }

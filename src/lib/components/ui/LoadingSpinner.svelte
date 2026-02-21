@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * LoadingSpinner Component
    * Spinner de loading simples e leve
@@ -14,7 +14,7 @@
   };
   
   const colorClasses = {
-    primary: 'text-brand-blue-500',
+    primary: 'text-primary-500',
     white: 'text-white',
     neutral: 'text-neutral-500'
   };

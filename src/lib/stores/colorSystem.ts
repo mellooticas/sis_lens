@@ -1,4 +1,4 @@
-import { writable } from 'svelte/store';
+﻿import { writable } from 'svelte/store';
 import { browser } from '$app/environment';
 import type { ContrastLevel, ColorTheme } from '$lib/utils/colorSystem';
 import { 
@@ -33,7 +33,7 @@ function createContrastStore() {
 // Store de tema de cores
 function createColorThemeStore() {
   const defaultTheme: ColorTheme = {
-    primary: '#1c3b5a',      // brand-blue-500
+    primary: '#1c3b5a',      // primary-500
     secondary: '#d4af37',    // brand-gold-500
     accent: '#3b82f6',       // blue-500
     success: '#10b981',      // green-500

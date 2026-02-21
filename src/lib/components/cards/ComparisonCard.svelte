@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * ComparisonCard Component
    * Comparação lado a lado de 2 fornecedores
@@ -243,7 +243,7 @@
   
   .lab-name {
     @apply text-lg font-bold;
-    @apply text-brand-blue-700 dark:text-brand-blue-400;
+    @apply text-primary-700 dark:text-primary-400;
   }
   
   .lab-metrics {
@@ -307,7 +307,7 @@
   
   .diff-value {
     @apply text-sm font-bold;
-    @apply text-brand-blue-700 dark:text-brand-blue-400;
+    @apply text-primary-700 dark:text-primary-400;
   }
   
   .diff-value .text-xs {

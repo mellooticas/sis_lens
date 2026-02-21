@@ -1,9 +1,10 @@
 /**
  * ⚖️ Comparar Lentes - Server Load
- * Permite comparação lado a lado de lentes
+ * Novo banco: v_catalog_lenses
  */
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabase';
+import type { VCatalogLens } from '$lib/types/database-views';
 
 export const load: PageServerLoad = async ({ url }) => {
   try {
@@ -11,56 +12,47 @@ export const load: PageServerLoad = async ({ url }) => {
     const lente1 = url.searchParams.get('lente1');
     const lente2 = url.searchParams.get('lente2');
     const lente3 = url.searchParams.get('lente3');
-    
-    const lenteIds = [lente1, lente2, lente3].filter(Boolean);
-    
+
+    const lenteIds = [lente1, lente2, lente3].filter(Boolean) as string[];
+
     console.log('⚖️ Comparação: Carregando lentes:', lenteIds);
 
-    let lentesComparacao: any[] = [];
-    
+    let lentesComparacao: VCatalogLens[] = [];
+
     if (lenteIds.length > 0) {
-      // Buscar dados das lentes selecionadas
       const { data: lentes, error } = await supabase
-        .from('lens_catalog.lentes')
+        .from('v_catalog_lenses')
         .select(`
-          id,
-          sku_canonico,
-          familia,
-          design,
-          material,
-          indice_refracao,
-          tipo_lente,
-          marca_nome,
-          descricao_completa,
-          tratamentos,
-          preco_base,
-          disponibilidade
+          id, slug, lens_name, brand_name, supplier_name, supplier_lab_id,
+          lens_type, material, refractive_index, category,
+          anti_reflective, anti_scratch, uv_filter, blue_light, photochromic, polarized,
+          digital, free_form, indoor, drive,
+          spherical_min, spherical_max, cylindrical_min, cylindrical_max,
+          addition_min, addition_max,
+          price_cost, price_suggested,
+          stock_available, lead_time_days,
+          is_premium, status, group_id, group_name
         `)
         .in('id', lenteIds);
 
       if (error) {
         console.error('❌ Erro ao buscar lentes para comparação:', error);
       } else {
-        lentesComparacao = lentes || [];
+        lentesComparacao = (lentes || []) as VCatalogLens[];
       }
     }
 
     // Buscar lentes populares para sugestões
     const { data: sugestoes } = await supabase
-      .from('lens_catalog.lentes')
-      .select(`
-        id,
-        familia,
-        marca_nome,
-        tipo_lente,
-        preco_base
-      `)
-      .order('familia')
+      .from('v_catalog_lenses')
+      .select('id, slug, lens_name, brand_name, lens_type, price_suggested, is_premium')
+      .eq('status', 'active')
+      .order('lens_name')
       .limit(20);
 
     return {
       lentes_comparacao: lentesComparacao,
-      lentes_sugeridas: sugestoes || [],
+      lentes_sugeridas: (sugestoes || []) as VCatalogLens[],
       total_selecionadas: lenteIds.length,
       max_comparacao: 3,
       sucesso: true,

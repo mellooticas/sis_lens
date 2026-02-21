@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   export let data: Array<{ label: string; value: number; color: string }> = [];
   export let size: number = 200;
 
@@ -99,7 +99,7 @@
         y={size / 2 - 8}
         text-anchor="middle"
         dominant-baseline="middle"
-        class="text-3xl font-bold fill-brand-blue-600 dark:fill-brand-blue-400"
+        class="text-3xl font-bold fill-primary-600 dark:fill-primary-400"
       >
         {data.length}
       </text>
@@ -129,7 +129,7 @@
 
         <!-- Label -->
         <span
-          class="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex-1 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors"
+          class="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
         >
           {arc.label}
         </span>
@@ -137,7 +137,7 @@
         <!-- Percentual -->
         <div class="flex items-center gap-2">
           <span
-            class="text-sm font-bold text-brand-blue-600 dark:text-brand-blue-400"
+            class="text-sm font-bold text-primary-600 dark:text-primary-400"
           >
             {arc.percentage}%
           </span>

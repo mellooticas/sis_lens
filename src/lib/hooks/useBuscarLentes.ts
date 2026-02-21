@@ -5,7 +5,7 @@
 
 import { writable, derived, get } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
-import type { VLente } from '$lib/types/database-views';
+import type { VCatalogLens as VLente } from '$lib/types/database-views';
 import type { BuscarLentesParams } from '$lib/api/views-client';
 
 interface BuscarLentesState {

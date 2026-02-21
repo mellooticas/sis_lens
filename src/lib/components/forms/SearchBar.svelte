@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   /**
    * SearchBar Component
    * Busca com autocomplete e histórico
@@ -180,7 +180,7 @@
     @apply bg-white dark:bg-neutral-800;
     @apply border border-neutral-300 dark:border-neutral-700;
     @apply transition-all duration-200;
-    @apply focus-within:border-brand-blue-500 focus-within:ring-2 focus-within:ring-brand-blue-500/20;
+    @apply focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20;
   }
   
   .search-icon {
@@ -203,7 +203,7 @@
   .spinner-sm {
     @apply w-4 h-4;
     @apply border-2 border-neutral-300 dark:border-neutral-600;
-    @apply border-t-brand-blue-500;
+    @apply border-t-primary-500;
     @apply rounded-full;
     @apply animate-spin;
   }

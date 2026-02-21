@@ -1,19 +1,23 @@
 /**
- * Hook para gerenciar fornecedores
- * Usa a view vw_fornecedores do banco de dados
+ * Hook para gerenciar fornecedores/labs
+ * NOVO BANCO: fornecedores derivados de v_catalog_lenses (supplier_lab_id, supplier_name)
  */
 
 import { writable, get } from 'svelte/store';
 import { viewsApi } from '$lib/api/views-client';
 
-interface Fornecedor {
+// Tipo que corresponde ao retorno de ViewsApiClient.listarFornecedores()
+export interface Fornecedor {
   id: string;
-  nome: string;
-  razao_social: string | null;
-  cnpj: string | null;
-  prazo_visao_simples: number | null;
-  prazo_multifocal: number | null;
-  ativo: boolean;
+  name: string;       // supplier_name do novo banco
+  total: number;      // qtd de lentes ativas deste fornecedor
+  // Compat legado — preenchidos com valores padrão
+  nome?: string;
+  razao_social?: string | null;
+  cnpj?: string | null;
+  prazo_visao_simples?: number | null;
+  prazo_multifocal?: number | null;
+  ativo?: boolean;
 }
 
 interface FornecedoresState {
@@ -30,7 +34,7 @@ export function useFornecedores() {
   });
 
   /**
-   * Carregar todos os fornecedores
+   * Carregar todos os fornecedores (derivado de v_catalog_lenses)
    */
   async function carregarFornecedores() {
     state.update(s => ({ ...s, loading: true, error: null }));
@@ -38,9 +42,20 @@ export function useFornecedores() {
     const response = await viewsApi.listarFornecedores();
 
     if (response.success && response.data) {
+      // Mapear para Fornecedor adicionando campos compat legado
+      const fornecedores: Fornecedor[] = response.data.map(f => ({
+        ...f,
+        nome: f.name,
+        razao_social: null,
+        cnpj: null,
+        prazo_visao_simples: null,
+        prazo_multifocal: null,
+        ativo: true
+      }));
+
       state.update(s => ({
         ...s,
-        fornecedores: response.data || [],
+        fornecedores,
         loading: false
       }));
     } else {
@@ -61,19 +76,20 @@ export function useFornecedores() {
   }
 
   /**
-   * Obter fornecedores ordenados por preço médio
+   * Obter fornecedores ordenados por total de lentes (descending)
    */
-  function obterFornecedoresOrdenadosPorPreco(): VwFornecedores[] {
+  function obterFornecedoresPorCatalogo(): Fornecedor[] {
     const currentState = get(state);
-    return [...currentState.fornecedores].sort((a, b) => a.preco_medio - b.preco_medio);
+    return [...currentState.fornecedores].sort((a, b) => (b.total ?? 0) - (a.total ?? 0));
   }
 
   /**
-   * Obter fornecedores com maior catálogo
+   * Obter fornecedores ordenados por nome
    */
-  function obterFornecedoresPorCatalogo(): VwFornecedores[] {
+  function obterFornecedoresOrdenadosPorPreco(): Fornecedor[] {
+    // Sem dado de preço por fornecedor; ordenar por nome como fallback
     const currentState = get(state);
-    return [...currentState.fornecedores].sort((a, b) => b.total_lentes - a.total_lentes);
+    return [...currentState.fornecedores].sort((a, b) => a.name.localeCompare(b.name));
   }
 
   return {
