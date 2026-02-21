@@ -4,5 +4,16 @@
 
 [build.environment]
   NODE_VERSION = "20"
-  VITE_SUPABASE_URL = "https://ahcikwsoxhmqqteertkx.supabase.co"
-  VITE_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImFoY2lrd3NveGhtcXF0ZWVydGt4Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3NTk0MzAwMzMsImV4cCI6MjA3NTAwNjAzM30.29PQSkRCNgmer_h7AcePf0BnOigyKJk4no8VqtmWBFk"
+
+  # ── Supabase (SvelteKit PUBLIC_ prefix → $env/static/public) ─────────────────
+  # Projeto SIS_DIGIAI: mhgbuplnxtfgipbemchb
+  PUBLIC_SUPABASE_URL      = "https://mhgbuplnxtfgipbemchb.supabase.co"
+  PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oZ2J1cGxueHRmZ2lwYmVtY2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwODAwMDQsImV4cCI6MjA1OTY1NjAwNH0.478ltLNyzDefQFZjnMHxuM2Qk8Aw8lsIpIrdb-h7rl0"
+
+  # ── SIS Gateway SSO ───────────────────────────────────────────────────────────
+  PUBLIC_SIS_GATEWAY_URL   = "https://sisgateway.netlify.app"
+
+  # ── App metadata ──────────────────────────────────────────────────────────────
+  VITE_APP_NAME        = "SIS_Lens"
+  VITE_APP_VERSION     = "2.0.0"
+  VITE_APP_ENVIRONMENT = "production"
