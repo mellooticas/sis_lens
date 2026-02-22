@@ -1,13 +1,13 @@
 <script lang="ts">
     import { onMount } from "svelte";
-    import { fade } from "svelte/transition";
+    import { fade, slide } from "svelte/transition";
     import { LensOracleAPI } from "$lib/api/lens-oracle";
     import type {
         RpcContactLensSearchResult,
         VBrand,
     } from "$lib/types/database-views";
     import type { FiltrosLentesContato } from "$lib/types/contact-lens";
-    import { SlidersHorizontal, RotateCcw } from "lucide-svelte";
+    import { SlidersHorizontal, RotateCcw, ChevronDown } from "lucide-svelte";
 
     // Layout Components
     import Container from "$lib/components/layout/Container.svelte";
@@ -27,12 +27,12 @@
     let lentes: RpcContactLensSearchResult[] = data.initialLenses || [];
     let loading = false;
     let error = "";
-    let total = 0; // Idealmente viria de uma RPC de contagem
+    let total = 0;
     let paginaAtual = 1;
     const itensPorPagina = 12;
 
     let filters: FiltrosLentesContato = {};
-    let showFilters = true;
+    let showFilters = false; // Começa recolhido no novo padrão
 
     // Marcas e Fabricantes carregados no server
     const brands: VBrand[] = data.brands || [];
@@ -43,22 +43,18 @@
             loading = true;
             error = "";
 
-            // Mapeamento de filtros do componente para a API
             const res = await LensOracleAPI.searchContactLenses({
                 query: filters.busca,
-                lens_type: filters.tipos?.[0], // Simplificando para o primeiro selecionado
+                lens_type: filters.tipos?.[0],
                 purpose: filters.finalidades?.[0],
                 material: filters.materiais?.[0],
-                // Nota: o componente filter panel envia nomes de marcas, a API espera IDs ou query
-                // Por agora usaremos a busca textual da API para marcas se selecionado
                 limit: itensPorPagina,
                 offset: (paginaAtual - 1) * itensPorPagina,
             });
 
             if (res.data) {
                 lentes = res.data;
-                // Simulação de total (idealmente retorna do banco)
-                if (total === 0 && res.data.length > 0) total = 225; // Baseado na migration 220
+                if (total === 0 && res.data.length > 0) total = 225;
             } else {
                 error =
                     res.error?.message || "Erro ao carregar lentes de contato";
@@ -84,7 +80,6 @@
     }
 
     onMount(() => {
-        // Se não houver dados iniciais, carrega
         if (lentes.length === 0) carregarLentesContatos();
     });
 </script>
@@ -109,38 +104,85 @@
     </div>
 
     <Container>
-        <div class="grid grid-cols-1 lg:grid-cols-4 gap-8">
-            <!-- Sidebar de Filtros -->
-            <aside class="lg:col-span-1 space-y-6">
-                <div class="sticky top-24">
-                    <div class="flex items-center justify-between mb-4">
-                        <SectionHeader title="Filtros" />
-                        <button
-                            class="lg:hidden p-2 bg-white dark:bg-neutral-800 rounded-lg shadow-sm"
-                            on:click={() => (showFilters = !showFilters)}
+        <div class="space-y-8">
+            <!-- Filtro no Topo (Recolhível) - PADRÃO SIS LENS -->
+            <div class="w-full">
+                <div
+                    class="w-full glass-panel rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                    on:click={() => (showFilters = !showFilters)}
+                    on:keydown={(e) =>
+                        e.key === "Enter" && (showFilters = !showFilters)}
+                    role="button"
+                    tabindex="0"
+                >
+                    <div class="flex items-center gap-3">
+                        <div
+                            class="p-2 rounded-lg bg-primary-50 dark:bg-primary-900/40 text-primary-600 dark:text-primary-400 group-hover:scale-110 transition-transform"
                         >
                             <SlidersHorizontal class="w-5 h-5" />
-                        </button>
-                    </div>
-
-                    {#if showFilters}
-                        <div transition:fade>
-                            <ContactLensFilterPanel
-                                {filters}
-                                {loading}
-                                totalResults={lentes.length}
-                                availableBrands={brands.map((b) => b.name)}
-                                availableSuppliers={manufacturers}
-                                on:change={handleFilterChange}
-                                on:clear={handleClearFilters}
-                            />
                         </div>
-                    {/if}
+                        <div>
+                            <h3
+                                class="text-lg font-semibold text-neutral-900 dark:text-neutral-100"
+                            >
+                                Configurar Filtros
+                            </h3>
+                            <p class="text-sm text-neutral-500">
+                                {showFilters
+                                    ? "Clique para recolher"
+                                    : "Clique para expandir e filtrar"}
+                            </p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4">
+                        {#if Object.keys(filters).length > 0}
+                            <span
+                                class="px-2 py-1 rounded-full bg-primary-100 dark:bg-primary-900/60 text-primary-700 dark:text-primary-300 text-xs font-bold"
+                            >
+                                Ativos
+                            </span>
+                        {/if}
+                        <div
+                            class="transform transition-transform duration-300 {showFilters
+                                ? 'rotate-180'
+                                : ''}"
+                        >
+                            <ChevronDown class="w-6 h-6 text-neutral-400" />
+                        </div>
+                    </div>
                 </div>
-            </aside>
+
+                {#if showFilters}
+                    <div
+                        transition:slide={{ duration: 300 }}
+                        class="mt-4 p-6 glass-panel rounded-xl border-primary-200/50 dark:border-primary-800/50 bg-white/50 dark:bg-neutral-800/50"
+                    >
+                        <ContactLensFilterPanel
+                            {filters}
+                            {loading}
+                            totalResults={lentes.length}
+                            availableBrands={brands.map((b) => b.name)}
+                            availableSuppliers={manufacturers}
+                            on:change={handleFilterChange}
+                            on:clear={handleClearFilters}
+                        />
+                        <div
+                            class="mt-6 flex justify-end border-t border-neutral-100 dark:border-neutral-700 pt-4"
+                        >
+                            <Button
+                                variant="ghost"
+                                size="sm"
+                                on:click={handleClearFilters}
+                            >
+                                <RotateCcw class="w-4 h-4 mr-2" /> Limpar Filtros
+                            </Button>
+                        </div>
+                    </div>
+                {/if}
+            </div>
 
             <!-- Grid de Resultados -->
-            <div class="lg:col-span-3 space-y-6">
+            <div class="space-y-6">
                 {#if loading && lentes.length === 0}
                     <div
                         class="flex flex-col items-center justify-center py-20 bg-white dark:bg-neutral-800 rounded-2xl border border-dashed border-neutral-300 dark:border-neutral-700"
@@ -187,11 +229,9 @@
                     </div>
                 {:else}
                     <div
-                        class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-2 gap-6"
+                        class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-3 gap-6"
                     >
                         {#each lentes as lente (lente.id)}
-                            <!-- Mapeamento para o formato esperado pelo ContactLensCard se necessário -->
-                            <!-- O RpcContactLensSearchResult é compatível com LenteContato do componente -->
                             <ContactLensCard {lente} />
                         {/each}
                     </div>
