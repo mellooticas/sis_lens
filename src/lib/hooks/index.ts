@@ -1,20 +1,15 @@
 /**
- * Hooks Index
- * Ponto central para todos os hooks personalizados
+ * SIS Lens — Hooks Index
+ * Novo padrão: todos os hooks usam LensOracleAPI (banco mhgbuplnxtfgipbemchb)
  */
 
-// Hooks antigos (manter compatibilidade)
-export { useLensSearch, useRanking } from './useLensSearch';
-export { useDecisions } from './useDecisions';
-
-export type { UseLensSearchOptions } from './useLensSearch';
-export type { UseDecisionsOptions } from './useDecisions';
-
-// Novos hooks baseados nas views públicas
+// Busca principal e stats
 export { useBuscarLentes } from './useBuscarLentes';
+export { useStatsCatalogo } from './useStatsCatalogo';
+
+// Catálogo e filtros
 export { useMarcas } from './useMarcas';
 export { useFornecedores } from './useFornecedores';
 export { useFiltros } from './useFiltros';
 export { useGruposCanonicos } from './useGruposCanonicos';
 export { useCompararFornecedores } from './useCompararFornecedores';
-export { useStatsCatalogo } from './useStatsCatalogo';

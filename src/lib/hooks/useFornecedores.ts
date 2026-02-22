@@ -1,23 +1,17 @@
 /**
- * Hook para gerenciar fornecedores/labs
- * NOVO BANCO: fornecedores derivados de v_catalog_lenses (supplier_lab_id, supplier_name)
+ * Hook para fornecedores/laboratórios
+ * NOVO BANCO: derivado de v_catalog_lenses (supplier_name / supplier_lab_id)
+ * Usa LensOracleAPI.searchLenses e agrega por supplier
  */
 
 import { writable, get } from 'svelte/store';
-import { viewsApi } from '$lib/api/views-client';
+import { LensOracleAPI } from '$lib/api/lens-oracle';
 
-// Tipo que corresponde ao retorno de ViewsApiClient.listarFornecedores()
 export interface Fornecedor {
   id: string;
-  name: string;       // supplier_name do novo banco
-  total: number;      // qtd de lentes ativas deste fornecedor
-  // Compat legado — preenchidos com valores padrão
-  nome?: string;
-  razao_social?: string | null;
-  cnpj?: string | null;
-  prazo_visao_simples?: number | null;
-  prazo_multifocal?: number | null;
-  ativo?: boolean;
+  name: string;
+  total: number;
+  ativo: boolean;
 }
 
 interface FornecedoresState {
@@ -33,70 +27,56 @@ export function useFornecedores() {
     error: null
   });
 
-  /**
-   * Carregar todos os fornecedores (derivado de v_catalog_lenses)
-   */
   async function carregarFornecedores() {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const response = await viewsApi.listarFornecedores();
+    // Busca lentes em lote e agrega por supplier
+    const res = await LensOracleAPI.searchLenses({ limit: 200, offset: 0 });
 
-    if (response.success && response.data) {
-      // Mapear para Fornecedor adicionando campos compat legado
-      const fornecedores: Fornecedor[] = response.data.map(f => ({
-        ...f,
-        nome: f.name,
-        razao_social: null,
-        cnpj: null,
-        prazo_visao_simples: null,
-        prazo_multifocal: null,
-        ativo: true
-      }));
-
-      state.update(s => ({
-        ...s,
-        fornecedores,
-        loading: false
-      }));
+    if (res.data) {
+      // Agregar fornecedores únicos
+      const map = new Map<string, Fornecedor>();
+      for (const lente of res.data) {
+        if (!lente.supplier_name) continue;
+        const key = lente.supplier_name;
+        if (map.has(key)) {
+          map.get(key)!.total++;
+        } else {
+          map.set(key, {
+            id:    key,
+            name:  key,
+            total: 1,
+            ativo: true
+          });
+        }
+      }
+      state.update(s => ({ ...s, fornecedores: Array.from(map.values()), loading: false }));
     } else {
       state.update(s => ({
         ...s,
         loading: false,
-        error: response.error || 'Erro ao carregar fornecedores'
+        error: res.error?.message || 'Erro ao carregar fornecedores'
       }));
     }
   }
 
-  /**
-   * Obter fornecedor por ID
-   */
-  function obterFornecedorPorId(fornecedorId: string): Fornecedor | undefined {
-    const currentState = get(state);
-    return currentState.fornecedores.find(f => f.id === fornecedorId);
+  function obterFornecedorPorId(id: string): Fornecedor | undefined {
+    return get(state).fornecedores.find(f => f.id === id);
   }
 
-  /**
-   * Obter fornecedores ordenados por total de lentes (descending)
-   */
   function obterFornecedoresPorCatalogo(): Fornecedor[] {
-    const currentState = get(state);
-    return [...currentState.fornecedores].sort((a, b) => (b.total ?? 0) - (a.total ?? 0));
+    return [...get(state).fornecedores].sort((a, b) => b.total - a.total);
   }
 
-  /**
-   * Obter fornecedores ordenados por nome
-   */
   function obterFornecedoresOrdenadosPorPreco(): Fornecedor[] {
-    // Sem dado de preço por fornecedor; ordenar por nome como fallback
-    const currentState = get(state);
-    return [...currentState.fornecedores].sort((a, b) => a.name.localeCompare(b.name));
+    return [...get(state).fornecedores].sort((a, b) => a.name.localeCompare(b.name));
   }
 
   return {
     state,
     carregarFornecedores,
     obterFornecedorPorId,
-    obterFornecedoresOrdenadosPorPreco,
-    obterFornecedoresPorCatalogo
+    obterFornecedoresPorCatalogo,
+    obterFornecedoresOrdenadosPorPreco
   };
 }

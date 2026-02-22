@@ -1,11 +1,10 @@
 /**
- * API Index — SIS Lens (Oráculo de Lentes)
- * 
- * Agora consolidado no LensOracleAPI para servir como o cérebro do ecossistema.
+ * SIS Lens — API Index
+ * Fonte única da verdade: LensOracleAPI + DecisionAPI
+ *
+ * Ecossistema SIS_DIGIAI — banco mhgbuplnxtfgipbemchb
+ * Todas as leituras via Views (public.v_*) e escritas/buscas via RPCs (public.rpc_*)
  */
 
 export * from './lens-oracle';
-export * from './catalogo-api'; // Mantido temporariamente para migração gradual
-export * from './views-client';  // Mantido temporariamente para migração gradual
-export * from './contact-lens-api'; // Mantido temporariamente para migração gradual
 export * from './decisao';

@@ -1,16 +1,21 @@
 /**
- * Hook para gerenciar grupos canônicos
- * NOVO BANCO: usa v_catalog_lens_groups (a criar) / fallback via v_catalog_lenses
+ * Hook para grupos canônicos
+ * NOVO BANCO: usa LensOracleAPI.searchLenses com is_premium filter
+ * Os "grupos canônicos" são representados pelo conjunto de lentes com mesmo material/tipo/índice
  */
 
 import { writable, get } from 'svelte/store';
-import { viewsApi } from '$lib/api/views-client';
-import type { VCatalogLensGroup } from '$lib/types/database-views';
-import type { BuscarGruposParams } from '$lib/api/views-client';
+import { LensOracleAPI } from '$lib/api/lens-oracle';
+import type { RpcLensSearchResult } from '$lib/types/database-views';
+
+// No novo banco grupos são lentes agrupadas — usamos RpcLensSearchResult
+export type VCatalogLensGroupNew = RpcLensSearchResult & {
+  is_active: boolean;
+};
 
 interface GruposState {
-  gruposGenericos: VCatalogLensGroup[];
-  gruposPremium: VCatalogLensGroup[];
+  gruposGenericos: RpcLensSearchResult[];
+  gruposPremium: RpcLensSearchResult[];
   loading: boolean;
   error: string | null;
   totalGenericos: number;
@@ -27,97 +32,73 @@ export function useGruposCanonicos() {
     totalPremium: 0
   });
 
-  /**
-   * Carregar grupos genéricos (is_premium = false)
-   */
-  async function carregarGruposGenericos(params: BuscarGruposParams = {}) {
+  async function carregarGruposGenericos(params: { limit?: number; offset?: number } = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const response = await viewsApi.buscarGruposGenericos(params);
+    const res = await LensOracleAPI.searchLenses({
+      is_premium: false,
+      limit: params.limit ?? 50,
+      offset: params.offset ?? 0
+    });
 
-    if (response.success && response.data) {
+    if (res.data) {
       state.update(s => ({
         ...s,
-        gruposGenericos: response.data || [],
-        totalGenericos: response.total || 0,
+        gruposGenericos: res.data!,
+        totalGenericos: res.data!.length,
         loading: false
       }));
     } else {
-      state.update(s => ({
-        ...s,
-        loading: false,
-        error: response.error || 'Erro ao carregar grupos genéricos'
-      }));
+      state.update(s => ({ ...s, loading: false, error: res.error?.message || 'Erro ao carregar grupos genéricos' }));
     }
   }
 
-  /**
-   * Carregar grupos premium (is_premium = true)
-   */
-  async function carregarGruposPremium(params: BuscarGruposParams = {}) {
+  async function carregarGruposPremium(params: { limit?: number; offset?: number } = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const response = await viewsApi.buscarGruposPremium(params);
+    const res = await LensOracleAPI.searchLenses({
+      is_premium: true,
+      limit: params.limit ?? 50,
+      offset: params.offset ?? 0
+    });
 
-    if (response.success && response.data) {
+    if (res.data) {
       state.update(s => ({
         ...s,
-        gruposPremium: response.data || [],
-        totalPremium: response.total || 0,
+        gruposPremium: res.data!,
+        totalPremium: res.data!.length,
         loading: false
       }));
     } else {
-      state.update(s => ({
-        ...s,
-        loading: false,
-        error: response.error || 'Erro ao carregar grupos premium'
-      }));
+      state.update(s => ({ ...s, loading: false, error: res.error?.message || 'Erro ao carregar grupos premium' }));
     }
   }
 
-  /**
-   * Carregar todos os grupos (genéricos e premium em paralelo)
-   */
-  async function carregarTodosGrupos(params: BuscarGruposParams = {}) {
+  async function carregarTodosGrupos(params: { limit?: number; offset?: number } = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const [responsePremium, responseGenericos] = await Promise.all([
-      viewsApi.buscarGruposPremium(params),
-      viewsApi.buscarGruposGenericos(params)
+    const [resPremium, resGenericos] = await Promise.all([
+      LensOracleAPI.searchLenses({ is_premium: true,  limit: params.limit ?? 50, offset: 0 }),
+      LensOracleAPI.searchLenses({ is_premium: false, limit: params.limit ?? 50, offset: 0 }),
     ]);
 
-    if (responsePremium.success && responseGenericos.success) {
-      state.update(s => ({
-        ...s,
-        gruposPremium: responsePremium.data || [],
-        gruposGenericos: responseGenericos.data || [],
-        totalPremium: responsePremium.total || 0,
-        totalGenericos: responseGenericos.total || 0,
-        loading: false
-      }));
-    } else {
-      state.update(s => ({
-        ...s,
-        loading: false,
-        error: 'Erro ao carregar grupos canônicos'
-      }));
-    }
+    state.update(s => ({
+      ...s,
+      gruposPremium:   resPremium.data   ?? [],
+      gruposGenericos: resGenericos.data ?? [],
+      totalPremium:    resPremium.data?.length   ?? 0,
+      totalGenericos:  resGenericos.data?.length ?? 0,
+      loading: false,
+      error: resPremium.error?.message || resGenericos.error?.message || null
+    }));
   }
 
-  /**
-   * Obter grupo genérico por ID
-   */
-  function obterGrupoGenericoPorId(grupoId: string): VCatalogLensGroup | undefined {
-    const currentState = get(state);
-    return currentState.gruposGenericos.find(g => g.id === grupoId);
+  function obterGrupoGenericoPorId(id: string) {
+    return get(state).gruposGenericos.find(g => g.id === id);
   }
 
-  /**
-   * Obter grupo premium por ID
-   */
-  function obterGrupoPremiumPorId(grupoId: string): VCatalogLensGroup | undefined {
-    const currentState = get(state);
-    return currentState.gruposPremium.find(g => g.id === grupoId);
+  function obterGrupoPremiumPorId(id: string) {
+    return get(state).gruposPremium.find(g => g.id === id);
   }
 
   return {

@@ -1,17 +1,14 @@
 /**
- * Hook para comparar fornecedores
- * Usa a view vw_comparar_fornecedores do banco de dados
+ * Hook para comparar lentes de um grupo canônico
+ * NOVO BANCO: usa LensOracleAPI.searchLenses com filtros de grupo (canonical_group_id)
  */
 
 import { writable } from 'svelte/store';
-import { viewsApi } from '$lib/api/views-client';
-import type { VCatalogLensGroup } from '$lib/types/database-views';
-
-// NOVO BANCO: comparações agora são grupos canônicos (v_catalog_lens_groups / derivado de v_catalog_lenses)
-type Comparacao = VCatalogLensGroup;
+import { LensOracleAPI } from '$lib/api/lens-oracle';
+import type { RpcLensSearchResult } from '$lib/types/database-views';
 
 interface CompararFornecedoresState {
-  comparacoes: Comparacao[];
+  comparacoes: RpcLensSearchResult[];
   loading: boolean;
   error: string | null;
 }
@@ -23,94 +20,59 @@ export function useCompararFornecedores() {
     error: null
   });
 
-  /**
-   * Comparar fornecedores para um grupo canônico específico
-   */
+  /** Buscar lentes de um grupo canônico para comparar opções */
   async function compararPorGrupo(grupoId: string) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const response = await viewsApi.compararFornecedores(grupoId);
+    // Busca lentes do grupo — cada resultado é uma opção de fornecedor/lab
+    const res = await LensOracleAPI.searchLenses({ query: grupoId, limit: 50, offset: 0 });
 
-    if (response.success && response.data) {
-      state.update(s => ({
-        ...s,
-        comparacoes: (response.data || []) as Comparacao[],
-        loading: false
-      }));
+    if (res.data) {
+      state.update(s => ({ ...s, comparacoes: res.data!, loading: false }));
     } else {
       state.update(s => ({
         ...s,
         loading: false,
-        error: response.error || 'Erro ao comparar fornecedores'
+        error: res.error?.message || 'Erro ao comparar fornecedores'
       }));
     }
   }
 
-  /**
-   * Comparar fornecedores para uma lente específica
-   */
+  /** Buscar lentes de uma lente específica (por ID) */
   async function compararPorLente(lenteId: string) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const response = await viewsApi.compararFornecedoresPorLente(lenteId);
+    const res = await LensOracleAPI.getLensById(lenteId);
 
-    if (response.success && response.data) {
+    if (res.data) {
+      // Wrap em array para compatibilidade com o template
       state.update(s => ({
         ...s,
-        comparacoes: (response.data || []) as Comparacao[],
+        comparacoes: [res.data as RpcLensSearchResult],
         loading: false
       }));
     } else {
       state.update(s => ({
         ...s,
         loading: false,
-        error: response.error || 'Erro ao comparar fornecedores'
+        error: res.error?.message || 'Erro ao comparar'
       }));
     }
   }
 
-  /**
-   * Listar todas as comparações (sem filtro)
-   */
+  /** Listar todas as lentes sem filtro de grupo */
   async function listarTodasComparacoes() {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const response = await viewsApi.compararFornecedores();
+    const res = await LensOracleAPI.searchLenses({ limit: 100, offset: 0 });
 
-    if (response.success && response.data) {
-      state.update(s => ({
-        ...s,
-        comparacoes: (response.data || []) as Comparacao[],
-        loading: false
-      }));
+    if (res.data) {
+      state.update(s => ({ ...s, comparacoes: res.data!, loading: false }));
     } else {
       state.update(s => ({
         ...s,
         loading: false,
-        error: response.error || 'Erro ao comparar fornecedores'
-      }));
-    }
-  }
-
-  /**
-   * Filtrar comparações por tipo (PREMIUM ou GENÉRICA)
-   */
-  async function compararPorTipo(tipo: 'PREMIUM' | 'GENÉRICA') {
-    state.update(s => ({ ...s, loading: true, error: null }));
-
-    const response = await viewsApi.compararFornecedores(undefined, tipo);
-
-    if (response.success && response.data) {
-      state.update(s => ({
-        ...s,
-        comparacoes: (response.data || []) as Comparacao[],
-        loading: false
-      }));
-    } else {
-      state.update(s => ({
-        ...s,
-        loading: false,
-        error: response.error || 'Erro ao comparar fornecedores'
+        error: res.error?.message || 'Erro ao listar'
       }));
     }
   }
@@ -119,7 +81,6 @@ export function useCompararFornecedores() {
     state,
     compararPorGrupo,
     compararPorLente,
-    listarTodasComparacoes,
-    compararPorTipo
+    listarTodasComparacoes
   };
 }
