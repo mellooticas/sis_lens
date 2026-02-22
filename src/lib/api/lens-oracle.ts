@@ -224,9 +224,15 @@ export class LensOracleAPI {
     material?: string;
     refractive_index?: number;
     limit?: number;
+    is_premium?: boolean;
   }): Promise<ApiResponse<VCanonicalLens[]>> {
     try {
-      let query = supabase.from('v_canonical_lenses').select('*');
+      // Se is_premium for definido, usa as views especializadas
+      let view = 'v_canonical_lenses';
+      if (params.is_premium === true) view = 'v_canonical_premium';
+      else if (params.is_premium === false) view = 'v_canonical_standard';
+
+      let query = supabase.from(view).select('*');
 
       if (params.lens_type)        query = query.eq('lens_type', params.lens_type);
       if (params.material)         query = query.eq('material', params.material);
@@ -239,6 +245,30 @@ export class LensOracleAPI {
     } catch (error: any) {
       return { error: { code: error.code, message: error.message } };
     }
+  }
+
+  /**
+   * Atalho para buscar apenas canônicas Premium.
+   */
+  static async getCanonicalPremium(params: {
+    lens_type?: string;
+    material?: string;
+    refractive_index?: number;
+    limit?: number;
+  }): Promise<ApiResponse<VCanonicalLens[]>> {
+    return LensOracleAPI.getCanonicalLenses({ ...params, is_premium: true });
+  }
+
+  /**
+   * Atalho para buscar apenas canônicas Standard.
+   */
+  static async getCanonicalStandard(params: {
+    lens_type?: string;
+    material?: string;
+    refractive_index?: number;
+    limit?: number;
+  }): Promise<ApiResponse<VCanonicalLens[]>> {
+    return LensOracleAPI.getCanonicalLenses({ ...params, is_premium: false });
   }
 
   /**

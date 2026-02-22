@@ -1,21 +1,15 @@
 /**
  * Hook para grupos canônicos
- * NOVO BANCO: usa LensOracleAPI.searchLenses com is_premium filter
- * Os "grupos canônicos" são representados pelo conjunto de lentes com mesmo material/tipo/índice
+ * NOVO BANCO: usa LensOracleAPI.getCanonicalLenses que agora suporta as views separadas
  */
 
 import { writable, get } from 'svelte/store';
 import { LensOracleAPI } from '$lib/api/lens-oracle';
-import type { RpcLensSearchResult } from '$lib/types/database-views';
-
-// No novo banco grupos são lentes agrupadas — usamos RpcLensSearchResult
-export type VCatalogLensGroupNew = RpcLensSearchResult & {
-  is_active: boolean;
-};
+import type { VCanonicalLens } from '$lib/types/database-views';
 
 interface GruposState {
-  gruposGenericos: RpcLensSearchResult[];
-  gruposPremium: RpcLensSearchResult[];
+  gruposGenericos: VCanonicalLens[];
+  gruposPremium: VCanonicalLens[];
   loading: boolean;
   error: string | null;
   totalGenericos: number;
@@ -35,10 +29,8 @@ export function useGruposCanonicos() {
   async function carregarGruposGenericos(params: { limit?: number; offset?: number } = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const res = await LensOracleAPI.searchLenses({
-      is_premium: false,
-      limit: params.limit ?? 50,
-      offset: params.offset ?? 0
+    const res = await LensOracleAPI.getCanonicalStandard({
+      limit: params.limit ?? 50
     });
 
     if (res.data) {
@@ -56,10 +48,8 @@ export function useGruposCanonicos() {
   async function carregarGruposPremium(params: { limit?: number; offset?: number } = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const res = await LensOracleAPI.searchLenses({
-      is_premium: true,
-      limit: params.limit ?? 50,
-      offset: params.offset ?? 0
+    const res = await LensOracleAPI.getCanonicalPremium({
+      limit: params.limit ?? 50
     });
 
     if (res.data) {
@@ -78,8 +68,8 @@ export function useGruposCanonicos() {
     state.update(s => ({ ...s, loading: true, error: null }));
 
     const [resPremium, resGenericos] = await Promise.all([
-      LensOracleAPI.searchLenses({ is_premium: true,  limit: params.limit ?? 50, offset: 0 }),
-      LensOracleAPI.searchLenses({ is_premium: false, limit: params.limit ?? 50, offset: 0 }),
+      LensOracleAPI.getCanonicalPremium({ limit: params.limit ?? 50 }),
+      LensOracleAPI.getCanonicalStandard({ limit: params.limit ?? 50 }),
     ]);
 
     state.update(s => ({

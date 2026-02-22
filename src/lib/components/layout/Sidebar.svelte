@@ -26,6 +26,12 @@
       icon: "search",
     },
     {
+      id: "catalogo-conceitos",
+      label: "Catálogo de Conceitos",
+      href: "/catalogo/conceitos",
+      icon: "brain",
+    },
+    {
       id: "standard",
       label: "Lentes Standard",
       href: "/catalogo/standard",
@@ -155,6 +161,20 @@
                 stroke-linejoin="round"
                 stroke-width="1.75"
                 d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
+              />
+            </svg>
+          {:else if item.icon === "brain"}
+            <svg
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              class="w-5 h-5"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="1.75"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1m-1.636 6.364l-.707-.707M12 21v-1m-6.364-1.636l.707-.707M3 12h1m1.636-6.364l.707.707M12 9a3 3 0 100 6 3 3 0 000-6z"
               />
             </svg>
           {:else if item.icon === "box"}
