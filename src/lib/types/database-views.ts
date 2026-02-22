@@ -58,6 +58,8 @@ export interface VCatalogLens {
   sku: string | null;
   slug: string | null;
   
+  group_id: string | null;
+  group_name: string | null;
   lens_type: string | null;
   material: string | null;
   refractive_index: number | null;
@@ -90,6 +92,30 @@ export interface VCatalogLens {
   is_premium: boolean;
   status: string;
   
+  created_at: string;
+  updated_at: string;
+}
+
+// ============================================================================
+// NOVO BANCO — VIEW: public.v_catalog_lens_groups (derived)
+// ============================================================================
+
+/**
+ * Grupo canônico de lentes (lens_groups ou derivado de canonical_lenses).
+ * Usado nas páginas /catalogo/premium/[id] e /catalogo/standard/[id].
+ */
+export interface VCatalogLensGroup {
+  id: string;
+  tenant_id: string;
+  name: string;
+  slug?: string | null;
+  lens_type: string | null;
+  material: string | null;
+  refractive_index: number | null;
+  is_premium: boolean;
+  is_active: boolean;
+  mapped_lens_count?: number;
+  mapped_supplier_count?: number;
   created_at: string;
   updated_at: string;
 }
@@ -212,6 +238,14 @@ export interface VCatalogLensStats {
 // NOVO BANCO — RPC: public.rpc_lens_search (migration 111/114)
 // ============================================================================
 
+/**
+ * Resultado REAL de public.rpc_lens_search (migration 111).
+ * Exatamente os 16 campos que a RPC retorna — não adicione campos que não existem.
+ *
+ * SELECT id, slug, lens_name, supplier_name, brand_name, lens_type, material,
+ *        refractive_index, price_suggested, category, has_ar, has_blue,
+ *        group_name, stock_available, lead_time_days, is_premium
+ */
 export interface RpcLensSearchResult {
   id: string;
   slug: string | null;
@@ -222,24 +256,15 @@ export interface RpcLensSearchResult {
   material: string | null;
   refractive_index: number | null;
   price_suggested: number;
-  price_cost: number;
   category: string | null;
+  /** Alias para anti_reflective — campo has_ar no retorno da RPC */
   has_ar: boolean;
+  /** Alias para blue_light — campo has_blue no retorno da RPC */
   has_blue: boolean;
   group_name: string | null;
   stock_available: number;
   lead_time_days: number;
   is_premium: boolean;
-  anti_reflective: boolean;
-  blue_light: boolean;
-  uv_filter: boolean;
-  photochromic: string | null;
-  spherical_min: number | null;
-  spherical_max: number | null;
-  cylindrical_min: number | null;
-  cylindrical_max: number | null;
-  addition_min: number | null;
-  addition_max: number | null;
 }
 
 // ============================================================================

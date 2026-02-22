@@ -8,14 +8,14 @@ import type { FiltrosBusca } from '$lib/types/sistema';
 
 // Estado inicial dos filtros
 const initialFilters: FiltrosBusca = {
-  usuario_id: null,
-  graduacao_de: null,
-  graduacao_ate: null,
-  tipo_lente: null,
-  material: null,
-  tratamentos: [],
-  faixa_preco_min: null,
-  faixa_preco_max: null,
+  usuario_id:       undefined,
+  graduacao_de:     undefined,
+  graduacao_ate:    undefined,
+  tipo_lente:       undefined,
+  material:         undefined,
+  tratamentos:      [],
+  faixa_preco_min:  undefined,
+  faixa_preco_max:  undefined,
   ordenacao: 'preco_asc'
 };
 

@@ -45,10 +45,28 @@ export function useCompararFornecedores() {
     const res = await LensOracleAPI.getLensById(lenteId);
 
     if (res.data) {
-      // Wrap em array para compatibilidade com o template
+      // Mapear VCatalogLens → RpcLensSearchResult (campos compatíveis)
+      const mapped: RpcLensSearchResult = {
+        id:               res.data.id,
+        slug:             res.data.slug,
+        lens_name:        res.data.lens_name,
+        supplier_name:    res.data.supplier_name,
+        brand_name:       res.data.brand_name,
+        lens_type:        res.data.lens_type,
+        material:         res.data.material,
+        refractive_index: res.data.refractive_index,
+        price_suggested:  res.data.price_suggested,
+        category:         res.data.category,
+        has_ar:           res.data.anti_reflective,
+        has_blue:         res.data.blue_light,
+        group_name:       res.data.group_name,
+        stock_available:  res.data.stock_available,
+        lead_time_days:   res.data.lead_time_days,
+        is_premium:       res.data.is_premium,
+      };
       state.update(s => ({
         ...s,
-        comparacoes: [res.data as RpcLensSearchResult],
+        comparacoes: [mapped],
         loading: false
       }));
     } else {

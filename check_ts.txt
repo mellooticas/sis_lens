@@ -1,0 +1,17 @@
+src/lib/hooks/useCompararFornecedores.ts(51,23): error TS2352: Conversion of type 'VCatalogLens | undefined' to type 'RpcLensSearchResult' may be a mistake because neither type sufficiently overlaps with the other. If this was intentional, convert the expression to 'unknown' first.
+  Type 'VCatalogLens' is missing the following properties from type 'RpcLensSearchResult': has_ar, has_blue
+src/lib/index.ts(10,32): error TS2307: Cannot find module './database/client' or its corresponding type declarations.
+src/lib/server/actions.ts(7,32): error TS2307: Cannot find module '$lib/database/client' or its corresponding type declarations.
+src/lib/server/actions.ts(9,3): error TS2305: Module '"$lib/types/sistema"' has no exported member 'CriterioDecisao'.
+src/lib/server/actions.ts(10,3): error TS2305: Module '"$lib/types/sistema"' has no exported member 'FiltrosRanking'.
+src/lib/server/actions.ts(11,3): error TS2305: Module '"$lib/types/sistema"' has no exported member 'PayloadDecisao'.
+src/lib/stores/decisoes.ts(7,15): error TS2305: Module '"$lib/types/sistema"' has no exported member 'DecisaoCompra'.
+src/lib/stores/decisoes.ts(7,30): error TS2305: Module '"$lib/types/sistema"' has no exported member 'StatusDecisao'.
+src/lib/stores/decisoes.ts(142,5): error TS7053: Element implicitly has an 'any' type because expression of type 'any' can't be used to index type '{ DECIDIDO: number; ENVIADO: number; CONFIRMADO: number; ENTREGUE: number; TODAS: number; }'.
+src/lib/stores/filtros.ts(7,15): error TS2305: Module '"$lib/types/sistema"' has no exported member 'FiltrosBusca'.
+src/lib/stores/ranking.ts(7,15): error TS2305: Module '"$lib/types/sistema"' has no exported member 'OpcaoRanking'.
+src/lib/stores/ranking.ts(7,29): error TS2305: Module '"$lib/types/sistema"' has no exported member 'CriterioDecisao'.
+src/lib/stores/session.ts(2,15): error TS2305: Module '"$lib/types/sistema"' has no exported member 'Session'.
+src/routes/catalogo/premium/[id]/+page.server.ts(8,15): error TS2724: '"$lib/types/database-views"' has no exported member named 'VCatalogLensGroup'. Did you mean 'VCatalogLens'?
+src/routes/catalogo/standard/[id]/+page.server.ts(8,15): error TS2724: '"$lib/types/database-views"' has no exported member named 'VCatalogLensGroup'. Did you mean 'VCatalogLens'?
+src/routes/lentes/[id]/+page.server.ts(8,29): error TS2724: '"$lib/types/database-views"' has no exported member named 'VCatalogLensGroup'. Did you mean 'VCatalogLens'?
