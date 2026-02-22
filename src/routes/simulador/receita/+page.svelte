@@ -3,7 +3,8 @@
   Interface profissional para busca de lentes por prescrição
 -->
 <script lang="ts">
-    import { CatalogoAPI } from "$lib/api/catalogo-api";
+    import { LensOracleAPI } from "$lib/api/lens-oracle";
+    import type { RpcLensSearchResult } from "$lib/types/database-views";
     import Container from "$lib/components/layout/Container.svelte";
     import PageHero from "$lib/components/layout/PageHero.svelte";
     import Button from "$lib/components/ui/Button.svelte";
@@ -11,37 +12,21 @@
     import LenteCard from "$lib/components/catalogo/LenteCard.svelte";
     import { Eye, Search, RotateCcw } from "lucide-svelte";
 
-    // Ranges oftalmológicos padrão
-    const esféricos = Array.from({ length: 81 }, (_, i) => -20 + i * 0.25); // -20 a +20 (0.25 em 0.25)
-    const cilíndricos = Array.from({ length: 33 }, (_, i) => -8 + i * 0.25); // -8 a 0 (0.25 em 0.25)
-    const eixos = Array.from({ length: 181 }, (_, i) => i); // 0 a 180
-    const adições = Array.from({ length: 17 }, (_, i) => 0.75 + i * 0.25); // +0.75 a +4.75 (0.25 em 0.25)
+    // ... ranges mapping ...
+    const esféricos = Array.from({ length: 81 }, (_, i) => -20 + i * 0.25);
+    const cilíndricos = Array.from({ length: 33 }, (_, i) => -8 + i * 0.25);
+    const eixos = Array.from({ length: 181 }, (_, i) => i);
+    const adições = Array.from({ length: 17 }, (_, i) => 0.75 + i * 0.25);
 
-    // Estado da receita - OD (Olho Direito)
-    let od = {
-        esferico: 0,
-        cilindrico: 0,
-        eixo: 0,
-        adicao: 0,
-        dnp: 32 // Distância naso-pupilar
-    };
+    // ... od/oe state ...
+    let od = { esferico: 0, cilindrico: 0, eixo: 0, adicao: 0, dnp: 32 };
+    let oe = { esferico: 0, cilindrico: 0, eixo: 0, adicao: 0, dnp: 32 };
 
-    // Estado da receita - OE (Olho Esquerdo)
-    let oe = {
-        esferico: 0,
-        cilindrico: 0,
-        eixo: 0,
-        adicao: 0,
-        dnp: 32
-    };
+    let tipoLente: "single_vision" | "multifocal" | "bifocal" = "single_vision";
+    let usarMesmaReceita = false;
 
-    // Configurações gerais
-    let tipoLente: "visao_simples" | "multifocal" | "bifocal" = "visao_simples";
-    let usarMesmaReceita = false; // Opção para copiar OD para OE
-
-    // Estado dos resultados
     let loading = false;
-    let resultados: any[] = [];
+    let resultados: RpcLensSearchResult[] = [];
     let erro = "";
     let mostrarPreview = true;
 
@@ -64,57 +49,26 @@
         return (valor > 0 ? "+" : "") + valor.toFixed(2);
     }
 
-    // Busca lentes compatíveis
     async function buscarLentes() {
         loading = true;
         erro = "";
         resultados = [];
 
         try {
-            // Busca para OD
-            const respOD = await CatalogoAPI.buscarLentesPorReceita({
-                receita: {
-                    esferico: od.esferico,
-                    cilindrico: od.cilindrico,
-                    eixo: od.eixo,
-                    adicao: od.adicao,
-                },
-                tipo_lente: tipoLente,
-                limite: 100,
+            // No novo banco, as buscas por receita são otimizadas via RPC
+            const res = await LensOracleAPI.searchByPrescription({
+                sphere: od.esferico,
+                cylinder: od.cilindrico,
+                addition: tipoLente !== "single_vision" ? od.adicao : undefined,
+                lens_type: tipoLente,
+                limit: 100,
             });
 
-            // Busca para OE
-            const respOE = await CatalogoAPI.buscarLentesPorReceita({
-                receita: {
-                    esferico: oe.esferico,
-                    cilindrico: oe.cilindrico,
-                    eixo: oe.eixo,
-                    adicao: oe.adicao,
-                },
-                tipo_lente: tipoLente,
-                limite: 100,
-            });
-
-            // Combina e remove duplicatas (lentes que servem para ambos os olhos)
-            if (respOD.success && respOE.success && respOD.data && respOE.data) {
-                const lentesOD = respOD.data.dados || [];
-                const lentesOE = respOE.data.dados || [];
-                
-                // Intersecção: lentes que atendem ambos os olhos
-                const idsOD = new Set(lentesOD.map((l: any) => l.id));
-                const lentesComuns = lentesOE.filter((l: any) => idsOD.has(l.id));
-                
-                resultados = lentesComuns.length > 0 ? lentesComuns : [...lentesOD, ...lentesOE];
-                
-                // Remove duplicatas finais
-                const uniqueIds = new Set();
-                resultados = resultados.filter((l: any) => {
-                    if (uniqueIds.has(l.id)) return false;
-                    uniqueIds.add(l.id);
-                    return true;
-                });
+            if (res.data) {
+                resultados = res.data;
             } else {
-                erro = "Erro ao buscar lentes compatíveis";
+                erro =
+                    res.error?.message || "Erro ao buscar lentes compatíveis";
             }
         } catch (e: any) {
             erro = e.message || "Erro ao processar busca";
@@ -141,7 +95,6 @@
     />
 
     <div class="mt-8 space-y-6">
-        
         <!-- Tipo de Lente -->
         <div class="glass-panel p-6 rounded-xl">
             <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
@@ -149,15 +102,27 @@
             </h3>
             <div class="flex gap-4 flex-wrap">
                 <label class="tipo-radio">
-                    <input type="radio" bind:group={tipoLente} value="visao_simples" />
+                    <input
+                        type="radio"
+                        bind:group={tipoLente}
+                        value="single_vision"
+                    />
                     <span>Visão Simples</span>
                 </label>
                 <label class="tipo-radio">
-                    <input type="radio" bind:group={tipoLente} value="bifocal" />
+                    <input
+                        type="radio"
+                        bind:group={tipoLente}
+                        value="bifocal"
+                    />
                     <span>Bifocal</span>
                 </label>
                 <label class="tipo-radio">
-                    <input type="radio" bind:group={tipoLente} value="multifocal" />
+                    <input
+                        type="radio"
+                        bind:group={tipoLente}
+                        value="multifocal"
+                    />
                     <span>Multifocal / Progressiva</span>
                 </label>
             </div>
@@ -165,7 +130,6 @@
 
         <!-- Receita Oftalmológica -->
         <div class="grid lg:grid-cols-2 gap-6">
-            
             <!-- OD - Olho Direito -->
             <div class="receita-card">
                 <div class="receita-header">
@@ -179,7 +143,9 @@
                         <label>Esférico</label>
                         <select bind:value={od.esferico} class="select-receita">
                             {#each esféricos as valor}
-                                <option value={valor}>{formatarGrau(valor)}</option>
+                                <option value={valor}
+                                    >{formatarGrau(valor)}</option
+                                >
                             {/each}
                         </select>
                     </div>
@@ -187,9 +153,14 @@
                     <!-- Cilíndrico -->
                     <div class="campo-receita">
                         <label>Cilíndrico</label>
-                        <select bind:value={od.cilindrico} class="select-receita">
+                        <select
+                            bind:value={od.cilindrico}
+                            class="select-receita"
+                        >
                             {#each cilíndricos as valor}
-                                <option value={valor}>{formatarGrau(valor)}</option>
+                                <option value={valor}
+                                    >{formatarGrau(valor)}</option
+                                >
                             {/each}
                         </select>
                     </div>
@@ -205,13 +176,18 @@
                     </div>
 
                     <!-- Adição (apenas para multifocal/bifocal) -->
-                    {#if tipoLente !== "visao_simples"}
+                    {#if tipoLente !== "single_vision"}
                         <div class="campo-receita">
                             <label>Adição</label>
-                            <select bind:value={od.adicao} class="select-receita">
+                            <select
+                                bind:value={od.adicao}
+                                class="select-receita"
+                            >
                                 <option value={0}>Sem adição</option>
                                 {#each adições as valor}
-                                    <option value={valor}>{formatarGrau(valor)}</option>
+                                    <option value={valor}
+                                        >{formatarGrau(valor)}</option
+                                    >
                                 {/each}
                             </select>
                         </div>
@@ -220,11 +196,11 @@
                     <!-- DNP -->
                     <div class="campo-receita">
                         <label>DNP (mm)</label>
-                        <input 
-                            type="number" 
-                            bind:value={od.dnp} 
-                            min="20" 
-                            max="40" 
+                        <input
+                            type="number"
+                            bind:value={od.dnp}
+                            min="20"
+                            max="40"
                             step="0.5"
                             class="input-receita"
                         />
@@ -237,9 +213,11 @@
                 <div class="receita-header">
                     <Eye class="text-orange-500" size={24} />
                     <h3>OE - Olho Esquerdo</h3>
-                    <label class="ml-auto flex items-center gap-2 text-sm cursor-pointer">
-                        <input 
-                            type="checkbox" 
+                    <label
+                        class="ml-auto flex items-center gap-2 text-sm cursor-pointer"
+                    >
+                        <input
+                            type="checkbox"
                             bind:checked={usarMesmaReceita}
                             class="checkbox"
                         />
@@ -251,9 +229,15 @@
                     <!-- Esférico -->
                     <div class="campo-receita">
                         <label>Esférico</label>
-                        <select bind:value={oe.esferico} class="select-receita" disabled={usarMesmaReceita}>
+                        <select
+                            bind:value={oe.esferico}
+                            class="select-receita"
+                            disabled={usarMesmaReceita}
+                        >
                             {#each esféricos as valor}
-                                <option value={valor}>{formatarGrau(valor)}</option>
+                                <option value={valor}
+                                    >{formatarGrau(valor)}</option
+                                >
                             {/each}
                         </select>
                     </div>
@@ -261,9 +245,15 @@
                     <!-- Cilíndrico -->
                     <div class="campo-receita">
                         <label>Cilíndrico</label>
-                        <select bind:value={oe.cilindrico} class="select-receita" disabled={usarMesmaReceita}>
+                        <select
+                            bind:value={oe.cilindrico}
+                            class="select-receita"
+                            disabled={usarMesmaReceita}
+                        >
                             {#each cilíndricos as valor}
-                                <option value={valor}>{formatarGrau(valor)}</option>
+                                <option value={valor}
+                                    >{formatarGrau(valor)}</option
+                                >
                             {/each}
                         </select>
                     </div>
@@ -271,7 +261,11 @@
                     <!-- Eixo -->
                     <div class="campo-receita">
                         <label>Eixo</label>
-                        <select bind:value={oe.eixo} class="select-receita" disabled={usarMesmaReceita}>
+                        <select
+                            bind:value={oe.eixo}
+                            class="select-receita"
+                            disabled={usarMesmaReceita}
+                        >
                             {#each eixos as valor}
                                 <option value={valor}>{valor}°</option>
                             {/each}
@@ -279,13 +273,19 @@
                     </div>
 
                     <!-- Adição (apenas para multifocal/bifocal) -->
-                    {#if tipoLente !== "visao_simples"}
+                    {#if tipoLente !== "single_vision"}
                         <div class="campo-receita">
                             <label>Adição</label>
-                            <select bind:value={oe.adicao} class="select-receita" disabled={usarMesmaReceita}>
+                            <select
+                                bind:value={oe.adicao}
+                                class="select-receita"
+                                disabled={usarMesmaReceita}
+                            >
                                 <option value={0}>Sem adição</option>
                                 {#each adições as valor}
-                                    <option value={valor}>{formatarGrau(valor)}</option>
+                                    <option value={valor}
+                                        >{formatarGrau(valor)}</option
+                                    >
                                 {/each}
                             </select>
                         </div>
@@ -294,11 +294,11 @@
                     <!-- DNP -->
                     <div class="campo-receita">
                         <label>DNP (mm)</label>
-                        <input 
-                            type="number" 
-                            bind:value={oe.dnp} 
-                            min="20" 
-                            max="40" 
+                        <input
+                            type="number"
+                            bind:value={oe.dnp}
+                            min="20"
+                            max="40"
                             step="0.5"
                             class="input-receita"
                             disabled={usarMesmaReceita}
@@ -311,7 +311,9 @@
         <!-- Preview da Receita -->
         {#if mostrarPreview}
             <div class="receita-preview">
-                <h4 class="text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-3">
+                <h4
+                    class="text-sm font-bold text-neutral-600 dark:text-neutral-400 mb-3"
+                >
                     📋 Preview da Receita
                 </h4>
                 <div class="preview-table">
@@ -322,7 +324,7 @@
                                 <th>Esférico</th>
                                 <th>Cilíndrico</th>
                                 <th>Eixo</th>
-                                {#if tipoLente !== "visao_simples"}
+                                {#if tipoLente !== "single_vision"}
                                     <th>Adição</th>
                                 {/if}
                                 <th>DNP</th>
@@ -334,7 +336,7 @@
                                 <td>{formatarGrau(od.esferico)}</td>
                                 <td>{formatarGrau(od.cilindrico)}</td>
                                 <td>{od.eixo}°</td>
-                                {#if tipoLente !== "visao_simples"}
+                                {#if tipoLente !== "single_vision"}
                                     <td>{formatarGrau(od.adicao)}</td>
                                 {/if}
                                 <td>{od.dnp} mm</td>
@@ -344,7 +346,7 @@
                                 <td>{formatarGrau(oe.esferico)}</td>
                                 <td>{formatarGrau(oe.cilindrico)}</td>
                                 <td>{oe.eixo}°</td>
-                                {#if tipoLente !== "visao_simples"}
+                                {#if tipoLente !== "single_vision"}
                                     <td>{formatarGrau(oe.adicao)}</td>
                                 {/if}
                                 <td>{oe.dnp} mm</td>
@@ -357,7 +359,11 @@
 
         <!-- Ações -->
         <div class="flex gap-4 justify-center flex-wrap">
-            <Button variant="primary" on:click={buscarLentes} disabled={loading}>
+            <Button
+                variant="primary"
+                on:click={buscarLentes}
+                disabled={loading}
+            >
                 {#if loading}
                     <LoadingSpinner size="sm" />
                     Buscando...
@@ -384,7 +390,11 @@
             <div class="resultados-section">
                 <div class="resultados-header">
                     <h3>Lentes Compatíveis</h3>
-                    <span class="badge-count">{resultados.length} lente{resultados.length !== 1 ? 's' : ''}</span>
+                    <span class="badge-count"
+                        >{resultados.length} lente{resultados.length !== 1
+                            ? "s"
+                            : ""}</span
+                    >
                 </div>
 
                 <div class="lentes-grid">
@@ -396,7 +406,10 @@
         {:else if !loading && !erro}
             <div class="empty-state">
                 <div class="empty-icon">👓</div>
-                <p>Preencha a receita e clique em "Buscar" para encontrar lentes compatíveis</p>
+                <p>
+                    Preencha a receita e clique em "Buscar" para encontrar
+                    lentes compatíveis
+                </p>
             </div>
         {/if}
     </div>
@@ -443,7 +456,11 @@
 
     /* Cards de Receita */
     .receita-card {
-        background: linear-gradient(135deg, rgba(255, 255, 255, 0.9), rgba(255, 255, 255, 0.7));
+        background: linear-gradient(
+            135deg,
+            rgba(255, 255, 255, 0.9),
+            rgba(255, 255, 255, 0.7)
+        );
         backdrop-filter: blur(10px);
         border: 1px solid rgba(0, 0, 0, 0.1);
         border-radius: 1rem;
@@ -452,7 +469,11 @@
     }
 
     :global(.dark) .receita-card {
-        background: linear-gradient(135deg, rgba(30, 30, 30, 0.9), rgba(40, 40, 40, 0.7));
+        background: linear-gradient(
+            135deg,
+            rgba(30, 30, 30, 0.9),
+            rgba(40, 40, 40, 0.7)
+        );
         border-color: rgba(255, 255, 255, 0.1);
     }
 
@@ -461,12 +482,20 @@
         align-items: center;
         gap: 0.75rem;
         padding: 1.25rem 1.5rem;
-        background: linear-gradient(90deg, rgba(59, 130, 246, 0.1), rgba(249, 115, 22, 0.1));
+        background: linear-gradient(
+            90deg,
+            rgba(59, 130, 246, 0.1),
+            rgba(249, 115, 22, 0.1)
+        );
         border-bottom: 2px solid rgba(0, 0, 0, 0.05);
     }
 
     :global(.dark) .receita-header {
-        background: linear-gradient(90deg, rgba(59, 130, 246, 0.2), rgba(249, 115, 22, 0.2));
+        background: linear-gradient(
+            90deg,
+            rgba(59, 130, 246, 0.2),
+            rgba(249, 115, 22, 0.2)
+        );
         border-bottom-color: rgba(255, 255, 255, 0.05);
     }
 
@@ -539,14 +568,22 @@
 
     /* Preview da Receita */
     .receita-preview {
-        background: linear-gradient(135deg, rgba(234, 179, 8, 0.1), rgba(249, 115, 22, 0.1));
+        background: linear-gradient(
+            135deg,
+            rgba(234, 179, 8, 0.1),
+            rgba(249, 115, 22, 0.1)
+        );
         border: 2px dashed rgba(234, 179, 8, 0.3);
         border-radius: 1rem;
         padding: 1.5rem;
     }
 
     :global(.dark) .receita-preview {
-        background: linear-gradient(135deg, rgba(234, 179, 8, 0.2), rgba(249, 115, 22, 0.2));
+        background: linear-gradient(
+            135deg,
+            rgba(234, 179, 8, 0.2),
+            rgba(249, 115, 22, 0.2)
+        );
         border-color: rgba(234, 179, 8, 0.5);
     }
 
@@ -600,7 +637,7 @@
     .preview-table td {
         font-size: 0.875rem;
         font-weight: 600;
-        font-family: 'Courier New', monospace;
+        font-family: "Courier New", monospace;
         color: var(--color-text-primary);
     }
 
@@ -654,7 +691,11 @@
 
     .badge-count {
         padding: 0.5rem 1rem;
-        background: linear-gradient(135deg, var(--color-primary), var(--color-secondary));
+        background: linear-gradient(
+            135deg,
+            var(--color-primary),
+            var(--color-secondary)
+        );
         color: white;
         border-radius: 999px;
         font-size: 0.875rem;

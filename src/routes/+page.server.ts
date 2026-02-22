@@ -1,48 +1,41 @@
 /**
  * SIS Lens — Dashboard Principal
- * Dados reais de v_catalog_lenses + v_catalog_lens_groups
+ * Utiliza v_catalog_lens_stats para KPIs de alta performance
  */
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ locals }) => {
   const supabase = locals.supabase;
 
-  const [lentesResult, gruposResult] = await Promise.all([
-    supabase
-      .from('v_catalog_lenses')
-      .select('lens_type, is_premium, status, supplier_name, brand_name'),
-    supabase
-      .from('v_catalog_lens_groups')
-      .select('id, is_active, is_premium')
-  ]);
+  // Busca estatísticas consolidadas
+  const { data: stats } = await supabase
+    .from('v_catalog_lens_stats')
+    .select('*')
+    .single();
 
-  const lentes = lentesResult.data ?? [];
-  const grupos = gruposResult.data ?? [];
+  const { data: grupos } = await supabase
+    .from('v_catalog_lens_groups')
+    .select('id, is_active');
 
-  // KPIs principais
-  const total_lentes   = lentes.length;
-  const lentes_ativas  = lentes.filter(l => l.status === 'active').length;
-  const lentes_premium = lentes.filter(l => l.is_premium).length;
-  const grupos_ativos  = grupos.filter(g => g.is_active).length;
+  const grupos_ativos = grupos?.filter(g => g.is_active).length || 0;
 
-  // Fornecedores/Labs e Marcas únicos
-  const fornecedores = [...new Set(lentes.map(l => l.supplier_name).filter(Boolean))];
-  const marcas       = [...new Set(lentes.map(l => l.brand_name).filter(Boolean))];
-
-  // Distribuição por tipo de lente
-  const por_tipo: Record<string, number> = {};
-  lentes.forEach(l => {
-    if (l.lens_type) por_tipo[l.lens_type] = (por_tipo[l.lens_type] || 0) + 1;
-  });
+  // Distribuição por tipo de lente (mapeado do stats)
+  const por_tipo: Record<string, number> = {
+    'single_vision': stats?.total_visao_simples || 0,
+    'multifocal': stats?.total_multifocal || 0,
+    'bifocal': stats?.total_bifocal || 0,
+    'reading': stats?.total_leitura || 0,
+    'occupational': stats?.total_ocupacional || 0
+  };
 
   return {
     stats: {
-      total_lentes,
-      lentes_ativas,
-      lentes_premium,
-      total_standard:    lentes.filter(l => !l.is_premium).length,
-      total_fornecedores: fornecedores.length,
-      total_marcas:       marcas.length,
+      total_lentes: stats?.total_lentes || 0,
+      lentes_ativas: stats?.total_lentes || 0, // No banco novo, a view v_catalog_lenses já filtra ativas por padrão se necessário, ou usamos status
+      lentes_premium: stats?.total_premium || 0,
+      total_standard: (stats?.total_lentes || 0) - (stats?.total_premium || 0),
+      total_fornecedores: stats?.total_fornecedores || 0,
+      total_marcas: stats?.total_marcas || 0,
       grupos_ativos,
       por_tipo
     }

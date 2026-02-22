@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
   import { createEventDispatcher } from "svelte";
   import {
     Search,
@@ -19,34 +19,36 @@
 
   const dispatch = createEventDispatcher();
 
-  // Opções para os selects
+  // Opções para os selects (Valores em EN para o novo banco)
   const types = [
-    { value: "visao_simples", label: "Visão Simples" },
+    { value: "single_vision", label: "Visão Simples" },
     { value: "bifocal", label: "Bifocal" },
     { value: "multifocal", label: "Multifocal" },
+    { value: "reading", label: "Leitura" },
+    { value: "occupational", label: "Ocupacional" },
   ];
 
   const materials = [
-    { value: "CR39", label: "CR-39" },
-    { value: "POLICARBONATO", label: "Policarbonato" },
-    { value: "TRIVEX", label: "Trivex" },
-    { value: "HIGH_INDEX", label: "Alto Índice" },
+    { value: "cr39", label: "CR-39" },
+    { value: "polycarbonate", label: "Policarbonato" },
+    { value: "trivex", label: "Trivex" },
+    { value: "high_index", label: "Alto Índice" },
+    { value: "glass", label: "Vidro" },
   ];
 
   const categories = [
-    { value: "economica", label: "Econômica" },
-    { value: "intermediaria", label: "Intermediária" },
+    { value: "standard", label: "Standard" },
     { value: "premium", label: "Premium" },
-    { value: "super_premium", label: "Super Premium" },
   ];
 
   const indices = [
-    { value: "1.50", label: "1.50" },
-    { value: "1.56", label: "1.56" },
-    { value: "1.59", label: "1.59" },
-    { value: "1.61", label: "1.61" },
-    { value: "1.67", label: "1.67" },
-    { value: "1.74", label: "1.74" },
+    { value: 1.5, label: "1.50" },
+    { value: 1.53, label: "1.53" },
+    { value: 1.56, label: "1.56" },
+    { value: 1.59, label: "1.59" },
+    { value: 1.61, label: "1.61" },
+    { value: 1.67, label: "1.67" },
+    { value: 1.74, label: "1.74" },
   ];
 
   const priceRanges = [
@@ -200,7 +202,7 @@
         <input
           type="text"
           placeholder="Buscar por nome, marca ou código..."
-          class="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all"
+          class="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
           bind:value={searchText}
           on:input={applyFilters}
         />
@@ -214,7 +216,7 @@
         >Tipo</label
       >
       <select
-        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedType}
         on:change={applyFilters}
       >
@@ -232,7 +234,7 @@
         >Material</label
       >
       <select
-        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedMaterial}
         on:change={applyFilters}
       >
@@ -250,7 +252,7 @@
         >Categoria</label
       >
       <select
-        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedCategory}
         on:change={applyFilters}
       >
@@ -268,7 +270,7 @@
         >Índice</label
       >
       <select
-        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedIndex}
         on:change={applyFilters}
       >
@@ -286,7 +288,7 @@
         >Preço</label
       >
       <select
-        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+        class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedPriceRange}
         on:change={applyFilters}
       >
@@ -300,7 +302,7 @@
   <!-- Nova Seção: Laboratórios (Multi-select visual) -->
   <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4 mb-6">
     <div class="flex items-center gap-2 mb-3">
-      <Factory class="w-4 h-4 text-brand-blue-600 dark:text-brand-blue-400" />
+      <Factory class="w-4 h-4 text-primary-600 dark:text-primary-400" />
       <label
         class="text-xs font-medium text-neutral-900 dark:text-neutral-100 uppercase tracking-wider"
         >Laboratórios / Marcas</label
@@ -312,8 +314,8 @@
           on:click={() => toggleLab(lab)}
           class="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border
             {selectedLabs.includes(lab)
-            ? 'bg-brand-blue-600 border-brand-blue-600 text-white shadow-md'
-            : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-brand-blue-300'}"
+            ? 'bg-primary-600 border-primary-600 text-white shadow-md'
+            : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-primary-300'}"
         >
           {lab}
         </button>
@@ -368,7 +370,7 @@
             >
             {#if esf !== null}
               <button
-                class="text-[10px] text-brand-blue-600 hover:underline"
+                class="text-[10px] text-primary-600 hover:underline"
                 on:click={() => {
                   esf = null;
                   applyFilters();
@@ -400,7 +402,7 @@
             >
             {#if cil !== null}
               <button
-                class="text-[10px] text-brand-blue-600 hover:underline"
+                class="text-[10px] text-primary-600 hover:underline"
                 on:click={() => {
                   cil = null;
                   applyFilters();
@@ -433,7 +435,7 @@
             >
             {#if add !== null}
               <button
-                class="text-[10px] text-brand-blue-600 hover:underline"
+                class="text-[10px] text-primary-600 hover:underline"
                 on:click={() => {
                   add = null;
                   applyFilters();
@@ -497,12 +499,12 @@
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input
           type="checkbox"
-          class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-brand-blue-600 focus:ring-2 focus:ring-brand-blue-500/20 transition-all cursor-pointer"
+          class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer"
           bind:checked={hasAR}
           on:change={applyFilters}
         />
         <span
-          class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors"
+          class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
           >💨 Antirreflexo</span
         >
         <span
@@ -515,12 +517,12 @@
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input
           type="checkbox"
-          class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-brand-blue-600 focus:ring-2 focus:ring-brand-blue-500/20 transition-all cursor-pointer"
+          class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer"
           bind:checked={hasBlue}
           on:change={applyFilters}
         />
         <span
-          class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors"
+          class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
           >🔵 Blue Light</span
         >
         <span
@@ -533,12 +535,12 @@
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input
           type="checkbox"
-          class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-brand-blue-600 focus:ring-2 focus:ring-brand-blue-500/20 transition-all cursor-pointer"
+          class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer"
           bind:checked={hasFoto}
           on:change={applyFilters}
         />
         <span
-          class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors"
+          class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
           >📷 Fotossensível</span
         >
         <span
@@ -551,12 +553,12 @@
       <label class="inline-flex items-center gap-2 cursor-pointer group">
         <input
           type="checkbox"
-          class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-brand-blue-600 focus:ring-2 focus:ring-brand-blue-500/20 transition-all cursor-pointer"
+          class="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-primary-600 focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer"
           bind:checked={hasPolar}
           on:change={applyFilters}
         />
         <span
-          class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-brand-blue-600 dark:group-hover:text-brand-blue-400 transition-colors"
+          class="text-sm text-neutral-700 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
           >😎 Polarizado</span
         >
         <span
@@ -580,12 +582,12 @@
     class="flex items-center justify-between mt-6 pt-4 border-t border-neutral-200 dark:border-neutral-700"
   >
     <div class="text-sm text-neutral-600 dark:text-neutral-400">
-      <span class="font-semibold text-brand-blue-600 dark:text-brand-blue-400"
+      <span class="font-semibold text-primary-600 dark:text-primary-400"
         >{loading ? "..." : totalResults}</span
       > lentes encontradas
     </div>
     {#if hasActiveFilters}
-      <Button variant="outline" size="sm" on:click={clearFilters}>
+      <Button variant="ghost" size="sm" on:click={clearFilters}>
         <RotateCcw class="w-3.5 h-3.5 mr-1.5" />
         Limpar Filtros
       </Button>

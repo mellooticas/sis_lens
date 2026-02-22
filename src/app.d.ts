@@ -1,4 +1,5 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
+// Padrão do Ecossistema SIS_DIGIAI — seção 4.4
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
 
 declare global {
@@ -10,8 +11,10 @@ declare global {
       user: User | null;
     }
     interface PageData {
-      // session é fornecido pelo +layout.server.ts e mergeado em todas as páginas
+      /** Sessão ativa do Supabase (fornecida pelo +layout.server.ts) */
       session?: Session | null;
+      /** Usuário autenticado — necessário para o authStore (currentUser) */
+      user?: User | null;
     }
     // interface Error {}
     // interface Platform {}

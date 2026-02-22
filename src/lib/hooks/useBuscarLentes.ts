@@ -1,39 +1,43 @@
 /**
- * Hook para buscar lentes do catálogo
- * Usa a view consolidada v_lentes do banco de dados
+ * Hook para buscar lentes do catálogo (SIS Lens Oracle)
+ * Usa a nova API consolidada LensOracleAPI
  */
 
-import { writable, derived, get } from 'svelte/store';
-import { viewsApi } from '$lib/api/views-client';
-import type { VCatalogLens as VLente } from '$lib/types/database-views';
-import type { BuscarLentesParams } from '$lib/api/views-client';
+import { writable, get } from 'svelte/store';
+import { LensOracleAPI } from '$lib/api/lens-oracle';
+import type { RpcLensSearchResult } from '$lib/types/database-views';
 
 interface BuscarLentesState {
-  lentes: VLente[];
+  lentes: RpcLensSearchResult[];
   loading: boolean;
   error: string | null;
   total: number;
   pagina: number;
-  totalPaginas: number;
+}
+
+export interface BuscarLentesParams {
+  query?: string;
+  lens_type?: string;
+  material?: string;
+  refractive_index?: number;
+  is_premium?: boolean;
+  limit?: number;
+  offset?: number;
 }
 
 export function useBuscarLentes(parametrosIniciais: BuscarLentesParams = {}) {
-  const limite = parametrosIniciais.limite || 50;
+  const limite = parametrosIniciais.limit || 50;
   
   const state = writable<BuscarLentesState>({
     lentes: [],
     loading: false,
     error: null,
     total: 0,
-    pagina: 1,
-    totalPaginas: 0
+    pagina: 1
   });
 
   const parametros = writable<BuscarLentesParams>(parametrosIniciais);
 
-  /**
-   * Buscar lentes com os parâmetros atuais
-   */
   async function buscar(novosParametros?: Partial<BuscarLentesParams>) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
@@ -42,80 +46,48 @@ export function useBuscarLentes(parametrosIniciais: BuscarLentesParams = {}) {
     }
 
     const params = get(parametros);
-    const offset = ((params.offset || 0) / limite);
-
-    const response = await viewsApi.buscarLentes({
+    const res = await LensOracleAPI.searchLenses({
       ...params,
-      limite,
-      offset: offset * limite
+      limit: limite,
+      offset: params.offset || 0
     });
 
-    if (response.success && response.data) {
+    if (res.data) {
       state.update(s => ({
         ...s,
-        lentes: response.data || [],
+        lentes: res.data || [],
         loading: false,
-        total: response.total || 0,
-        totalPaginas: response.metadata?.paginas || 0,
-        pagina: offset + 1
+        pagina: Math.floor((params.offset || 0) / limite) + 1
       }));
+      
+      // Busca total se necessário
+      if (get(state).total === 0) {
+        const stats = await LensOracleAPI.getCatalogStats();
+        if (stats?.data) {
+          state.update(s => ({ ...s, total: stats.data!.total_lenses }));
+        }
+      }
     } else {
       state.update(s => ({
         ...s,
         loading: false,
-        error: response.error || 'Erro ao buscar lentes'
+        error: res.error?.message || 'Erro ao buscar lentes'
       }));
     }
   }
 
-  /**
-   * Ir para uma página específica
-   */
   function irParaPagina(pagina: number) {
     const offset = (pagina - 1) * limite;
     buscar({ offset });
   }
 
-  /**
-   * Próxima página
-   */
-  function proximaPagina() {
-    const currentState = get(state);
-    if (currentState.pagina < currentState.totalPaginas) {
-      irParaPagina(currentState.pagina + 1);
-    }
-  }
-
-  /**
-   * Página anterior
-   */
-  function paginaAnterior() {
-    const currentState = get(state);
-    if (currentState.pagina > 1) {
-      irParaPagina(currentState.pagina - 1);
-    }
-  }
-
-  /**
-   * Atualizar filtros e buscar
-   */
   function aplicarFiltros(novosParametros: Partial<BuscarLentesParams>) {
     buscar({ ...novosParametros, offset: 0 });
   }
 
-  /**
-   * Limpar filtros
-   */
   function limparFiltros() {
-    parametros.set({ limite });
+    parametros.set({ limit: limite });
     buscar({ offset: 0 });
-  }
-
-  /**
-   * Recarregar com os mesmos parâmetros
-   */
-  function recarregar() {
-    buscar();
   }
 
   return {
@@ -123,10 +95,7 @@ export function useBuscarLentes(parametrosIniciais: BuscarLentesParams = {}) {
     parametros,
     buscar,
     irParaPagina,
-    proximaPagina,
-    paginaAnterior,
     aplicarFiltros,
-    limparFiltros,
-    recarregar
+    limparFiltros
   };
 }

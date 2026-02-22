@@ -40,86 +40,161 @@ export type LensMaterialType =
 export type RecordStatus = 'active' | 'inactive' | 'archived';
 
 // ============================================================================
-// NOVO BANCO — VIEW: public.v_catalog_lenses  (migration 111)
+// NOVO BANCO — VIEW: public.v_catalog_lenses  (migration 111/212)
 // ============================================================================
 
 /**
  * Linha da view pública `public.v_catalog_lenses`.
  * JWT-tenant-filtered; acesso SELECT concedido ao role `authenticated`.
- * Campos `lens_type`, `material` e `status` são TEXT (cast from enums na view).
  */
 export interface VCatalogLens {
-  // ─── IDs ───────────────────────────────────────────────────────────────────
   id: string;
   tenant_id: string;
   supplier_lab_id: string | null;
-  group_id: string | null;
-
-  // ─── Relacionamentos (desnormalizados na view) ──────────────────────────────
-  supplier_name: string | null;   // catalog_lenses.suppliers_labs.name
-  group_name: string | null;      // catalog_lenses.lens_groups.name
-
-  // ─── Identificação ─────────────────────────────────────────────────────────
-  sku: string | null;
-  slug: string | null;
+  brand_id: string | null;
   lens_name: string;
   brand_name: string | null;
-
-  // ─── Características técnicas ───────────────────────────────────────────────
-  lens_type: string | null;         // TEXT cast de catalog_lenses.lens_type
-  material: string | null;          // TEXT cast de catalog_lenses.lens_material_type
+  supplier_name: string | null;
+  sku: string | null;
+  slug: string | null;
+  
+  lens_type: string | null;
+  material: string | null;
   refractive_index: number | null;
-  category: string | null;          // 'standard' | 'premium' | …
-
-  // ─── Tratamentos ───────────────────────────────────────────────────────────
+  category: string | null;
+  
   anti_reflective: boolean;
   anti_scratch: boolean;
   uv_filter: boolean;
   blue_light: boolean;
-  photochromic: string | null;      // VARCHAR(50): 'nenhum' | 'photo' | 'transitions' | …
+  photochromic: string | null;
   polarized: boolean;
-
-  // ─── Tecnologias ───────────────────────────────────────────────────────────
+  
   digital: boolean;
   free_form: boolean;
   indoor: boolean;
   drive: boolean;
-
-  // ─── Faixas ópticas ────────────────────────────────────────────────────────
+  
   spherical_min: number | null;
   spherical_max: number | null;
   cylindrical_min: number | null;
   cylindrical_max: number | null;
   addition_min: number | null;
   addition_max: number | null;
-
-  // ─── Preços ────────────────────────────────────────────────────────────────
+  
   price_cost: number;
   price_suggested: number;
-
-  // ─── Estoque / Logística ───────────────────────────────────────────────────
+  
   stock_available: number;
-  stock_minimum: number;
   lead_time_days: number;
-
-  // ─── Classificação / Status ─────────────────────────────────────────────────
   is_premium: boolean;
-  status: string;                   // TEXT cast de inventory.record_status
-  attributes: Record<string, unknown>;
-
-  // ─── Metadata ──────────────────────────────────────────────────────────────
+  status: string;
+  
   created_at: string;
   updated_at: string;
+}
+
+// ============================================================================
+// NOVO BANCO — VIEW: public.v_brands (migration 210)
+// ============================================================================
+
+export interface VBrand {
+  brand_id: string;
+  name: string;
+  slug: string;
+  logo_url: string | null;
+  manufacturer_name: string | null;
+  is_premium: boolean;
+  brand_scope: 'ophthalmic' | 'contact' | 'both';
+  is_active: boolean;
+}
+
+// ============================================================================
+// NOVO BANCO — VIEW: public.v_contact_lenses (migration 214)
+// ============================================================================
+
+export interface VContactLens {
+  id: string;
+  tenant_id: string;
+  brand_id: string;
+  brand_name: string;
+  manufacturer_name: string | null;
+  product_name: string;
+  slug: string;
+  sku: string | null;
+  lens_type: string;
+  purpose: string;
+  material: string;
+  diameter: number | null;
+  base_curve: number | null;
+  dk_t: number | null;
+  water_content: number | null;
+  spherical_min: number | null;
+  spherical_max: number | null;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  uv_protection: boolean;
+  is_colored: boolean;
+  available_colors: string[] | null;
+  usage_days: number | null;
+  units_per_box: number;
+  price_cost: number;
+  price_suggested: number;
+  stock_available: number;
+  lead_time_days: number;
+  is_premium: boolean;
+  status: string;
+  created_at: string;
+}
+
+// ============================================================================
+// NOVO BANCO — VIEW: public.v_canonical_lenses (migration 212)
+// ============================================================================
+
+export interface VCanonicalLens {
+  id: string;
+  fingerprint: string;
+  canonical_name: string;
+  slug: string | null;
+  lens_type: string;
+  material: string;
+  refractive_index: number;
+  anti_reflective: boolean;
+  photochromic: string | null;
+  spherical_min: number | null;
+  spherical_max: number | null;
+  mapped_lens_count: number;
+  mapped_supplier_count: number;
+  has_premium_mapping: boolean;
+}
+
+// ============================================================================
+// NOVO BANCO — RPC: public.rpc_contact_lens_search (migration 214)
+// ============================================================================
+
+export interface RpcContactLensSearchResult {
+  id: string;
+  brand_name: string;
+  manufacturer_name: string | null;
+  is_premium: boolean;
+  product_name: string;
+  slug: string;
+  lens_type: string;
+  purpose: string;
+  material: string;
+  is_colored: boolean;
+  available_colors: string[] | null;
+  units_per_box: number;
+  price_suggested: number;
+  usage_days: number | null;
+  dk_t: number | null;
+  stock_available: number;
 }
 
 // ============================================================================
 // NOVO BANCO — VIEW: public.v_catalog_lens_stats  (migration 111)
 // ============================================================================
 
-/**
- * Linha única da view `public.v_catalog_lens_stats`.
- * Agrega contagens e faixas de preço para o catálogo do tenant atual.
- */
 export interface VCatalogLensStats {
   total_lenses: number;
   total_active: number;
@@ -134,13 +209,9 @@ export interface VCatalogLensStats {
 }
 
 // ============================================================================
-// NOVO BANCO — RPC: public.rpc_lens_search(...)  (migration 111/114)
+// NOVO BANCO — RPC: public.rpc_lens_search (migration 111/114)
 // ============================================================================
 
-/**
- * Linha retornada por `public.rpc_lens_search(...)`.
- * Subset de campos de `v_catalog_lenses` otimizado para busca.
- */
 export interface RpcLensSearchResult {
   id: string;
   slug: string | null;
@@ -151,6 +222,7 @@ export interface RpcLensSearchResult {
   material: string | null;
   refractive_index: number | null;
   price_suggested: number;
+  price_cost: number;
   category: string | null;
   has_ar: boolean;
   has_blue: boolean;
@@ -158,45 +230,16 @@ export interface RpcLensSearchResult {
   stock_available: number;
   lead_time_days: number;
   is_premium: boolean;
-}
-
-// ============================================================================
-// NOVO BANCO — RPC: public.rpc_lens_get_alternatives(...)  (migration 111/114)
-// ============================================================================
-
-/**
- * Linha retornada por `public.rpc_lens_get_alternatives(...)`.
- */
-export interface RpcLensAlternativeResult {
-  id: string;
-  slug: string | null;
-  lens_name: string;
-  supplier_name: string | null;
-  price_suggested: number;
-  price_diff: number;
-  lead_time_days: number;
-}
-
-// ============================================================================
-// NOVO BANCO — VIEW GROUPS (v_catalog_lens_groups — a criar)
-// ============================================================================
-
-/**
- * Linha da view de grupos canônicos do novo banco.
- * A view `public.v_catalog_lens_groups` será criada pelo usuário;
- * enquanto isso, `group_id` / `group_name` estão disponíveis em VCatalogLens.
- */
-export interface VCatalogLensGroup {
-  id: string;
-  tenant_id: string;
-  name: string;
-  lens_type: string | null;
-  material: string | null;
-  refractive_index: number | null;
-  is_premium: boolean;
-  is_active: boolean;
-  created_at: string;
-  updated_at: string;
+  anti_reflective: boolean;
+  blue_light: boolean;
+  uv_filter: boolean;
+  photochromic: string | null;
+  spherical_min: number | null;
+  spherical_max: number | null;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  addition_min: number | null;
+  addition_max: number | null;
 }
 
 // ============================================================================

@@ -1,66 +1,70 @@
 <!--
   🏆 Rankings de Lentes - SIS Lens
-  Análise completa dos grupos canônicos mais relevantes
+  Análise completa dos grupos mais relevantes utilizando LensOracleAPI
 -->
 <script lang="ts">
-  import { onMount } from 'svelte';
-  import { CatalogoAPI } from '$lib/api/catalogo-api';
-  import Container from '$lib/components/layout/Container.svelte';
-  import PageHero from '$lib/components/layout/PageHero.svelte';
-  import SectionHeader from '$lib/components/layout/SectionHeader.svelte';
-  import LoadingSpinner from '$lib/components/ui/LoadingSpinner.svelte';
-  import type { VGruposCanonico } from '$lib/types/database-views';
-  
-  let topCaros: VGruposCanonico[] = [];
-  let topPopulares: VGruposCanonico[] = [];
-  let topPremium: VGruposCanonico[] = [];
+  import { onMount } from "svelte";
+  import { LensOracleAPI } from "$lib/api/lens-oracle";
+  import Container from "$lib/components/layout/Container.svelte";
+  import PageHero from "$lib/components/layout/PageHero.svelte";
+  import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
+  import LoadingSpinner from "$lib/components/ui/LoadingSpinner.svelte";
+  import type { RpcLensSearchResult } from "$lib/types/database-views";
+
+  let topCaros: RpcLensSearchResult[] = [];
+  let topPopulares: RpcLensSearchResult[] = [];
+  let topPremium: RpcLensSearchResult[] = [];
   let distribuicaoTipo: Array<{ tipo_lente: string; count: number }> = [];
   let distribuicaoMaterial: Array<{ material: string; count: number }> = [];
   let loading = true;
-  let error = '';
-  
+  let error = "";
+
   onMount(async () => {
     await carregarDados();
   });
-  
+
   async function carregarDados() {
     loading = true;
-    error = '';
-    
+    error = "";
+
     try {
-      const [resCaros, resPopulares, resPremium, resTipo, resMaterial] = await Promise.all([
-        CatalogoAPI.buscarTopCaros(10),
-        CatalogoAPI.buscarTopPopulares(10),
-        CatalogoAPI.buscarTopPremium(10),
-        CatalogoAPI.obterDistribuicaoPorTipo(),
-        CatalogoAPI.obterDistribuicaoPorMaterial()
-      ]);
-      
-      if (resCaros.success && resCaros.data) topCaros = resCaros.data;
-      if (resPopulares.success && resPopulares.data) topPopulares = resPopulares.data;
-      if (resPremium.success && resPremium.data) topPremium = resPremium.data;
-      if (resTipo.success && resTipo.data) distribuicaoTipo = resTipo.data.sort((a, b) => b.count - a.count);
-      if (resMaterial.success && resMaterial.data) distribuicaoMaterial = resMaterial.data.sort((a, b) => b.count - a.count);
-      
+      const [resCaros, resPopulares, resPremium, resTipo, resMaterial] =
+        await Promise.all([
+          LensOracleAPI.getRankings({ category: "expensive", limit: 10 }),
+          LensOracleAPI.getRankings({ category: "popular", limit: 10 }),
+          LensOracleAPI.getRankings({ category: "premium", limit: 10 }),
+          LensOracleAPI.getDistribution("type"),
+          LensOracleAPI.getDistribution("material"),
+        ]);
+
+      if (resCaros.data) topCaros = resCaros.data;
+      if (resPopulares.data) topPopulares = resPopulares.data;
+      if (resPremium.data) topPremium = resPremium.data;
+      if (resTipo.data)
+        distribuicaoTipo = resTipo.data.sort((a, b) => b.count - a.count);
+      if (resMaterial.data)
+        distribuicaoMaterial = resMaterial.data.sort(
+          (a, b) => b.count - a.count,
+        );
     } catch (err) {
-      error = err instanceof Error ? err.message : 'Erro ao carregar dados';
-      console.error('❌ Erro ao carregar ranking:', err);
+      error = err instanceof Error ? err.message : "Erro ao carregar dados";
+      console.error("❌ Erro ao carregar ranking:", err);
     } finally {
       loading = false;
     }
   }
-  
+
   function formatarPreco(valor: number | null): string {
-    if (!valor) return 'N/A';
-    return new Intl.NumberFormat('pt-BR', { 
-      style: 'currency', 
-      currency: 'BRL' 
+    if (!valor) return "N/A";
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL",
     }).format(valor);
   }
-  
+
   function formatarTexto(texto: string | null): string {
-    if (!texto) return 'N/A';
-    return texto.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase());
+    if (!texto) return "N/A";
+    return texto.replace(/_/g, " ").replace(/\b\w/g, (l) => l.toUpperCase());
   }
 
   function calcularTotal(items: any[]): number {
@@ -74,15 +78,16 @@
 </script>
 
 <svelte:head>
-  <title>Rankings | SIS Lens</title>
-  <meta name="description" content="Rankings e análises de grupos canônicos de lentes" />
+  <title>Rankings | SIS Lens Oracle</title>
 </svelte:head>
 
-<main class="min-h-screen bg-gradient-to-br from-neutral-50 via-blue-50 to-neutral-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900">
+<main
+  class="min-h-screen bg-gradient-to-br from-neutral-50 via-blue-50 to-neutral-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900"
+>
   <Container>
     <PageHero
-      title="🏆 Rankings de Lentes"
-      description="Análise completa dos grupos canônicos mais relevantes do catálogo"
+      title="🏆 Rankings"
+      subtitle="Análise completa baseada no motor Lens Oracle"
     />
 
     {#if loading}
@@ -90,44 +95,56 @@
         <LoadingSpinner size="lg" />
       </div>
     {:else if error}
-      <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 mt-8">
+      <div
+        class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl p-6 mt-8"
+      >
         <p class="text-red-800 dark:text-red-200">❌ {error}</p>
       </div>
     {:else}
-      <!-- Top 10 Rankings Grid -->
       <section class="mt-8">
         <SectionHeader
-          title="🏅 Top 10 Rankings"
-          subtitle="Grupos canônicos classificados por diferentes critérios"
+          title="🏅 Top 10"
+          subtitle="Lentes classificadas por preço e exclusividade"
         />
 
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           <!-- Mais Caros -->
-          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
-            <div class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4">
+          <div
+            class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+          >
+            <div
+              class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4"
+            >
               <h3 class="text-lg font-bold text-white flex items-center gap-2">
                 <span>💰</span>
                 <span>Mais Caros</span>
               </h3>
-              <p class="text-amber-50 text-sm mt-1">Grupos de maior valor médio</p>
             </div>
             <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
-              {#each topCaros as grupo, index}
-                <div class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
-                  <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold text-sm">
+              {#each topCaros as lens, index}
+                <div
+                  class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  <span
+                    class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold text-sm"
+                  >
                     {index + 1}
                   </span>
                   <div class="flex-1 min-w-0">
-                    <h4 class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1">
-                      {grupo.nome_grupo}
+                    <h4
+                      class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1"
+                    >
+                      {lens.lens_name}
                     </h4>
                     <p class="text-xs text-neutral-600 dark:text-neutral-400">
-                      {formatarTexto(grupo.tipo_lente)} • {grupo.total_lentes} un
+                      {formatarTexto(lens.lens_type)} • {lens.brand_name}
                     </p>
                   </div>
                   <div class="flex-shrink-0 text-right">
-                    <p class="font-bold text-amber-600 dark:text-amber-400 text-sm">
-                      {formatarPreco(grupo.preco_medio)}
+                    <p
+                      class="font-bold text-amber-600 dark:text-amber-400 text-sm"
+                    >
+                      {formatarPreco(lens.price_suggested)}
                     </p>
                   </div>
                 </div>
@@ -136,31 +153,42 @@
           </div>
 
           <!-- Mais Populares -->
-          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
-            <div class="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-4">
+          <div
+            class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+          >
+            <div
+              class="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-4"
+            >
               <h3 class="text-lg font-bold text-white flex items-center gap-2">
                 <span>🔥</span>
                 <span>Mais Populares</span>
               </h3>
-              <p class="text-green-50 text-sm mt-1">Maior quantidade de lentes</p>
             </div>
             <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
-              {#each topPopulares as grupo, index}
-                <div class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
-                  <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold text-sm">
+              {#each topPopulares as lens, index}
+                <div
+                  class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  <span
+                    class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold text-sm"
+                  >
                     {index + 1}
                   </span>
                   <div class="flex-1 min-w-0">
-                    <h4 class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1">
-                      {grupo.nome_grupo}
+                    <h4
+                      class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1"
+                    >
+                      {lens.lens_name}
                     </h4>
                     <p class="text-xs text-neutral-600 dark:text-neutral-400">
-                      {formatarTexto(grupo.tipo_lente)} • {formatarPreco(grupo.preco_medio)}
+                      {formatarTexto(lens.lens_type)} • {lens.brand_name}
                     </p>
                   </div>
                   <div class="flex-shrink-0 text-right">
-                    <p class="font-bold text-green-600 dark:text-green-400 text-sm">
-                      {grupo.total_lentes} un
+                    <p
+                      class="font-bold text-green-600 dark:text-green-400 text-sm"
+                    >
+                      {formatarPreco(lens.price_suggested)}
                     </p>
                   </div>
                 </div>
@@ -169,31 +197,40 @@
           </div>
 
           <!-- Premium -->
-          <div class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden">
+          <div
+            class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+          >
             <div class="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-4">
               <h3 class="text-lg font-bold text-white flex items-center gap-2">
                 <span>👑</span>
                 <span>Top Premium</span>
               </h3>
-              <p class="text-purple-50 text-sm mt-1">Grupos premium de destaque</p>
             </div>
             <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
-              {#each topPremium as grupo, index}
-                <div class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors">
-                  <span class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 font-bold text-sm">
+              {#each topPremium as lens, index}
+                <div
+                  class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                >
+                  <span
+                    class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 font-bold text-sm"
+                  >
                     {index + 1}
                   </span>
                   <div class="flex-1 min-w-0">
-                    <h4 class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1">
-                      {grupo.nome_grupo}
+                    <h4
+                      class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1"
+                    >
+                      {lens.lens_name}
                     </h4>
                     <p class="text-xs text-neutral-600 dark:text-neutral-400">
-                      {formatarTexto(grupo.tipo_lente)} • {grupo.total_lentes} un
+                      {formatarTexto(lens.lens_type)} • {lens.brand_name}
                     </p>
                   </div>
                   <div class="flex-shrink-0 text-right">
-                    <p class="font-bold text-purple-600 dark:text-purple-400 text-sm">
-                      {formatarPreco(grupo.preco_medio)}
+                    <p
+                      class="font-bold text-purple-600 dark:text-purple-400 text-sm"
+                    >
+                      {formatarPreco(lens.price_suggested)}
                     </p>
                   </div>
                 </div>
@@ -206,13 +243,14 @@
       <!-- Distribuições -->
       <section class="mt-12">
         <SectionHeader
-          title="📊 Distribuição do Catálogo"
-          subtitle="Composição por tipo de lente e material"
+          title="📊 Distribuição"
+          subtitle="Composição técnica do catálogo"
         />
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
-          <!-- Por Tipo -->
-          <div class="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <div
+            class="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700"
+          >
             <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
               Por Tipo de Lente
             </h3>
@@ -222,14 +260,20 @@
                 {@const percentual = calcularPercentual(item.count, total)}
                 <div>
                   <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    <span
+                      class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                    >
                       {formatarTexto(item.tipo_lente)}
                     </span>
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                      {item.count.toLocaleString('pt-BR')} ({percentual}%)
+                    <span
+                      class="text-sm text-neutral-600 dark:text-neutral-400"
+                    >
+                      {item.count.toLocaleString("pt-BR")} ({percentual}%)
                     </span>
                   </div>
-                  <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5">
+                  <div
+                    class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5"
+                  >
                     <div
                       class="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-500"
                       style="width: {percentual}%"
@@ -240,8 +284,9 @@
             </div>
           </div>
 
-          <!-- Por Material -->
-          <div class="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700">
+          <div
+            class="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700"
+          >
             <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
               Por Material
             </h3>
@@ -251,14 +296,20 @@
                 {@const percentual = calcularPercentual(item.count, total)}
                 <div>
                   <div class="flex justify-between items-center mb-2">
-                    <span class="text-sm font-medium text-neutral-700 dark:text-neutral-300">
+                    <span
+                      class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                    >
                       {formatarTexto(item.material)}
                     </span>
-                    <span class="text-sm text-neutral-600 dark:text-neutral-400">
-                      {item.count.toLocaleString('pt-BR')} ({percentual}%)
+                    <span
+                      class="text-sm text-neutral-600 dark:text-neutral-400"
+                    >
+                      {item.count.toLocaleString("pt-BR")} ({percentual}%)
                     </span>
                   </div>
-                  <div class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5">
+                  <div
+                    class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5"
+                  >
                     <div
                       class="bg-gradient-to-r from-green-500 to-emerald-600 h-2.5 rounded-full transition-all duration-500"
                       style="width: {percentual}%"

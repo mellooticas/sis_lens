@@ -1,10 +1,10 @@
 /**
  * Hook para estatísticas do catálogo
- * Usa a view vw_stats_catalogo do banco de dados
+ * Usa a nova API consolidada LensOracleAPI
  */
 
 import { writable } from 'svelte/store';
-import { viewsApi } from '$lib/api/views-client';
+import { LensOracleAPI } from '$lib/api/lens-oracle';
 import type { VCatalogLensStats } from '$lib/types/database-views';
 
 interface StatsCatalogoState {
@@ -20,25 +20,22 @@ export function useStatsCatalogo() {
     error: null
   });
 
-  /**
-   * Carregar estatísticas do catálogo
-   */
   async function carregarEstatisticas() {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const response = await viewsApi.obterEstatisticasCatalogo();
+    const res = await LensOracleAPI.getCatalogStats();
 
-    if (response.success && response.data) {
+    if (res.data) {
       state.update(s => ({
         ...s,
-        stats: response.data || null,
+        stats: res.data || null,
         loading: false
       }));
     } else {
       state.update(s => ({
         ...s,
         loading: false,
-        error: response.error || 'Erro ao carregar estatísticas'
+        error: res.error?.message || 'Erro ao carregar estatísticas'
       }));
     }
   }

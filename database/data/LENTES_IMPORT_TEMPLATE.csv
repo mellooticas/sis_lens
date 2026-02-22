@@ -1,4 +1,0 @@
-sku_fornecedor,codigo_original,nome_comercial,marca_id,fornecedor_id,tipo_lente,categoria,material,indice_refracao,diametro,esferico_min,esferico_max,cilindrico_min,cilindrico_max,adicao_min,adicao_max,ar,blue,fotossensivel,polarizado,custo_base,preco_tabela,status
-SKU-EX-001,COD-001,Lente Visão Simples 1.56 AR,COLE_O_ID_DA_MARCA_AQUI,COLE_O_ID_DO_FORNECEDOR_AQUI,visao_simples,economica,CR39,1.56,70,-4.00,4.00,-2.00,0.00,,,true,false,nenhum,false,50.00,150.00,ativo
-SKU-EX-002,COD-002,Lente Multifocal 1.67 Blue,COLE_O_ID_DA_MARCA_AQUI,COLE_O_ID_DO_FORNECEDOR_AQUI,multifocal,premium,HIGH_INDEX_167,1.67,75,-6.00,6.00,-4.00,0.00,1.00,3.50,true,true,nenhum,false,200.00,600.00,ativo
-SKU-EX-003,COD-003,Lente Policarbonato Transitions,COLE_O_ID_DA_MARCA_AQUI,COLE_O_ID_DO_FORNECEDOR_AQUI,visao_simples,intermediaria,POLICARBONATO,1.59,70,-4.00,4.00,-2.00,0.00,,,true,false,transitions,false,120.00,350.00,ativo

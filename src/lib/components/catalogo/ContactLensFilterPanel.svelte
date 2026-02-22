@@ -1,4 +1,4 @@
-<script lang="ts">
+﻿<script lang="ts">
     import { createEventDispatcher } from "svelte";
     import {
         Search,
@@ -145,7 +145,7 @@
                 <input
                     type="text"
                     placeholder="Buscar lente, marca ou código..."
-                    class="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all"
+                    class="w-full pl-10 pr-4 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all"
                     bind:value={searchText}
                     on:input={applyFilters}
                 />
@@ -159,7 +159,7 @@
                 >Descarte</label
             >
             <select
-                class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+                class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
                 bind:value={selectedType}
                 on:change={applyFilters}
             >
@@ -177,7 +177,7 @@
                 >Finalidade</label
             >
             <select
-                class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+                class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
                 bind:value={selectedPurpose}
                 on:change={applyFilters}
             >
@@ -195,7 +195,7 @@
                 >Material</label
             >
             <select
-                class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+                class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
                 bind:value={selectedMaterial}
                 on:change={applyFilters}
             >
@@ -213,7 +213,7 @@
                 >Preço</label
             >
             <select
-                class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-blue-500/20 focus:border-brand-blue-500 outline-none transition-all cursor-pointer"
+                class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
                 bind:value={selectedPriceRange}
                 on:change={applyFilters}
             >
@@ -260,7 +260,7 @@
         >
             <div class="flex items-center gap-2 mb-3">
                 <Factory
-                    class="w-4 h-4 text-brand-blue-600 dark:text-brand-blue-400"
+                    class="w-4 h-4 text-primary-600 dark:text-primary-400"
                 />
                 <label
                     class="text-xs font-medium text-neutral-900 dark:text-neutral-100 uppercase tracking-wider"
@@ -273,8 +273,8 @@
                         on:click={() => toggleBrand(brand)}
                         class="px-3 py-1.5 rounded-full text-xs font-medium transition-all duration-300 border
             {selectedBrands.includes(brand)
-                            ? 'bg-brand-blue-600 border-brand-blue-600 text-white shadow-md'
-                            : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-brand-blue-300'}"
+                            ? 'bg-primary-600 border-primary-600 text-white shadow-md'
+                            : 'bg-neutral-50 dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-primary-300'}"
                     >
                         {brand}
                     </button>
@@ -330,7 +330,7 @@
                         >
                         {#if esf !== null}
                             <button
-                                class="text-[10px] text-brand-blue-600 hover:underline"
+                                class="text-[10px] text-primary-600 hover:underline"
                                 on:click={() => {
                                     esf = null;
                                     applyFilters();
@@ -362,7 +362,7 @@
                         >
                         {#if cil !== null}
                             <button
-                                class="text-[10px] text-brand-blue-600 hover:underline"
+                                class="text-[10px] text-primary-600 hover:underline"
                                 on:click={() => {
                                     cil = null;
                                     applyFilters();
@@ -395,7 +395,7 @@
                         >
                         {#if add !== null}
                             <button
-                                class="text-[10px] text-brand-blue-600 hover:underline"
+                                class="text-[10px] text-primary-600 hover:underline"
                                 on:click={() => {
                                     add = null;
                                     applyFilters();
@@ -439,7 +439,7 @@
     >
         <div class="text-sm text-neutral-600 dark:text-neutral-400">
             <span
-                class="font-semibold text-brand-blue-600 dark:text-brand-blue-400"
+                class="font-semibold text-primary-600 dark:text-primary-400"
                 >{loading ? "..." : totalResults}</span
             > lentes encontradas
         </div>
