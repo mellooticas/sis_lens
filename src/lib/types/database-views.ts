@@ -178,20 +178,67 @@ export interface VContactLens {
 // ============================================================================
 
 export interface VCanonicalLens {
-  id: string;
-  fingerprint: string;
+  canonical_lens_id: string;
   canonical_name: string;
+  fingerprint: string;
+  is_premium: boolean;
   slug: string | null;
   lens_type: string;
   material: string;
   refractive_index: number;
+  category: string | null;
   anti_reflective: boolean;
+  anti_scratch: boolean;
+  uv_filter: boolean;
+  blue_light: boolean;
   photochromic: string | null;
   spherical_min: number | null;
   spherical_max: number | null;
-  mapped_lens_count: number;
-  mapped_supplier_count: number;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  addition_min: number | null;
+  addition_max: number | null;
+  global_mapped_count: number;
+  global_supplier_count: number;
   has_premium_mapping: boolean;
+  tenant_mapped_count: number;
+  tenant_min_price: number | null;
+  tenant_max_price: number | null;
+  created_at: string;
+}
+
+export interface VCanonicalLensOption {
+  canonical_lens_id: string;
+  canonical_name: string;
+  lens_id: string;
+  lens_name: string;
+  brand_name: string | null;
+  is_premium: boolean;
+  supplier_id: string;
+  supplier_name: string | null;
+  price_cost: number;
+  final_price: number;
+  lead_time_days: number;
+  stock_available: number;
+  confidence_score: number;
+  match_method: string;
+  lens_type: string;
+  material: string;
+  refractive_index: number;
+  anti_reflective: boolean;
+  blue_light: boolean;
+  photochromic: string | null;
+  spherical_min: number | null;
+  spherical_max: number | null;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  addition_min: number | null;
+  addition_max: number | null;
+  is_preferred: boolean;
+  effective_markup: number | null;
+  margin_percent: number | null;
+  has_discount: boolean;
+  mapped_at: string;
 }
 
 // ============================================================================
@@ -224,6 +271,7 @@ export interface RpcContactLensSearchResult {
 export interface VCatalogLensStats {
   total_lenses: number;
   total_active: number;
+  total_brands: number;
   total_premium: number;
   total_with_ar: number;
   total_with_blue: number;

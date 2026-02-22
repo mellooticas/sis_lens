@@ -5,7 +5,7 @@
 	} from "$lib/types/database-views";
 	import { TrendingDown, ShieldCheck, Zap, Sparkles } from "lucide-svelte";
 
-	export let lente: VCatalogLens | RpcLensSearchResult;
+	export let lente: VCatalogLens | RpcLensSearchResult | any;
 	export let mostrarFornecedor = true;
 	export let mostrarAlternativas = false;
 	export let onSelecionar:
@@ -37,19 +37,21 @@
 		return cores[categoria || "standard"] || cores.standard;
 	}
 
-	// Computed
+	// Computed - usando cast any para evitar lints chatos de union types incompletos
+	$: _lente = lente as any;
+
 	$: margemLucro =
-		lente.price_suggested > 0
-			? ((lente.price_suggested - lente.price_cost) /
-					lente.price_suggested) *
+		_lente.price_suggested > 0
+			? ((_lente.price_suggested - (_lente.price_cost || 0)) /
+					_lente.price_suggested) *
 				100
 			: null;
 
 	$: temTratamentos =
-		lente.anti_reflective ||
-		lente.blue_light ||
-		lente.uv_filter ||
-		(lente.photochromic && lente.photochromic !== "nenhum");
+		_lente.anti_reflective ||
+		_lente.blue_light ||
+		_lente.uv_filter ||
+		(_lente.photochromic && _lente.photochromic !== "nenhum");
 </script>
 
 <div
@@ -68,22 +70,26 @@
 	>
 		<div class="flex items-start justify-between">
 			<div class="flex-1">
-				<h3
-					class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2"
+				<a
+					href="/catalogo/lente/{_lente.id}"
+					class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 hover:text-primary-600 transition-colors"
 				>
-					{lente.lens_name}
-				</h3>
+					{_lente.lens_name || _lente.nome}
+				</a>
 				<div class="flex items-center gap-2 mt-1 flex-wrap">
-					{#if lente.category}
+					{#if _lente.category || _lente.categoria}
 						<span
 							class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {obterCorCategoria(
-								lente.category,
+								_lente.category || _lente.categoria,
 							)}"
 						>
-							{lente.category.replace("_", " ")}
+							{(_lente.category || _lente.categoria).replace(
+								"_",
+								" ",
+							)}
 						</span>
 					{/if}
-					{#if lente.is_premium}
+					{#if _lente.is_premium}
 						<span
 							class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200"
 						>
@@ -111,16 +117,16 @@
 				<div>
 					<span class="text-gray-500 dark:text-gray-400">Marca:</span>
 					<strong class="ml-1 text-gray-900 dark:text-white"
-						>{lente.brand_name || "—"}</strong
+						>{_lente.brand_name || _lente.marca || "—"}</strong
 					>
 				</div>
-				{#if mostrarFornecedor && lente.supplier_name}
+				{#if mostrarFornecedor && (_lente.supplier_name || _lente.fornecedor)}
 					<div class="text-right">
 						<span class="text-gray-500 dark:text-gray-400"
 							>Fornecedor:</span
 						>
 						<strong class="ml-1 text-gray-900 dark:text-white"
-							>{lente.supplier_name}</strong
+							>{_lente.supplier_name || _lente.fornecedor}</strong
 						>
 					</div>
 				{/if}
@@ -138,20 +144,20 @@
 				<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
 					<div class="text-gray-500 dark:text-gray-400">Marca</div>
 					<div class="font-medium text-gray-900 dark:text-white">
-						{lente.brand_name || "—"}
+						{_lente.brand_name || _lente.marca || "—"}
 					</div>
 				</div>
 			{/if}
 			<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
 				<div class="text-gray-500 dark:text-gray-400">Material</div>
 				<div class="font-medium text-gray-900 dark:text-white">
-					{lente.material || "—"}
+					{_lente.material || "—"}
 				</div>
 			</div>
 			<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
 				<div class="text-gray-500 dark:text-gray-400">Índice</div>
 				<div class="font-medium text-gray-900 dark:text-white">
-					{lente.refractive_index ?? "—"}
+					{_lente.refractive_index || _lente.indice_refracao || "—"}
 				</div>
 			</div>
 			<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
@@ -159,146 +165,125 @@
 				<div
 					class="font-medium text-gray-900 dark:text-white capitalize"
 				>
-					{(lente.lens_type || "—").replace("_", " ")}
+					{(_lente.lens_type || _lente.tipo_lente || "—").replace(
+						"_",
+						" ",
+					)}
 				</div>
 			</div>
-			{#if compact && lente.supplier_name}
+			{#if compact}
 				<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
-					<div class="text-gray-500 dark:text-gray-400">
-						Fornecedor
-					</div>
-					<div class="font-medium text-gray-900 dark:text-white">
-						{lente.supplier_name}
+					<div class="text-gray-500 dark:text-gray-400">Preço</div>
+					<div
+						class="font-bold text-primary-600 dark:text-primary-400"
+					>
+						{formatarPreco(_lente.price_suggested || _lente.preco)}
 					</div>
 				</div>
 			{/if}
 		</div>
 
 		<!-- Tratamentos -->
-		{#if temTratamentos}
-			<div class="flex flex-wrap gap-1.5" class:flex-shrink-0={compact}>
-				{#if lente.anti_reflective}
+		{#if temTratamentos && !compact}
+			<div class="flex flex-wrap gap-1.5">
+				{#if _lente.anti_reflective || _lente.tem_ar}
 					<span
-						class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-blue-50 text-blue-700 dark:bg-blue-900/30 dark:text-blue-300"
-						>AR</span
+						class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-blue-50 text-blue-700 dark:bg-blue-900 dark:text-blue-200"
 					>
-				{/if}
-				{#if lente.blue_light}
-					<span
-						class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-indigo-50 text-indigo-700 dark:bg-indigo-900/30 dark:text-indigo-300"
-						>Blue Light</span
-					>
-				{/if}
-				{#if lente.photochromic && lente.photochromic !== "nenhum"}
-					<span
-						class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-purple-50 text-purple-700 dark:bg-purple-900/30 dark:text-purple-300"
-					>
-						{lente.photochromic}
+						Antirreflexo
 					</span>
 				{/if}
-				{#if lente.uv_filter}
+				{#if _lente.blue_light || _lente.tem_blue}
 					<span
-						class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-yellow-50 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-300"
-						>UV</span
+						class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-indigo-50 text-indigo-700 dark:bg-indigo-900 dark:text-indigo-200"
 					>
+						Blue Light
+					</span>
+				{/if}
+				{#if _lente.photochromic && _lente.photochromic !== "nenhum"}
+					<span
+						class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-200"
+					>
+						{_lente.photochromic}
+					</span>
+				{:else if (_lente.photochromic && _lente.photochromic !== "nenhum") || _lente.photochromic === true}
+					<span
+						class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-200"
+					>
+						Fotossensível
+					</span>
+				{/if}
+				{#if _lente.uv_filter}
+					<span
+						class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-teal-50 text-teal-700 dark:bg-teal-900 dark:text-teal-200"
+					>
+						Filtro UV
+					</span>
 				{/if}
 			</div>
 		{/if}
 
+		<!-- Footer do Card (Preço e Ações) -->
 		{#if !compact}
-			<!-- Faixas Ópticas -->
 			<div
-				class="border-t border-gray-200 dark:border-gray-700 pt-2 text-xs text-gray-600 dark:text-gray-400"
+				class="pt-3 border-t border-gray-100 dark:border-gray-700 flex items-center justify-between"
 			>
-				<div class="grid grid-cols-2 gap-2">
-					<div>
-						<span class="font-medium">Esférico:</span>
-						{lente.spherical_min !== null
-							? ((lente.spherical_min ?? 0) > 0 ? "+" : "") +
-								lente.spherical_min
-							: "?"}
-						a
-						{lente.spherical_max !== null
-							? ((lente.spherical_max ?? 0) > 0 ? "+" : "") +
-								lente.spherical_max
-							: "?"}
+				<div>
+					<div
+						class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
+					>
+						Preço Sugerido
 					</div>
-					<div>
-						<span class="font-medium">Cilíndrico:</span>
-						{lente.cylindrical_min ?? "?"} a {lente.cylindrical_max ??
-							"?"}
+					<div
+						class="text-xl font-black text-gray-900 dark:text-white"
+					>
+						{formatarPreco(_lente.price_suggested || _lente.preco)}
 					</div>
 				</div>
-				{#if lente.addition_min !== null && lente.addition_max !== null}
-					<div class="mt-1">
-						<span class="font-medium">Adição:</span>
-						+{lente.addition_min} a +{lente.addition_max}
-					</div>
-				{/if}
+
+				<div class="flex items-center gap-2">
+					{#if onSelecionar}
+						<button
+							on:click={() => onSelecionar(_lente)}
+							class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-xs font-bold rounded-lg shadow-sm shadow-primary-500/20 transition-all"
+						>
+							Selecionar
+						</button>
+					{:else}
+						<a
+							href="/catalogo/lente/{_lente.id}"
+							class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-xs font-bold rounded-lg transition-all"
+						>
+							Ver Detalhes
+						</a>
+					{/if}
+				</div>
 			</div>
 		{/if}
-	</div>
 
-	<!-- Footer -->
-	<div
-		class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700"
-		class:border-t-0={compact}
-		class:border-l={compact}
-		class:flex-shrink-0={compact}
-	>
-		<div
-			class="flex items-center justify-between"
-			class:flex-col={compact}
-			class:items-end={compact}
-			class:gap-3={compact}
-		>
-			<div class:text-center={compact}>
-				<div class="text-xs text-gray-500 dark:text-gray-400">
-					Preço Sugerido
-				</div>
-				<div
-					class="font-bold text-gray-900 dark:text-white"
-					class:text-2xl={!compact}
-					class:text-xl={compact}
+		{#if mostrarAlternativas}
+			<div
+				class="mt-4 pt-4 border-t border-dashed border-gray-200 dark:border-gray-700"
+			>
+				<h4
+					class="text-xs font-bold text-gray-400 uppercase mb-3 flex items-center gap-2"
 				>
-					{formatarPreco(lente.price_suggested)}
+					<Sparkles class="w-3 h-3 text-amber-500" /> Alternativas Sugeridas
+				</h4>
+				<!-- Placeholder para alternativas no card -->
+				<div class="text-[10px] text-gray-500 italic">
+					Comparação de marcas disponível em detalhes.
 				</div>
-				{#if margemLucro !== null && margemLucro > 0}
-					<div class="text-xs text-green-600 dark:text-green-400">
-						Margem: {margemLucro.toFixed(0)}%
-					</div>
-				{/if}
 			</div>
-
-			<div class="flex gap-2">
-				<a
-					href="/catalogo/{lente.id}"
-					class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
-				>
-					Ver Detalhes
-				</a>
-				{#if onSelecionar}
-					<button
-						class="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2"
-						on:click={() => onSelecionar?.(lente)}
-					>
-						Selecionar
-					</button>
-				{/if}
-			</div>
-		</div>
+		{/if}
 	</div>
 </div>
 
 <style>
-	.lente-card {
-		@apply w-full max-w-md;
+	:global(.lente-card) {
+		@apply transition-all duration-300;
 	}
-
-	.line-clamp-2 {
-		display: -webkit-box;
-		-webkit-line-clamp: 2;
-		-webkit-box-orient: vertical;
-		overflow: hidden;
+	:global(.lente-card:hover) {
+		@apply -translate-y-1 shadow-xl border-primary-200 dark:border-primary-900/30;
 	}
 </style>

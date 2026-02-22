@@ -84,11 +84,11 @@ export function useGruposCanonicos() {
   }
 
   function obterGrupoGenericoPorId(id: string) {
-    return get(state).gruposGenericos.find(g => g.id === id);
+    return get(state).gruposGenericos.find(g => g.canonical_lens_id === id);
   }
 
   function obterGrupoPremiumPorId(id: string) {
-    return get(state).gruposPremium.find(g => g.id === id);
+    return get(state).gruposPremium.find(g => g.canonical_lens_id === id);
   }
 
   return {

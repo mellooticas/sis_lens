@@ -1,11 +1,11 @@
 /**
  * 🏆 Detalhes Grupo Canônico Premium - Server Load
- * Novo banco: v_catalog_lens_groups (is_premium = true) + v_catalog_lenses
+ * NOVO BANCO: v_canonical_lenses + v_canonical_lens_options
  */
 import type { PageServerLoad } from './$types';
 import { supabase } from '$lib/supabase';
 import { error } from '@sveltejs/kit';
-import type { VCatalogLensGroup, VCatalogLens } from '$lib/types/database-views';
+import type { VCanonicalLens, VCanonicalLensOption } from '$lib/types/database-views';
 
 export const load: PageServerLoad = async ({ params }) => {
   const grupoId = params.id;
@@ -15,77 +15,56 @@ export const load: PageServerLoad = async ({ params }) => {
   }
 
   try {
-    console.log('🔍 Buscando grupo premium:', grupoId);
+    console.log('🔍 [Motor Oracle] Buscando conceito premium:', grupoId);
 
-    // Buscar grupo específico com validação is_premium = true
-    let grupo: VCatalogLensGroup | null = null;
-    const { data: grupoData, error: erroGrupo } = await supabase
-      .from('v_catalog_lens_groups')
+    // Buscar o conceito canônico
+    const { data: grupo, error: erroGrupo } = await supabase
+      .from('v_canonical_lenses')
       .select('*')
-      .eq('id', grupoId)
-      .eq('is_premium', true)
+      .eq('canonical_lens_id', grupoId)
       .single();
 
-    if (erroGrupo || !grupoData) {
-      // Fallback: derivar grupo de v_catalog_lenses
-      console.warn('⚠ v_catalog_lens_groups indisponível, usando fallback');
-      const { data: ref } = await supabase
-        .from('v_catalog_lenses')
-        .select('group_id, group_name, lens_type, material, refractive_index, is_premium, tenant_id, created_at, updated_at')
-        .eq('group_id', grupoId)
-        .eq('is_premium', true)
-        .limit(1)
-        .maybeSingle();
-
-      if (!ref) {
-        throw error(404, 'Grupo premium não encontrado');
-      }
-
-      grupo = {
-        id: grupoId,
-        tenant_id: ref.tenant_id,
-        name: ref.group_name ?? grupoId,
-        lens_type: ref.lens_type,
-        material: ref.material,
-        refractive_index: ref.refractive_index,
-        is_premium: true,
-        is_active: true,
-        created_at: ref.created_at,
-        updated_at: ref.updated_at
-      };
-    } else {
-      grupo = grupoData as VCatalogLensGroup;
+    if (erroGrupo || !grupo) {
+      console.error('❌ Erro ao buscar conceito:', erroGrupo);
+      throw error(404, 'Conceito ótico não encontrado');
     }
 
-    console.log('✅ Grupo encontrado:', grupo.name);
-
-    // Buscar lentes do grupo
-    console.log('🔍 Buscando lentes do grupo:', grupoId);
-    const { data: lentes, error: erroLentes } = await supabase
-      .from('v_catalog_lenses')
+    // Buscar as lentes reais mapeadas para este conceito
+    console.log('🔍 [Motor Oracle] Buscando opções reais para o conceito:', grupoId);
+    const { data: options, error: erroOptions } = await supabase
+      .from('v_canonical_lens_options')
       .select('*')
-      .eq('group_id', grupoId)
-      .eq('status', 'active')
-      .order('price_suggested', { ascending: true });
+      .eq('canonical_lens_id', grupoId)
+      .order('final_price', { ascending: true });
 
-    if (erroLentes) {
-      console.error('❌ Erro ao buscar lentes:', erroLentes);
-      throw error(500, `Erro ao buscar lentes: ${erroLentes.message}`);
+    if (erroOptions) {
+      console.error('❌ Erro ao buscar opções:', erroOptions);
+      throw error(500, `Erro ao carregar opções de lentes: ${erroOptions.message}`);
     }
 
-    console.log('✅ Grupo Premium carregado:', {
-      grupoId,
-      nome: grupo.name,
-      total_lentes: lentes?.length || 0
-    });
+    // Adaptar para o formato que o componente LenteCard espera se necessário
+    // LenteCard espera price_suggested, mas v_canonical_lens_options usa final_price
+    const mappedLentes = (options || []).map(opt => ({
+      ...opt,
+      id: opt.lens_id,
+      price_suggested: opt.final_price,
+      // Garante campos básicos para o card
+      lens_name: opt.lens_name,
+      brand_name: opt.brand_name,
+      supplier_name: opt.supplier_name
+    }));
 
     return {
-      grupo,
-      lentes: (lentes || []) as VCatalogLens[],
+      grupo: {
+        ...grupo,
+        id: grupo.canonical_lens_id,
+        name: grupo.canonical_name
+      },
+      lentes: mappedLentes,
       sucesso: true
     };
   } catch (err) {
-    console.error('❌ Erro ao carregar grupo premium:', err);
-    throw error(500, 'Erro ao carregar detalhes do grupo');
+    console.error('❌ Erro fatal no load premium:', err);
+    throw error(500, 'Erro interno ao carregar detalhes do conceito');
   }
 };

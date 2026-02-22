@@ -261,11 +261,11 @@
                     <div
                         class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6"
                     >
-                        {#each currentGrupos as grupo (grupo.id)}
+                        {#each currentGrupos as grupo (grupo.canonical_lens_id)}
                             <div in:fade={{ duration: 200 }} class="h-full">
                                 <GrupoCanonicoCard
                                     grupo={{
-                                        id: grupo.id,
+                                        id: grupo.canonical_lens_id,
                                         name: grupo.canonical_name,
                                         lens_type: grupo.lens_type,
                                         material: grupo.material,
