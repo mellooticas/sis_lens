@@ -1,5 +1,8 @@
 node_modules
 
+# Agente AI — pasta interna, não deve ir ao repositório
+.claude/
+
 # Output
 .output
 .vercel
