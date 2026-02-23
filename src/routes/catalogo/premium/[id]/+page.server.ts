@@ -3,12 +3,12 @@
  * NOVO BANCO: v_canonical_lenses + v_canonical_lens_options
  */
 import type { PageServerLoad } from './$types';
-import { supabase } from '$lib/supabase';
 import { error } from '@sveltejs/kit';
 import type { VCanonicalLens, VCanonicalLensOption } from '$lib/types/database-views';
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
   const grupoId = params.id;
+  const { supabase } = locals;
 
   if (!grupoId) {
     throw error(400, 'ID do grupo não encontrado');
@@ -43,12 +43,10 @@ export const load: PageServerLoad = async ({ params }) => {
     }
 
     // Adaptar para o formato que o componente LenteCard espera se necessário
-    // LenteCard espera price_suggested, mas v_canonical_lens_options usa final_price
-    const mappedLentes = (options || []).map(opt => ({
+    const mappedLentes = (options || []).map((opt: any) => ({
       ...opt,
       id: opt.lens_id,
       price_suggested: opt.final_price,
-      // Garante campos básicos para o card
       lens_name: opt.lens_name,
       brand_name: opt.brand_name,
       supplier_name: opt.supplier_name
