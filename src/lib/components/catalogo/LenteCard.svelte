@@ -232,13 +232,31 @@
 					<div
 						class="text-[10px] text-gray-500 dark:text-gray-400 font-medium uppercase tracking-wider"
 					>
-						Preço Sugerido
+						{_lente.price_suggested || _lente.preco
+							? "Preço Sugerido"
+							: "Faixa de Preço"}
 					</div>
 					<div
 						class="text-xl font-black text-gray-900 dark:text-white"
 					>
-						{formatarPreco(_lente.price_suggested || _lente.preco)}
+						{#if _lente.price_suggested || _lente.preco}
+							{formatarPreco(
+								_lente.price_suggested || _lente.preco,
+							)}
+						{:else if _lente.price_min && _lente.price_max}
+							<span class="text-sm font-medium">a partir de</span>
+							{formatarPreco(_lente.price_min)}
+						{:else}
+							Sob Consulta
+						{/if}
 					</div>
+					{#if _lente.options_count}
+						<div
+							class="text-[10px] text-primary-600 dark:text-primary-400 font-bold mt-1 uppercase"
+						>
+							{_lente.options_count} opções disponíveis
+						</div>
+					{/if}
 				</div>
 
 				<div class="flex items-center gap-2">

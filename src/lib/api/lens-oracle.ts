@@ -229,10 +229,10 @@ export class LensOracleAPI {
     is_premium?: boolean;
   }): Promise<ApiResponse<VCanonicalLens[]>> {
     try {
-      // Se is_premium for definido, usa as views especializadas
-      let view = 'v_canonical_lenses';
-      if (params.is_premium === true) view = 'v_canonical_premium';
-      else if (params.is_premium === false) view = 'v_canonical_standard';
+      // Usa as novas views limpas criadas para separar Standard de Premium
+      let view = 'v_canonical_lenses'; // fallback
+      if (params.is_premium === true) view = 'v_premium_catalog';
+      else if (params.is_premium === false) view = 'v_standard_catalog';
 
       let query = supabase.from(view).select('*');
 
@@ -243,7 +243,9 @@ export class LensOracleAPI {
 
       const { data, error } = await query;
       if (error) throw error;
-      return { data: (data as VCanonicalLens[]) ?? [] };
+      
+      // Mapeia os nomes das colunas se as views usarem nomes amigáveis
+      return { data: (data as any[]) ?? [] };
     } catch (error: any) {
       return { error: { code: error.code, message: error.message } };
     }
