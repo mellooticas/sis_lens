@@ -59,11 +59,11 @@
     <Container maxWidth="xl" padding="sm">
       <div class="flex items-center justify-between py-3">
         <button
-          on:click={() => goto("/catalogo/conceitos")}
+          on:click={() => history.back()}
           class="flex items-center gap-2 text-neutral-500 hover:text-primary-600 transition-colors text-sm font-medium"
         >
           <ChevronLeft class="w-4 h-4" />
-          Voltar ao Motor de Conceitos
+          Voltar ao Catálogo
         </button>
         <div class="flex items-center gap-2">
           <Badge variant="gold" class="flex items-center gap-1">
