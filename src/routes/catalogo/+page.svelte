@@ -66,16 +66,60 @@
       loading = true;
       error = "";
 
-      const res = await LensOracleAPI.searchLenses({
-        query: filters.busca,
-        lens_type: filters.tipos[0], // O componente envia array, mas a RPC espera um valor
-        material: filters.materiais[0],
-        refractive_index: filters.indices[0],
-        has_ar: filters.tratamentos?.ar,
-        has_blue: filters.tratamentos?.blue,
-        limit: itensPorPagina,
-        offset: (paginaAtual - 1) * itensPorPagina,
-      });
+      let res;
+      
+      // Se houver filtro de grau, usamos a busca clínica por prescrição
+      if (filters.graus && (filters.graus.esferico !== null || filters.graus.cilindrico !== null)) {
+        console.log('🔍 [Motor Oracle] Executando busca clínica por prescrição...');
+        const prescRes = await LensOracleAPI.searchByPrescription({
+          lens_type: filters.tipos[0],
+          material: filters.materiais[0],
+          refractive_index: filters.indices[0],
+          spherical_needed: filters.graus.esferico,
+          cylindrical_needed: filters.graus.cilindrico,
+          addition_needed: filters.graus.adicao,
+          limit: itensPorPagina,
+          offset: (paginaAtual - 1) * itensPorPagina,
+        });
+        
+        // Mapear VCanonicalLens para o formato que a página espera (RpcLensSearchResult)
+        if (prescRes.data) {
+          res = {
+            data: prescRes.data.map(g => ({
+              id: g.canonical_lens_id,
+              slug: g.slug,
+              lens_name: g.canonical_name,
+              brand_name: 'Conceito Canônico',
+              supplier_name: `${g.tenant_mapped_count || 0} opções`,
+              lens_type: g.lens_type,
+              material: g.material,
+              refractive_index: g.refractive_index,
+              price_suggested: g.tenant_min_price || 0,
+              category: g.category,
+              has_ar: g.anti_reflective,
+              has_blue: g.blue_light,
+              group_name: g.canonical_name,
+              stock_available: 0,
+              lead_time_days: 0,
+              is_premium: g.is_premium
+            }))
+          };
+        } else {
+          res = prescRes;
+        }
+      } else {
+        // Busca padrão por texto/filtros técnicos
+        res = await LensOracleAPI.searchLenses({
+          query: filters.busca,
+          lens_type: filters.tipos[0],
+          material: filters.materiais[0],
+          refractive_index: filters.indices[0],
+          has_ar: filters.tratamentos?.ar,
+          has_blue: filters.tratamentos?.blue,
+          limit: itensPorPagina,
+          offset: (paginaAtual - 1) * itensPorPagina,
+        });
+      }
 
       if (res.data) {
         lentes = res.data;

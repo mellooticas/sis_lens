@@ -14,7 +14,7 @@ export type ISODateString = string;
 // SESSÃO / IDENTIDADE (JWT Gateway)
 // ============================================================================
 
-export interface AppSession {
+export interface Session {
   user: {
     id: UserId;
     email: string;
@@ -26,14 +26,18 @@ export interface AppSession {
   loading: boolean;
 }
 
+/** @deprecated Use Session */
+export interface AppSession extends Session { }
+
+
 // ============================================================================
 // DOMÍNIO: Lentes e Catálogo
 // ============================================================================
 
-export interface Lens extends VCatalogLens {}
-export interface ContactLens extends VContactLens {}
-export interface Brand extends VBrand {}
-export interface CanonicalLens extends VCanonicalLens {}
+export interface Lens extends VCatalogLens { }
+export interface ContactLens extends VContactLens { }
+export interface Brand extends VBrand { }
+export interface CanonicalLens extends VCanonicalLens { }
 
 // Rank criteria according to SIS Lens logic
 export type RankingCriteria = 'normal' | 'urgent' | 'special';
@@ -120,7 +124,7 @@ export interface FiltrosBusca {
 }
 
 /** @deprecated */
-export interface OpcaoRanking extends RankingOption {}
+export interface OpcaoRanking extends RankingOption { }
 
 /** @deprecated */
 export interface FiltrosRanking {
@@ -143,5 +147,6 @@ export interface PayloadDecisao {
   alternativas: unknown[];
 }
 
-/** @deprecated Use AppSession */
-export type Session = AppSession;
+/** @deprecated Use Session */
+// export type Session = Session; // Already defined as interface above
+
