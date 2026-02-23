@@ -24,6 +24,8 @@
  *   v_catalog_lenses, v_catalog_lens_stats, v_brands, v_brands_by_manufacturer
  *   v_canonical_lenses, v_canonical_lens_options, v_canonicalization_coverage
  *   v_contact_lenses, v_contact_lens_brand_stats, v_pricing_profiles, v_pricing_book
+ *   v_system_health_audit, v_pricing_organism_health, v_contact_pricing_health, v_global_catalog_summary
+ *   v_technical_commercial_catalog
  */
 
 import { supabase } from '$lib/supabase';
@@ -119,7 +121,7 @@ export class LensOracleAPI {
         p_price_max:        params.price_max         ?? null,
         p_has_ar:           params.has_ar            ?? null,
         p_has_blue:         params.has_blue          ?? null,
-        p_supplier_id:      params.supplier_id       ?? null,
+        p_supplier_lab_id:  params.supplier_id       ?? null,
         p_brand_name:       params.brand_name        ?? null,
         p_limit:            params.limit             ?? 50,
         p_offset:           params.offset            ?? 0,
@@ -436,6 +438,88 @@ export class LensOracleAPI {
       }
 
       return { data: results };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // SAÚDE DO SISTEMA & ORGANISMO VIVO
+  // ════════════════════════════════════════════════════════════
+
+  /**
+   * Auditoria de saúde vital do sistema (Migration 238).
+   */
+  static async getSystemHealthAudit(): Promise<ApiResponse<any[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_system_health_audit')
+        .select('*');
+      if (error) throw error;
+      return { data: data ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Resumo global do catálogo (Oftálmicas vs Contato) (Migration 241).
+   */
+  static async getGlobalCatalogSummary(): Promise<ApiResponse<any[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_global_catalog_summary')
+        .select('*');
+      if (error) throw error;
+      return { data: data ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Saúde do Organismo de Precificação (Migration 240).
+   */
+  static async getPricingOrganismHealth(): Promise<ApiResponse<any[]>> {
+    try {
+      const { data, error } = await supabase
+        .from('v_pricing_organism_health')
+        .select('*');
+      if (error) throw error;
+      return { data: data ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Calibra o Organismo Vivo de Precificação (Migration 240).
+   */
+  static async autotunePricing(targetFloor = 250, targetCeilingFactor = 4.0): Promise<ApiResponse<any>> {
+    try {
+      const { data, error } = await supabase.rpc('fn_autotune_pricing', {
+        p_target_floor: targetFloor,
+        p_target_ceiling_factor: targetCeilingFactor
+      });
+      if (error) throw error;
+      return { data };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Catálogo de Lentes com Abstração Comercial (Migration 237).
+   */
+  static async getTechnicalCommercialCatalog(params: { limit?: number; offset?: number }): Promise<ApiResponse<any[]>> {
+    try {
+      let query = supabase.from('v_technical_commercial_catalog').select('*');
+      if (params.limit) query = query.limit(params.limit);
+      if (params.offset) query = query.range(params.offset, params.offset + (params.limit ?? 10) - 1);
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return { data: data ?? [] };
     } catch (error: any) {
       return { error: { code: error.code, message: error.message } };
     }
