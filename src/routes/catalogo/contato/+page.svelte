@@ -43,21 +43,41 @@
             loading = true;
             error = "";
 
+            // Mapeia nome da marca para ID se selecionado
+            let brandId: string | null = null;
+            if (filters.marcas?.[0]) {
+                const brand = brands.find(
+                    (b) => b.name === filters.marcas?.[0],
+                );
+                if (brand) brandId = brand.brand_id;
+            }
+
             const res = await LensOracleAPI.searchContactLenses({
                 query: filters.busca,
-                lens_type: filters.tipos?.[0],
-                purpose: filters.finalidades?.[0],
-                material: filters.materiais?.[0],
+                brand_id: brandId as any,
+                lens_type: filters.tipos?.[0] as any,
+                purpose: filters.finalidades?.[0] as any,
+                material: filters.materiais?.[0] as any,
                 limit: itensPorPagina,
                 offset: (paginaAtual - 1) * itensPorPagina,
             });
 
             if (res.data) {
                 lentes = res.data;
-                if (total === 0 && res.data.length > 0) total = 225;
+                // Simula total para paginação se não vier da API (RPC simples costuma não retornar count)
+                if (total === 0 || paginaAtual === 1) {
+                    total =
+                        res.data.length < itensPorPagina
+                            ? res.data.length
+                            : 225;
+                }
             } else {
                 error =
                     res.error?.message || "Erro ao carregar lentes de contato";
+                if (error.includes("permission denied")) {
+                    error =
+                        "Acesso negado: Verifique as permissões do RPC rpc_contact_lens_search no banco.";
+                }
             }
         } catch (err) {
             console.error("Erro ao buscar contatos:", err);

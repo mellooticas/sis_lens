@@ -343,38 +343,11 @@
     {/each}
   </nav>
 
-  <!-- Footer: tema + usuário -->
-  <div
-    class="border-t border-neutral-200 dark:border-neutral-700 p-2 shrink-0 space-y-1"
-  >
+  <!-- Footer: tema -->
+  <div class="border-t border-neutral-200 dark:border-neutral-700 p-2 shrink-0">
     <!-- Theme Toggle -->
     <div class="flex items-center justify-center py-1">
       <ThemeToggle size="sm" />
-    </div>
-
-    <!-- User stub -->
-    <div
-      class="flex items-center gap-2.5 px-2 py-2 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors duration-150 cursor-pointer"
-    >
-      <div
-        class="shrink-0 w-8 h-8 rounded-full bg-primary-600 flex items-center justify-center text-white text-xs font-semibold"
-      >
-        U
-      </div>
-      {#if !collapsed}
-        <div class="overflow-hidden">
-          <p
-            class="text-xs font-medium text-neutral-800 dark:text-neutral-200 truncate leading-none mb-0.5"
-          >
-            Usuário
-          </p>
-          <p
-            class="text-[11px] text-neutral-500 dark:text-neutral-500 truncate leading-none"
-          >
-            SIS Lens
-          </p>
-        </div>
-      {/if}
     </div>
   </div>
 </aside>
