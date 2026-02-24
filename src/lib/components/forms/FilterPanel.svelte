@@ -181,7 +181,8 @@
         <div class="checkbox-grid">
           {#each marcasDisponiveis as marca}
             <Checkbox
-              checked={filters.marcas?.includes(marca) || false}
+              value={marca}
+              group={filters.marcas?.includes(marca) ? marca : ''}
               label={marca}
               on:change={() => toggleMarca(marca)}
             />
@@ -195,7 +196,8 @@
         <div class="checkbox-grid">
           {#each tratamentosDisponiveis as tratamento}
             <Checkbox
-              checked={filters.tratamentos?.includes(tratamento) || false}
+              value={tratamento}
+              group={filters.tratamentos?.includes(tratamento) ? tratamento : ''}
               label={tratamento}
               on:change={() => toggleTratamento(tratamento)}
             />

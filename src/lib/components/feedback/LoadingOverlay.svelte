@@ -19,7 +19,7 @@
     <div class="loading-content">
       {#if showLogo}
         <div class="mb-6 animate-pulse">
-          <Logo size="lg" theme="auto" />
+          <Logo size="lg" />
         </div>
       {/if}
       

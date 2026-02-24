@@ -1,17 +1,35 @@
 <script lang="ts">
 	import { onMount } from 'svelte';
 	import { useFiltros, useMarcas, useFornecedores } from '$lib/hooks';
-	import type { BuscarLentesParams, TipoLente, Material, IndiceRefracao, Categoria } from '$lib/types/views';
-	
-	export let filtrosAtuais: BuscarLentesParams = {};
-	export let onAplicar: (filtros: BuscarLentesParams) => void;
+
+	// Extended filter params used by this component
+	type FiltrosLocais = {
+		tipo_lente?: string;
+		material?: string;
+		indice_refracao?: number;
+		categoria?: string;
+		marca_id?: string;
+		fornecedor_id?: string;
+		apenas_premium?: boolean;
+		com_ar?: boolean;
+		com_blue?: boolean;
+		com_fotossensivel?: boolean;
+		com_polarizado?: boolean;
+		com_uv400?: boolean;
+		preco_min?: number;
+		preco_max?: number;
+		[key: string]: unknown;
+	};
+
+	export let filtrosAtuais: FiltrosLocais = {};
+	export let onAplicar: (filtros: FiltrosLocais) => void;
 	export let onLimpar: (() => void) | undefined = undefined;
-	
+
 	const { state: filtrosState, carregarFiltros } = useFiltros();
 	const { state: marcasState, carregarMarcas } = useMarcas();
 	const { state: fornecedoresState, carregarFornecedores } = useFornecedores();
-	
-	let filtrosLocais: BuscarLentesParams = { ...filtrosAtuais };
+
+	let filtrosLocais: FiltrosLocais = { ...filtrosAtuais };
 	let expanded = false;
 	
 	onMount(async () => {
@@ -92,7 +110,7 @@
 					>
 						<option value={undefined}>Todos os tipos</option>
 						{#each $filtrosState.filtros.tipos_lente as tipo}
-							<option value={tipo}>{tipo.replace('_', ' ')}</option>
+							<option value={tipo.valor}>{tipo.label}</option>
 						{/each}
 					</select>
 				</div>
@@ -134,24 +152,7 @@
 				</div>
 			{/if}
 			
-			<!-- Categoria -->
-			{#if $filtrosState.filtros?.categorias}
-				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						Categoria
-					</label>
-					<select
-						bind:value={filtrosLocais.categoria}
-						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
-					>
-						<option value={undefined}>Todas as categorias</option>
-						{#each $filtrosState.filtros.categorias as cat}
-							<option value={cat}>{cat.replace('_', ' ')}</option>
-						{/each}
-					</select>
-				</div>
-			{/if}
-			
+				
 			<!-- Marca -->
 			{#if $marcasState.marcas.length > 0}
 				<div>
@@ -164,8 +165,8 @@
 					>
 						<option value={undefined}>Todas as marcas</option>
 						{#each $marcasState.marcas as marca}
-							<option value={marca.id}>
-								{marca.nome} {marca.is_premium ? '★' : ''}
+							<option value={marca.brand_id}>
+								{marca.name} {marca.is_premium ? '★' : ''}
 							</option>
 						{/each}
 					</select>
@@ -184,63 +185,9 @@
 					>
 						<option value={undefined}>Todos os fornecedores</option>
 						{#each $fornecedoresState.fornecedores as fornecedor}
-							<option value={fornecedor.id}>{fornecedor.nome}</option>
+							<option value={fornecedor.id}>{fornecedor.name}</option>
 						{/each}
 					</select>
-				</div>
-			{/if}
-			
-			<!-- Tratamentos -->
-			{#if $filtrosState.filtros?.tratamentos_disponiveis}
-				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
-						Tratamentos
-					</label>
-					<div class="space-y-2">
-						{#if $filtrosState.filtros.tratamentos_disponiveis.ar}
-							<label class="flex items-center">
-								<input
-									type="checkbox"
-									bind:checked={filtrosLocais.com_ar}
-									class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-								/>
-								<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Antirreflexo (AR)</span>
-							</label>
-						{/if}
-						
-						{#if $filtrosState.filtros.tratamentos_disponiveis.blue}
-							<label class="flex items-center">
-								<input
-									type="checkbox"
-									bind:checked={filtrosLocais.com_blue}
-									class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-								/>
-								<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Filtro Blue Light</span>
-							</label>
-						{/if}
-						
-						{#if $filtrosState.filtros.tratamentos_disponiveis.polarizado}
-							<label class="flex items-center">
-								<input
-									type="checkbox"
-									bind:checked={filtrosLocais.com_polarizado}
-									class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-								/>
-								<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Polarizado</span>
-							</label>
-						{/if}
-						
-						{#if $filtrosState.filtros.tratamentos_disponiveis.uv400}
-							<label class="flex items-center">
-								<input
-									type="checkbox"
-									bind:checked={filtrosLocais.com_uv400}
-									class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-								/>
-								<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">UV400</span>
-							</label>
-						{/if}
-					</div>
 				</div>
 			{/if}
 			

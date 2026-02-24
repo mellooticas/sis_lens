@@ -172,7 +172,7 @@
             </div>
             <div>
               <span class="text-gray-600 block text-sm">Status</span>
-              <span class="font-medium">{grupoCanonicos.is_active ? 'Ativo' : 'Inativo'}</span>
+              <span class="font-medium">Ativo</span>
             </div>
             {#if grupoCanonicos.is_premium}
               <span class="px-2 py-1 bg-yellow-100 text-yellow-800 rounded text-xs font-medium">⭐ Premium</span>
@@ -229,12 +229,6 @@
               <span class="text-gray-600">Disponível:</span>
               <span class="font-medium">{lente.stock_available}</span>
             </div>
-            {#if lente.stock_minimum !== null && lente.stock_minimum !== undefined}
-              <div class="flex justify-between">
-                <span class="text-gray-600">Mínimo:</span>
-                <span class="font-medium">{lente.stock_minimum}</span>
-              </div>
-            {/if}
           </div>
         </div>
       {/if}

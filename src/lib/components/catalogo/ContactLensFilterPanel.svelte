@@ -444,7 +444,7 @@
             > lentes encontradas
         </div>
         {#if hasActiveFilters}
-            <Button variant="outline" size="sm" on:click={clearFilters}>
+            <Button variant="secondary" size="sm" on:click={clearFilters}>
                 <RotateCcw class="w-3.5 h-3.5 mr-1.5" />
                 Limpar Filtros
             </Button>

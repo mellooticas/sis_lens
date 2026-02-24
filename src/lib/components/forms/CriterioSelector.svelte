@@ -4,7 +4,7 @@
    * Urgência | Normal | Especial
    */
   
-  import type { Criterio } from '$lib/types';
+  type Criterio = 'URGENCIA' | 'NORMAL' | 'ESPECIAL';
   
   export let selected: Criterio = 'NORMAL';
   

@@ -64,7 +64,7 @@
   >
     <!-- Header -->
     <div class="drawer-header">
-      <Logo size="md" theme="auto" />
+      <Logo size="md" />
       
       <button
         class="close-btn"

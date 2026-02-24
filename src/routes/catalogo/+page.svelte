@@ -122,7 +122,7 @@
       }
 
       if (res.data) {
-        lentes = res.data;
+        lentes = res.data as RpcLensSearchResult[];
         // A RPC não retorna o total em todas as versões, mas assumimos que se vieram dados, está ok.
         // Idealmente a RPC deveria retornar o total. Por ora, usamos um placeholder ou buscamos stats.
         if (total === 0) {

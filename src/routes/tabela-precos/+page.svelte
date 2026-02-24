@@ -104,8 +104,10 @@
     });
   }
 
-  function getMarcaColor(marcaVal: string): string {
-    const cores: Record<string, string> = {
+  type BadgeVariant = "error" | "success" | "warning" | "info" | "primary" | "secondary" | "orange" | "gold" | "melhor-opcao" | "promocao" | "entrega-expressa" | "neutral";
+
+  function getMarcaColor(marcaVal: string): BadgeVariant {
+    const cores: Record<string, BadgeVariant> = {
       essilor: "primary",
       zeiss: "success",
       hoya: "warning",
@@ -115,7 +117,7 @@
     return cores[marcaVal?.toLowerCase()] || cores.default;
   }
 
-  function getTipoColor(tipo: string): string {
+  function getTipoColor(tipo: string): BadgeVariant {
     switch (tipo?.toLowerCase()) {
       case "progressive":
         return "primary";
@@ -128,7 +130,7 @@
     }
   }
 
-  function getStatusColor(status: string): string {
+  function getStatusColor(status: string): BadgeVariant {
     switch (status?.toLowerCase()) {
       case "active":
         return "success";
@@ -475,7 +477,7 @@
                     <Button
                       variant="primary"
                       size="sm"
-                      on:click={() => gerarVoucher(row)}
+                      on:click={() => gerarVoucher(row as unknown as VCatalogLens)}
                       title="Gerar Voucher"
                     >
                       🎫
@@ -484,7 +486,7 @@
                     <Button
                       variant="ghost"
                       size="sm"
-                      on:click={() => verDetalhes(row)}
+                      on:click={() => verDetalhes(row as unknown as VCatalogLens)}
                       title="Ver Detalhes"
                     >
                       👁️
@@ -701,7 +703,7 @@
           title="Configurações"
           description="Configurar fornecedores e políticas"
           actionLabel="Configurar"
-          color="purple"
+          color="orange"
           on:click={() => goto("/configuracoes")}
         />
       </div>

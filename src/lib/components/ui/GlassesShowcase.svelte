@@ -85,9 +85,9 @@
     <div class="display-card">
       <!-- Featured Glasses -->
       <div class="featured-icon" class:animate={animate && hoveredIndex === null}>
-        <GlassesIcon 
-          style={glassesStyles[selectedStyle].id} 
-          size="xl" 
+        <GlassesIcon
+          style={glassesStyles[selectedStyle].id as "round" | "aviator" | "wayfarer" | "rectangular" | "cat-eye"}
+          size="xl"
           color={glassesStyles[selectedStyle].color}
         />
       </div>
@@ -120,9 +120,9 @@
         on:mouseleave={() => hoveredIndex = null}
       >
         <div class="style-icon">
-          <GlassesIcon 
-            style={style.id} 
-            size="md" 
+          <GlassesIcon
+            style={style.id as "round" | "aviator" | "wayfarer" | "rectangular" | "cat-eye"}
+            size="md"
             color={selectedStyle === index ? style.color : '#9ca3af'}
           />
         </div>

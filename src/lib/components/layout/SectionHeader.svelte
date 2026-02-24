@@ -10,7 +10,7 @@
   export let title = '';
   export let subtitle = '';
   export let actionLabel = '';
-  export let actionVariant: 'primary' | 'outline' | 'ghost' = 'outline';
+  export let actionVariant: 'primary' | 'secondary' | 'ghost' = 'secondary';
   export let actionSize: 'sm' | 'md' | 'lg' = 'sm';
   
   const dispatch = createEventDispatcher();
@@ -32,13 +32,16 @@
     {/if}
   </div>
   
-  {#if actionLabel}
-    <Button
-      variant={actionVariant}
-      size={actionSize}
-      on:click={handleAction}
-    >
-      {actionLabel}
-    </Button>
-  {/if}
+  <div class="flex items-center gap-2">
+    <slot name="actions" />
+    {#if actionLabel}
+      <Button
+        variant={actionVariant}
+        size={actionSize}
+        on:click={handleAction}
+      >
+        {actionLabel}
+      </Button>
+    {/if}
+  </div>
 </div>

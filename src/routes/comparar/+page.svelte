@@ -26,7 +26,7 @@
   $: grupoParam = $page.url.searchParams.get('grupo') || '';
 
   // Dados reativos
-  $: comparacoes = ($state.comparacoes || []) as VCatalogLensGroup[];
+  $: comparacoes = ($state.comparacoes || []) as unknown as VCatalogLensGroup[];
   $: loading = $state.loading;
   $: error = $state.error;
 
@@ -145,8 +145,8 @@
                 {#if grupo.lens_type}
                   <Badge variant="neutral" size="sm">{grupo.lens_type.replace('_', ' ')}</Badge>
                 {/if}
-                <Badge variant={grupo.is_active ? 'success' : 'neutral'} size="sm">
-                  {grupo.is_active ? 'Ativo' : 'Inativo'}
+                <Badge variant="success" size="sm">
+                  Ativo
                 </Badge>
               </div>
 

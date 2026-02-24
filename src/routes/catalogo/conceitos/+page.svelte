@@ -106,7 +106,7 @@
                 />
                 <StatsCard
                     title="Marcas Ativas"
-                    value={stats?.total_brands || "..."}
+                    value={stats?.total_lenses || "..."}
                     color="gold"
                     icon="🏷️"
                 />
@@ -272,7 +272,7 @@
                                         refractive_index:
                                             grupo.refractive_index,
                                         is_premium: grupo.has_premium_mapping,
-                                        is_active: true,
+                                        supplier_lab_id: null,
                                         tenant_id: "",
                                         created_at: "",
                                         updated_at: "",

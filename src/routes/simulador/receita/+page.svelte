@@ -4,7 +4,7 @@
 -->
 <script lang="ts">
     import { LensOracleAPI } from "$lib/api/lens-oracle";
-    import type { RpcLensSearchResult } from "$lib/types/database-views";
+    import type { VCanonicalLens } from "$lib/types/database-views";
     import Container from "$lib/components/layout/Container.svelte";
     import PageHero from "$lib/components/layout/PageHero.svelte";
     import Button from "$lib/components/ui/Button.svelte";
@@ -26,7 +26,7 @@
     let usarMesmaReceita = false;
 
     let loading = false;
-    let resultados: RpcLensSearchResult[] = [];
+    let resultados: VCanonicalLens[] = [];
     let erro = "";
     let mostrarPreview = true;
 
@@ -57,11 +57,11 @@
         try {
             // No novo banco, as buscas por receita são otimizadas via RPC
             const res = await LensOracleAPI.searchByPrescription({
-                sphere: od.esferico,
-                cylinder: od.cilindrico,
-                addition: tipoLente !== "single_vision" ? od.adicao : undefined,
-                lens_type: tipoLente,
-                limit: 100,
+                spherical_needed:   od.esferico,
+                cylindrical_needed: od.cilindrico,
+                addition_needed:    tipoLente !== "single_vision" ? od.adicao : undefined,
+                lens_type:          tipoLente,
+                limit:              100,
             });
 
             if (res.data) {
@@ -140,35 +140,32 @@
                 <div class="receita-body">
                     <!-- Esférico -->
                     <div class="campo-receita">
-                        <label>Esférico</label>
-                        <select bind:value={od.esferico} class="select-receita">
+                        <label for="od-esf">Esférico</label>
+                        <select id="od-esf" bind:value={od.esferico} class="select-receita">
                             {#each esféricos as valor}
-                                <option value={valor}
-                                    >{formatarGrau(valor)}</option
-                                >
+                                <option value={valor}>{formatarGrau(valor)}</option>
                             {/each}
                         </select>
                     </div>
 
                     <!-- Cilíndrico -->
                     <div class="campo-receita">
-                        <label>Cilíndrico</label>
+                        <label for="od-cil">Cilíndrico</label>
                         <select
+                            id="od-cil"
                             bind:value={od.cilindrico}
                             class="select-receita"
                         >
                             {#each cilíndricos as valor}
-                                <option value={valor}
-                                    >{formatarGrau(valor)}</option
-                                >
+                                <option value={valor}>{formatarGrau(valor)}</option>
                             {/each}
                         </select>
                     </div>
 
                     <!-- Eixo -->
                     <div class="campo-receita">
-                        <label>Eixo</label>
-                        <select bind:value={od.eixo} class="select-receita">
+                        <label for="od-eixo">Eixo</label>
+                        <select id="od-eixo" bind:value={od.eixo} class="select-receita">
                             {#each eixos as valor}
                                 <option value={valor}>{valor}°</option>
                             {/each}
@@ -178,16 +175,15 @@
                     <!-- Adição (apenas para multifocal/bifocal) -->
                     {#if tipoLente !== "single_vision"}
                         <div class="campo-receita">
-                            <label>Adição</label>
+                            <label for="od-add">Adição</label>
                             <select
+                                id="od-add"
                                 bind:value={od.adicao}
                                 class="select-receita"
                             >
                                 <option value={0}>Sem adição</option>
                                 {#each adições as valor}
-                                    <option value={valor}
-                                        >{formatarGrau(valor)}</option
-                                    >
+                                    <option value={valor}>{formatarGrau(valor)}</option>
                                 {/each}
                             </select>
                         </div>
@@ -195,8 +191,9 @@
 
                     <!-- DNP -->
                     <div class="campo-receita">
-                        <label>DNP (mm)</label>
+                        <label for="od-dnp">DNP (mm)</label>
                         <input
+                            id="od-dnp"
                             type="number"
                             bind:value={od.dnp}
                             min="20"
@@ -228,40 +225,39 @@
                 <div class="receita-body">
                     <!-- Esférico -->
                     <div class="campo-receita">
-                        <label>Esférico</label>
+                        <label for="oe-esf">Esférico</label>
                         <select
+                            id="oe-esf"
                             bind:value={oe.esferico}
                             class="select-receita"
                             disabled={usarMesmaReceita}
                         >
                             {#each esféricos as valor}
-                                <option value={valor}
-                                    >{formatarGrau(valor)}</option
-                                >
+                                <option value={valor}>{formatarGrau(valor)}</option>
                             {/each}
                         </select>
                     </div>
 
                     <!-- Cilíndrico -->
                     <div class="campo-receita">
-                        <label>Cilíndrico</label>
+                        <label for="oe-cil">Cilíndrico</label>
                         <select
+                            id="oe-cil"
                             bind:value={oe.cilindrico}
                             class="select-receita"
                             disabled={usarMesmaReceita}
                         >
                             {#each cilíndricos as valor}
-                                <option value={valor}
-                                    >{formatarGrau(valor)}</option
-                                >
+                                <option value={valor}>{formatarGrau(valor)}</option>
                             {/each}
                         </select>
                     </div>
 
                     <!-- Eixo -->
                     <div class="campo-receita">
-                        <label>Eixo</label>
+                        <label for="oe-eixo">Eixo</label>
                         <select
+                            id="oe-eixo"
                             bind:value={oe.eixo}
                             class="select-receita"
                             disabled={usarMesmaReceita}
@@ -275,17 +271,16 @@
                     <!-- Adição (apenas para multifocal/bifocal) -->
                     {#if tipoLente !== "single_vision"}
                         <div class="campo-receita">
-                            <label>Adição</label>
+                            <label for="oe-add">Adição</label>
                             <select
+                                id="oe-add"
                                 bind:value={oe.adicao}
                                 class="select-receita"
                                 disabled={usarMesmaReceita}
                             >
                                 <option value={0}>Sem adição</option>
                                 {#each adições as valor}
-                                    <option value={valor}
-                                        >{formatarGrau(valor)}</option
-                                    >
+                                    <option value={valor}>{formatarGrau(valor)}</option>
                                 {/each}
                             </select>
                         </div>
@@ -293,8 +288,9 @@
 
                     <!-- DNP -->
                     <div class="campo-receita">
-                        <label>DNP (mm)</label>
+                        <label for="oe-dnp">DNP (mm)</label>
                         <input
+                            id="oe-dnp"
                             type="number"
                             bind:value={oe.dnp}
                             min="20"

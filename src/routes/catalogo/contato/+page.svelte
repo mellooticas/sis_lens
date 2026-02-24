@@ -35,8 +35,8 @@
     let showFilters = false; // Começa recolhido no novo padrão
 
     // Marcas e Fabricantes carregados no server
-    const brands: VBrand[] = data.brands || [];
-    const manufacturers: string[] = data.manufacturers || [];
+    const brands: VBrand[] = (data.brands || []).filter((b: VBrand | null): b is VBrand => b !== null);
+    const manufacturers: string[] = ((data.manufacturers || []) as (string | null)[]).filter((m): m is string => m !== null);
 
     async function carregarLentesContatos() {
         try {

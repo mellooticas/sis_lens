@@ -106,7 +106,7 @@
                     <div class="flex flex-wrap gap-3">
                         <Badge
                             variant="neutral"
-                            size="lg"
+                            size="md"
                             class="px-5 py-2 !rounded-2xl shadow-sm"
                         >
                             {(lente.lens_type || "Visão Simples").replace(
@@ -116,14 +116,14 @@
                         </Badge>
                         <Badge
                             variant="neutral"
-                            size="lg"
+                            size="md"
                             class="px-5 py-2 !rounded-2xl shadow-sm"
                         >
                             {lente.material}
                         </Badge>
                         <Badge
                             variant="neutral"
-                            size="lg"
+                            size="md"
                             class="px-5 py-2 !rounded-2xl shadow-sm"
                         >
                             n = {lente.refractive_index}
@@ -421,12 +421,12 @@
                             <Button
                                 variant="primary"
                                 fullWidth
-                                size="lg"
+                                size="md"
                                 class="!py-6 text-lg font-black rounded-2xl shadow-lg shadow-primary-500/20"
                             >
                                 Selecionar para Venda
                             </Button>
-                            <Button variant="ghost" fullWidth size="lg">
+                            <Button variant="ghost" fullWidth size="md">
                                 Adicionar ao Laboratório
                             </Button>
                         </div>

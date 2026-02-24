@@ -11,9 +11,6 @@
 	export let onSelecionar:
 		| ((lente: VCatalogLens | RpcLensSearchResult) => void)
 		| undefined = undefined;
-	export let onCompararFornecedores:
-		| ((lente: VCatalogLens | RpcLensSearchResult) => void)
-		| undefined = undefined;
 	export let compact = false;
 
 	function formatarPreco(preco: number): string {

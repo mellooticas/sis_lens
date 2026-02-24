@@ -190,7 +190,7 @@
     add !== null;
 </script>
 
-<div class="glass-panel rounded-xl p-6">
+<div class="rounded-xl p-6 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700">
   <!-- Grid de Filtros Compactos -->
   <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
     <!-- Busca Textual (Full Width em mobile) -->
@@ -211,14 +211,15 @@
 
     <!-- Tipo de Lente -->
     <div>
-      <label
+      <span
         class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5"
-        >Tipo</label
+        >Tipo</span
       >
       <select
         class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedType}
         on:change={applyFilters}
+        aria-label="Tipo de lente"
       >
         <option value="">Todos os tipos</option>
         {#each types as type}
@@ -229,14 +230,15 @@
 
     <!-- Material -->
     <div>
-      <label
+      <span
         class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5"
-        >Material</label
+        >Material</span
       >
       <select
         class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedMaterial}
         on:change={applyFilters}
+        aria-label="Material da lente"
       >
         <option value="">Todos os materiais</option>
         {#each materials as mat}
@@ -247,14 +249,15 @@
 
     <!-- Categoria -->
     <div>
-      <label
+      <span
         class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5"
-        >Categoria</label
+        >Categoria</span
       >
       <select
         class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedCategory}
         on:change={applyFilters}
+        aria-label="Categoria da lente"
       >
         <option value="">Todas as categorias</option>
         {#each categories as cat}
@@ -265,14 +268,15 @@
 
     <!-- Índice -->
     <div>
-      <label
+      <span
         class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5"
-        >Índice</label
+        >Índice</span
       >
       <select
         class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedIndex}
         on:change={applyFilters}
+        aria-label="Índice de refração"
       >
         <option value="">Todos os índices</option>
         {#each indices as idx}
@@ -283,14 +287,15 @@
 
     <!-- Faixa de Preço -->
     <div>
-      <label
+      <span
         class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1.5"
-        >Preço</label
+        >Preço</span
       >
       <select
         class="w-full px-3 py-2.5 text-sm bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-primary-500/20 focus:border-primary-500 outline-none transition-all cursor-pointer"
         bind:value={selectedPriceRange}
         on:change={applyFilters}
+        aria-label="Faixa de preço"
       >
         {#each priceRanges as range}
           <option value={range.value}>{range.label}</option>
@@ -303,9 +308,9 @@
   <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4 mb-6">
     <div class="flex items-center gap-2 mb-3">
       <Factory class="w-4 h-4 text-primary-600 dark:text-primary-400" />
-      <label
+      <span
         class="text-xs font-medium text-neutral-900 dark:text-neutral-100 uppercase tracking-wider"
-        >Laboratórios / Marcas</label
+        >Laboratórios / Marcas</span
       >
     </div>
     <div class="flex flex-wrap gap-2">
@@ -335,11 +340,11 @@
     >
       <div class="flex items-center gap-2">
         <Stethoscope
-          class="w-4 h-4 text-brand-gold-600 dark:text-brand-gold-400"
+          class="w-4 h-4 text-amber-600 dark:text-amber-400"
         />
-        <label
+        <span
           class="text-xs font-medium text-neutral-900 dark:text-neutral-100 uppercase tracking-wider"
-          >Filtrar por Receita (Grau)</label
+          >Filtrar por Receita (Grau)</span
         >
       </div>
       <div class="flex items-center gap-2 text-neutral-500">
@@ -365,6 +370,7 @@
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <label
+              for="fp-esf"
               class="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
               >Esférico (SPH)</label
             >
@@ -380,10 +386,11 @@
           </div>
           <div class="relative">
             <input
+              id="fp-esf"
               type="number"
               step="0.25"
               placeholder="0.00"
-              class="w-full px-3 py-2 text-center font-mono font-bold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-gold-500/20 outline-none"
+              class="w-full px-3 py-2 text-center font-mono font-bold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-amber-500/20 outline-none"
               bind:value={esf}
               on:input={applyFilters}
             />
@@ -397,6 +404,7 @@
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <label
+              for="fp-cil"
               class="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
               >Cilíndrico (CYL)</label
             >
@@ -412,11 +420,12 @@
           </div>
           <div class="relative">
             <input
+              id="fp-cil"
               type="number"
               step="0.25"
               max="0"
               placeholder="0.00"
-              class="w-full px-3 py-2 text-center font-mono font-bold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-gold-500/20 outline-none"
+              class="w-full px-3 py-2 text-center font-mono font-bold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-amber-500/20 outline-none"
               bind:value={cil}
               on:input={applyFilters}
             />
@@ -430,6 +439,7 @@
         <div class="space-y-2">
           <div class="flex items-center justify-between">
             <label
+              for="fp-add"
               class="text-xs font-semibold text-neutral-700 dark:text-neutral-300"
               >Adição (ADD)</label
             >
@@ -445,11 +455,12 @@
           </div>
           <div class="relative">
             <input
+              id="fp-add"
               type="number"
               step="0.25"
               min="0"
               placeholder="0.00"
-              class="w-full px-3 py-2 text-center font-mono font-bold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-brand-gold-500/20 outline-none"
+              class="w-full px-3 py-2 text-center font-mono font-bold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg focus:ring-2 focus:ring-amber-500/20 outline-none"
               bind:value={add}
               on:input={applyFilters}
             />
@@ -474,9 +485,9 @@
 
   <!-- Tratamentos (Checkboxes Horizontais com Indicador Premium) -->
   <div class="border-t border-neutral-200 dark:border-neutral-700 pt-4">
-    <label
+    <span
       class="block text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-3"
-      >Tratamentos</label
+      >Tratamentos</span
     >
     <div class="flex flex-wrap gap-3">
       <!-- Filtro Premium (Destaque) -->

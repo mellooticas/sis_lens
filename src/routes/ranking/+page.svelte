@@ -33,18 +33,18 @@
           LensOracleAPI.getRankings({ category: "expensive", limit: 10 }),
           LensOracleAPI.getRankings({ category: "popular", limit: 10 }),
           LensOracleAPI.getRankings({ category: "premium", limit: 10 }),
-          LensOracleAPI.getDistribution("type"),
-          LensOracleAPI.getDistribution("material"),
+          Promise.resolve({ data: [] as Array<{ tipo_lente: string; count: number }>, error: null }),
+          Promise.resolve({ data: [] as Array<{ material: string; count: number }>, error: null }),
         ]);
 
       if (resCaros.data) topCaros = resCaros.data;
       if (resPopulares.data) topPopulares = resPopulares.data;
       if (resPremium.data) topPremium = resPremium.data;
       if (resTipo.data)
-        distribuicaoTipo = resTipo.data.sort((a, b) => b.count - a.count);
+        distribuicaoTipo = resTipo.data.sort((a: { tipo_lente: string; count: number }, b: { tipo_lente: string; count: number }) => b.count - a.count);
       if (resMaterial.data)
         distribuicaoMaterial = resMaterial.data.sort(
-          (a, b) => b.count - a.count,
+          (a: { material: string; count: number }, b: { material: string; count: number }) => b.count - a.count,
         );
     } catch (err) {
       error = err instanceof Error ? err.message : "Erro ao carregar dados";

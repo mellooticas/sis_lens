@@ -6,8 +6,6 @@
   import Sidebar from "./Sidebar.svelte";
   import Header from "./Header.svelte";
 
-  export let currentPage = "";
-
   let sidebarCollapsed = false;
 
   function toggleSidebar() {

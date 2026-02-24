@@ -79,14 +79,7 @@
     {/if}
   </div>
 
-  <!-- Status -->
-  {#if !grupo.is_active}
-    <div class="flex flex-wrap gap-1.5" class:mb-4={!compact}>
-      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs bg-gray-100 text-gray-600 dark:bg-gray-800 dark:text-gray-400">
-        Inativo
-      </span>
-    </div>
-  {/if}
+  <!-- Status: v_catalog_lens_groups já filtra deleted_at IS NULL (sempre ativos) -->
 
 </a>
 
