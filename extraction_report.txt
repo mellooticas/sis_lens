@@ -1,0 +1,20 @@
+  [brascor.xlsx] Abas encontradas: ['multi_dig', 'bifocais', 'vs_surf', 'vs_pronta', 'color', 'multi_essilor', 'multi_essilor_color', 'vs_essilor', 'vs_kids', 'vs_essilor_pronta', 'vs_surfacada_essilor', 'promocoes_completas', 'vs_essilor_solares', 'vs_essilor_coloracao', 'multi_kodak', 'ocupacional_kodak', 'vs_kodak', 'vs_pront_kodak', 'vs_kodak_polarizada', 'vs_kodak_coloridas', 'multi_kodak_polarizada', 'multi_kodak_colorida', 'multi_espace']
+Erro processando brascor.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+  [bras_lentes_2026.xlsx] Abas encontradas: ['VS', 'multi', 'coloridas']
+Erro processando bras_lentes_2026.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+  [high_vision.xlsx] Abas encontradas: ['Planilha1']
+Erro processando high_vision.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+  [hoya.xlsx] Abas encontradas: ['vs', 'ocupacional', 'especiais']
+Erro processando hoya.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+  [lentes_express.xlsx] Abas encontradas: ['vs_pronta', 'solares_pronta']
+Erro processando lentes_express.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+  [polilux.xlsx] Abas encontradas: ['vs', 'multi', 'servicos', 'vs_surf', 'Planilha5', 'multi_surf', 'mulit_marcas', 'bifocais']
+Erro processando polilux.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+  [so_blocos.xlsx] Abas encontradas: ['vs', 'multi']
+Erro processando so_blocos.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+  [style.xlsx] Abas encontradas: ['multi', 'bifocal', 'vs_surf', 'especiais', 'marcas', 'serviccos']
+Erro processando style.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+  [sygma.xlsx] Abas encontradas: ['vs', 'vs_surf', 'color', 'bifocais', 'multi', 'multi_surf', 'multi_dig', 'multi_essilor', 'servicos']
+Erro processando sygma.xlsx: 'charmap' codec can't encode character '\u2192' in position 4: character maps to <undefined>
+Total de lentes extraídas: 0
+Total de ranges técnicos únicos: 0

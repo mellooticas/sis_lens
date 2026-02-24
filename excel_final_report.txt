@@ -1,0 +1,53 @@
+--- brascor.xlsx ---
+Cols: ['Código', 'Nome completo da lente', 'Material', 'Índice', 'Diâmetro', 'Esf Min', 'Esf Max', 'Cil Max', 'Add Min', 'Add Max', 'Alt Min', 'Alt Max', 'AWAY', 'CLARUS', 'BLUE PROT', 'CLEAN', 'WHITE', 'INCOLOR']
+Código,Nome completo da lente,Material,Índice,Diâmetro,Esf Min,Esf Max,Cil Max,Add Min,Add Max,Alt Min,Alt Max,AWAY,CLARUS,BLUE PROT,CLEAN,WHITE,INCOLOR
+9227,PRODIGE PLATINUM DIGITAL RESINA 1.50,Resina,1.5,70,-4.0,4.0,-4.0,0.5,4.0,17,20,474.0,414.0,409.0,429.0,369.0,294.0
+9754,PRODIGE PLATINUM DIGITAL RESINA 1.50,Resina,1.5,80,-4.0,4.0,-4.0,0.5,4.0,17,20,500.0,440.0,435.0,455.0,395.0,320.0
+
+--- bras_lentes_2026.xlsx ---
+Cols: ['tipo', 'modelo', 'indice', 'produto', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'diametro_1', 'diametro_2', 'preco_custo']
+tipo,modelo,indice,produto,esf_min,esf_max,cil_min,cil_max,diametro_1,diametro_2,preco_custo
+LENTES ACABADAS,CR VISÃO SIMPLES,1.49,INCOLOR SEM A.R.,-6.0,6.0,-2.0,0.0,70,65,9.0
+LENTES ACABADAS,CR VISÃO SIMPLES,1.49,INCOLOR SEM A.R. CIL. ESTENDIDO,-4.0,4.0,-4.0,-2.25,70,65,12.0
+
+--- high_vision.xlsx ---
+Cols: ['codigo_web', 'nome_completo_lente', 'linha', 'material', 'indice', 'blue', 'foto', 'marca_foto', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'design', 'diametro_mm', 'valor']
+codigo_web,nome_completo_lente,linha,material,indice,blue,foto,marca_foto,esf_min,esf_max,cil_min,cil_max,design,diametro_mm,valor
+3338,HV PRIME CR AR 1.56,HIGH VISION PRIME,CR,1.56,NAO,NAO,,-6.0,6.0,0.0,-2.0,ESF,65/70,13.0
+3339,HV PRIME CR AR 1.56 CIL EXT,HIGH VISION PRIME,CR,1.56,NAO,NAO,,-6.0,5.0,0.0,-4.0,ESF,65/70,32.0
+
+--- hoya.xlsx ---
+Cols: ['fornecedor', 'linha', 'design', 'modelo', 'tipo_lente', 'cor', 'tratamento', 'ar', 'eyvia_1_74', 'eynoa_1_67', 'eyas_1_60', 'pnx_1_53', 'organic_1_50', 'esferico', 'cilindrico', 'adicao', 'diametros', 'observacoes']
+fornecedor,linha,design,modelo,tipo_lente,cor,tratamento,ar,eyvia_1_74,eynoa_1_67,eyas_1_60,pnx_1_53,organic_1_50,esferico,cilindrico,adicao,diametros,observacoes
+HOYA,NULUX,Asférica,Miolight (neg) / Hiperlight (pos),Visão Simples,Incolor,BlueControl,SIM,,1320,,,,"-10,00 a +6,00","0,00 a -3,00",,65 / 70 / 75,Miolight para graus negativos e Hiperlight para positivos
+HOYA,NULUX,Asférica,Miolight (neg) / Hiperlight (pos),Visão Simples,Incolor,LongLife UV,SIM,,1350,1050.0,,,"-10,00 a +6,00","0,00 a -2,00",,65 / 70 / 75,
+
+--- lentes_express.xlsx ---
+Cols: ['fornecedor', 'linha', 'familia', 'produto', 'tipo_lente', 'processo', 'design', 'material', 'indice', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'ar', 'blue', 'foto', 'marca_foto', 'diametro_mm', 'codigo_web', 'valor', 'observacoes']
+fornecedor,linha,familia,produto,tipo_lente,processo,design,material,indice,esf_min,esf_max,cil_min,cil_max,ar,blue,foto,marca_foto,diametro_mm,codigo_web,valor,observacoes
+Lentes Express,Express,Prime,CR AR 1.56,VISAO_SIMPLES,ACABADA,ESF,CR,1.56,-6.0,6.0,0.0,-2.0,SIM,NAO,NAO,,65/70,3338,13.0,
+Lentes Express,Express,Prime,CR AR 1.56 CIL EXT,VISAO_SIMPLES,ACABADA,ESF,CR,1.56,-6.0,5.0,0.0,-4.0,SIM,NAO,NAO,,65/70,3339,32.0,Cilindro estendido
+
+--- polilux.xlsx ---
+Cols: ['fornecedor', 'indice_refracao', 'tipo_lente', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'valor_custo']
+fornecedor,indice_refracao,tipo_lente,tratamento,esf_min,esf_max,cil_min,cil_max,valor_custo
+POLYLUX,1.49,VISAO_SIMPLES,AR,-4.0,4.0,-2.0,0.0,10.0
+POLYLUX,1.56,VISAO_SIMPLES,INCOLOR,-6.0,6.0,-2.0,0.0,13.5
+
+--- so_blocos.xlsx ---
+Cols: ['nome_completo_lente', 'material', 'indice_refracao', 'tratamento', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'observacoes', 'preco_custo']
+nome_completo_lente,material,indice_refracao,tratamento,esf_min,esf_max,cil_min,cil_max,observacoes,preco_custo
+Lente Ac. 1.49 Incolor,Acetato,1.49,Incolor,-4.0,6.0,0.0,-2.0,,18.5
+Lente Ac. 1.49 Incolor Cil. Estendido,Acetato,1.49,Incolor,-4.0,4.0,-2.25,-4.0,Cilindrico Estendido,26.0
+
+--- style.xlsx ---
+Cols: ['codigo_item', 'nome_completo_lente', 'linha', 'modelo', 'design', 'tecnologia', 'tipo', 'material', 'indice', 'blue_uv', 'foto', 'marca_foto', 'marcacao', 'esf_min', 'esf_max', 'cil_min', 'cil_max', 'add_min', 'add_max', 'alt_min', 'alt_max', 'diametro_mm', 'Incolor', 'AR_SClean', 'SClean_Hidro', 'AR_BlueHidro']
+codigo_item,nome_completo_lente,linha,modelo,design,tecnologia,tipo,material,indice,blue_uv,foto,marca_foto,marcacao,esf_min,esf_max,cil_min,cil_max,add_min,add_max,alt_min,alt_max,diametro_mm,Incolor,AR_SClean,SClean_Hidro,AR_BlueHidro
+440,STYLE PRIMER 180 1.56 INCOLOR,STYLE,PRIMER,180,PERFORM,MULTIFOCAL,1.56,1.56,NAO,NAO,,S,-4.0,4.0,-4.0,0.0,1.0,3.5,14,26,80,124.0,183.0,243.0,313.0
+441,STYLE PRIMER 180 1.56 BLUE,STYLE,PRIMER,180,PERFORM,MULTIFOCAL,1.56,1.56,SIM,NAO,,S,-4.0,4.0,-4.0,0.0,1.0,3.5,14,26,80,162.0,221.0,281.0,351.0
+
+--- sygma.xlsx ---
+Cols: ['Categoria', 'Descrição da Lente', 'Cod. Web', 'Valor / Par', 'Grade', 'Æ']
+Categoria,Descrição da Lente,Cod. Web,Valor / Par,Grade,Æ
+Visão Simples CR,LT CR 1.49 Incolor,1,12.0,"Esf. -6,00 a +6,00Cil. 0,00 a -2,00",Ø-70/+65
+Visão Simples CR,LT CR 1.49 Incolor Cil. Ext.,1929,15.5,"Esf. -4,00 a +4,00Cil. -2,25 a -4,00",Ø-70/+65
