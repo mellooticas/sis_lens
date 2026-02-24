@@ -121,7 +121,7 @@ export class LensOracleAPI {
         p_price_max:        params.price_max         ?? null,
         p_has_ar:           params.has_ar            ?? null,
         p_has_blue:         params.has_blue          ?? null,
-        p_supplier_id:      params.supplier_id       ?? null,
+        p_supplier_lab_id:  params.supplier_id       ?? null,  // parâmetro real da migration 111
         p_brand_name:       params.brand_name        ?? null,
         p_limit:            params.limit             ?? 50,
         p_offset:           params.offset            ?? 0,

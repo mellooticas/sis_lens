@@ -108,10 +108,11 @@
         <p class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{stats.total_standard}</p>
       </div>
 
-      <!-- Fornecedores -->
+      <!-- Com Antirreflexo -->
       <div class="bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 space-y-1">
-        <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Fornecedores</p>
-        <p class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{stats.total_fornecedores}</p>
+        <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide">Com AR</p>
+        <p class="text-3xl font-bold text-neutral-900 dark:text-neutral-100">{stats.com_ar}</p>
+        <p class="text-xs text-neutral-400 dark:text-neutral-500">antirreflexo</p>
       </div>
 
       <!-- Grupos Ativos -->

@@ -101,21 +101,20 @@ export interface VCatalogLens {
 // ============================================================================
 
 /**
- * Grupo canônico de lentes (lens_groups ou derivado de canonical_lenses).
- * Usado nas páginas /catalogo/premium/[id] e /catalogo/standard/[id].
+ * Grupo canônico de lentes — view public.v_catalog_lens_groups (migration 076).
+ * Campos reais: id, tenant_id, name, lens_type, material, refractive_index,
+ *               is_premium, supplier_lab_id, created_at, updated_at
+ * NOTA: is_active NÃO existe na view (já filtra deleted_at IS NULL).
  */
 export interface VCatalogLensGroup {
   id: string;
   tenant_id: string;
   name: string;
-  slug?: string | null;
   lens_type: string | null;
   material: string | null;
   refractive_index: number | null;
   is_premium: boolean;
-  is_active: boolean;
-  mapped_lens_count?: number;
-  mapped_supplier_count?: number;
+  supplier_lab_id: string | null;
   created_at: string;
   updated_at: string;
 }
@@ -268,10 +267,13 @@ export interface RpcContactLensSearchResult {
 // NOVO BANCO — VIEW: public.v_catalog_lens_stats  (migration 111)
 // ============================================================================
 
+/**
+ * Campos reais da view public.v_catalog_lens_stats (migration 111).
+ * NOTA: total_brands NÃO existe — removido para não gerar queries erradas.
+ */
 export interface VCatalogLensStats {
   total_lenses: number;
   total_active: number;
-  total_brands: number;
   total_premium: number;
   total_with_ar: number;
   total_with_blue: number;
