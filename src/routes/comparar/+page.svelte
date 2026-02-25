@@ -77,7 +77,7 @@
 
     <!-- Busca por Grupo -->
     <section class="mt-8">
-      <div class="glass-panel rounded-xl p-6 shadow-xl max-w-2xl mx-auto">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 shadow-xl max-w-2xl mx-auto">
         <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-4">
           Buscar Grupo Canônico
         </h3>
@@ -135,7 +135,7 @@
 
         <div class="mt-6 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {#each comparacoes as grupo}
-            <div class="glass-panel rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
+            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 shadow-xl hover:shadow-2xl transition-all duration-300">
               <div class="flex flex-wrap gap-2 mb-3">
                 {#if grupo.is_premium}
                   <Badge variant="gold" size="sm">⭐ Premium</Badge>
@@ -199,7 +199,7 @@
 
         <div class="grid grid-cols-1 md:grid-cols-2 gap-6 mt-6">
           <button
-            class="glass-panel rounded-lg p-6 hover:shadow-lg transition-shadow text-left"
+            class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-6 hover:shadow-lg transition-shadow text-left"
             on:click={() => goto('/catalogo/standard')}
           >
             <p class="text-xl font-bold text-blue-600 dark:text-blue-400 mb-2">📦 Catálogo Standard</p>
@@ -209,7 +209,7 @@
           </button>
 
           <button
-            class="glass-panel rounded-lg p-6 hover:shadow-lg transition-shadow text-left"
+            class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-6 hover:shadow-lg transition-shadow text-left"
             on:click={() => goto('/catalogo/premium')}
           >
             <p class="text-xl font-bold text-yellow-600 dark:text-yellow-400 mb-2">⭐ Catálogo Premium</p>

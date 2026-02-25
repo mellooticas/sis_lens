@@ -122,7 +122,7 @@
             <!-- Barra de Ações e Filtros -->
             <div class="flex flex-col gap-4">
                 <div
-                    class="flex flex-col md:flex-row items-center justify-between gap-4 glass-panel p-3 rounded-2xl shadow-sm"
+                    class="flex flex-col md:flex-row items-center justify-between gap-4 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-3 rounded-2xl shadow-sm"
                 >
                     <!-- Segment Selector -->
                     <div
@@ -220,7 +220,7 @@
 
                 {#if $state.loading}
                     <div
-                        class="flex flex-col items-center justify-center py-24 glass-panel rounded-2xl border border-dashed text-center"
+                        class="flex flex-col items-center justify-center py-24 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl border-dashed text-center"
                     >
                         <LoadingSpinner size="lg" />
                         <p
@@ -231,7 +231,7 @@
                     </div>
                 {:else if $state.error}
                     <div
-                        class="glass-panel p-12 text-center rounded-2xl border-2 border-red-100 bg-red-50/30"
+                        class="p-12 text-center rounded-2xl border-2 border-red-100 bg-red-50/30"
                     >
                         <p class="text-red-500 font-bold mb-4">
                             {$state.error}
@@ -242,7 +242,7 @@
                     </div>
                 {:else if currentGrupos.length === 0}
                     <div
-                        class="glass-panel p-24 text-center rounded-2xl border border-dashed"
+                        class="bg-white dark:bg-neutral-900 p-24 text-center rounded-2xl border border-dashed"
                     >
                         <div class="text-6xl mb-6 opacity-20">🔍</div>
                         <h3 class="text-2xl font-bold dark:text-white mb-2">
@@ -289,7 +289,4 @@
 </main>
 
 <style>
-    :global(.glass-panel) {
-        @apply bg-white/70 dark:bg-neutral-800/70 backdrop-blur-md border border-white/20 dark:border-neutral-700/30;
-    }
 </style>

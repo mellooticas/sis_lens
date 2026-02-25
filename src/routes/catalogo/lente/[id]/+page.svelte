@@ -136,7 +136,7 @@
                     class="grid grid-cols-1 md:grid-cols-2 gap-6"
                     in:fade={{ delay: 200 }}
                 >
-                    <div class="glass-panel p-8 rounded-3xl space-y-6">
+                    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-8 rounded-3xl space-y-6">
                         <h3
                             class="text-lg font-bold flex items-center gap-3 text-neutral-900 dark:text-white"
                         >
@@ -197,7 +197,7 @@
                         </div>
                     </div>
 
-                    <div class="glass-panel p-8 rounded-3xl space-y-6">
+                    <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-8 rounded-3xl space-y-6">
                         <h3
                             class="text-lg font-bold flex items-center gap-3 text-neutral-900 dark:text-white"
                         >
@@ -520,14 +520,4 @@
 </main>
 
 <style>
-    :global(.glass-panel) {
-        background-color: rgba(255, 255, 255, 0.7);
-        backdrop-filter: blur(12px);
-        border: 1px solid rgba(255, 255, 255, 0.2);
-    }
-
-    :global(.dark .glass-panel) {
-        background-color: rgba(38, 38, 38, 0.7);
-        border-color: rgba(64, 64, 64, 0.3);
-    }
 </style>

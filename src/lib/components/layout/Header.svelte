@@ -50,7 +50,7 @@
 <header
   class="
   sticky top-4 z-40 mx-6 mt-4 rounded-2xl
-  glass-panel border-white/40 dark:border-white/10
+  bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800
   transition-all duration-300
   flex items-center justify-between px-6 py-3
 "

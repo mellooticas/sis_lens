@@ -133,7 +133,7 @@
         add !== null;
 </script>
 
-<div class="glass-panel rounded-xl p-6">
+<div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6">
     <!-- Grid de Filtros Compactos -->
     <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-4 mb-6">
         <!-- Busca Textual (Full Width em mobile) -->

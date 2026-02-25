@@ -284,7 +284,7 @@
 
     <!-- Filtros -->
     <section class="mt-12">
-      <div class="glass-panel rounded-xl p-6 shadow-xl">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 shadow-xl">
         <div class="flex items-center justify-between mb-6">
           <SectionHeader
             title="Filtros Avançados"
@@ -421,7 +421,7 @@
       {:else if temResultados}
         {#if visualizacao === "tabela"}
           <!-- Visualização Tabela -->
-          <div class="glass-panel rounded-xl p-6 shadow-xl overflow-hidden">
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 shadow-xl overflow-hidden">
             <Table headers={tableHeaders} data={lentes} hoverable striped>
               <svelte:fragment slot="cell" let:row let:column>
                 {#if column === "brand_name"}
@@ -515,7 +515,7 @@
             {#each lentes as lente}
               {@const tratamentos = getLenteTratamentos(lente)}
               <div
-                class="glass-panel rounded-xl p-4 hover:shadow-lg transition-all duration-200"
+                class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 hover:shadow-lg transition-all duration-200"
               >
                 <div class="space-y-4">
                   <!-- Header do Card -->

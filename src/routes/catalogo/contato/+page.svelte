@@ -128,7 +128,7 @@
             <!-- Filtro no Topo (Recolhível) - PADRÃO SIS LENS -->
             <div class="w-full">
                 <div
-                    class="w-full glass-panel rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
+                    class="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
                     on:click={() => (showFilters = !showFilters)}
                     on:keydown={(e) =>
                         e.key === "Enter" && (showFilters = !showFilters)}
@@ -175,7 +175,7 @@
                 {#if showFilters}
                     <div
                         transition:slide={{ duration: 300 }}
-                        class="mt-4 p-6 glass-panel rounded-xl border-primary-200/50 dark:border-primary-800/50 bg-white/50 dark:bg-neutral-800/50"
+                        class="mt-4 p-6 rounded-xl border-primary-200/50 dark:border-primary-800/50 bg-white/50 dark:bg-neutral-800/50"
                     >
                         <ContactLensFilterPanel
                             {filters}

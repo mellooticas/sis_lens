@@ -91,7 +91,7 @@
       <!-- Filtro no Topo (Recolhível) -->
       <div class="w-full">
         <div
-          class="w-full glass-panel rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
+          class="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
           on:click={() => (showFilters = !showFilters)}
           on:keydown={(e) => e.key === "Enter" && (showFilters = !showFilters)}
           role="button"
@@ -130,7 +130,7 @@
         {#if showFilters}
           <div
             transition:slide={{ duration: 300 }}
-            class="mt-4 p-6 glass-panel rounded-xl bg-white/50 dark:bg-neutral-800/50"
+            class="mt-4 p-6 rounded-xl bg-white/50 dark:bg-neutral-800/50"
           >
             <FilterPanel
               on:change={(e) =>
@@ -151,13 +151,13 @@
       <div class="flex-1">
         {#if $searchState.loading}
           <div
-            class="flex flex-col items-center justify-center py-20 glass-panel rounded-xl"
+            class="flex flex-col items-center justify-center py-20 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl"
           >
             <LoadingSpinner size="lg" />
             <p class="mt-4 text-neutral-500">Buscando coleção premium...</p>
           </div>
         {:else if $searchState.error}
-          <div class="glass-panel p-10 text-center rounded-xl border-red-200">
+          <div class="bg-white dark:bg-neutral-900 p-10 text-center rounded-xl border border-red-200">
             <p class="text-red-500 font-medium">{$searchState.error}</p>
             <Button
               class="mt-4"
@@ -167,7 +167,7 @@
             >
           </div>
         {:else if $searchState.lentes.length === 0}
-          <div class="glass-panel p-20 text-center rounded-xl">
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-20 text-center rounded-xl">
             <Crown class="w-12 h-12 text-neutral-300 mx-auto mb-4" />
             <h3 class="text-xl font-bold dark:text-white">
               Nenhum tesouro encontrado

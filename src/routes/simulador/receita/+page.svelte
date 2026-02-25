@@ -96,7 +96,7 @@
 
     <div class="mt-8 space-y-6">
         <!-- Tipo de Lente -->
-        <div class="glass-panel p-6 rounded-xl">
+        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-6 rounded-xl">
             <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
                 Tipo de Lente
             </h3>

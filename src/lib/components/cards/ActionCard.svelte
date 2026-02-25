@@ -24,7 +24,7 @@
 </script>
 
 <div
-  class="glass-panel rounded-xl p-6 hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300"
+  class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 hover:shadow-card-hover transition-all duration-300"
   class:opacity-50={disabled}
 >
   <!-- Header -->

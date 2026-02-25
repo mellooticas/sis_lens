@@ -64,7 +64,7 @@
 </script>
 
 <div
-  class="glass-panel rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300 border {currentColor.border}"
+  class="bg-white dark:bg-neutral-900 rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300 border {currentColor.border}"
 >
   <!-- Header com gradiente -->
   <div

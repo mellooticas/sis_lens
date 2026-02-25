@@ -132,7 +132,7 @@
 
           <!-- Description / Intel -->
           <div
-            class="glass-panel p-6 rounded-2xl border-l-4 border-amber-500"
+            class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border-l-4 border-amber-500"
             in:fade={{ delay: 200 }}
           >
             <div class="flex gap-4">
@@ -218,7 +218,7 @@
 
     <!-- Features & Technical Ranges -->
     <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-      <div class="glass-panel p-8 rounded-2xl h-full">
+      <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-8 rounded-2xl h-full">
         <SectionHeader
           title="🧬 Especificações Fisiológicas"
           subtitle="Range de fabricação garantido"
@@ -283,7 +283,7 @@
       </div>
 
       <div
-        class="glass-panel p-8 rounded-2xl h-full flex flex-col justify-center"
+        class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-8 rounded-2xl h-full flex flex-col justify-center"
       >
         <div class="text-center space-y-4">
           <div
@@ -332,14 +332,4 @@
 </main>
 
 <style>
-  :global(.glass-panel) {
-    background-color: rgba(255, 255, 255, 0.7);
-    backdrop-filter: blur(12px);
-    border: 1px solid rgba(255, 255, 255, 0.2);
-  }
-
-  :global(.dark .glass-panel) {
-    background-color: rgba(38, 38, 38, 0.7);
-    border-color: rgba(64, 64, 64, 0.3);
-  }
 </style>

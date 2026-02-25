@@ -191,7 +191,7 @@
 
       <!-- Stats Rápidos -->
       <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mt-8">
-        <div class="glass-panel rounded-lg p-4 text-center">
+        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4 text-center">
           <div
             class="text-2xl font-bold text-primary-600 dark:text-primary-400"
           >
@@ -201,7 +201,7 @@
             Lentes Total
           </div>
         </div>
-        <div class="glass-panel rounded-lg p-4 text-center">
+        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4 text-center">
           <div class="text-2xl font-bold text-orange-600 dark:text-orange-400">
             {lentes.length}
           </div>
@@ -209,7 +209,7 @@
             Exibindo Agora
           </div>
         </div>
-        <div class="glass-panel rounded-lg p-4 text-center">
+        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-lg p-4 text-center">
           <div
             class="text-2xl font-bold text-brand-gold-600 dark:text-brand-gold-400"
           >
@@ -228,7 +228,7 @@
       <!-- Filtros Expansíveis (Desktop) -->
       <div class="hidden md:block">
         <div
-          class="w-full glass-panel rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
+          class="w-full bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-4 flex items-center justify-between hover:shadow-lg transition-all duration-300 cursor-pointer group"
         >
           <div
             class="flex items-center gap-3 flex-1"
@@ -328,11 +328,11 @@
           on:keydown={(e) => e.key === "Enter" && toggleMobileFilters()}
         ></div>
         <aside
-          class="fixed inset-y-0 right-0 z-50 w-full max-w-md glass-panel shadow-2xl overflow-y-auto md:hidden"
+          class="fixed inset-y-0 right-0 z-50 w-full max-w-md bg-white dark:bg-neutral-900 shadow-2xl overflow-y-auto md:hidden"
           transition:fly={{ x: 300, duration: 300 }}
         >
           <div
-            class="sticky top-0 z-10 glass-panel border-b border-neutral-200 dark:border-neutral-700 p-6"
+            class="sticky top-0 z-10 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700 p-6"
           >
             <div class="flex items-center justify-between">
               <div>
@@ -398,7 +398,7 @@
       <div class="space-y-6">
         {#if loading && lentes.length === 0}
           <div
-            class="glass-panel rounded-xl p-20 flex flex-col items-center justify-center"
+            class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-20 flex flex-col items-center justify-center"
           >
             <LoadingSpinner size="lg" />
             <p class="mt-4 text-neutral-600 dark:text-neutral-400">
@@ -407,7 +407,7 @@
           </div>
         {:else if error}
           <div
-            class="glass-panel rounded-xl p-8 text-center border-2 border-error"
+            class="bg-white dark:bg-neutral-900 rounded-xl p-8 text-center border-2 border-error"
           >
             <div class="text-5xl mb-4">⚠️</div>
             <h3
@@ -421,7 +421,7 @@
             >
           </div>
         {:else if lentes.length === 0}
-          <div class="glass-panel rounded-xl p-12 text-center">
+          <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-12 text-center">
             <div class="text-6xl mb-4">🔍</div>
             <h3
               class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-3"

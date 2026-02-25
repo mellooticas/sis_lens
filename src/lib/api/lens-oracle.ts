@@ -114,18 +114,17 @@ export class LensOracleAPI {
   static async searchLenses(params: LensSearchParams): Promise<ApiResponse<RpcLensSearchResult[]>> {
     try {
       const { data, error } = await supabase.rpc('rpc_lens_search', {
-        p_lens_type:        params.lens_type        ?? null,
-        p_material:         params.material          ?? null,
-        p_refractive_index: params.refractive_index  ?? null,
-        p_price_min:        params.price_min         ?? null,
-        p_price_max:        params.price_max         ?? null,
-        p_has_ar:           params.has_ar            ?? null,
-        p_has_blue:         params.has_blue          ?? null,
-        p_supplier_lab_id:  params.supplier_id       ?? null,  // parâmetro real da migration 111
-        p_brand_name:       params.brand_name        ?? null,
-        p_limit:            params.limit             ?? 50,
-        p_offset:           params.offset            ?? 0,
-        p_tenant_id:        null,  // resolvido pelo JWT via current_tenant_id()
+        p_lens_type:   params.lens_type   ?? null,
+        p_material_id: null,               // UUID — resolver via client se necessário
+        p_price_min:   params.price_min   ?? null,
+        p_price_max:   params.price_max   ?? null,
+        p_has_ar:      params.has_ar      ?? null,
+        p_has_blue:    params.has_blue    ?? null,
+        p_supplier_id: params.supplier_id ?? null,  // migration 267: p_supplier_id (era p_supplier_lab_id)
+        p_brand_name:  params.brand_name  ?? null,
+        p_limit:       params.limit       ?? 50,
+        p_offset:      params.offset      ?? 0,
+        p_tenant_id:   null,               // resolvido pelo JWT via current_tenant_id()
       });
 
       if (error) throw error;
