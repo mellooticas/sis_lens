@@ -42,60 +42,87 @@ export type LensMaterialType =
 export type RecordStatus = 'active' | 'inactive' | 'archived';
 
 // ============================================================================
-// NOVO BANCO — VIEW: public.v_catalog_lenses  (migration 111/212)
+// NOVO BANCO — VIEW: public.v_catalog_lenses  (schema real confirmado 2026-02)
 // ============================================================================
 
 /**
  * Linha da view pública `public.v_catalog_lenses`.
- * JWT-tenant-filtered; acesso SELECT concedido ao role `authenticated`.
+ * JWT-tenant-filtered via current_tenant_id(); funciona na app com usuário logado.
+ * Colunas confirmadas via information_schema — não adicionar campos que não existem.
+ *
+ * Joins internos da view:
+ *   catalog_lenses.lenses ← base (3698 linhas em prod)
+ *   catalog_lenses.brands         (INNER JOIN por brand_id)
+ *   catalog_lenses.lens_materials (INNER JOIN por material_id)
+ *   sales_finance.suppliers       (INNER JOIN por supplier_id)
+ *   catalog_lenses.lens_matrices  (LEFT JOIN por matrix_id)
+ *   lens_treatment_links lateral  (LEFT JOIN — agrega tratamentos)
  */
 export interface VCatalogLens {
+  // ── UUIDs (chaves)
   id: string;
-  tenant_id: string;
-  supplier_lab_id: string | null;
+  tenant_id: string | null;
+  supplier_id: string | null;        // → sales_finance.suppliers.id
   brand_id: string | null;
-  lens_name: string;
-  brand_name: string | null;
-  supplier_name: string | null;
-  sku: string | null;
-  slug: string | null;
-  
+  material_id: string | null;
+  matrix_id: string | null;
   group_id: string | null;
-  group_name: string | null;
-  lens_type: string | null;
-  material: string | null;
-  refractive_index: number | null;
-  category: string | null;
-  
-  anti_reflective: boolean;
-  anti_scratch: boolean;
-  uv_filter: boolean;
-  blue_light: boolean;
-  photochromic: string | null;
-  polarized: boolean;
-  
-  digital: boolean;
-  free_form: boolean;
-  indoor: boolean;
-  drive: boolean;
-  
+
+  // ── Marca (via brands JOIN)
+  brand_name: string | null;
+  brand_slug: string | null;
+  brand_is_premium: boolean | null;
+
+  // ── Material (via lens_materials JOIN)
+  material_name: string | null;      // ex: "CR39 1.50", "HIGH_INDEX 1.67"
+  refractive_index: number | null;   // 1.50 | 1.56 | 1.59 | 1.61 | 1.67 | 1.74
+
+  // ── Fornecedor (via sales_finance.suppliers JOIN)
+  supplier_name: string | null;
+
+  // ── Faixas de prescrição (via lens_matrices LEFT JOIN)
   spherical_min: number | null;
   spherical_max: number | null;
   cylindrical_min: number | null;
   cylindrical_max: number | null;
   addition_min: number | null;
   addition_max: number | null;
-  
-  price_cost: number;
-  price_suggested: number;
-  
-  stock_available: number;
-  lead_time_days: number;
-  is_premium: boolean;
-  status: string;
-  
-  created_at: string;
-  updated_at: string;
+
+  // ── Identificação da lente
+  sku: string | null;
+  slug: string | null;
+  lens_name: string | null;
+  normalized_name: string | null;
+  lens_type: string | null;          // single_vision | multifocal | bifocal | occupational
+  category: string | null;
+
+  // ── Tratamentos (lateral aggregate)
+  treatment_names: string[] | null;  // ex: ["Anti-Reflexo", "Filtro UV"]
+  treatment_ids: string[] | null;
+
+  // ── Flags booleanos de tratamento (derivados do lateral)
+  anti_reflective: boolean | null;
+  anti_scratch: boolean | null;
+  uv_filter: boolean | null;
+  blue_light: boolean | null;
+  photochromic: boolean | null;      // boolean (não string)
+  polarized: boolean | null;
+
+  // ── Preços
+  price_cost: number | null;
+  price_suggested: number | null;
+
+  // ── Estoque
+  stock_available: number | null;
+  stock_minimum: number | null;
+  lead_time_days: number | null;
+
+  // ── Metadados
+  is_premium: boolean | null;
+  status: string | null;
+  attributes: Record<string, unknown> | null;
+  created_at: string | null;
+  updated_at: string | null;
 }
 
 // ============================================================================
@@ -398,35 +425,43 @@ export interface VCatalogLensStats {
 }
 
 // ============================================================================
-// NOVO BANCO — RPC: public.rpc_lens_search (migration 111/114)
+// NOVO BANCO — RPC: public.rpc_lens_search (assinatura real confirmada 2026-02)
 // ============================================================================
 
 /**
- * Resultado REAL de public.rpc_lens_search (migration 111).
- * Exatamente os 16 campos que a RPC retorna — não adicione campos que não existem.
+ * Resultado de public.rpc_lens_search.
+ * Retorno confirmado via pg_get_function_result:
+ *   id, lens_name, lens_type, brand_name, material_name, refractive_index,
+ *   supplier_name, spherical_min/max, cylindrical_min/max, addition_min/max,
+ *   treatment_names text[], anti_reflective, blue_light,
+ *   price_cost, price_suggested, lead_time_days, is_premium, category
  *
- * SELECT id, slug, lens_name, supplier_name, brand_name, lens_type, material,
- *        refractive_index, price_suggested, category, has_ar, has_blue,
- *        group_name, stock_available, lead_time_days, is_premium
+ * Parâmetros aceitos:
+ *   p_lens_type text, p_material_id uuid, p_price_min/max numeric,
+ *   p_has_ar boolean, p_has_blue boolean, p_supplier_id uuid,
+ *   p_brand_name text, p_limit int, p_offset int, p_tenant_id uuid
  */
 export interface RpcLensSearchResult {
   id: string;
-  slug: string | null;
   lens_name: string;
-  supplier_name: string | null;
-  brand_name: string | null;
   lens_type: string | null;
-  material: string | null;
+  brand_name: string | null;
+  material_name: string | null;      // era "material" — campo real é material_name
   refractive_index: number | null;
-  price_suggested: number;
+  supplier_name: string | null;
+  spherical_min: number | null;
+  spherical_max: number | null;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  addition_min: number | null;
+  addition_max: number | null;
+  treatment_names: string[] | null;
+  anti_reflective: boolean | null;
+  blue_light: boolean | null;
+  price_cost: number | null;
+  price_suggested: number | null;
+  lead_time_days: number | null;
+  is_premium: boolean | null;
   category: string | null;
-  /** Alias para anti_reflective — campo has_ar no retorno da RPC */
-  has_ar: boolean;
-  /** Alias para blue_light — campo has_blue no retorno da RPC */
-  has_blue: boolean;
-  group_name: string | null;
-  stock_available: number;
-  lead_time_days: number;
-  is_premium: boolean;
 }
 
