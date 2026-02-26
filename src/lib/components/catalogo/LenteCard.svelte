@@ -48,7 +48,7 @@
 		_lente.anti_reflective ||
 		_lente.blue_light ||
 		_lente.uv_filter ||
-		(_lente.photochromic && _lente.photochromic !== "nenhum");
+		!!_lente.photochromic;
 </script>
 
 <div
@@ -148,7 +148,7 @@
 			<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
 				<div class="text-gray-500 dark:text-gray-400">Material</div>
 				<div class="font-medium text-gray-900 dark:text-white">
-					{_lente.material || "—"}
+					{_lente.material_name || "—"}
 				</div>
 			</div>
 			<div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
@@ -197,13 +197,7 @@
 						Blue Light
 					</span>
 				{/if}
-				{#if _lente.photochromic && _lente.photochromic !== "nenhum"}
-					<span
-						class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-200"
-					>
-						{_lente.photochromic}
-					</span>
-				{:else if (_lente.photochromic && _lente.photochromic !== "nenhum") || _lente.photochromic === true}
+				{#if _lente.photochromic}
 					<span
 						class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-medium bg-purple-50 text-purple-700 dark:bg-purple-900 dark:text-purple-200"
 					>

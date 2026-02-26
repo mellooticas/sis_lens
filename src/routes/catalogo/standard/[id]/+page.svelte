@@ -67,8 +67,6 @@
         if (l.blue_light)      t.push('Blue Cut');
         if (l.photochromic)    t.push('Fotossensível');
         if (l.polarized)       t.push('Polarizado');
-        if (l.digital)         t.push('Digital');
-        if (l.free_form)       t.push('Free Form');
         return t;
     }
 
@@ -272,9 +270,9 @@
                                     {#if lentePreferida.lens_sku}
                                         <div class="font-mono text-[11px] text-neutral-400 mt-0.5">{lentePreferida.lens_sku}</div>
                                     {/if}
-                                    {#if lentePreferida.material || lentePreferida.refractive_index}
+                                    {#if lentePreferida.material_name || lentePreferida.refractive_index}
                                         <div class="text-xs text-neutral-500 mt-1">
-                                            {lentePreferida.material ?? ''}{lentePreferida.material && lentePreferida.refractive_index ? ' · ' : ''}{lentePreferida.refractive_index ? `n = ${lentePreferida.refractive_index}` : ''}
+                                            {lentePreferida.material_name ?? ''}{lentePreferida.material_name && lentePreferida.refractive_index ? ' · ' : ''}{lentePreferida.refractive_index ? `n = ${lentePreferida.refractive_index}` : ''}
                                         </div>
                                     {/if}
                                     {#if getTratamentosLente(lentePreferida).length > 0}
@@ -318,9 +316,9 @@
                                     {#if lente.lens_sku}
                                         <div class="font-mono text-[10px] text-neutral-400 mt-0.5">{lente.lens_sku}</div>
                                     {/if}
-                                    {#if lente.material || lente.refractive_index}
+                                    {#if lente.material_name || lente.refractive_index}
                                         <div class="text-[11px] text-neutral-400 mt-1">
-                                            {lente.material ?? ''}{lente.material && lente.refractive_index ? ' · ' : ''}{lente.refractive_index ? `n = ${lente.refractive_index}` : ''}
+                                            {lente.material_name ?? ''}{lente.material_name && lente.refractive_index ? ' · ' : ''}{lente.refractive_index ? `n = ${lente.refractive_index}` : ''}
                                         </div>
                                     {/if}
                                     {#if getTratamentosLente(lente).length > 0}

@@ -372,12 +372,10 @@ export interface CanonicalDetailEnriched extends CanonicalDetail {
   anti_scratch?: boolean;
   uv_filter?: boolean;
   blue_light?: boolean;
-  photochromic?: string | null;
+  photochromic?: boolean;        // boolean — confirmado via information_schema
   polarized?: boolean;
-  digital?: boolean;
-  free_form?: boolean;
   refractive_index?: number | null;
-  material?: string | null;
+  material_name?: string | null;  // coluna real em v_catalog_lenses (não "material")
 }
 
 // ============================================================================

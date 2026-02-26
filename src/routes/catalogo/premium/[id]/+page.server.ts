@@ -67,7 +67,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
         if (lensIds.length > 0) {
             const { data: detalhes } = await supabase
                 .from('v_catalog_lenses')
-                .select('id, sku, anti_reflective, anti_scratch, uv_filter, blue_light, photochromic, polarized, digital, free_form, refractive_index, material')
+                .select('id, sku, anti_reflective, anti_scratch, uv_filter, blue_light, photochromic, polarized, refractive_index, material_name')
                 .in('id', lensIds);
 
             const mapaDetalhe = new Map<string, Record<string, unknown>>(
@@ -84,12 +84,10 @@ export const load: PageServerLoad = async ({ params, locals }) => {
                     anti_scratch: d.anti_scratch as boolean | undefined,
                     uv_filter: d.uv_filter as boolean | undefined,
                     blue_light: d.blue_light as boolean | undefined,
-                    photochromic: d.photochromic as string | null | undefined,
+                    photochromic: d.photochromic as boolean | undefined,
                     polarized: d.polarized as boolean | undefined,
-                    digital: d.digital as boolean | undefined,
-                    free_form: d.free_form as boolean | undefined,
                     refractive_index: d.refractive_index as number | null | undefined,
-                    material: d.material as string | null | undefined,
+                    material_name: d.material_name as string | null | undefined,
                 };
             });
         }
