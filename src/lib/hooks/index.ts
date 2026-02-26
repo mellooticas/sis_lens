@@ -12,4 +12,3 @@ export { useMarcas } from './useMarcas';
 export { useFornecedores } from './useFornecedores';
 export { useFiltros } from './useFiltros';
 export { useGruposCanonicos } from './useGruposCanonicos';
-export { useCompararFornecedores } from './useCompararFornecedores';

@@ -3,41 +3,36 @@
  * O Cérebro Clínico e Comercial do Ecossistema SIS_DIGIAI
  *
  * Banco: mhgbuplnxtfgipbemchb
- * Alinhado com as assinaturas REAIS das RPCs (migrations 111, 208, 210, 212, 214, 274–278)
  *
- * ── Canonical Engine v2 (migrations 274–278) ───────────────────────────────
- * Views canônicas:
- *   v_canonical_lenses                    — conceitos standard (SKU CST)
- *   v_canonical_lenses_premium            — conceitos premium (SKU CPR)
- *   v_canonical_lenses_pricing            — standard com pricing agregado
- *   v_canonical_lenses_premium_pricing    — premium com pricing agregado
- * RPCs canônicas:
- *   rpc_canonical_for_prescription(p_spherical, p_cylindrical, p_addition, p_lens_type, p_is_premium)
- *   rpc_canonical_detail(p_canonical_id, p_is_premium)
+ * ── Canonical Engine v2 (migrations 274–278) ─────────────────────────────
+ * Views:   v_canonical_lenses(_pricing) | v_canonical_lenses_premium(_pricing)
+ * RPCs:    rpc_canonical_for_prescription(5 params) | rpc_canonical_detail(2 params)
+ * Métodos: searchByPrescriptionV2, getCanonicalDetail
+ *          getCanonicalStandardWithPricing, getCanonicalPremiumWithPricing
+ *          getCanonicalLenses, getCanonicalStandard, getCanonicalPremium
  *
- * ── Catalog & Search (migrations 111, 208, 210, 212, 214) ─────────────────
- *   rpc_lens_search(...)
- *   rpc_lens_get_alternatives(...)
- *   rpc_contact_lens_search(...)
- *   rpc_brands_list(...)
- *   rpc_pricing_simulate(...)
+ * ── Catálogo & Busca (migrations 111, 208, 210, 214) ─────────────────────
+ * RPCs: rpc_lens_search | rpc_lens_get_alternatives | rpc_contact_lens_search
+ *       rpc_brands_list | rpc_pricing_simulate
+ * Métodos: searchLenses, getAlternatives, searchContactLenses
+ *          getContactLensById, getBrands, getCatalogStats, simulatePricing
+ *          getRankings, getSystemHealthAudit, getGlobalCatalogSummary
+ *          getPricingOrganismHealth, autotunePricing, getTechnicalCommercialCatalog
  */
 
 import { supabase } from '$lib/supabase';
 import type {
-  VCatalogLens,
   VContactLens,
   VBrand,
   VCatalogLensStats,
   RpcLensSearchResult,
   RpcContactLensSearchResult,
-  VCanonicalLens,
   CanonicalLensV2,
   CanonicalWithPricing,
   PrescriptionSearchResult,
   CanonicalDetail,
 } from '$lib/types/database-views';
-import type { ApiResponse, RankingOption } from '$lib/types/sistema';
+import type { ApiResponse } from '$lib/types/sistema';
 
 // ──────────────────────────────────────────────────────────────
 // Tipos internos alinhados ao banco novo
@@ -60,21 +55,6 @@ export interface LensSearchParams {
   brand_name?: string;
   /** Filtrar por is_premium — feito via brand check no JS (banco não tem parâmetro direto) */
   is_premium?: boolean;
-  limit?: number;
-  offset?: number;
-}
-
-export interface CanonicalSearchParams {
-  lens_type?: string;
-  material?: string;
-  refractive_index?: number;
-  anti_reflective?: boolean;
-  photochromic?: string;
-  /** Grau esférico da receita */
-  spherical_needed?: number;
-  /** Grau cilíndrico da receita */
-  cylindrical_needed?: number;
-  addition_needed?: number;
   limit?: number;
   offset?: number;
 }
@@ -170,50 +150,6 @@ export class LensOracleAPI {
       }
 
       return { data: results };
-    } catch (error: any) {
-      return { error: { code: error.code, message: error.message } };
-    }
-  }
-
-  /**
-   * Busca por prescrição/receita usando rpc_canonical_search (Migration 212).
-   * Este é o "motor clínico" — encontra conceitos canônicos que cobrem a receita.
-   */
-  static async searchByPrescription(params: CanonicalSearchParams): Promise<ApiResponse<VCanonicalLens[]>> {
-    try {
-      const { data, error } = await supabase.rpc('rpc_canonical_search', {
-        p_lens_type:          params.lens_type          ?? null,
-        p_material:           params.material           ?? null,
-        p_refractive_index:   params.refractive_index   ?? null,
-        p_anti_reflective:    params.anti_reflective    ?? null,
-        p_photochromic:       params.photochromic       ?? null,
-        p_spherical_needed:   params.spherical_needed   ?? null,
-        p_cylindrical_needed: params.cylindrical_needed ?? null,
-        p_addition_needed:    params.addition_needed    ?? null,
-        p_limit:              params.limit              ?? 20,
-        p_offset:             params.offset             ?? 0,
-      });
-
-      if (error) throw error;
-      return { data: (data as VCanonicalLens[]) ?? [] };
-    } catch (error: any) {
-      return { error: { code: error.code, message: error.message } };
-    }
-  }
-
-  /**
-   * Detalhes completos de uma lente oftálmica (via view v_catalog_lenses).
-   */
-  static async getLensById(id: string): Promise<ApiResponse<VCatalogLens>> {
-    try {
-      const { data, error } = await supabase
-        .from('v_catalog_lenses')
-        .select('*')
-        .eq('id', id)
-        .single();
-
-      if (error) throw error;
-      return { data: data as VCatalogLens };
     } catch (error: any) {
       return { error: { code: error.code, message: error.message } };
     }
@@ -368,48 +304,6 @@ export class LensOracleAPI {
 
       if (error) throw error;
       return { data: (data as CanonicalDetail[]) ?? [] };
-    } catch (error: any) {
-      return { error: { code: error.code, message: error.message } };
-    }
-  }
-
-  /**
-   * @deprecated Use searchByPrescriptionV2. Mantido para compat com migration 212.
-   */
-  static async searchByPrescription(params: CanonicalSearchParams): Promise<ApiResponse<VCanonicalLens[]>> {
-    try {
-      const { data, error } = await supabase.rpc('rpc_canonical_search', {
-        p_lens_type:          params.lens_type          ?? null,
-        p_material:           params.material           ?? null,
-        p_refractive_index:   params.refractive_index   ?? null,
-        p_anti_reflective:    params.anti_reflective    ?? null,
-        p_photochromic:       params.photochromic       ?? null,
-        p_spherical_needed:   params.spherical_needed   ?? null,
-        p_cylindrical_needed: params.cylindrical_needed ?? null,
-        p_addition_needed:    params.addition_needed    ?? null,
-        p_limit:              params.limit              ?? 20,
-        p_offset:             params.offset             ?? 0,
-      });
-
-      if (error) throw error;
-      return { data: (data as VCanonicalLens[]) ?? [] };
-    } catch (error: any) {
-      return { error: { code: error.code, message: error.message } };
-    }
-  }
-
-  /**
-   * @deprecated Melhor opção de compra — legado migration 212.
-   */
-  static async getBestPurchaseOptions(canonicalId: string, limit = 5): Promise<ApiResponse<RankingOption[]>> {
-    try {
-      const { data, error } = await supabase.rpc('rpc_canonical_best_purchase', {
-        p_canonical_lens_id: canonicalId,
-        p_limit:             limit,
-      });
-
-      if (error) throw error;
-      return { data: (data as RankingOption[]) ?? [] };
     } catch (error: any) {
       return { error: { code: error.code, message: error.message } };
     }

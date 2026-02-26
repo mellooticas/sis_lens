@@ -1,10 +1,7 @@
 /**
  * SIS Lens — API Index
- * Fonte única da verdade: LensOracleAPI + DecisionAPI
- *
  * Ecossistema SIS_DIGIAI — banco mhgbuplnxtfgipbemchb
- * Todas as leituras via Views (public.v_*) e escritas/buscas via RPCs (public.rpc_*)
+ * Canonical Engine v2 (migrations 274–278) + Catálogo (111, 208, 210, 214)
  */
 
 export * from './lens-oracle';
-export * from './decisao';
