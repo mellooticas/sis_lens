@@ -6,7 +6,7 @@
     import { goto } from "$app/navigation";
     import { fade, fly } from "svelte/transition";
     import type { PageData } from "./$types";
-    import type { CanonicalDetail } from "$lib/types/database-views";
+    import type { CanonicalDetailEnriched } from "$lib/types/database-views";
 
     // Componentes
     import Container from "$lib/components/layout/Container.svelte";
@@ -21,7 +21,7 @@
     export let data: PageData;
 
     $: conceito = data.conceito;
-    $: lentes = (data.lentes || []) as CanonicalDetail[];
+    $: lentes = (data.lentes || []) as CanonicalDetailEnriched[];
 
     function formatarPreco(valor: number | null | undefined): string {
         if (valor == null) return "—";
@@ -47,6 +47,19 @@
             blue: "Blue Cut", uv: "UV", photo: "Fotossensível",
         };
         return mapa[code] ?? code.toUpperCase();
+    }
+
+    function getTratamentosLente(l: CanonicalDetailEnriched): string[] {
+        const t: string[] = [];
+        if (l.anti_reflective) t.push('Anti-Reflexo');
+        if (l.anti_scratch)    t.push('Anti-Risco');
+        if (l.uv_filter)       t.push('UV');
+        if (l.blue_light)      t.push('Blue Cut');
+        if (l.photochromic)    t.push('Fotossensível');
+        if (l.polarized)       t.push('Polarizado');
+        if (l.digital)         t.push('Digital');
+        if (l.free_form)       t.push('Free Form');
+        return t;
     }
 
     $: lentePreferida = lentes.find((l) => l.is_preferred);
@@ -240,10 +253,25 @@
                             <span class="text-sm font-bold text-amber-700 dark:text-amber-400">Opção Preferida</span>
                         </div>
                         <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-300 dark:border-amber-700 rounded-2xl p-6">
-                            <div class="flex flex-col md:flex-row md:items-center justify-between gap-4">
-                                <div>
+                            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
+                                <div class="flex-1">
                                     <div class="font-bold text-neutral-900 dark:text-white text-lg">{lentePreferida.lens_name}</div>
                                     <div class="text-sm text-neutral-500">{lentePreferida.brand_name ?? '—'} · {lentePreferida.supplier_name ?? '—'}</div>
+                                    {#if lentePreferida.lens_sku}
+                                        <div class="font-mono text-[11px] text-neutral-400 mt-0.5">{lentePreferida.lens_sku}</div>
+                                    {/if}
+                                    {#if lentePreferida.material || lentePreferida.refractive_index}
+                                        <div class="text-xs text-neutral-500 mt-1">
+                                            {lentePreferida.material ?? ''}{lentePreferida.material && lentePreferida.refractive_index ? ' · ' : ''}{lentePreferida.refractive_index ? `n = ${lentePreferida.refractive_index}` : ''}
+                                        </div>
+                                    {/if}
+                                    {#if getTratamentosLente(lentePreferida).length > 0}
+                                        <div class="flex flex-wrap gap-1 mt-2">
+                                            {#each getTratamentosLente(lentePreferida) as trat}
+                                                <span class="px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/40 text-amber-700 dark:text-amber-300 text-[10px] font-bold rounded uppercase">{trat}</span>
+                                            {/each}
+                                        </div>
+                                    {/if}
                                 </div>
                                 <div class="flex items-center gap-6">
                                     <div class="text-center">
@@ -273,6 +301,21 @@
                                     <div class="text-xs text-neutral-500 mt-0.5">{lente.brand_name ?? '—'}</div>
                                     {#if lente.supplier_name}
                                         <div class="text-xs text-neutral-400 mt-0.5">🚚 {lente.supplier_name}</div>
+                                    {/if}
+                                    {#if lente.lens_sku}
+                                        <div class="font-mono text-[10px] text-neutral-400 mt-0.5">{lente.lens_sku}</div>
+                                    {/if}
+                                    {#if lente.material || lente.refractive_index}
+                                        <div class="text-[11px] text-neutral-400 mt-1">
+                                            {lente.material ?? ''}{lente.material && lente.refractive_index ? ' · ' : ''}{lente.refractive_index ? `n = ${lente.refractive_index}` : ''}
+                                        </div>
+                                    {/if}
+                                    {#if getTratamentosLente(lente).length > 0}
+                                        <div class="flex flex-wrap gap-1 mt-2">
+                                            {#each getTratamentosLente(lente) as trat}
+                                                <span class="px-1 py-0.5 bg-amber-50 dark:bg-amber-900/30 text-amber-600 dark:text-amber-400 text-[9px] font-bold rounded uppercase leading-none">{trat}</span>
+                                            {/each}
+                                        </div>
                                     {/if}
                                 </div>
                                 <div class="space-y-1.5 border-t border-neutral-100 dark:border-neutral-800 pt-3">

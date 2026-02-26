@@ -13,13 +13,13 @@
   export let currentPage = '';
   
   const navItems = [
-    { id: 'home',      label: 'Dashboard',           href: '/',                    icon: '🏠' },
-    { id: 'conceitos', label: 'Conceitos Canônicos', href: '/catalogo/conceitos',  icon: '🧠' },
-    { id: 'standard',  label: 'Lentes Standard',     href: '/catalogo/standard',   icon: '📦' },
-    { id: 'premium',   label: 'Lentes Premium',      href: '/catalogo/premium',    icon: '✨' },
-    { id: 'contato',   label: 'Lentes de Contato',   href: '/catalogo/contato',    icon: '👁️' },
-    { id: 'simulador', label: 'Simulador',            href: '/simulador/receita',   icon: '⚡' },
-    { id: 'ranking',   label: 'Ranking',              href: '/ranking',             icon: '🏆' },
+    { id: 'home',      label: 'Dashboard',   href: '/',                   icon: '🏠' },
+    { id: 'lentes',    label: 'Lentes',      href: '/catalogo/lentes',    icon: '🔭' },
+    { id: 'standard',  label: 'Standard',    href: '/catalogo/standard',  icon: '📦' },
+    { id: 'premium',   label: 'Premium',     href: '/catalogo/premium',   icon: '✨' },
+    { id: 'contato',   label: 'Contato',     href: '/catalogo/contato',   icon: '👁️' },
+    { id: 'simulador', label: 'Simulador',   href: '/simulador/receita',  icon: '⚡' },
+    { id: 'ranking',   label: 'Ranking',     href: '/ranking',            icon: '🏆' },
   ];
   
   function handleClose() {

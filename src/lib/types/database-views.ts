@@ -336,6 +336,23 @@ export interface CanonicalDetail {
   match_method: string;
 }
 
+/**
+ * CanonicalDetail enriquecido com dados técnicos reais de v_catalog_lenses.
+ * Gerado no server load ao cruzar rpc_canonical_detail + v_catalog_lenses.
+ */
+export interface CanonicalDetailEnriched extends CanonicalDetail {
+  anti_reflective?: boolean;
+  anti_scratch?: boolean;
+  uv_filter?: boolean;
+  blue_light?: boolean;
+  photochromic?: string | null;
+  polarized?: boolean;
+  digital?: boolean;
+  free_form?: boolean;
+  refractive_index?: number | null;
+  material?: string | null;
+}
+
 // ============================================================================
 // NOVO BANCO — RPC: public.rpc_contact_lens_search (migration 214)
 // ============================================================================

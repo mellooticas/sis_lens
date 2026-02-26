@@ -30,26 +30,26 @@
       label: "Catálogos",
       items: [
         {
-          id: "conceitos",
-          label: "Conceitos Canônicos",
-          href: "/catalogo/conceitos",
-          icon: "brain",
+          id: "lentes",
+          label: "Lentes",
+          href: "/catalogo/lentes",
+          icon: "grid",
         },
         {
           id: "standard",
-          label: "Lentes Standard",
+          label: "Standard",
           href: "/catalogo/standard",
           icon: "box",
         },
         {
           id: "premium",
-          label: "Lentes Premium",
+          label: "Premium",
           href: "/catalogo/premium",
           icon: "sparkles",
         },
         {
           id: "contato",
-          label: "Lentes de Contato",
+          label: "Contato",
           href: "/catalogo/contato",
           icon: "eye",
         },
@@ -187,7 +187,7 @@
                     d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
                   />
                 </svg>
-              {:else if item.icon === "brain"}
+              {:else if item.icon === "grid"}
                 <svg
                   fill="none"
                   viewBox="0 0 24 24"
@@ -198,7 +198,7 @@
                     stroke-linecap="round"
                     stroke-linejoin="round"
                     stroke-width="1.75"
-                    d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1m-1.636 6.364l-.707-.707M12 21v-1m-6.364-1.636l.707-.707M3 12h1m1.636-6.364l.707.707M12 9a3 3 0 100 6 3 3 0 000-6z"
+                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
                   />
                 </svg>
               {:else if item.icon === "box"}

@@ -1,10 +1,11 @@
 /**
  * 📚 Detalhes Conceito Canônico Standard — Server Load
  * Canonical Engine v2: v_canonical_lenses_pricing + rpc_canonical_detail (migration 278).
+ * Enriquece cada lente com dados técnicos reais de v_catalog_lenses.
  */
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import type { CanonicalWithPricing, CanonicalDetail } from '$lib/types/database-views';
+import type { CanonicalWithPricing, CanonicalDetail, CanonicalDetailEnriched } from '$lib/types/database-views';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     const conceitoId = params.id;
@@ -40,7 +41,7 @@ export const load: PageServerLoad = async ({ params, locals }) => {
             // Retorna sem pricing
             return {
                 conceito: conceitoBase as CanonicalWithPricing,
-                lentes: [] as CanonicalDetail[],
+                lentes: [] as CanonicalDetailEnriched[],
                 isPremium: false,
                 sucesso: true
             };
@@ -58,9 +59,45 @@ export const load: PageServerLoad = async ({ params, locals }) => {
             console.error('⚠️ Erro ao buscar lentes do conceito (não fatal):', erroLentes);
         }
 
+        const lentesBase = (lentes || []) as CanonicalDetail[];
+
+        // Enriquecer com dados técnicos reais de v_catalog_lenses
+        let lentesEnriquecidas: CanonicalDetailEnriched[] = lentesBase;
+        const lensIds = lentesBase.map((l) => l.lens_id).filter(Boolean);
+
+        if (lensIds.length > 0) {
+            const { data: detalhes } = await supabase
+                .from('v_catalog_lenses')
+                .select('id, sku, anti_reflective, anti_scratch, uv_filter, blue_light, photochromic, polarized, digital, free_form, refractive_index, material')
+                .in('id', lensIds);
+
+            const mapaDetalhe = new Map<string, Record<string, unknown>>(
+                (detalhes || []).map((d: Record<string, unknown>) => [d.id as string, d])
+            );
+
+            lentesEnriquecidas = lentesBase.map((l) => {
+                const d = mapaDetalhe.get(l.lens_id);
+                if (!d) return l;
+                return {
+                    ...l,
+                    lens_sku: l.lens_sku ?? (d.sku as string | null) ?? null,
+                    anti_reflective: d.anti_reflective as boolean | undefined,
+                    anti_scratch: d.anti_scratch as boolean | undefined,
+                    uv_filter: d.uv_filter as boolean | undefined,
+                    blue_light: d.blue_light as boolean | undefined,
+                    photochromic: d.photochromic as string | null | undefined,
+                    polarized: d.polarized as boolean | undefined,
+                    digital: d.digital as boolean | undefined,
+                    free_form: d.free_form as boolean | undefined,
+                    refractive_index: d.refractive_index as number | null | undefined,
+                    material: d.material as string | null | undefined,
+                };
+            });
+        }
+
         return {
             conceito: conceito as CanonicalWithPricing,
-            lentes: (lentes || []) as CanonicalDetail[],
+            lentes: lentesEnriquecidas,
             isPremium: false,
             sucesso: true
         };
