@@ -3,29 +3,24 @@
  * O Cérebro Clínico e Comercial do Ecossistema SIS_DIGIAI
  *
  * Banco: mhgbuplnxtfgipbemchb
- * Alinhado com as assinaturas REAIS das RPCs (migrations 111, 208, 210, 212, 214)
- * Verificado via Migration 219 (audit) e 220 (data verification)
+ * Alinhado com as assinaturas REAIS das RPCs (migrations 111, 208, 210, 212, 214, 274–278)
  *
- * RPCs disponíveis (public schema):
- *   rpc_lens_search(p_lens_type, p_material, p_refractive_index, p_price_min, p_price_max,
- *                   p_has_ar, p_has_blue, p_supplier_id, p_brand_name, p_limit, p_offset, p_tenant_id)
- *   rpc_lens_get_alternatives(p_lens_id, p_limit, p_tenant_id)
- *   rpc_canonical_search(p_lens_type, p_material, p_refractive_index, p_anti_reflective,
- *                        p_photochromic, p_spherical_needed, p_cylindrical_needed,
- *                        p_addition_needed, p_limit, p_offset)
- *   rpc_canonical_best_purchase(p_canonical_lens_id, p_limit)
- *   rpc_contact_lens_search(p_brand_id, p_lens_type, p_purpose, p_material,
- *                           p_is_colored, p_can_sleep_with, p_premium_only,
- *                           p_spherical_needed, p_cylindrical_needed, p_search, p_limit, p_offset)
- *   rpc_brands_list(p_scope, p_premium_only, p_visible_only, p_search, p_limit, p_offset)
- *   rpc_pricing_simulate(p_cost, p_supplier_id, p_category)
+ * ── Canonical Engine v2 (migrations 274–278) ───────────────────────────────
+ * Views canônicas:
+ *   v_canonical_lenses                    — conceitos standard (SKU CST)
+ *   v_canonical_lenses_premium            — conceitos premium (SKU CPR)
+ *   v_canonical_lenses_pricing            — standard com pricing agregado
+ *   v_canonical_lenses_premium_pricing    — premium com pricing agregado
+ * RPCs canônicas:
+ *   rpc_canonical_for_prescription(p_spherical, p_cylindrical, p_addition, p_lens_type, p_is_premium)
+ *   rpc_canonical_detail(p_canonical_id, p_is_premium)
  *
- * Views disponíveis (public schema):
- *   v_catalog_lenses, v_catalog_lens_stats, v_brands, v_brands_by_manufacturer
- *   v_canonical_lenses, v_canonical_lens_options, v_canonicalization_coverage
- *   v_contact_lenses, v_contact_lens_brand_stats, v_pricing_profiles, v_pricing_book
- *   v_system_health_audit, v_pricing_organism_health, v_contact_pricing_health, v_global_catalog_summary
- *   v_technical_commercial_catalog
+ * ── Catalog & Search (migrations 111, 208, 210, 212, 214) ─────────────────
+ *   rpc_lens_search(...)
+ *   rpc_lens_get_alternatives(...)
+ *   rpc_contact_lens_search(...)
+ *   rpc_brands_list(...)
+ *   rpc_pricing_simulate(...)
  */
 
 import { supabase } from '$lib/supabase';
@@ -37,6 +32,10 @@ import type {
   RpcLensSearchResult,
   RpcContactLensSearchResult,
   VCanonicalLens,
+  CanonicalLensV2,
+  CanonicalWithPricing,
+  PrescriptionSearchResult,
+  CanonicalDetail,
 } from '$lib/types/database-views';
 import type { ApiResponse, RankingOption } from '$lib/types/sistema';
 
@@ -76,6 +75,31 @@ export interface CanonicalSearchParams {
   /** Grau cilíndrico da receita */
   cylindrical_needed?: number;
   addition_needed?: number;
+  limit?: number;
+  offset?: number;
+}
+
+/** Parâmetros para busca por receita no Canonical Engine v2 */
+export interface PrescriptionSearchParams {
+  /** Grau esférico (ex: -3.00) */
+  spherical: number;
+  /** Grau cilíndrico (ex: -1.50, zero se não astigmata) */
+  cylindrical?: number;
+  /** Adição multifocal (ex: +2.00) */
+  addition?: number;
+  /** Tipo de lente: 'single_vision' | 'multifocal' | 'bifocal' | ... */
+  lens_type?: string;
+  /** true = busca em premium, false = busca em standard */
+  is_premium?: boolean;
+  limit?: number;
+}
+
+/** Parâmetros para buscar conceitos canônicos com pricing */
+export interface CanonicalPricingParams {
+  lens_type?: string;
+  material_class?: string;
+  refractive_index?: number;
+  search?: string;
   limit?: number;
   offset?: number;
 }
@@ -214,68 +238,168 @@ export class LensOracleAPI {
   }
 
   // ════════════════════════════════════════════════════════════
-  // CANONICALIZAÇÃO & RANKING (O "Cérebro")
+  // CANONICAL ENGINE v2 — Motor de Conceitos (migrations 274–278)
   // ════════════════════════════════════════════════════════════
 
   /**
-   * Busca conceitos canônicos únicos (view v_canonical_lenses).
+   * Busca conceitos canônicos STANDARD com pricing agregado.
+   * View: v_canonical_lenses_pricing (migration 277)
+   * Retorna: sku (CST...), price_min/max/avg, cost ranges, markup ranges.
    */
-  static async getCanonicalLenses(params: {
-    lens_type?: string;
-    material?: string;
-    refractive_index?: number;
-    limit?: number;
-    is_premium?: boolean;
-  }): Promise<ApiResponse<VCanonicalLens[]>> {
+  static async getCanonicalStandardWithPricing(params: CanonicalPricingParams = {}): Promise<ApiResponse<CanonicalWithPricing[]>> {
     try {
-      // Usa as novas views limpas criadas para separar Standard de Premium
-      let view = 'v_canonical_lenses'; // fallback
-      if (params.is_premium === true) view = 'v_premium_catalog';
-      else if (params.is_premium === false) view = 'v_standard_catalog';
-
-      let query = supabase.from(view).select('*');
+      let query = supabase.from('v_canonical_lenses_pricing').select('*');
 
       if (params.lens_type)        query = query.eq('lens_type', params.lens_type);
-      if (params.material)         query = query.eq('material', params.material);
+      if (params.material_class)   query = query.eq('material_class', params.material_class);
       if (params.refractive_index) query = query.eq('refractive_index', params.refractive_index);
+      if (params.search)           query = query.ilike('canonical_name', `%${params.search}%`);
       if (params.limit)            query = query.limit(params.limit);
+      if (params.offset)           query = query.range(params.offset, params.offset + (params.limit ?? 50) - 1);
+
+      query = query.order('canonical_name', { ascending: true });
 
       const { data, error } = await query;
       if (error) throw error;
-      
-      // Mapeia os nomes das colunas se as views usarem nomes amigáveis
-      return { data: (data as any[]) ?? [] };
+      return { data: (data as CanonicalWithPricing[]) ?? [] };
     } catch (error: any) {
       return { error: { code: error.code, message: error.message } };
     }
   }
 
   /**
-   * Atalho para buscar apenas canônicas Premium.
+   * Busca conceitos canônicos PREMIUM com pricing agregado.
+   * View: v_canonical_lenses_premium_pricing (migration 277)
+   * Retorna: sku (CPR...), price_min/max/avg, cost ranges, markup ranges.
    */
-  static async getCanonicalPremium(params: {
-    lens_type?: string;
-    material?: string;
-    refractive_index?: number;
-    limit?: number;
-  }): Promise<ApiResponse<VCanonicalLens[]>> {
-    return LensOracleAPI.getCanonicalLenses({ ...params, is_premium: true });
+  static async getCanonicalPremiumWithPricing(params: CanonicalPricingParams = {}): Promise<ApiResponse<CanonicalWithPricing[]>> {
+    try {
+      let query = supabase.from('v_canonical_lenses_premium_pricing').select('*');
+
+      if (params.lens_type)        query = query.eq('lens_type', params.lens_type);
+      if (params.material_class)   query = query.eq('material_class', params.material_class);
+      if (params.refractive_index) query = query.eq('refractive_index', params.refractive_index);
+      if (params.search)           query = query.ilike('canonical_name', `%${params.search}%`);
+      if (params.limit)            query = query.limit(params.limit);
+      if (params.offset)           query = query.range(params.offset, params.offset + (params.limit ?? 50) - 1);
+
+      query = query.order('canonical_name', { ascending: true });
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return { data: (data as CanonicalWithPricing[]) ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
   }
 
   /**
-   * Atalho para buscar apenas canônicas Standard.
+   * Busca conceitos canônicos sem pricing (view base).
+   * Standard: v_canonical_lenses | Premium: v_canonical_lenses_premium
    */
-  static async getCanonicalStandard(params: {
+  static async getCanonicalLenses(params: {
     lens_type?: string;
-    material?: string;
+    material_class?: string;
     refractive_index?: number;
     limit?: number;
-  }): Promise<ApiResponse<VCanonicalLens[]>> {
+    is_premium?: boolean;
+  }): Promise<ApiResponse<CanonicalLensV2[]>> {
+    try {
+      const view = params.is_premium ? 'v_canonical_lenses_premium' : 'v_canonical_lenses';
+      let query = supabase.from(view).select('*');
+
+      if (params.lens_type)        query = query.eq('lens_type', params.lens_type);
+      if (params.material_class)   query = query.eq('material_class', params.material_class);
+      if (params.refractive_index) query = query.eq('refractive_index', params.refractive_index);
+      if (params.limit)            query = query.limit(params.limit);
+
+      const { data, error } = await query;
+      if (error) throw error;
+      return { data: (data as CanonicalLensV2[]) ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /** Atalho: canonical premium sem pricing */
+  static async getCanonicalPremium(params: { lens_type?: string; material_class?: string; limit?: number } = {}): Promise<ApiResponse<CanonicalLensV2[]>> {
+    return LensOracleAPI.getCanonicalLenses({ ...params, is_premium: true });
+  }
+
+  /** Atalho: canonical standard sem pricing */
+  static async getCanonicalStandard(params: { lens_type?: string; material_class?: string; limit?: number } = {}): Promise<ApiResponse<CanonicalLensV2[]>> {
     return LensOracleAPI.getCanonicalLenses({ ...params, is_premium: false });
   }
 
   /**
-   * Melhor opção de compra para um conceito canônico (ranking de fornecedores).
+   * Busca por prescrição oftalmológica — Canonical Engine v2.
+   * RPC: rpc_canonical_for_prescription (migration 278)
+   * Retorna conceitos que cobrem a receita com pricing do tenant.
+   * Tenant isolado via require_tenant_id() dentro da RPC.
+   */
+  static async searchByPrescriptionV2(params: PrescriptionSearchParams): Promise<ApiResponse<PrescriptionSearchResult[]>> {
+    try {
+      const { data, error } = await supabase.rpc('rpc_canonical_for_prescription', {
+        p_spherical:   params.spherical,
+        p_cylindrical: params.cylindrical ?? null,
+        p_addition:    params.addition    ?? null,
+        p_lens_type:   params.lens_type   ?? null,
+        p_is_premium:  params.is_premium  ?? false,
+      });
+
+      if (error) throw error;
+      return { data: (data as PrescriptionSearchResult[]) ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Detalhes de um conceito canônico — lentes reais mapeadas com preços.
+   * RPC: rpc_canonical_detail (migration 278)
+   * Retorna: lentes do tenant ordenadas por is_preferred DESC, sell_price ASC.
+   */
+  static async getCanonicalDetail(canonicalId: string, isPremium = false): Promise<ApiResponse<CanonicalDetail[]>> {
+    try {
+      const { data, error } = await supabase.rpc('rpc_canonical_detail', {
+        p_canonical_id: canonicalId,
+        p_is_premium:   isPremium,
+      });
+
+      if (error) throw error;
+      return { data: (data as CanonicalDetail[]) ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * @deprecated Use searchByPrescriptionV2. Mantido para compat com migration 212.
+   */
+  static async searchByPrescription(params: CanonicalSearchParams): Promise<ApiResponse<VCanonicalLens[]>> {
+    try {
+      const { data, error } = await supabase.rpc('rpc_canonical_search', {
+        p_lens_type:          params.lens_type          ?? null,
+        p_material:           params.material           ?? null,
+        p_refractive_index:   params.refractive_index   ?? null,
+        p_anti_reflective:    params.anti_reflective    ?? null,
+        p_photochromic:       params.photochromic       ?? null,
+        p_spherical_needed:   params.spherical_needed   ?? null,
+        p_cylindrical_needed: params.cylindrical_needed ?? null,
+        p_addition_needed:    params.addition_needed    ?? null,
+        p_limit:              params.limit              ?? 20,
+        p_offset:             params.offset             ?? 0,
+      });
+
+      if (error) throw error;
+      return { data: (data as VCanonicalLens[]) ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * @deprecated Melhor opção de compra — legado migration 212.
    */
   static async getBestPurchaseOptions(canonicalId: string, limit = 5): Promise<ApiResponse<RankingOption[]>> {
     try {

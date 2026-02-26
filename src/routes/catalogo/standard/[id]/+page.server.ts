@@ -1,68 +1,72 @@
 /**
- * 📚 Detalhes Grupo Canônico Standard - Server Load
- * NOVO BANCO: v_canonical_lenses + v_canonical_lens_options
+ * 📚 Detalhes Conceito Canônico Standard — Server Load
+ * Canonical Engine v2: v_canonical_lenses_pricing + rpc_canonical_detail (migration 278).
  */
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import type { VCanonicalLens, VCanonicalLensOption } from '$lib/types/database-views';
+import type { CanonicalWithPricing, CanonicalDetail } from '$lib/types/database-views';
 
 export const load: PageServerLoad = async ({ params, locals }) => {
-  const grupoId = params.id;
-  const { supabase } = locals;
+    const conceitoId = params.id;
+    const { supabase } = locals;
 
-  if (!grupoId) {
-    throw error(400, 'ID do grupo não encontrado');
-  }
-
-  try {
-    console.log('🔍 [Motor Oracle] Buscando conceito standard:', grupoId);
-
-    // Buscar o conceito canônico
-    const { data: grupo, error: erroGrupo } = await supabase
-      .from('v_canonical_lenses')
-      .select('*')
-      .eq('canonical_lens_id', grupoId)
-      .single();
-
-    if (erroGrupo || !grupo) {
-      console.error('❌ Erro ao buscar conceito:', erroGrupo);
-      throw error(404, 'Conceito ótico não encontrado');
+    if (!conceitoId) {
+        throw error(400, 'ID do conceito não encontrado');
     }
 
-    // Buscar as lentes reais mapeadas para este conceito
-    console.log('🔍 [Motor Oracle] Buscando opções reais para o conceito:', grupoId);
-    const { data: options, error: erroOptions } = await supabase
-      .from('v_canonical_lens_options')
-      .select('*')
-      .eq('canonical_lens_id', grupoId)
-      .order('final_price', { ascending: true });
+    try {
+        console.log('🔍 [Oracle v2] Buscando conceito standard:', conceitoId);
 
-    if (erroOptions) {
-      console.error('❌ Erro ao buscar opções:', erroOptions);
-      throw error(500, `Erro ao carregar opções de lentes: ${erroOptions.message}`);
+        // Buscar conceito canônico (com pricing)
+        const { data: conceito, error: erroConceito } = await supabase
+            .from('v_canonical_lenses_pricing')
+            .select('*')
+            .eq('id', conceitoId)
+            .single();
+
+        if (erroConceito || !conceito) {
+            // Fallback: tenta view sem pricing (conceito pode não ter lentes no pricing_book)
+            const { data: conceitoBase, error: erroBase } = await supabase
+                .from('v_canonical_lenses')
+                .select('*')
+                .eq('id', conceitoId)
+                .single();
+
+            if (erroBase || !conceitoBase) {
+                console.error('❌ Conceito não encontrado:', erroConceito, erroBase);
+                throw error(404, 'Conceito ótico não encontrado');
+            }
+
+            // Retorna sem pricing
+            return {
+                conceito: conceitoBase as CanonicalWithPricing,
+                lentes: [] as CanonicalDetail[],
+                isPremium: false,
+                sucesso: true
+            };
+        }
+
+        // Buscar lentes reais via rpc_canonical_detail
+        console.log('🔍 [Oracle v2] Buscando lentes do conceito via rpc_canonical_detail...');
+        const { data: lentes, error: erroLentes } = await supabase
+            .rpc('rpc_canonical_detail', {
+                p_canonical_id: conceitoId,
+                p_is_premium: false,
+            });
+
+        if (erroLentes) {
+            console.error('⚠️ Erro ao buscar lentes do conceito (não fatal):', erroLentes);
+        }
+
+        return {
+            conceito: conceito as CanonicalWithPricing,
+            lentes: (lentes || []) as CanonicalDetail[],
+            isPremium: false,
+            sucesso: true
+        };
+    } catch (err: any) {
+        if (err.status) throw err; // Re-throw SvelteKit errors
+        console.error('❌ Erro fatal no load standard v2:', err);
+        throw error(500, 'Erro interno ao carregar detalhes do conceito');
     }
-
-    // Adaptar para o formato que o componente LenteCard espera se necessário
-    const mappedLentes = (options || []).map((opt: any) => ({
-      ...opt,
-      id: opt.lens_id,
-      price_suggested: opt.final_price,
-      lens_name: opt.lens_name,
-      brand_name: opt.brand_name,
-      supplier_name: opt.supplier_name
-    }));
-
-    return {
-      grupo: {
-        ...grupo,
-        id: grupo.canonical_lens_id,
-        name: grupo.canonical_name
-      },
-      lentes: mappedLentes,
-      sucesso: true
-    };
-  } catch (err) {
-    console.error('❌ Erro fatal no load standard:', err);
-    throw error(500, 'Erro interno ao carregar detalhes do conceito');
-  }
 };

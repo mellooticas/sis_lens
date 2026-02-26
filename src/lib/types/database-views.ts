@@ -241,6 +241,100 @@ export interface VCanonicalLensOption {
 }
 
 // ============================================================================
+// CANONICAL ENGINE v2 — Views e RPCs (migrations 274–278)
+// ============================================================================
+
+/**
+ * Linha da view public.v_canonical_lenses ou v_canonical_lenses_premium.
+ * Motor Canônico v2 — SKU legível, sem categoria no fingerprint.
+ * Standard: CST + 6 dígitos | Premium: CPR + 6 dígitos.
+ */
+export interface CanonicalLensV2 {
+  id: string;
+  sku: string;                     // ex: "CST847392" | "CPR319204"
+  fingerprint: string;
+  canonical_name: string;
+  lens_type: string;               // single_vision | multifocal | bifocal | ...
+  material_class: string;          // cr39 | polycarbonate | high_index | trivex
+  refractive_index: number;        // 1.50 | 1.56 | 1.67 | ...
+  material_display: string;        // ex: "CR39 1.50" | "Policarbonato 1.59"
+  treatment_codes: string[];       // ex: ["ar", "scratch", "blue"]
+  spherical_min: number | null;
+  spherical_max: number | null;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  addition_min: number | null;
+  addition_max: number | null;
+  mapped_lens_count: number;       // total de lentes mapeadas neste conceito
+  mapped_supplier_count: number;
+  mapped_brand_count: number;
+  created_at: string;
+  updated_at: string;
+}
+
+/**
+ * Views v_canonical_lenses_pricing / v_canonical_lenses_premium_pricing.
+ * Junta conceitos canônicos com pricing_book — inclui faixas de preço e markup.
+ */
+export interface CanonicalWithPricing extends CanonicalLensV2 {
+  price_min: number | null;        // menor sell_price entre lentes do conceito
+  price_max: number | null;        // maior sell_price
+  price_avg: number | null;        // média de sell_price
+  cost_min: number | null;         // menor cost_price
+  cost_max: number | null;         // maior cost_price
+  cost_avg: number | null;         // média de cost_price
+  markup_min: number | null;       // menor effective_markup
+  markup_max: number | null;       // maior effective_markup
+}
+
+/**
+ * Resultado de rpc_canonical_for_prescription (migration 278).
+ * Conceitos canônicos que cobrem uma determinada receita oftalmológica.
+ */
+export interface PrescriptionSearchResult {
+  id: string;
+  sku: string;
+  canonical_name: string;
+  lens_type: string;
+  material_class: string;
+  refractive_index: number;
+  material_display: string;
+  treatment_codes: string[];
+  spherical_min: number | null;
+  spherical_max: number | null;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  addition_min: number | null;
+  addition_max: number | null;
+  tenant_lens_count: number;       // qtd de lentes do tenant neste conceito
+  price_min: number | null;
+  price_max: number | null;
+  price_avg: number | null;
+  cost_min: number | null;
+  cost_max: number | null;
+  markup_min: number | null;
+  markup_max: number | null;
+}
+
+/**
+ * Resultado de rpc_canonical_detail (migration 278).
+ * Lentes reais mapeadas para um conceito canônico, com preços do tenant.
+ */
+export interface CanonicalDetail {
+  lens_id: string;
+  lens_sku: string | null;
+  lens_name: string;
+  brand_name: string | null;
+  supplier_name: string | null;
+  sell_price: number;
+  cost_price: number;
+  final_price: number;
+  effective_markup: number | null;
+  is_preferred: boolean;
+  match_method: string;
+}
+
+// ============================================================================
 // NOVO BANCO — RPC: public.rpc_contact_lens_search (migration 214)
 // ============================================================================
 

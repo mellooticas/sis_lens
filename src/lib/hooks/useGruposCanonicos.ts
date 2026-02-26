@@ -1,15 +1,18 @@
 /**
- * Hook para grupos canônicos
- * NOVO BANCO: usa LensOracleAPI.getCanonicalLenses que agora suporta as views separadas
+ * Hook para grupos canônicos — Canonical Engine v2
+ * Usa v_canonical_lenses_pricing e v_canonical_lenses_premium_pricing (migrations 274–277)
+ * Tipos: CanonicalWithPricing (inclui SKU, pricing, treatment_codes)
  */
 
 import { writable, get } from 'svelte/store';
 import { LensOracleAPI } from '$lib/api/lens-oracle';
-import type { VCanonicalLens } from '$lib/types/database-views';
+import type { CanonicalWithPricing } from '$lib/types/database-views';
+
+export type { CanonicalWithPricing };
 
 interface GruposState {
-  gruposGenericos: VCanonicalLens[];
-  gruposPremium: VCanonicalLens[];
+  gruposGenericos: CanonicalWithPricing[];
+  gruposPremium: CanonicalWithPricing[];
   loading: boolean;
   error: string | null;
   totalGenericos: number;
@@ -26,11 +29,19 @@ export function useGruposCanonicos() {
     totalPremium: 0
   });
 
-  async function carregarGruposGenericos(params: { limit?: number; offset?: number } = {}) {
+  async function carregarGruposGenericos(params: {
+    limit?: number;
+    offset?: number;
+    lens_type?: string;
+    search?: string;
+  } = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const res = await LensOracleAPI.getCanonicalStandard({
-      limit: params.limit ?? 50
+    const res = await LensOracleAPI.getCanonicalStandardWithPricing({
+      limit:      params.limit    ?? 100,
+      offset:     params.offset   ?? 0,
+      lens_type:  params.lens_type,
+      search:     params.search,
     });
 
     if (res.data) {
@@ -41,15 +52,27 @@ export function useGruposCanonicos() {
         loading: false
       }));
     } else {
-      state.update(s => ({ ...s, loading: false, error: res.error?.message || 'Erro ao carregar grupos genéricos' }));
+      state.update(s => ({
+        ...s,
+        loading: false,
+        error: res.error?.message || 'Erro ao carregar conceitos standard'
+      }));
     }
   }
 
-  async function carregarGruposPremium(params: { limit?: number; offset?: number } = {}) {
+  async function carregarGruposPremium(params: {
+    limit?: number;
+    offset?: number;
+    lens_type?: string;
+    search?: string;
+  } = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const res = await LensOracleAPI.getCanonicalPremium({
-      limit: params.limit ?? 50
+    const res = await LensOracleAPI.getCanonicalPremiumWithPricing({
+      limit:      params.limit    ?? 100,
+      offset:     params.offset   ?? 0,
+      lens_type:  params.lens_type,
+      search:     params.search,
     });
 
     if (res.data) {
@@ -60,16 +83,23 @@ export function useGruposCanonicos() {
         loading: false
       }));
     } else {
-      state.update(s => ({ ...s, loading: false, error: res.error?.message || 'Erro ao carregar grupos premium' }));
+      state.update(s => ({
+        ...s,
+        loading: false,
+        error: res.error?.message || 'Erro ao carregar conceitos premium'
+      }));
     }
   }
 
-  async function carregarTodosGrupos(params: { limit?: number; offset?: number } = {}) {
+  async function carregarTodosGrupos(params: {
+    limit?: number;
+    offset?: number;
+  } = {}) {
     state.update(s => ({ ...s, loading: true, error: null }));
 
     const [resPremium, resGenericos] = await Promise.all([
-      LensOracleAPI.getCanonicalPremium({ limit: params.limit ?? 50 }),
-      LensOracleAPI.getCanonicalStandard({ limit: params.limit ?? 50 }),
+      LensOracleAPI.getCanonicalPremiumWithPricing({ limit: params.limit ?? 100 }),
+      LensOracleAPI.getCanonicalStandardWithPricing({ limit: params.limit ?? 100 }),
     ]);
 
     state.update(s => ({
@@ -84,11 +114,11 @@ export function useGruposCanonicos() {
   }
 
   function obterGrupoGenericoPorId(id: string) {
-    return get(state).gruposGenericos.find(g => g.canonical_lens_id === id);
+    return get(state).gruposGenericos.find(g => g.id === id);
   }
 
   function obterGrupoPremiumPorId(id: string) {
-    return get(state).gruposPremium.find(g => g.canonical_lens_id === id);
+    return get(state).gruposPremium.find(g => g.id === id);
   }
 
   return {

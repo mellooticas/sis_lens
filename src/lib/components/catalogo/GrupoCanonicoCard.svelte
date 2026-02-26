@@ -1,91 +1,182 @@
-﻿<script lang="ts">
-  import type { VCatalogLensGroup } from '$lib/types/database-views';
+<!--
+  GrupoCanonicoCard — Canonical Engine v2
+  Exibe conceito canônico com SKU (CST/CPR), faixa de preço, tratamentos e counters.
+  Props: grupo (CanonicalWithPricing), variant ('standard' | 'premium'), compact
+-->
+<script lang="ts">
+  import type { CanonicalWithPricing } from '$lib/types/database-views';
 
-  export let grupo: VCatalogLensGroup;
+  export let grupo: CanonicalWithPricing;
   export let variant: 'standard' | 'premium' = 'standard';
   export let compact = false;
 
-  function formatarTexto(texto: string | null | undefined): string {
-    return texto ? texto.replace(/_/g, ' ') : '—';
+  const isPremium = variant === 'premium';
+  const linkBase  = isPremium ? '/catalogo/premium' : '/catalogo/standard';
+
+  // ── Formatação ──────────────────────────────────────────────────────────────
+  function formatarPreco(valor: number | null): string {
+    if (valor == null) return '—';
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency', currency: 'BRL', minimumFractionDigits: 0
+    }).format(valor);
   }
 
-  $: badgeClasses = variant === 'premium'
-    ? 'bg-gradient-to-r from-amber-100 to-orange-100 text-amber-800 dark:from-amber-900/30 dark:to-orange-900/30 dark:text-amber-300'
-    : 'bg-primary-100 text-primary-800 dark:bg-primary-900 dark:text-primary-200';
+  function formatarLensType(lt: string | null): string {
+    const mapa: Record<string, string> = {
+      single_vision: 'Visão Simples',
+      multifocal:    'Multifocal',
+      bifocal:       'Bifocal',
+      reading:       'Leitura',
+      occupational:  'Ocupacional',
+    };
+    return lt ? (mapa[lt] ?? lt.replace(/_/g, ' ')) : '—';
+  }
 
-  $: badgeText = variant === 'premium' ? 'Premium' : 'Standard';
-  $: linkBase = variant === 'premium' ? '/catalogo/premium' : '/catalogo/standard';
+  function formatarTratamento(code: string): string {
+    const mapa: Record<string, string> = {
+      ar:      'AR',
+      scratch: 'Anti-Risco',
+      blue:    'Blue Cut',
+      uv:      'UV',
+      photo:   'Fotossensível',
+    };
+    return mapa[code] ?? code.toUpperCase();
+  }
+
+  function tratamentoBadgeClass(code: string): string {
+    const mapa: Record<string, string> = {
+      ar:      'bg-blue-100 text-blue-800 dark:bg-blue-900/40 dark:text-blue-300',
+      scratch: 'bg-green-100 text-green-800 dark:bg-green-900/40 dark:text-green-300',
+      blue:    'bg-indigo-100 text-indigo-800 dark:bg-indigo-900/40 dark:text-indigo-300',
+      uv:      'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
+      photo:   'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300',
+    };
+    return mapa[code] ?? 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300';
+  }
+
+  $: faixaEsf = (grupo.spherical_min != null && grupo.spherical_max != null)
+    ? `${grupo.spherical_min > 0 ? '+' : ''}${grupo.spherical_min} a ${grupo.spherical_max > 0 ? '+' : ''}${grupo.spherical_max}`
+    : null;
+
+  $: temPricing  = grupo.price_min != null;
+  $: temMarkup   = grupo.markup_max != null;
+
+  $: cardBorder = isPremium
+    ? 'border-amber-200 dark:border-amber-800/50 hover:border-amber-400 dark:hover:border-amber-600'
+    : 'border-neutral-200 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600';
+
+  $: skuBadgeClass = isPremium
+    ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-700'
+    : 'bg-primary-100 text-primary-800 dark:bg-primary-900/40 dark:text-primary-300 border border-primary-200 dark:border-primary-700';
+
+  $: headerBg = isPremium
+    ? 'from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20'
+    : 'from-primary-50 to-blue-50 dark:from-primary-950/20 dark:to-blue-950/20';
+
+  $: priceBg = isPremium
+    ? 'from-amber-600 to-orange-600'
+    : 'from-primary-600 to-indigo-600';
 </script>
 
 <a
   href="{linkBase}/{grupo.id}"
-  class="grupo-card bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl hover:shadow-lg transition-all duration-200 block"
-  class:p-6={!compact}
-  class:p-4={compact}
-  class:flex={compact}
-  class:items-center={compact}
-  class:gap-4={compact}
+  class="grupo-card flex flex-col bg-white dark:bg-neutral-900 border {cardBorder} rounded-2xl hover:shadow-xl transition-all duration-300 overflow-hidden group"
 >
-  <!-- Header -->
-  <div
-    class:mb-4={!compact}
-    class:flex-shrink-0={compact}
-    style={compact ? 'width: 33%;' : ''}
-  >
-    <h3
-      class="font-bold text-gray-900 dark:text-white mb-2 line-clamp-2"
-      class:text-lg={!compact}
-      class:text-base={compact}
-    >
-      {grupo.name}
-    </h3>
-    <div class="flex flex-wrap gap-2">
-      {#if grupo.is_premium}
-        <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium bg-yellow-100 text-yellow-800 dark:bg-yellow-900 dark:text-yellow-200">
-          ★ Premium
-        </span>
-      {/if}
-      <span class="inline-flex items-center px-2 py-0.5 rounded text-xs font-medium {badgeClasses}">
-        {badgeText}
+  <!-- ── Header ─────────────────────────────────────────────────────────── -->
+  <div class="px-5 pt-5 pb-3 bg-gradient-to-br {headerBg}">
+    <div class="flex items-start justify-between gap-2 mb-2">
+      <span class="inline-flex items-center px-2.5 py-1 rounded-lg text-xs font-black tracking-wider font-mono {skuBadgeClass}">
+        {grupo.sku}
       </span>
+      {#if isPremium}
+        <span class="text-amber-500 text-sm" title="Premium">★</span>
+      {/if}
+    </div>
+
+    <h3 class="font-bold text-neutral-900 dark:text-white text-base leading-tight line-clamp-2 mb-1.5 group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
+      {grupo.canonical_name}
+    </h3>
+
+    <div class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+      {formatarLensType(grupo.lens_type)}
     </div>
   </div>
 
-  <!-- Especificações Técnicas -->
-  <div class="gap-2 mb-4 text-xs flex-1"
-       class:grid={!compact}
-       class:grid-cols-3={!compact}
-       class:flex={compact}
-       class:flex-wrap={compact}>
-    {#if grupo.material}
-    <div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
-      <div class="text-gray-500 dark:text-gray-400">Material</div>
-      <div class="font-medium text-gray-900 dark:text-white">{grupo.material}</div>
+  <!-- ── Especificações Técnicas ─────────────────────────────────────────── -->
+  <div class="px-5 py-3 flex-1 space-y-2.5">
+    <!-- Material + Índice -->
+    <div class="flex items-center gap-2 flex-wrap">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+        {grupo.material_display}
+      </span>
+      <span class="text-[11px] text-neutral-400 dark:text-neutral-500">n={grupo.refractive_index}</span>
     </div>
+
+    <!-- Tratamentos -->
+    {#if grupo.treatment_codes && grupo.treatment_codes.length > 0}
+      <div class="flex flex-wrap gap-1">
+        {#each grupo.treatment_codes as code}
+          <span class="inline-flex items-center px-1.5 py-0.5 rounded text-[10px] font-bold uppercase tracking-wide {tratamentoBadgeClass(code)}">
+            {formatarTratamento(code)}
+          </span>
+        {/each}
+      </div>
+    {:else}
+      <div class="text-[11px] text-neutral-400 italic">Sem tratamentos adicionais</div>
     {/if}
-    {#if grupo.refractive_index !== null && grupo.refractive_index !== undefined}
-    <div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
-      <div class="text-gray-500 dark:text-gray-400">Índice</div>
-      <div class="font-medium text-gray-900 dark:text-white">{grupo.refractive_index}</div>
-    </div>
+
+    <!-- Faixa de Graus -->
+    {#if faixaEsf}
+      <div class="text-xs text-neutral-500 dark:text-neutral-400">
+        <span class="font-semibold text-neutral-700 dark:text-neutral-300">Esf:</span>
+        {faixaEsf}
+        {#if grupo.addition_max}
+          &nbsp;<span class="font-semibold text-neutral-700 dark:text-neutral-300">Add:</span>
+          até +{grupo.addition_max}
+        {/if}
+      </div>
     {/if}
-    {#if grupo.lens_type}
-    <div class="bg-gray-50 dark:bg-gray-900 rounded px-2 py-1.5">
-      <div class="text-gray-500 dark:text-gray-400">Tipo</div>
-      <div class="font-medium text-gray-900 dark:text-white capitalize">
-        {formatarTexto(grupo.lens_type)}
+  </div>
+
+  <!-- ── Pricing ─────────────────────────────────────────────────────────── -->
+  {#if temPricing}
+    <div class="px-5 py-3 bg-gradient-to-r {priceBg}">
+      <div class="flex items-center justify-between">
+        <div>
+          <div class="text-[10px] text-white/70 uppercase font-bold tracking-widest">Faixa de Preço</div>
+          <div class="text-white font-bold text-base leading-tight">
+            {formatarPreco(grupo.price_min)}
+            {#if grupo.price_max && grupo.price_max !== grupo.price_min}
+              — {formatarPreco(grupo.price_max)}
+            {/if}
+          </div>
+          {#if grupo.price_avg}
+            <div class="text-white/70 text-xs">Média: {formatarPreco(grupo.price_avg)}</div>
+          {/if}
+        </div>
+        {#if temMarkup}
+          <div class="text-right">
+            <div class="text-[10px] text-white/70 uppercase font-bold tracking-widest">Markup</div>
+            <div class="text-white font-bold text-sm">{grupo.markup_min?.toFixed(1)}x — {grupo.markup_max?.toFixed(1)}x</div>
+          </div>
+        {/if}
       </div>
     </div>
-    {/if}
+  {/if}
+
+  <!-- ── Footer: Counters ────────────────────────────────────────────────── -->
+  <div class="px-5 py-2.5 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-800">
+    <div class="flex items-center justify-between text-[10px] text-neutral-500 dark:text-neutral-400 font-semibold">
+      <span title="Lentes mapeadas">📦 {grupo.mapped_lens_count ?? 0} lentes</span>
+      <span title="Marcas">🏷️ {grupo.mapped_brand_count ?? 0} marcas</span>
+      <span title="Fornecedores">🚚 {grupo.mapped_supplier_count ?? 0} fornec.</span>
+    </div>
   </div>
-
-  <!-- Status: v_catalog_lens_groups já filtra deleted_at IS NULL (sempre ativos) -->
-
 </a>
 
 <style>
   .grupo-card {
-    @apply w-full max-w-md;
+    @apply w-full;
   }
 
   .line-clamp-2 {
