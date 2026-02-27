@@ -68,7 +68,7 @@
 		<div class="flex items-start justify-between">
 			<div class="flex-1">
 				<a
-					href="/catalogo/lente/{_lente.id}"
+					href="/lentes/{_lente.id}"
 					class="text-sm font-semibold text-gray-900 dark:text-white line-clamp-2 hover:text-primary-600 transition-colors"
 				>
 					{_lente.lens_name || _lente.nome}
@@ -260,7 +260,7 @@
 						</button>
 					{:else}
 						<a
-							href="/catalogo/lente/{_lente.id}"
+							href="/lentes/{_lente.id}"
 							class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-900 dark:text-white text-xs font-bold rounded-lg transition-all"
 						>
 							Ver Detalhes

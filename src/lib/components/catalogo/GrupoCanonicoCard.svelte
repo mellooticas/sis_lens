@@ -11,7 +11,7 @@
   export let compact = false;
 
   const isPremium = variant === 'premium';
-  const linkBase  = isPremium ? '/catalogo/premium' : '/catalogo/standard';
+  const linkBase  = isPremium ? '/premium' : '/standard';
 
   // ── Formatação ──────────────────────────────────────────────────────────────
   function formatarPreco(valor: number | null): string {

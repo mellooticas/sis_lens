@@ -214,7 +214,7 @@
 
             <div class="flex gap-2">
                 <a
-                    href="/catalogo/contato/{lente.id}"
+                    href="/contato/{lente.id}"
                     class="px-4 py-2 bg-gray-100 hover:bg-gray-200 dark:bg-gray-800 dark:hover:bg-gray-700 text-gray-900 dark:text-white text-sm font-medium rounded-lg transition-colors focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2"
                 >
                     Ver Detalhes

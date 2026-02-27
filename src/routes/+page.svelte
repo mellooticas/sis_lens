@@ -37,7 +37,7 @@
     {
       label: 'Catálogo Completo',
       desc: 'Browse todas as lentes disponíveis',
-      href: '/catalogo',
+      href: '/lentes',
       icon: 'search',
     },
     {

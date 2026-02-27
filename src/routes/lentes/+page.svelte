@@ -55,9 +55,9 @@
         return q ? `?${q}` : '';
     }
 
-    function aplicarFiltros() { goto(`/catalogo/lentes${buildParams()}`); }
-    function limparFiltros()  { tipo = ''; fornecedor = ''; material = ''; premium = ''; ar = false; blue = false; goto('/catalogo/lentes'); }
-    function irParaPagina(p: number) { goto(`/catalogo/lentes${buildParams(p)}`); }
+    function aplicarFiltros() { goto(`/lentes${buildParams()}`); }
+    function limparFiltros()  { tipo = ''; fornecedor = ''; material = ''; premium = ''; ar = false; blue = false; goto('/lentes'); }
+    function irParaPagina(p: number) { goto(`/lentes${buildParams(p)}`); }
 
     // ── Helpers de display ───────────────────────────────────────────────────
     const TIPO_LABELS: Record<string, string> = {
@@ -121,11 +121,11 @@
                         </p>
                     </div>
                     <div class="flex gap-2">
-                        <a href="/catalogo/standard"
+                        <a href="/standard"
                             class="px-3 py-1.5 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-xs font-bold rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors">
                             ↗ Standard
                         </a>
-                        <a href="/catalogo/premium"
+                        <a href="/premium"
                             class="px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors">
                             ↗ Premium
                         </a>

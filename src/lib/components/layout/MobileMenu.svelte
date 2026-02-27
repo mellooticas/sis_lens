@@ -14,10 +14,10 @@
   
   const navItems = [
     { id: 'home',      label: 'Dashboard',   href: '/',                   icon: '🏠' },
-    { id: 'lentes',    label: 'Lentes',      href: '/catalogo/lentes',    icon: '🔭' },
-    { id: 'standard',  label: 'Standard',    href: '/catalogo/standard',  icon: '📦' },
-    { id: 'premium',   label: 'Premium',     href: '/catalogo/premium',   icon: '✨' },
-    { id: 'contato',   label: 'Contato',     href: '/catalogo/contato',   icon: '👁️' },
+    { id: 'lentes',    label: 'Lentes',      href: '/lentes',    icon: '🔭' },
+    { id: 'standard',  label: 'Standard',    href: '/standard',  icon: '📦' },
+    { id: 'premium',   label: 'Premium',     href: '/premium',   icon: '✨' },
+    { id: 'contato',   label: 'Contato',     href: '/contato',   icon: '👁️' },
     { id: 'simulador', label: 'Simulador',   href: '/simulador/receita',  icon: '⚡' },
     { id: 'ranking',   label: 'Ranking',     href: '/ranking',            icon: '🏆' },
   ];

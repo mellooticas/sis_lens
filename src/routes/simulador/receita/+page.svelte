@@ -399,7 +399,7 @@
                     </div>
                     <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         {#each resultadosStandard as res (res.id)}
-                            <a href="/catalogo/standard/{res.id}" class="result-card group border-neutral-200 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600">
+                            <a href="/standard/{res.id}" class="result-card group border-neutral-200 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600">
                                 <!-- Header -->
                                 <div class="px-4 pt-4 pb-3 bg-gradient-to-br from-primary-50 to-blue-50 dark:from-primary-950/20 dark:to-blue-950/20">
                                     <div class="flex items-start justify-between gap-2 mb-2">
@@ -471,7 +471,7 @@
                     </div>
                     <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         {#each resultadosPremium as res (res.id)}
-                            <a href="/catalogo/premium/{res.id}" class="result-card group border-amber-200 dark:border-amber-800/40 hover:border-amber-400 dark:hover:border-amber-500">
+                            <a href="/premium/{res.id}" class="result-card group border-amber-200 dark:border-amber-800/40 hover:border-amber-400 dark:hover:border-amber-500">
                                 <!-- Header -->
                                 <div class="px-4 pt-4 pb-3 bg-gradient-to-br from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20">
                                     <div class="flex items-start justify-between gap-2 mb-2">
