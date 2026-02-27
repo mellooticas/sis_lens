@@ -92,8 +92,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
             .range(offset, offset + LIMITE - 1);
 
         if (errLentes) {
-            console.error('❌ Erro ao carregar lentes:', errLentes);
-            throw error(500, 'Erro ao carregar catálogo de lentes');
+            console.error('❌ Erro ao carregar lentes:', JSON.stringify(errLentes));
+            throw error(500, `Supabase: ${errLentes.code} — ${errLentes.message} — ${errLentes.details ?? ''}`);
         }
 
         const total         = count ?? 0;
@@ -113,7 +113,8 @@ export const load: PageServerLoad = async ({ locals, url }) => {
 
     } catch (err: unknown) {
         if (err && typeof err === 'object' && 'status' in err) throw err;
-        console.error('❌ Erro fatal no load de lentes:', err);
-        throw error(500, 'Erro interno ao carregar lentes');
+        const msg = err instanceof Error ? err.message : JSON.stringify(err);
+        console.error('❌ Erro fatal no load de lentes:', msg);
+        throw error(500, `Fatal: ${msg}`);
     }
 };
