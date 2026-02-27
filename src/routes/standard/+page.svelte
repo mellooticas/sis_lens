@@ -338,11 +338,11 @@
                             <!-- Footer preço -->
                             <div class="flex items-center justify-between pt-3 border-t border-neutral-100 dark:border-neutral-800">
                                 <span class="text-[10px] font-black uppercase tracking-wide text-neutral-400">
-                                    {c.price_min != null ? 'A partir de' : 'Preço'}
+                                    {c.price_avg != null ? 'Média' : 'Preço'}
                                 </span>
                                 <span class="text-base font-black text-neutral-900 dark:text-white">
-                                    {#if c.price_min != null}
-                                        {fmt(c.price_min)}
+                                    {#if c.price_avg != null}
+                                        {fmt(c.price_avg)}
                                     {:else}
                                         Sob Consulta
                                     {/if}
