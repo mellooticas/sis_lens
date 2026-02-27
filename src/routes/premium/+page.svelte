@@ -35,10 +35,11 @@
     limparFiltros,
     irParaPagina,
   } = useBuscarLentes({ is_premium: true });
-  const { state: statsState } = useStatsCatalogo();
+  const { state: statsState, carregarEstatisticas } = useStatsCatalogo();
 
   onMount(() => {
     aplicarFiltros({ is_premium: true });
+    carregarEstatisticas();
   });
 
   let viewMode: "grid" | "list" = "grid";
@@ -70,7 +71,7 @@
         {#if $statsState.stats}
           <StatsCard
             title="Lentes Premium"
-            value={$statsState.stats.total_premium.toString()}
+            value={$statsState.stats.premium.toString()}
             color="orange"
           >
             <Crown slot="icon" class="w-6 h-6" />

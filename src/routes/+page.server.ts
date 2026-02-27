@@ -1,8 +1,8 @@
 /**
  * SIS Lens — Dashboard Principal
- * Campos reais da v_catalog_lens_stats (migration 111):
- *   total_lenses, total_active, total_premium, total_with_ar,
- *   total_with_blue, total_photochromic, price_min, price_max, price_avg, stock_total
+ * Campos reais da v_catalog_lens_stats (migration 271 + 280):
+ *   total, premium, economica, with_ar, with_blue, with_uv, with_photochromic,
+ *   price_min, price_max, price_avg, suppliers_count, brands_count, materials_count
  *
  * Campos reais da v_catalog_lens_groups (migration 076):
  *   id, tenant_id, name, lens_type, material, refractive_index,
@@ -35,11 +35,11 @@ export const load: PageServerLoad = async ({ locals }) => {
 
   return {
     stats: {
-      total_lentes:   stats?.total_lenses  || 0,
-      lentes_ativas:  stats?.total_active   || 0,
-      lentes_premium: stats?.total_premium  || 0,
-      total_standard: (stats?.total_lenses  || 0) - (stats?.total_premium || 0),
-      com_ar:         stats?.total_with_ar  || 0,
+      total_lentes:   stats?.total    || 0,
+      lentes_ativas:  stats?.total    || 0,   // view já filtra status='active'
+      lentes_premium: stats?.premium  || 0,
+      total_standard: (stats?.total   || 0) - (stats?.premium || 0),
+      com_ar:         stats?.with_ar  || 0,
       grupos_ativos,
       por_tipo,
     }

@@ -402,24 +402,28 @@ export interface RpcContactLensSearchResult {
 }
 
 // ============================================================================
-// NOVO BANCO — VIEW: public.v_catalog_lens_stats  (migration 111)
+// NOVO BANCO — VIEW: public.v_catalog_lens_stats  (migration 271 + 280)
 // ============================================================================
 
 /**
- * Campos reais da view public.v_catalog_lens_stats (migration 111).
- * NOTA: total_brands NÃO existe — removido para não gerar queries erradas.
+ * Campos REAIS da view public.v_catalog_lens_stats (migration 271).
+ * Confirmados via curl em 2026-02-26.
+ * Tenant filter corrigido com COALESCE na migration 280.
  */
 export interface VCatalogLensStats {
-  total_lenses: number;
-  total_active: number;
-  total_premium: number;
-  total_with_ar: number;
-  total_with_blue: number;
-  total_photochromic: number;
+  total: number;
+  premium: number;
+  economica: number;
+  with_ar: number;
+  with_blue: number;
+  with_uv: number;
+  with_photochromic: number;
   price_min: number | null;
   price_max: number | null;
   price_avg: number | null;
-  stock_total: number;
+  suppliers_count: number;
+  brands_count: number;
+  materials_count: number;
 }
 
 // ============================================================================

@@ -64,7 +64,7 @@ export function useBuscarLentes(parametrosIniciais: BuscarLentesParams = {}) {
       if (get(state).total === 0) {
         const stats = await LensOracleAPI.getCatalogStats();
         if (stats?.data) {
-          state.update(s => ({ ...s, total: stats.data!.total_lenses }));
+          state.update(s => ({ ...s, total: stats.data!.total }));
         }
       }
     } else {

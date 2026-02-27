@@ -34,10 +34,11 @@
     limparFiltros,
     irParaPagina,
   } = useBuscarLentes({ is_premium: false });
-  const { state: statsState } = useStatsCatalogo();
+  const { state: statsState, carregarEstatisticas } = useStatsCatalogo();
 
   onMount(() => {
     aplicarFiltros({ is_premium: false });
+    carregarEstatisticas();
   });
 
   let viewMode: "grid" | "list" = "grid";
@@ -69,7 +70,7 @@
         {#if $statsState.stats}
           <StatsCard
             title="Lentes Disponíveis"
-            value={$statsState.stats.total_lenses.toString()}
+            value={$statsState.stats.total.toString()}
             color="blue"
           >
             <Package slot="icon" class="w-6 h-6" />
