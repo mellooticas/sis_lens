@@ -128,7 +128,7 @@ export class LensOracleAPI {
         p_brand_name:  params.brand_name  ?? null,
         p_limit:       params.limit       ?? 50,
         p_offset:      params.offset      ?? 0,
-        p_tenant_id:   null,               // resolvido pelo JWT via current_tenant_id()
+        p_tenant_id:   '00000000-0000-0000-0000-000000000000',
       });
 
       if (error) throw error;
@@ -163,7 +163,7 @@ export class LensOracleAPI {
       const { data, error } = await supabase.rpc('rpc_lens_get_alternatives', {
         p_lens_id:   lensId,
         p_limit:     limit,
-        p_tenant_id: null,
+        p_tenant_id: '00000000-0000-0000-0000-000000000000',
       });
 
       if (error) throw error;
