@@ -18,6 +18,7 @@
     // ── Tipos locais ────────────────────────────────────────────────────────────
     interface Fornecedor { id: string; name: string; }
     interface Material   { id: string; name: string; refractive_index: number | null; }
+    interface Marca      { id: string; name: string; }
     interface Lente {
         id: string;
         lens_name: string | null;
@@ -47,36 +48,55 @@
 
     let fornecedores: Fornecedor[] = [];
     let materiais: Material[]      = [];
+    let marcas: Marca[]            = [];
     let opcoesCarregadas           = false;
 
     // ── Estado local de filtros (sincronizado com data via afterNavigate) ───────
+    let busca      = data.busca       ?? '';
     let tipo       = data.lens_type   ?? '';
     let fornecedor = data.supplier_id ?? '';
+    let marca      = data.brand_id    ?? '';
     let material   = data.material_id ?? '';
     let premium    = data.is_premium === true ? 'true' : data.is_premium === false ? 'false' : '';
-    let ar         = data.has_ar;
-    let blue       = data.has_blue;
+    let has_ar      = data.has_ar;
+    let has_blue    = data.has_blue;
+    let has_scratch = data.has_scratch;
+    let has_uv      = data.has_uv;
+    let has_photo   = data.has_photo;
+    let has_polar   = data.has_polar;
     let filtrosAbertos = false;
 
-    $: filtrosAtivos = [tipo, fornecedor, material, premium, ar ? '1' : '', blue ? '1' : '']
+    $: filtrosAtivos = [busca, tipo, fornecedor, marca, material, premium,
+        has_ar ? '1' : '', has_blue ? '1' : '', has_scratch ? '1' : '',
+        has_uv ? '1' : '', has_photo ? '1' : '', has_polar ? '1' : '']
         .filter(Boolean).length;
 
     // ── Navegação ───────────────────────────────────────────────────────────────
     function buildParams(p?: number): string {
         const params = new URLSearchParams();
-        if (tipo)       params.set('tipo', tipo);
-        if (fornecedor) params.set('fornecedor', fornecedor);
-        if (material)   params.set('material', material);
-        if (premium)    params.set('premium', premium);
-        if (ar)         params.set('ar', '1');
-        if (blue)       params.set('blue', '1');
-        if (p && p > 1) params.set('pagina', String(p));
+        if (busca)       params.set('busca',     busca);
+        if (tipo)        params.set('tipo',       tipo);
+        if (fornecedor)  params.set('fornecedor', fornecedor);
+        if (marca)       params.set('marca',      marca);
+        if (material)    params.set('material',   material);
+        if (premium)     params.set('premium',    premium);
+        if (has_ar)      params.set('ar',      '1');
+        if (has_blue)    params.set('blue',    '1');
+        if (has_scratch) params.set('scratch', '1');
+        if (has_uv)      params.set('uv',      '1');
+        if (has_photo)   params.set('foto',    '1');
+        if (has_polar)   params.set('polar',   '1');
+        if (p && p > 1)  params.set('pagina',  String(p));
         const q = params.toString();
         return q ? `?${q}` : '';
     }
 
     function aplicarFiltros()        { goto(`/lentes${buildParams()}`); }
-    function limparFiltros()         { tipo = ''; fornecedor = ''; material = ''; premium = ''; ar = false; blue = false; goto('/lentes'); }
+    function limparFiltros() {
+        busca = ''; tipo = ''; fornecedor = ''; marca = ''; material = ''; premium = '';
+        has_ar = false; has_blue = false; has_scratch = false; has_uv = false; has_photo = false; has_polar = false;
+        goto('/lentes');
+    }
     function irParaPagina(p: number) { goto(`/lentes${buildParams(p)}`); }
 
     // ── Fetch opções de filtro (once) ───────────────────────────────────────────
@@ -84,18 +104,23 @@
         if (opcoesCarregadas) return;
         const { data: rows } = await supabase
             .from('v_catalog_lenses')
-            .select('supplier_id, supplier_name, material_id, material_name, refractive_index')
+            .select('supplier_id, supplier_name, brand_id, brand_name, material_id, material_name, refractive_index')
             .eq('status', 'active');
 
         if (rows) {
-            const suppMap = new Map<string, string>();
-            const matMap  = new Map<string, { name: string; refractive_index: number | null }>();
+            const suppMap  = new Map<string, string>();
+            const brandMap = new Map<string, string>();
+            const matMap   = new Map<string, { name: string; refractive_index: number | null }>();
             for (const l of rows) {
                 if (l.supplier_id && l.supplier_name) suppMap.set(l.supplier_id, l.supplier_name);
+                if (l.brand_id    && l.brand_name)    brandMap.set(l.brand_id, l.brand_name);
                 if (l.material_id && l.material_name && !matMap.has(l.material_id))
                     matMap.set(l.material_id, { name: l.material_name, refractive_index: l.refractive_index ?? null });
             }
             fornecedores = [...suppMap.entries()]
+                .map(([id, name]) => ({ id, name }))
+                .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+            marcas = [...brandMap.entries()]
                 .map(([id, name]) => ({ id, name }))
                 .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
             materiais = [...matMap.entries()]
@@ -111,12 +136,18 @@
         erro    = null;
 
         // Sincroniza form com data atual (após navigation)
+        busca      = data.busca       ?? '';
         tipo       = data.lens_type   ?? '';
         fornecedor = data.supplier_id ?? '';
+        marca      = data.brand_id    ?? '';
         material   = data.material_id ?? '';
         premium    = data.is_premium === true ? 'true' : data.is_premium === false ? 'false' : '';
-        ar         = data.has_ar;
-        blue       = data.has_blue;
+        has_ar      = data.has_ar;
+        has_blue    = data.has_blue;
+        has_scratch = data.has_scratch;
+        has_uv      = data.has_uv;
+        has_photo   = data.has_photo;
+        has_polar   = data.has_polar;
 
         const offset = (data.pagina - 1) * LIMITE;
 
@@ -125,12 +156,18 @@
             .select('id,lens_name,supplier_name,brand_name,lens_type,material_name,refractive_index,sku,is_premium,treatment_names,anti_reflective,anti_scratch,uv_filter,blue_light,photochromic,polarized,price_suggested', { count: 'exact' })
             .eq('status', 'active');
 
-        if (data.lens_type)           query = query.eq('lens_type',       data.lens_type);
-        if (data.supplier_id)         query = query.eq('supplier_id',     data.supplier_id);
-        if (data.material_id)         query = query.eq('material_id',     data.material_id);
-        if (data.is_premium !== null) query = query.eq('is_premium',      data.is_premium);
-        if (data.has_ar)              query = query.eq('anti_reflective', true);
-        if (data.has_blue)            query = query.eq('blue_light',      true);
+        if (data.busca)               query = query.ilike('lens_name',      `%${data.busca}%`);
+        if (data.lens_type)           query = query.eq('lens_type',         data.lens_type);
+        if (data.supplier_id)         query = query.eq('supplier_id',       data.supplier_id);
+        if (data.brand_id)            query = query.eq('brand_id',          data.brand_id);
+        if (data.material_id)         query = query.eq('material_id',       data.material_id);
+        if (data.is_premium !== null) query = query.eq('is_premium',        data.is_premium);
+        if (data.has_ar)              query = query.eq('anti_reflective',   true);
+        if (data.has_blue)            query = query.eq('blue_light',        true);
+        if (data.has_scratch)         query = query.eq('anti_scratch',      true);
+        if (data.has_uv)              query = query.eq('uv_filter',         true);
+        if (data.has_photo)           query = query.eq('photochromic',      true);
+        if (data.has_polar)           query = query.eq('polarized',         true);
 
         const { data: rows, count, error: err } = await query
             .order('supplier_name', { ascending: true, nullsFirst: false })
@@ -261,7 +298,16 @@
 
             {#if filtrosAbertos}
                 <div class="border-t border-neutral-100 dark:border-neutral-800 px-5 py-5">
+                    <!-- Linha 1: Busca + Fornecedor + Marca + Material + Linha -->
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
+
+                        <div class="lg:col-span-1">
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Buscar</label>
+                            <input type="text" bind:value={busca}
+                                placeholder="Nome da lente..."
+                                on:keydown={(e) => e.key === 'Enter' && aplicarFiltros()}
+                                class="w-full text-sm bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-400"/>
+                        </div>
 
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Tipo</label>
@@ -287,6 +333,17 @@
                         </div>
 
                         <div>
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Marca</label>
+                            <select bind:value={marca}
+                                class="w-full text-sm bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
+                                <option value="">Todas</option>
+                                {#each marcas as m (m.id)}
+                                    <option value={m.id}>{m.name}</option>
+                                {/each}
+                            </select>
+                        </div>
+
+                        <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Material</label>
                             <select bind:value={material}
                                 class="w-full text-sm bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
@@ -296,11 +353,14 @@
                                 {/each}
                             </select>
                         </div>
+                    </div>
 
+                    <!-- Linha 2: Linha + Tratamentos -->
+                    <div class="mt-4 flex flex-wrap items-end gap-6">
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Linha</label>
                             <select bind:value={premium}
-                                class="w-full text-sm bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
+                                class="text-sm bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
                                 <option value="">Todas</option>
                                 <option value="false">Standard</option>
                                 <option value="true">Premium</option>
@@ -308,17 +368,31 @@
                         </div>
 
                         <div>
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Tratamentos</label>
-                            <div class="flex flex-col gap-2">
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" bind:checked={ar}
-                                        class="w-3.5 h-3.5 rounded accent-primary-600 cursor-pointer"/>
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-2">Tratamentos</label>
+                            <div class="flex flex-wrap gap-x-5 gap-y-2">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_ar}      class="w-3.5 h-3.5 rounded accent-primary-600"/>
                                     <span class="text-sm text-neutral-700 dark:text-neutral-300">Anti-Reflexo</span>
                                 </label>
-                                <label class="flex items-center gap-2 cursor-pointer">
-                                    <input type="checkbox" bind:checked={blue}
-                                        class="w-3.5 h-3.5 rounded accent-primary-600 cursor-pointer"/>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_scratch} class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">Anti-Risco</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_uv}      class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">UV</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_blue}    class="w-3.5 h-3.5 rounded accent-primary-600"/>
                                     <span class="text-sm text-neutral-700 dark:text-neutral-300">Blue Cut</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_photo}   class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">Fotossensível</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_polar}   class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">Polarizado</span>
                                 </label>
                             </div>
                         </div>
@@ -377,7 +451,7 @@
                 <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                     {#each lentes as lente (lente.id)}
                         {@const tratamentos = getTratamentos(lente)}
-                        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5 hover:shadow-md hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-200 flex flex-col gap-3">
+                        <a href="/lentes/{lente.id}" class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5 hover:shadow-md hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-200 flex flex-col gap-3 no-underline">
 
                             <div class="flex items-start justify-between gap-2">
                                 <div class="flex-1 min-w-0">
@@ -436,7 +510,7 @@
                                     {formatarPreco(lente.price_suggested)}
                                 </span>
                             </div>
-                        </div>
+                        </a>
                     {/each}
                 </div>
 

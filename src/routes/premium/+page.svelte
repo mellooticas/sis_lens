@@ -48,6 +48,10 @@
     let busca          = '';
     let lens_type      = '';
     let material_class = '';
+    let has_ar    = data.has_ar    ?? false;
+    let has_uv    = data.has_uv    ?? false;
+    let has_blue  = data.has_blue  ?? false;
+    let has_photo = data.has_photo ?? false;
     let filtrosAbertos = false;
 
     // ── Fetch principal ──────────────────────────────────────────────────────────
@@ -58,6 +62,10 @@
         busca          = data.busca          ?? '';
         lens_type      = data.lens_type      ?? '';
         material_class = data.material_class ?? '';
+        has_ar    = data.has_ar    ?? false;
+        has_uv    = data.has_uv    ?? false;
+        has_blue  = data.has_blue  ?? false;
+        has_photo = data.has_photo ?? false;
 
         const offset = (data.pagina - 1) * LIMITE;
 
@@ -71,6 +79,10 @@
         if (busca)          query = query.ilike('canonical_name', `%${busca}%`);
         if (lens_type)      query = query.eq('lens_type', lens_type);
         if (material_class) query = query.eq('material_class', material_class);
+        if (data.has_ar)    query = query.contains('treatment_codes', ['ar']);
+        if (data.has_uv)    query = query.contains('treatment_codes', ['uv']);
+        if (data.has_blue)  query = query.contains('treatment_codes', ['blue']);
+        if (data.has_photo) query = query.contains('treatment_codes', ['photo']);
 
         const { data: rows, count, error: err } = await query
             .order('canonical_name', { ascending: true })
@@ -111,6 +123,10 @@
         if (busca)          p.set('busca',    busca);
         if (lens_type)      p.set('tipo',     lens_type);
         if (material_class) p.set('material', material_class);
+        if (has_ar)         p.set('ar',   '1');
+        if (has_uv)         p.set('uv',   '1');
+        if (has_blue)       p.set('blue', '1');
+        if (has_photo)      p.set('foto', '1');
         goto(`/premium?${p.toString()}`);
     }
 
@@ -118,6 +134,7 @@
         busca = '';
         lens_type = '';
         material_class = '';
+        has_ar = false; has_uv = false; has_blue = false; has_photo = false;
         goto('/premium');
     }
 
@@ -126,6 +143,10 @@
         if (busca)          params.set('busca',    busca);
         if (lens_type)      params.set('tipo',     lens_type);
         if (material_class) params.set('material', material_class);
+        if (has_ar)         params.set('ar',   '1');
+        if (has_uv)         params.set('uv',   '1');
+        if (has_blue)       params.set('blue', '1');
+        if (has_photo)      params.set('foto', '1');
         params.set('pagina', String(p));
         goto(`/premium?${params.toString()}`);
     }
@@ -147,7 +168,10 @@
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
     }
 
-    $: filtrosAtivos = [data.busca, data.lens_type, data.material_class].filter(Boolean).length;
+    $: filtrosAtivos = [data.busca, data.lens_type, data.material_class,
+        data.has_ar ? '1' : '', data.has_uv ? '1' : '',
+        data.has_blue ? '1' : '', data.has_photo ? '1' : '']
+        .filter(Boolean).length;
 </script>
 
 <svelte:head>
@@ -234,6 +258,29 @@
                                     <option value={c}>{c}</option>
                                 {/each}
                             </select>
+                        </div>
+                    </div>
+                    <div class="mt-4 flex flex-wrap items-center gap-6">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-2">Tratamentos</label>
+                            <div class="flex flex-wrap gap-x-5 gap-y-2">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_ar}    class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">Anti-Reflexo</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_uv}    class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">UV</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_blue}  class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">Blue Cut</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_photo} class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">Fotossensível</span>
+                                </label>
+                            </div>
                         </div>
                     </div>
                     <div class="flex items-center gap-3 mt-5 pt-4 border-t border-neutral-100 dark:border-neutral-800">

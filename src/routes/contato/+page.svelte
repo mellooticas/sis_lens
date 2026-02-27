@@ -44,6 +44,7 @@
     let tiposLente: string[]  = [];
     let finalidades: string[] = [];
     let materiais: string[]   = [];
+    let marcas_ct: string[]   = [];
     let opcoesCarregadas      = false;
 
     // Form (espelha URL)
@@ -51,6 +52,9 @@
     let lens_type = '';
     let purpose   = '';
     let material  = '';
+    let marca      = '';
+    let is_colored = false;
+    let has_uv_ct  = false;
     let filtrosAbertos = false;
 
     // ── Labels ───────────────────────────────────────────────────────────────────
@@ -62,10 +66,11 @@
         anual:      'Uso Anual',
     };
     const PURPOSE_LABELS: Record<string, string> = {
-        vision_correction: 'Correção Visual',
-        cosmetic:          'Cosmético',
-        therapeutic:       'Terapêutico',
-        orthokeratology:   'Ortoceratologia',
+        visao_simples: 'Visão Simples',
+        torica:        'Tórica (Astigmatismo)',
+        multifocal:    'Multifocal',
+        cosmetica:     'Cosmético / Colorida',
+        terapeutica:   'Terapêutico',
     };
 
     // ── Fetch principal ──────────────────────────────────────────────────────────
@@ -77,6 +82,9 @@
         lens_type = data.lens_type ?? '';
         purpose   = data.purpose   ?? '';
         material  = data.material  ?? '';
+        marca     = data.brand     ?? '';
+        is_colored = data.is_colored === true;
+        has_uv_ct  = data.has_uv ?? false;
 
         const offset = (data.pagina - 1) * LIMITE;
 
@@ -88,10 +96,13 @@
             )
             .eq('status', 'active');
 
-        if (busca)     query = query.or(`product_name.ilike.%${busca}%,brand_name.ilike.%${busca}%`);
-        if (lens_type) query = query.eq('lens_type', lens_type);
-        if (purpose)   query = query.eq('purpose', purpose);
-        if (material)  query = query.eq('material', material);
+        if (busca)      query = query.or(`product_name.ilike.%${busca}%,brand_name.ilike.%${busca}%`);
+        if (lens_type)  query = query.eq('lens_type',    lens_type);
+        if (purpose)    query = query.eq('purpose',      purpose);
+        if (material)   query = query.eq('material',     material);
+        if (marca)      query = query.eq('brand_name',   marca);
+        if (is_colored) query = query.eq('is_colored',   true);
+        if (has_uv_ct)  query = query.eq('uv_protection', true);
 
         const { data: rows, count, error: err } = await query
             .order('brand_name',   { ascending: true, nullsFirst: false })
@@ -114,44 +125,54 @@
         if (opcoesCarregadas) return;
         const { data: rows } = await supabase
             .from('v_contact_lenses')
-            .select('lens_type, purpose, material')
+            .select('lens_type, purpose, material, brand_name')
             .eq('status', 'active')
             .limit(500);
         const ts = new Set<string>();
         const ps = new Set<string>();
         const ms = new Set<string>();
+        const bs = new Set<string>();
         for (const r of rows ?? []) {
-            if (r.lens_type) ts.add(r.lens_type);
-            if (r.purpose)   ps.add(r.purpose);
-            if (r.material)  ms.add(r.material);
+            if (r.lens_type)   ts.add(r.lens_type);
+            if (r.purpose)     ps.add(r.purpose);
+            if (r.material)    ms.add(r.material);
+            if (r.brand_name)  bs.add(r.brand_name);
         }
         tiposLente  = [...ts].sort();
         finalidades = [...ps].sort();
         materiais   = [...ms].sort();
+        marcas_ct   = [...bs].sort((a, b) => a.localeCompare(b, 'pt-BR'));
         opcoesCarregadas = true;
     }
 
     // ── Navegação ────────────────────────────────────────────────────────────────
     function aplicarFiltros() {
         const p = new URLSearchParams();
-        if (busca)     p.set('busca',    busca);
-        if (lens_type) p.set('tipo',     lens_type);
-        if (purpose)   p.set('uso',      purpose);
-        if (material)  p.set('material', material);
+        if (busca)      p.set('busca',    busca);
+        if (lens_type)  p.set('tipo',     lens_type);
+        if (purpose)    p.set('uso',      purpose);
+        if (material)   p.set('material', material);
+        if (marca)      p.set('marca',    marca);
+        if (is_colored) p.set('colorida', '1');
+        if (has_uv_ct)  p.set('uv',       '1');
         goto(`/contato?${p.toString()}`);
     }
 
     function limparFiltros() {
         busca = ''; lens_type = ''; purpose = ''; material = '';
+        marca = ''; is_colored = false; has_uv_ct = false;
         goto('/contato');
     }
 
     function irParaPagina(p: number) {
         const params = new URLSearchParams();
-        if (busca)     params.set('busca',    busca);
-        if (lens_type) params.set('tipo',     lens_type);
-        if (purpose)   params.set('uso',      purpose);
-        if (material)  params.set('material', material);
+        if (busca)      params.set('busca',    busca);
+        if (lens_type)  params.set('tipo',     lens_type);
+        if (purpose)    params.set('uso',      purpose);
+        if (material)   params.set('material', material);
+        if (marca)      params.set('marca',    marca);
+        if (is_colored) params.set('colorida', '1');
+        if (has_uv_ct)  params.set('uv',       '1');
         params.set('pagina', String(p));
         goto(`/contato?${params.toString()}`);
     }
@@ -160,7 +181,9 @@
     onMount(() => { fetchOpcoes(); });
     afterNavigate(() => { fetchContato(); });
 
-    $: filtrosAtivos = [data.busca, data.lens_type, data.purpose, data.material].filter(Boolean).length;
+    $: filtrosAtivos = [data.busca, data.lens_type, data.purpose, data.material,
+        data.brand, data.is_colored ? '1' : '', data.has_uv ? '1' : '']
+        .filter(Boolean).length;
 </script>
 
 <svelte:head>
@@ -217,13 +240,23 @@
 
             {#if filtrosAbertos}
                 <div class="border-t border-neutral-100 dark:border-neutral-800 px-5 py-5">
-                    <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Buscar</label>
                             <input type="text" bind:value={busca}
                                 placeholder="Marca ou nome..."
                                 on:keydown={(e) => e.key === 'Enter' && aplicarFiltros()}
                                 class="w-full text-sm bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-400"/>
+                        </div>
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Marca</label>
+                            <select bind:value={marca}
+                                class="w-full text-sm bg-neutral-50 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 rounded-lg px-3 py-2 text-neutral-700 dark:text-neutral-300 focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
+                                <option value="">Todas</option>
+                                {#each marcas_ct as m}
+                                    <option value={m}>{m}</option>
+                                {/each}
+                            </select>
                         </div>
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Descarte</label>
@@ -256,6 +289,23 @@
                             </select>
                         </div>
                     </div>
+
+                    <div class="mt-4 flex flex-wrap items-center gap-6">
+                        <div>
+                            <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-2">Características</label>
+                            <div class="flex flex-wrap gap-x-5 gap-y-2">
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={is_colored} class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">Colorida / Estética</span>
+                                </label>
+                                <label class="flex items-center gap-1.5 cursor-pointer">
+                                    <input type="checkbox" bind:checked={has_uv_ct} class="w-3.5 h-3.5 rounded accent-primary-600"/>
+                                    <span class="text-sm text-neutral-700 dark:text-neutral-300">Proteção UV</span>
+                                </label>
+                            </div>
+                        </div>
+                    </div>
+
                     <div class="flex items-center gap-3 mt-5 pt-4 border-t border-neutral-100 dark:border-neutral-800">
                         <button type="button" on:click={aplicarFiltros}
                             class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-bold rounded-lg transition-colors">
