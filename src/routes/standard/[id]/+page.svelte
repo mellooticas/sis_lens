@@ -262,7 +262,8 @@
                             <Star class="w-4 h-4 text-amber-500 fill-amber-500" />
                             <span class="text-sm font-bold text-amber-700 dark:text-amber-400">Opção Preferida</span>
                         </div>
-                        <div class="bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl p-6">
+                        <a href="/lentes/{lentePreferida.lens_id}"
+                            class="block bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl p-6 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700 transition-all no-underline">
                             <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
                                 <div class="flex-1">
                                     <div class="font-bold text-neutral-900 dark:text-white text-lg">{lentePreferida.lens_name}</div>
@@ -296,9 +297,10 @@
                                         <div class="text-[10px] text-neutral-400 uppercase font-bold">Markup</div>
                                         <div class="font-bold text-green-600 dark:text-green-400">{formatarMarkup(lentePreferida.effective_markup)}</div>
                                     </div>
+                                    <span class="text-xs font-bold text-primary-600 dark:text-primary-400 whitespace-nowrap">Ver detalhes →</span>
                                 </div>
                             </div>
-                        </div>
+                        </a>
                     </div>
                 {/if}
 
@@ -306,7 +308,8 @@
                 <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                     {#each outrasLentes as lente, i (lente.lens_id)}
                         <div in:fly={{ y: 30, delay: i * 40, duration: 400 }}>
-                            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-5 hover:shadow-lg transition-all duration-200 hover:border-primary-300 dark:hover:border-primary-700 relative group">
+                            <a href="/lentes/{lente.lens_id}"
+                                class="block bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-5 hover:shadow-lg transition-all duration-200 hover:border-primary-300 dark:hover:border-primary-700 relative group no-underline">
                                 <div class="mb-3">
                                     <div class="font-semibold text-neutral-900 dark:text-white text-sm line-clamp-2">{lente.lens_name}</div>
                                     <div class="text-xs text-neutral-500 mt-0.5">{lente.brand_name ?? '—'}</div>
@@ -352,7 +355,7 @@
                                         {lente.match_method}
                                     </span>
                                 </div>
-                            </div>
+                            </a>
                         </div>
                     {/each}
                 </div>
