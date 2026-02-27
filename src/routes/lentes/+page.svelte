@@ -1,47 +1,67 @@
 <script lang="ts">
     /**
-     * Catálogo de Lentes Reais — cards + filtros server-side
-     * Fonte: public.v_catalog_lenses (tenant-filtered)
-     * Filtros via goto() → URL params → server re-render
+     * Catálogo de Lentes — client-side data fetching
+     * Fonte: public.v_catalog_lenses (browser supabase client)
+     * Filtros via goto() → URL params → server re-render → client re-fetch
      */
-    import { goto }         from '$app/navigation';
-    import type { PageData } from './$types';
-    import type { VCatalogLens } from '$lib/types/database-views';
-    import type { FiltrosLentes, FornecedorOption, MaterialOption } from './+page.server';
-    import Container from '$lib/components/layout/Container.svelte';
+    import { onMount }         from 'svelte';
+    import { afterNavigate }   from '$app/navigation';
+    import { goto }            from '$app/navigation';
+    import type { PageData }   from './$types';
+    import { supabase }        from '$lib/supabase';
+    import Container           from '$lib/components/layout/Container.svelte';
 
     export let data: PageData;
 
-    $: lentes       = data.lentes       as VCatalogLens[];
-    $: total        = data.total        as number;
-    $: pagina       = data.pagina       as number;
-    $: total_paginas = data.total_paginas as number;
-    $: fornecedores = data.fornecedores as FornecedorOption[];
-    $: materiais    = data.materiais    as MaterialOption[];
-    $: filtros      = data.filtros      as FiltrosLentes;
+    const LIMITE = 24;
 
-    // Estado local dos filtros — sincronizado com server data
-    let tipo       = filtros.lens_type   ?? '';
-    let fornecedor = filtros.supplier_id ?? '';
-    let material   = filtros.material_id ?? '';
-    let premium    = filtros.is_premium === true ? 'true' : filtros.is_premium === false ? 'false' : '';
-    let ar         = filtros.has_ar;
-    let blue       = filtros.has_blue;
-    let filtrosAbertos = false;
-
-    // Sincroniza ao navegar entre páginas (server re-render)
-    $: {
-        tipo       = filtros.lens_type   ?? '';
-        fornecedor = filtros.supplier_id ?? '';
-        material   = filtros.material_id ?? '';
-        premium    = filtros.is_premium === true ? 'true' : filtros.is_premium === false ? 'false' : '';
-        ar         = filtros.has_ar;
-        blue       = filtros.has_blue;
+    // ── Tipos locais ────────────────────────────────────────────────────────────
+    interface Fornecedor { id: string; name: string; }
+    interface Material   { id: string; name: string; refractive_index: number | null; }
+    interface Lente {
+        id: string;
+        lens_name: string | null;
+        supplier_name: string | null;
+        brand_name: string | null;
+        lens_type: string | null;
+        material_name: string | null;
+        refractive_index: number | null;
+        sku: string | null;
+        is_premium: boolean | null;
+        treatment_names: string[] | null;
+        anti_reflective: boolean | null;
+        anti_scratch: boolean | null;
+        uv_filter: boolean | null;
+        blue_light: boolean | null;
+        photochromic: boolean | null;
+        polarized: boolean | null;
+        price_suggested: number | null;
     }
+
+    // ── Estado ──────────────────────────────────────────────────────────────────
+    let lentes: Lente[]     = [];
+    let total               = 0;
+    let total_paginas       = 0;
+    let loading             = true;
+    let erro: string | null = null;
+
+    let fornecedores: Fornecedor[] = [];
+    let materiais: Material[]      = [];
+    let opcoesCarregadas           = false;
+
+    // ── Estado local de filtros (sincronizado com data via afterNavigate) ───────
+    let tipo       = data.lens_type   ?? '';
+    let fornecedor = data.supplier_id ?? '';
+    let material   = data.material_id ?? '';
+    let premium    = data.is_premium === true ? 'true' : data.is_premium === false ? 'false' : '';
+    let ar         = data.has_ar;
+    let blue       = data.has_blue;
+    let filtrosAbertos = false;
 
     $: filtrosAtivos = [tipo, fornecedor, material, premium, ar ? '1' : '', blue ? '1' : '']
         .filter(Boolean).length;
 
+    // ── Navegação ───────────────────────────────────────────────────────────────
     function buildParams(p?: number): string {
         const params = new URLSearchParams();
         if (tipo)       params.set('tipo', tipo);
@@ -55,11 +75,85 @@
         return q ? `?${q}` : '';
     }
 
-    function aplicarFiltros() { goto(`/lentes${buildParams()}`); }
-    function limparFiltros()  { tipo = ''; fornecedor = ''; material = ''; premium = ''; ar = false; blue = false; goto('/lentes'); }
+    function aplicarFiltros()        { goto(`/lentes${buildParams()}`); }
+    function limparFiltros()         { tipo = ''; fornecedor = ''; material = ''; premium = ''; ar = false; blue = false; goto('/lentes'); }
     function irParaPagina(p: number) { goto(`/lentes${buildParams(p)}`); }
 
-    // ── Helpers de display ───────────────────────────────────────────────────
+    // ── Fetch opções de filtro (once) ───────────────────────────────────────────
+    async function fetchOpcoes() {
+        if (opcoesCarregadas) return;
+        const { data: rows } = await supabase
+            .from('v_catalog_lenses')
+            .select('supplier_id, supplier_name, material_id, material_name, refractive_index')
+            .eq('status', 'active');
+
+        if (rows) {
+            const suppMap = new Map<string, string>();
+            const matMap  = new Map<string, { name: string; refractive_index: number | null }>();
+            for (const l of rows) {
+                if (l.supplier_id && l.supplier_name) suppMap.set(l.supplier_id, l.supplier_name);
+                if (l.material_id && l.material_name && !matMap.has(l.material_id))
+                    matMap.set(l.material_id, { name: l.material_name, refractive_index: l.refractive_index ?? null });
+            }
+            fornecedores = [...suppMap.entries()]
+                .map(([id, name]) => ({ id, name }))
+                .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
+            materiais = [...matMap.entries()]
+                .map(([id, m]) => ({ id, ...m }))
+                .sort((a, b) => (a.refractive_index ?? 0) - (b.refractive_index ?? 0));
+            opcoesCarregadas = true;
+        }
+    }
+
+    // ── Fetch lentes (chamado em todo afterNavigate) ─────────────────────────────
+    async function fetchLentes() {
+        loading = true;
+        erro    = null;
+
+        // Sincroniza form com data atual (após navigation)
+        tipo       = data.lens_type   ?? '';
+        fornecedor = data.supplier_id ?? '';
+        material   = data.material_id ?? '';
+        premium    = data.is_premium === true ? 'true' : data.is_premium === false ? 'false' : '';
+        ar         = data.has_ar;
+        blue       = data.has_blue;
+
+        const offset = (data.pagina - 1) * LIMITE;
+
+        let query = supabase
+            .from('v_catalog_lenses')
+            .select('id,lens_name,supplier_name,brand_name,lens_type,material_name,refractive_index,sku,is_premium,treatment_names,anti_reflective,anti_scratch,uv_filter,blue_light,photochromic,polarized,price_suggested', { count: 'exact' })
+            .eq('status', 'active');
+
+        if (data.lens_type)           query = query.eq('lens_type',       data.lens_type);
+        if (data.supplier_id)         query = query.eq('supplier_id',     data.supplier_id);
+        if (data.material_id)         query = query.eq('material_id',     data.material_id);
+        if (data.is_premium !== null) query = query.eq('is_premium',      data.is_premium);
+        if (data.has_ar)              query = query.eq('anti_reflective', true);
+        if (data.has_blue)            query = query.eq('blue_light',      true);
+
+        const { data: rows, count, error: err } = await query
+            .order('supplier_name', { ascending: true, nullsFirst: false })
+            .order('material_name', { ascending: true, nullsFirst: false })
+            .order('lens_name',     { ascending: true })
+            .range(offset, offset + LIMITE - 1);
+
+        if (err) {
+            erro   = err.message;
+            lentes = [];
+        } else {
+            lentes       = (rows ?? []) as Lente[];
+            total        = count ?? 0;
+            total_paginas = Math.ceil(total / LIMITE);
+        }
+        loading = false;
+    }
+
+    // ── Ciclo de vida ────────────────────────────────────────────────────────────
+    onMount(() => { fetchOpcoes(); });
+    afterNavigate(() => { fetchLentes(); });
+
+    // ── Helpers de display ───────────────────────────────────────────────────────
     const TIPO_LABELS: Record<string, string> = {
         single_vision: 'Visão Simples',
         multifocal:    'Multifocal',
@@ -72,8 +166,7 @@
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
     }
 
-    // Converte treatment_names[] do banco em labels curtos para exibição
-    function getTratamentos(lente: VCatalogLens): string[] {
+    function getTratamentos(lente: Lente): string[] {
         const nomes = lente.treatment_names ?? [];
         if (nomes.length > 0) {
             return nomes.map(n => {
@@ -89,7 +182,6 @@
                 return n.split(' ')[0];
             });
         }
-        // Fallback flags booleanos
         const t: string[] = [];
         if (lente.anti_reflective) t.push('AR');
         if (lente.anti_scratch)    t.push('AS');
@@ -115,9 +207,13 @@
                     <div>
                         <h1 class="text-2xl font-black text-neutral-900 dark:text-white">Catálogo de Lentes</h1>
                         <p class="text-sm text-neutral-500 mt-1">
-                            {total.toLocaleString('pt-BR')} lentes ·
-                            {materiais.length} materiais ·
-                            {fornecedores.length} fornecedores
+                            {#if loading}
+                                Carregando...
+                            {:else}
+                                {total.toLocaleString('pt-BR')} lentes ·
+                                {materiais.length} materiais ·
+                                {fornecedores.length} fornecedores
+                            {/if}
                         </p>
                     </div>
                     <div class="flex gap-2">
@@ -140,7 +236,6 @@
         <!-- ── Filtros ────────────────────────────────────────────────────── -->
         <div class="mt-6 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl overflow-hidden">
 
-            <!-- Header clicável -->
             <button
                 class="w-full flex items-center justify-between px-5 py-4 hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-colors text-left"
                 on:click={() => filtrosAbertos = !filtrosAbertos}
@@ -164,12 +259,10 @@
                 </svg>
             </button>
 
-            <!-- Conteúdo dos filtros -->
             {#if filtrosAbertos}
                 <div class="border-t border-neutral-100 dark:border-neutral-800 px-5 py-5">
                     <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
 
-                        <!-- Tipo -->
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Tipo</label>
                             <select bind:value={tipo}
@@ -182,7 +275,6 @@
                             </select>
                         </div>
 
-                        <!-- Fornecedor -->
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Fornecedor</label>
                             <select bind:value={fornecedor}
@@ -194,7 +286,6 @@
                             </select>
                         </div>
 
-                        <!-- Material -->
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Material</label>
                             <select bind:value={material}
@@ -206,7 +297,6 @@
                             </select>
                         </div>
 
-                        <!-- Linha -->
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Linha</label>
                             <select bind:value={premium}
@@ -217,7 +307,6 @@
                             </select>
                         </div>
 
-                        <!-- Tratamentos -->
                         <div>
                             <label class="block text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1.5">Tratamentos</label>
                             <div class="flex flex-col gap-2">
@@ -235,7 +324,6 @@
                         </div>
                     </div>
 
-                    <!-- Botões de ação -->
                     <div class="flex items-center gap-3 mt-5 pt-4 border-t border-neutral-100 dark:border-neutral-800">
                         <button type="button" on:click={aplicarFiltros}
                             class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-bold rounded-lg transition-colors">
@@ -248,7 +336,7 @@
                             </button>
                         {/if}
                         <span class="text-xs text-neutral-400 ml-auto">
-                            {total.toLocaleString('pt-BR')} resultado{total !== 1 ? 's' : ''}
+                            {#if !loading}{total.toLocaleString('pt-BR')} resultado{total !== 1 ? 's' : ''}{/if}
                         </span>
                     </div>
                 </div>
@@ -257,7 +345,22 @@
 
         <!-- ── Grid de Cards ──────────────────────────────────────────────── -->
         <div class="mt-6">
-            {#if lentes.length === 0}
+            {#if loading}
+                <div class="flex flex-col items-center justify-center py-24 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl">
+                    <div class="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
+                    <p class="text-neutral-500 dark:text-neutral-400 text-sm">Carregando lentes...</p>
+                </div>
+
+            {:else if erro}
+                <div class="py-16 text-center bg-white dark:bg-neutral-900 border border-red-200 rounded-2xl">
+                    <p class="text-red-500 font-semibold">{erro}</p>
+                    <button type="button" on:click={fetchLentes}
+                        class="mt-4 px-4 py-2 bg-primary-600 text-white text-sm font-bold rounded-lg">
+                        Tentar novamente
+                    </button>
+                </div>
+
+            {:else if lentes.length === 0}
                 <div class="py-24 text-center">
                     <div class="text-5xl mb-4">🔍</div>
                     <p class="text-neutral-500 dark:text-neutral-400 text-lg font-semibold">Nenhuma lente encontrada</p>
@@ -276,7 +379,6 @@
                         {@const tratamentos = getTratamentos(lente)}
                         <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5 hover:shadow-md hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-200 flex flex-col gap-3">
 
-                            <!-- Topo: nome + badge STD/PRE -->
                             <div class="flex items-start justify-between gap-2">
                                 <div class="flex-1 min-w-0">
                                     <h3 class="font-bold text-neutral-900 dark:text-white text-sm leading-snug line-clamp-2">
@@ -293,7 +395,6 @@
                                 {/if}
                             </div>
 
-                            <!-- Especificações -->
                             <div class="space-y-1.5 flex-1">
                                 {#if lente.brand_name}
                                     <div class="flex items-center gap-2">
@@ -301,14 +402,12 @@
                                         <span class="text-xs text-neutral-600 dark:text-neutral-400 truncate">{lente.brand_name}</span>
                                     </div>
                                 {/if}
-
                                 {#if lente.lens_type}
                                     <div class="flex items-center gap-2">
                                         <span class="text-[10px] font-black uppercase tracking-wide text-neutral-300 dark:text-neutral-600 w-14 shrink-0">Tipo</span>
                                         <span class="text-xs text-neutral-600 dark:text-neutral-400">{TIPO_LABELS[lente.lens_type] ?? lente.lens_type}</span>
                                     </div>
                                 {/if}
-
                                 {#if lente.material_name}
                                     <div class="flex items-center gap-2">
                                         <span class="text-[10px] font-black uppercase tracking-wide text-neutral-300 dark:text-neutral-600 w-14 shrink-0">Material</span>
@@ -317,7 +416,6 @@
                                         </span>
                                     </div>
                                 {/if}
-
                                 {#if lente.sku}
                                     <div class="flex items-center gap-2">
                                         <span class="text-[10px] font-black uppercase tracking-wide text-neutral-300 dark:text-neutral-600 w-14 shrink-0">SKU</span>
@@ -326,14 +424,12 @@
                                 {/if}
                             </div>
 
-                            <!-- Tratamentos -->
                             <div class="flex flex-wrap gap-1 min-h-[18px]">
                                 {#each tratamentos as trat}
                                     <span class="px-1.5 py-0.5 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-[9px] font-black rounded uppercase">{trat}</span>
                                 {/each}
                             </div>
 
-                            <!-- Rodapé: preço -->
                             <div class="flex items-center justify-between pt-3 border-t border-neutral-100 dark:border-neutral-800">
                                 <span class="text-[10px] font-black uppercase tracking-wide text-neutral-400">Sugerido</span>
                                 <span class="text-base font-black text-neutral-900 dark:text-white">
@@ -350,25 +446,25 @@
                         <div class="flex items-center gap-2">
                             <button
                                 type="button"
-                                disabled={pagina <= 1}
-                                on:click={() => irParaPagina(pagina - 1)}
+                                disabled={data.pagina <= 1}
+                                on:click={() => irParaPagina(data.pagina - 1)}
                                 class="px-4 py-2 text-sm font-bold rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                                 ← Anterior
                             </button>
 
                             <div class="flex items-center gap-1">
                                 {#each Array.from({ length: total_paginas }, (_, i) => i + 1) as p}
-                                    {#if p === 1 || p === total_paginas || (p >= pagina - 2 && p <= pagina + 2)}
+                                    {#if p === 1 || p === total_paginas || (p >= data.pagina - 2 && p <= data.pagina + 2)}
                                         <button
                                             type="button"
                                             on:click={() => irParaPagina(p)}
                                             class="w-9 h-9 text-sm font-bold rounded-lg transition-colors
-                                                {p === pagina
+                                                {p === data.pagina
                                                     ? 'bg-primary-600 text-white shadow-sm'
                                                     : 'bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800'}">
                                             {p}
                                         </button>
-                                    {:else if p === pagina - 3 || p === pagina + 3}
+                                    {:else if p === data.pagina - 3 || p === data.pagina + 3}
                                         <span class="text-neutral-400 text-sm px-1">…</span>
                                     {/if}
                                 {/each}
@@ -376,15 +472,15 @@
 
                             <button
                                 type="button"
-                                disabled={pagina >= total_paginas}
-                                on:click={() => irParaPagina(pagina + 1)}
+                                disabled={data.pagina >= total_paginas}
+                                on:click={() => irParaPagina(data.pagina + 1)}
                                 class="px-4 py-2 text-sm font-bold rounded-lg border border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-800 disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
                                 Próxima →
                             </button>
                         </div>
 
                         <p class="text-xs text-neutral-400">
-                            Página {pagina} de {total_paginas} · {total.toLocaleString('pt-BR')} lentes no total
+                            Página {data.pagina} de {total_paginas} · {total.toLocaleString('pt-BR')} lentes no total
                         </p>
                     </div>
                 {/if}
