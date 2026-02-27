@@ -50,7 +50,7 @@
     $: destino = href ?? `/lentes/${_l.id}`;
 </script>
 
-<a {href}={destino}
+<a href={destino}
     class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5 hover:shadow-md hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-200 flex flex-col gap-3 no-underline">
 
     <!-- Nome + badge linha -->

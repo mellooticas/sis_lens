@@ -25,6 +25,14 @@
     // Tratamentos calculados
     let tratamentos: string[] = [];
 
+    // Edição de preços
+    let editando      = false;
+    let editCost      = 0;
+    let editSugerido  = 0;
+    let editSalvando  = false;
+    let editErro: string | null = null;
+    let editSucesso   = false;
+
     onMount(async () => {
         const { data: row, error: err } = await supabase
             .from('v_catalog_lenses')
@@ -36,6 +44,8 @@
             erro = err?.message ?? 'Lente não encontrada';
         } else {
             lente = row;
+            editCost     = row.price_cost      ?? 0;
+            editSugerido = row.price_suggested ?? 0;
             // Calcula tratamentos
             const nomes: string[] = row.treatment_names ?? [];
             if (nomes.length > 0) {
@@ -51,6 +61,38 @@
         }
         loading = false;
     });
+
+    function abrirEdicao() {
+        editCost     = lente?.price_cost      ?? 0;
+        editSugerido = lente?.price_suggested ?? 0;
+        editErro     = null;
+        editSucesso  = false;
+        editando     = true;
+    }
+
+    async function salvarPrecos() {
+        editSalvando = true;
+        editErro     = null;
+        editSucesso  = false;
+        try {
+            const { data: res, error: err } = await supabase
+                .rpc('rpc_update_lens_price', {
+                    p_id:              lente!.id,
+                    p_price_cost:      editCost,
+                    p_price_suggested: editSugerido,
+                });
+            if (err) throw new Error(err.message);
+            if (res && !res.ok) throw new Error(res.error ?? 'Erro ao salvar');
+            lente        = { ...lente!, price_cost: editCost, price_suggested: editSugerido };
+            editando     = false;
+            editSucesso  = true;
+            setTimeout(() => editSucesso = false, 3000);
+        } catch (e: any) {
+            editErro = e.message;
+        } finally {
+            editSalvando = false;
+        }
+    }
 
     function fmt(v: number | null | undefined): string {
         if (v == null) return '—';
@@ -216,29 +258,81 @@
                     <!-- Sidebar preço -->
                     <div class="space-y-4">
                         <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5">
-                            <h2 class="text-sm font-black uppercase tracking-wide text-neutral-400 mb-4">Preços</h2>
-                            <div class="space-y-4">
-                                {#if lente.price_suggested}
-                                    <div>
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Preço Sugerido</div>
-                                        <div class="text-3xl font-black text-neutral-900 dark:text-white mt-0.5">{fmt(lente.price_suggested)}</div>
-                                    </div>
-                                {/if}
-                                {#if lente.price_cost}
-                                    <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Custo</div>
-                                        <div class="text-xl font-bold text-neutral-500 dark:text-neutral-400 mt-0.5">{fmt(lente.price_cost)}</div>
-                                    </div>
-                                {/if}
-                                {#if lente.price_cost && lente.price_suggested}
-                                    <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Margem</div>
-                                        <div class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
-                                            {(((lente.price_suggested - lente.price_cost) / lente.price_suggested) * 100).toFixed(1)}%
-                                        </div>
-                                    </div>
+                            <div class="flex items-center justify-between mb-4">
+                                <h2 class="text-sm font-black uppercase tracking-wide text-neutral-400">Preços</h2>
+                                {#if !editando}
+                                    <button on:click={abrirEdicao}
+                                        class="text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">
+                                        Editar
+                                    </button>
                                 {/if}
                             </div>
+
+                            {#if editSucesso}
+                                <div class="mb-3 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-lg">
+                                    ✓ Preços atualizados com sucesso
+                                </div>
+                            {/if}
+
+                            {#if editando}
+                                <!-- Modo edição -->
+                                <div class="space-y-3">
+                                    <div>
+                                        <label class="text-[10px] font-black uppercase tracking-wider text-neutral-400 block mb-1">Custo (R$)</label>
+                                        <input type="number" step="0.01" min="0" bind:value={editCost}
+                                            class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg text-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                    </div>
+                                    <div>
+                                        <label class="text-[10px] font-black uppercase tracking-wider text-neutral-400 block mb-1">Preço Sugerido (R$)</label>
+                                        <input type="number" step="0.01" min="0" bind:value={editSugerido}
+                                            class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg text-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                    </div>
+                                    {#if editCost > 0 && editSugerido > 0}
+                                        <div class="text-xs text-neutral-400 text-right">
+                                            Margem: <span class="font-bold text-emerald-600 dark:text-emerald-400">
+                                                {(((editSugerido - editCost) / editSugerido) * 100).toFixed(1)}%
+                                            </span>
+                                        </div>
+                                    {/if}
+                                    {#if editErro}
+                                        <p class="text-xs text-red-500 font-medium">{editErro}</p>
+                                    {/if}
+                                    <div class="flex gap-2 pt-1">
+                                        <button on:click={salvarPrecos} disabled={editSalvando}
+                                            class="flex-1 px-3 py-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-colors">
+                                            {editSalvando ? 'Salvando…' : 'Salvar'}
+                                        </button>
+                                        <button on:click={() => { editando = false; editErro = null; }}
+                                            class="px-3 py-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400 text-xs font-bold rounded-lg transition-colors">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            {:else}
+                                <!-- Modo leitura -->
+                                <div class="space-y-4">
+                                    {#if lente.price_suggested}
+                                        <div>
+                                            <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Preço Sugerido</div>
+                                            <div class="text-3xl font-black text-neutral-900 dark:text-white mt-0.5">{fmt(lente.price_suggested)}</div>
+                                        </div>
+                                    {/if}
+                                    {#if lente.price_cost}
+                                        <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                                            <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Custo</div>
+                                            <div class="text-xl font-bold text-neutral-500 dark:text-neutral-400 mt-0.5">{fmt(lente.price_cost)}</div>
+                                        </div>
+                                    {/if}
+                                    {#if lente.price_cost && lente.price_suggested}
+                                        <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800">
+                                            <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Margem</div>
+                                            <div class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
+                                                {(((lente.price_suggested - lente.price_cost) / lente.price_suggested) * 100).toFixed(1)}%
+                                            </div>
+                                        </div>
+                                    {/if}
+                                </div>
+                            {/if}
                         </div>
 
                         {#if lente.lead_time_days || lente.stock_minimum}
