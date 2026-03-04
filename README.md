@@ -1,23 +1,147 @@
-# 🔍 SIS Lens - Sistema Decisor de Lentes
+# SIS Lens — Catálogo Inteligente de Lentes Oftálmicas
 
-> **Sistema inteligente para tomada de decisões na compra de lentes oftálmicas com sistema integrado de vouchers e descontos.**
+> Sistema de gestão e consulta de catálogo de lentes para óticas, com engine canônica de equivalência, pricing por contrato e filtros avançados.
 
-## 🎯 **Sobre o Projeto**
+---
 
-O SIS Lens é um sistema híbrido que combina:
+## Stack
 
-- **🔍 Decisor de Lentes**: Análise inteligente de fornecedores, preços e prazos
-- **🎫 Sistema de Vouchers**: Gestão de descontos e promoções para lojas
-- **📊 Analytics**: Dashboard com métricas de economia e performance
+| Camada | Tecnologia |
+|--------|-----------|
+| Frontend | SvelteKit 2.5 + Svelte 5 + TypeScript |
+| Estilo | Tailwind CSS v3 |
+| Backend | Supabase (PostgreSQL 15 + Auth + RLS) |
+| Deploy | Netlify (adapter-netlify) |
 
-## 🚀 Tecnologias
+---
 
-- **Frontend:** SvelteKit + TypeScript + TailwindCSS
-- **Backend:** Supabase (PostgreSQL + Auth + APIs)
-- **Autenticação:** 4 níveis de usuários com controles específicos
-- **Vouchers:** Sistema avançado de descontos com limites mensais
+## Módulos do Catálogo
 
-## ⚡ **Quick Start**
+### `/lentes` — Catálogo Real
+Todas as lentes físicas do pricing_book do tenant.
+
+**Filtros disponíveis:**
+- Busca por nome
+- Tipo (Visão Simples, Multifocal, Bifocal, Ocupacional)
+- Fornecedor (dinâmico)
+- Marca (dinâmico)
+- Material / Índice de refração (dinâmico)
+- Linha (Standard / Premium)
+- Tratamentos: Anti-Reflexo, Anti-Risco, UV, Blue Cut, Fotossensível, Polarizado
+
+Cards clicáveis → `/lentes/[id]` com edição de preço (custo + sugerido).
+
+---
+
+### `/standard` — Conceitos Canônicos Standard
+View: `v_canonical_lenses_pricing` — agrupa lentes equivalentes por física ótica.
+
+**Filtros disponíveis:**
+- Busca por nome canônico
+- Tipo de lente
+- Classe de material
+- Tratamentos: AR, UV, Blue Cut, Fotossensível
+
+Cards → `/standard/[id]` com lentes mapeadas clicáveis para `/lentes/[id]`.
+Preço exibido: **Média** (`price_avg`).
+
+---
+
+### `/premium` — Conceitos Canônicos Premium
+View: `v_canonical_lenses_premium_pricing` — mesma lógica, foco em alta tecnologia.
+
+**Filtros disponíveis:** idênticos ao `/standard`.
+
+Cards → `/premium/[id]` com lentes mapeadas clicáveis para `/lentes/[id]`.
+Preço exibido: **Média** (`price_avg`).
+
+---
+
+### `/contato` — Lentes de Contato
+View: `v_contact_lenses` — 226 lentes de contato (inseridas via migration 284).
+
+**Filtros disponíveis:**
+- Busca (nome ou marca)
+- Marca (dinâmico)
+- Tipo de descarte
+- Finalidade (Visão Simples, Tórica, Multifocal, Cosmético, Terapêutico)
+- Material
+- Colorida / Estética
+- Proteção UV
+
+Cards → `/contato/[id]` com edição de preço.
+
+---
+
+## Arquitetura de Dados
+
+### Schemas principais
+
+```
+catalog_lenses/
+├── lenses                    # Lentes reais (com pricing_book)
+├── contact_lenses            # Lentes de contato (226 registros)
+├── brands                    # Marcas (ópticas + contato)
+├── canonical_lenses          # Conceitos canônicos
+├── canonical_lens_mappings   # Mapeamento canônico → lente real
+└── stg_contact_lens_import   # Staging ETL (233 linhas CSV)
+
+inventory/
+└── pricing_book              # Preços por tenant
+
+iam/
+└── tenants                   # Multi-tenant (tenant_id via JWT)
+```
+
+### Views públicas principais
+
+| View | Uso |
+|------|-----|
+| `v_catalog_lenses` | Catálogo real com pricing + tratamentos |
+| `v_catalog_contact_lenses` | Lentes de contato com dados técnicos |
+| `v_contact_lenses` | View pública com COALESCE tenant |
+| `v_canonical_lenses_pricing` | Canônicos standard com pricing agregado |
+| `v_canonical_lenses_premium_pricing` | Canônicos premium com pricing agregado |
+
+### RPCs de escrita
+
+| RPC | Função |
+|-----|--------|
+| `rpc_update_lens_price` | Edita custo + preço sugerido de lente real |
+| `rpc_update_contact_lens_price` | Edita custo + preço sugerido de lente de contato |
+| `rpc_canonical_detail` | Retorna lentes mapeadas de um conceito canônico |
+| `rpc_etl_contact_lenses_from_csv` | ETL do staging para contact_lenses |
+
+Todas as RPCs usam `SECURITY DEFINER` + `COALESCE(current_tenant_id(), '00000000-...')` para compatibilidade com JWT admin (sem claim tenant_id).
+
+---
+
+## Regras de Negócio
+
+- **Preço canônico**: exibido como `price_avg` (média de todas as lentes mapeadas), não `price_min`
+- **Edição de preço**: permitida apenas em `/lentes/[id]` e `/contato/[id]` — páginas canônicas são somente leitura
+- **Lentes de contato**: `status='draft'` no CSV original → mapeado para `'inactive'` (enum `inventory.record_status` não tem 'draft')
+- **Multi-tenant**: todas as queries filtram por `tenant_id` via RLS + COALESCE
+
+---
+
+## Histórico de Migrations Relevantes
+
+| Migration | O que fez |
+|-----------|-----------|
+| 214 | Cria `catalog_lenses.contact_lenses` |
+| 217 | Cria ETL + staging + crosswalk de marcas |
+| 263 | `TRUNCATE brands CASCADE` → apagou contact_lenses acidentalmente |
+| 269 | Re-seed de lentes ópticas (sem re-seed de contato) |
+| 277 | Views canônicas com pricing agregado |
+| 278 | `rpc_canonical_detail` |
+| 281 | View `v_contact_lenses` com COALESCE fix |
+| 284 | Re-insert direto de 226 lentes de contato (bypass ETL) |
+| 285 | RPCs de edição de preço |
+
+---
+
+## Quick Start
 
 ```bash
 # 1. Instalar dependências
@@ -25,357 +149,45 @@ npm install
 
 # 2. Configurar variáveis de ambiente
 cp .env.example .env
-# Edite .env com suas credenciais do Supabase
+# VITE_SUPABASE_URL=https://...supabase.co
+# VITE_SUPABASE_ANON_KEY=...
 
-# 3. Configurar banco de dados
-# Execute as migrations primeiro, depois popule com dados iniciais
-cd database/seeds
-chmod +x executar_populacao.sh
-./executar_populacao.sh dev
-
-# 4. Executar em desenvolvimento
+# 3. Rodar em desenvolvimento
 npm run dev
-
-# 5. Acessar aplicação
 # http://localhost:5173
+
+# 4. Build para produção
+npm run build
 ```
-
-## 📋 Funcionalidades
-
-# Frontend: http://localhost:5173
-
-# Debug: http://localhost:5173/debug```bash### Sistema de Autenticação
-
-```
-
-# 1. Instalar dependências- **DCL Decisor:** Acesso total, geração de vouchers até 20%
-
-## 🏗️ **Arquitetura**
-
-npm install- **Financeiro Supervisor:** Controle financeiro, vouchers até 25%
-
-```
-
-🏢 Frontend (SvelteKit)- **Admin Junior:** Administração, vouchers até 15%
-
-├─ 🔍 /buscar - Busca de lentes
-
-├─ 📊 /ranking - Ranking de fornecedores  # 2. Configurar variáveis de ambiente- **Loja Consulta:** Consulta apenas, sem geração de vouchers
-
-├─ 📋 /debug - Auditoria completa
-
-└─ 🏠 / - Dashboard principalcp .env.example .env
-
-
-
-🗄️ Backend (Supabase)# Edite .env com suas credenciais do Supabase### Sistema de Vouchers
-
-├─ 📊 Schemas especializados (lens_catalog, suppliers, orders...)
-
-├─ 🔗 Views públicas (vw_lentes_catalogo, vw_fornecedores...)- Geração controlada com limites mensais (80 vouchers/mês)
-
-├─ ⚙️ RPCs (rpc_buscar_lente, rpc_rank_opcoes...)
-
-└─ 🎫 Sistema de vouchers (usuarios, lojas, clientes, vouchers)# 3. Executar em desenvolvimento- Limite de valor máximo: R$ 16.000/mês
-
-```
-
-npm run dev- Controle por percentual conforme nível de usuário
-
-## 🚀 **Funcionalidades**
-
-- Auditoria completa de uso e economia gerada
-
-### 🔍 **Decisor de Lentes**
-
-- ✅ Catálogo completo de lentes (4 lentes ativas)# 4. Acessar aplicação
-
-- ✅ Ranking inteligente de fornecedores (3 laboratórios)
-
-- ✅ Critérios: NORMAL, URGÊNCIA, ESPECIAL# Frontend: http://localhost:5173### APIs Públicas
-
-- ✅ Análise de preços, prazos e qualidade
-
-# Debug: http://localhost:5173/debug- `api_listar_vouchers` - Lista vouchers disponíveis
-
-### 🎫 **Sistema de Vouchers**
-
-- ✅ Gestão de clientes e lojas```- `api_gerar_voucher_controlado` - Gera novos vouchers
-
-- ✅ Vouchers com desconto fixo ou percentual
-
-- ✅ Dashboard de economia gerada- `api_dashboard_executivo` - Dashboard de controle
-
-- ✅ Controle de validade e uso
-
-## 🏗️ **Arquitetura**- `api_login_usuario` - Sistema de autenticação
-
-### 📊 **Analytics**
-
-- ✅ Métricas de economia por fornecedor
-
-- ✅ Histórico de decisões
-
-- ✅ Relatórios de performance```## 🛠️ Configuração
-
-- ✅ Dashboard executivo
-
-🏢 Frontend (SvelteKit)
-
-## 🛠️ **Stack Tecnológica**
-
-├─ 🔍 /buscar - Busca de lentes### Variáveis de Ambiente (.env)
-
-- **Frontend**: SvelteKit + TypeScript + Tailwind CSS
-
-- **Backend**: Supabase (PostgreSQL)├─ 📊 /ranking - Ranking de fornecedores  ```bash
-
-- **Autenticação**: Supabase Auth
-
-- **Deployment**: Vercel/Netlify Ready├─ 📋 /debug - Auditoria completaVITE_SUPABASE_URL=https://ahcikwsoxhmqqteertkx.supabase.co
-
-
-
-## 📁 **Estrutura do Projeto**└─ 🏠 / - Dashboard principalVITE_SUPABASE_ANON_KEY=your_anon_key
-
-
-
-```VITE_APP_NAME=SIS Lens
-
-best_lens/
-
-├─ 📱 src/                    # Código fonte SvelteKit🗄️ Backend (Supabase)VITE_APP_VERSION=1.0.0
-
-├─ 📚 docs/                   # Documentação e scripts
-
-│  ├─ 🗄️ database/           # Migrações e seeds Supabase├─ 📊 Schemas especializados (lens_catalog, suppliers, orders...)VITE_APP_ENVIRONMENT=production
-
-│  ├─ migrations-completas/   # Scripts SQL completos
-
-│  ├─ testes-auditoria/      # Scripts de teste├─ 🔗 Views públicas (vw_lentes_catalogo, vw_fornecedores...)```
-
-│  └─ scripts-desenvolvimento/ # Documentação técnica
-
-├─ 🌐 static/                 # Assets estáticos├─ ⚙️ RPCs (rpc_buscar_lente, rpc_rank_opcoes...)
-
-└─ ⚙️ supabase/               # Configuração Supabase
-
-```└─ 🎫 Sistema de vouchers (usuarios, lojas, clientes, vouchers)### Instalação
-
-
-
-## 🧪 **Testes e Auditoria**``````bash
-
-
-
-```bashnpm install
-
-# Auditoria completa do sistema
-
-node docs/testes-auditoria/auditoria_completa.js## 🚀 **Funcionalidades**npm run dev
-
-
-
-# Teste de views específicas  ```
-
-node docs/testes-auditoria/teste_completo.js
-
-### 🔍 **Decisor de Lentes**
-
-# Verificar conexão do backend
-
-# Acessar: http://localhost:5173/debug- ✅ Catálogo completo de lentes (4 lentes ativas)## 📁 Estrutura do Projeto
-
-```
-
-- ✅ Ranking inteligente de fornecedores (3 laboratórios)
-
-## 📊 **Status do Sistema**
-
-- ✅ Critérios: NORMAL, URGÊNCIA, ESPECIAL```
-
-- ✅ **100% das estruturas** funcionando
-
-- ✅ **Sistema híbrido** operacional  - ✅ Análise de preços, prazos e qualidadesrc/
-
-- ✅ **Backend conectado** às views
-
-- ✅ **4 lentes** no catálogo├── lib/
-
-- ✅ **3 fornecedores** ativos
-
-- ✅ **Sistema de vouchers** com dados### 🎫 **Sistema de Vouchers**│   ├── supabase.ts          # Cliente Supabase
-
-
-
-## 📚 **Documentação Completa**- ✅ Gestão de clientes e lojas│   ├── types/               # Tipos TypeScript
-
-
-
-Para documentação detalhada, consulte:- ✅ Vouchers com desconto fixo ou percentual│   ├── stores/              # Stores Svelte
-
-- **📋 [Documentação Completa](docs/README.md)**
-
-- **🏗️ [Database e Migrações](docs/database/)**- ✅ Dashboard de economia gerada│   └── components/          # Componentes reutilizáveis
-
-- **🔧 [Setup e Configuração](docs/scripts-desenvolvimento/)**
-
-- ✅ Controle de validade e uso├── routes/                  # Páginas SvelteKit
-
-## 🤝 **Contribuição**
-
-└── app.html                 # Template principal
-
-Este é um sistema híbrido completo e funcional. Para modificações:
-
-### 📊 **Analytics**
-
-1. Consulte a documentação em `/docs`
-
-2. Execute testes com os scripts de auditoria- ✅ Métricas de economia por fornecedorsupabase/
-
-3. Use o sistema de debug para validar mudanças
-
-- ✅ Histórico de decisões└── migrations/
-
-## 📄 **Licença**
-
-- ✅ Relatórios de performance    └── production/          # Scripts SQL de produção
-
-Projeto privado - Sistema SIS Lens © 2025
-
-- ✅ Dashboard executivo        ├── 01_auth_system.sql
 
 ---
 
-        ├── 02_voucher_controls.sql
-
-**🎯 Sistema 100% operacional e pronto para produção!**
-## 🛠️ **Stack Tecnológica**        ├── 03_public_api.sql
-
-        └── 04_auth_config.sql
-
-- **Frontend**: SvelteKit + TypeScript + Tailwind CSS```
-
-- **Backend**: Supabase (PostgreSQL)
-
-- **Autenticação**: Supabase Auth## � Estrutura do Banco
-
-- **Deployment**: Vercel/Netlify Ready
-
-### Tabelas Principais
-
-## 📁 **Estrutura do Projeto**- `usuarios` - Gestão de usuários e permissões
-
-- `vouchers_desconto` - Sistema de vouchers
-
-```- `consultas_lens_log` - Log de consultas e economia
-
-best_lens/- `controle_vouchers_mensal` - Controles mensais
-
-├─ 📱 src/                    # Código fonte SvelteKit- `ranking_vouchers` - Ranking de economia
-
-├─ 🗄️ database/              # Migrações Supabase
-
-├─ 📚 docs/                   # Documentação e scripts### Views Públicas
-
-│  ├─ migrations-completas/   # Scripts SQL completos- `v_vouchers_disponiveis` - Vouchers disponíveis por usuário
-
-│  ├─ testes-auditoria/      # Scripts de teste  - `v_dashboard_vouchers` - Dashboard de controle
-
-│  └─ scripts-desenvolvimento/ # Documentação- `v_ranking_economia` - Ranking de economia gerada
-
-├─ 🌐 static/                 # Assets estáticos- `v_user_profile` - Perfil do usuário logado
-
-└─ ⚙️ supabase/               # Configuração Supabase
-
-```## 📊 Monitoramento
-
-
-
-## 🧪 **Testes e Auditoria**O sistema inclui:
-
-- Auditoria completa de ações
-
-```bash- Dashboard executivo com métricas
-
-# Auditoria completa do sistema- Controles automáticos de limite
-
-node docs/testes-auditoria/auditoria_completa.js- Sistema de alertas por percentual usado
-
-
-
-# Teste de views específicas  ## � Deploy
-
-node docs/testes-auditoria/teste_completo.js
-
-Sistema está configurado para Supabase Cloud:
-
-# Verificar conexão do backend- Projeto: `ahcikwsoxhmqqteertkx`
-
-# Acessar: http://localhost:5173/debug- Região: US East 1
-
-```- PostgreSQL 15+ com RLS ativo
-
-
-
-## 📊 **Status do Sistema**## � Suporte
-
-
-
-- ✅ **100% das estruturas** funcionandoPara suporte técnico, entre em contato com a equipe DCL - Desenrola Comunicação & Lentes.
-
-- ✅ **Sistema híbrido** operacional  
-
-- ✅ **Backend conectado** às views---
-
-- ✅ **4 lentes** no catálogo
-
-- ✅ **3 fornecedores** ativos**Versão:** 1.0.0  
-
-- ✅ **Sistema de vouchers** com dados**Status:** Produção  
-
-**Última atualização:** Outubro 2025
-
-## 📚 **Documentação Completa**npm run dev              # Inicia dev server
-
-npm run lint             # Verifica código
-
-Para documentação detalhada, consulte:npm run format           # Formata código
-
-- **📋 [Documentação Completa](docs/README.md)**
-
-- **🏗️ [Arquitetura do Sistema](docs/scripts-desenvolvimento/README_Sistema_Completo.md)**# Banco de dados
-
-- **🔧 [Setup e Configuração](docs/scripts-desenvolvimento/SETUP_STATUS.md)**npm run db:start         # Inicia Supabase local
-
-npm run db:stop          # Para Supabase
-
-## 🤝 **Contribuição**npm run db:reset         # Reset DB + migrations
-
-npm run db:push          # Aplica migrations em produção
-
-Este é um sistema híbrido completo e funcional. Para modificações:```
-
-
-
-1. Consulte a documentação em `/docs`## 🤝 Contribuindo
-
-2. Execute testes com os scripts de auditoria
-
-3. Use o sistema de debug para validar mudanças1. Criar branch: `git checkout -b feat/nova-feature`
-
-2. Commit: `git commit -m "feat: adicionar nova feature"`
-
-## 📄 **Licença**3. Push: `git push origin feat/nova-feature`
-
-4. Abrir Pull Request
-
-Projeto privado - Sistema SIS Lens © 2025
-
-## 📄 Licença
+## Estrutura de Rotas
+
+```
+src/routes/
+├── /                        # Dashboard
+├── /lentes                  # Catálogo real (filtros completos)
+│   └── /[id]               # Detalhe + edição de preço
+├── /standard                # Canônicos standard (filtros)
+│   └── /[id]               # Detalhe canônico + lentes mapeadas
+├── /premium                 # Canônicos premium (filtros)
+│   └── /[id]               # Detalhe canônico + lentes mapeadas
+└── /contato                 # Lentes de contato (filtros completos)
+    └── /[id]               # Detalhe + edição de preço
+```
 
 ---
 
-Proprietário - Todos os direitos reservados
-**🎯 Sistema 100% operacional e pronto para produção!**
+## Padrão de Fetch (Client-Side)
+
+Todas as páginas de catálogo usam fetch client-side para evitar problemas de SSR com JWT:
+
+```
++page.server.ts  →  lê URL params apenas (sem queries ao DB)
++page.svelte     →  afterNavigate() → supabase client → fetch
+```
+
+---
+
+Projeto privado — SIS Lens © 2026
