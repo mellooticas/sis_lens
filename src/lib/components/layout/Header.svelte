@@ -1,13 +1,12 @@
 <!--
   SIS Lens — Header Dinâmico
   Padrão do Ecossistema SIS_DIGIAI (seção 3.2)
-  Avatar com iniciais | firstName | roleLabel | ThemeToggle | Logout
+  Avatar com iniciais | firstName | roleLabel | Logout
 -->
 <script lang="ts">
   import { createEventDispatcher } from "svelte";
   import { fade } from "svelte/transition";
   import { onMount } from "svelte";
-  import ThemeToggle from "$lib/components/ui/ThemeToggle.svelte";
   import { currentUser, logout } from "$lib/stores/auth";
 
   export let collapsed = false;
@@ -49,10 +48,10 @@
 
 <header
   class="
-  sticky top-4 z-40 mx-6 mt-4 rounded-2xl
-  bg-white/95 dark:bg-neutral-900/95 backdrop-blur-sm border-b border-neutral-200 dark:border-neutral-800
+  sticky top-0 h-16 z-30
+  bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800
   transition-all duration-300
-  flex items-center justify-between px-6 py-3
+  flex items-center justify-between px-6
 "
 >
   <!-- Esquerda: Menu Toggle + Saudação -->
@@ -110,10 +109,8 @@
     </div>
   </div>
 
-  <!-- Direita: ThemeToggle + Avatar do Usuário -->
+  <!-- Direita: Avatar do Usuário -->
   <div class="flex items-center gap-3">
-    <ThemeToggle size="md" />
-
     <!-- Avatar / User Menu -->
     {#if $currentUser}
       <div id="user-menu-container" class="relative">

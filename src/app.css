@@ -1,7 +1,6 @@
+/* SIS DIGIAI Design System — SIS Lens (Violet #8b5cf6) */
 /* ============================================================================
-   SIS_LENS — Design System Global
    Filosofia: "Base Neutra + Sotaque de Cor" (Ecossistema SIS_DIGIAI)
-   Cor primária: Violet (#7c3aed / violet-600)
    Regras: Flat · Sóbrio · Focado em Dados
    - SEM gradientes em backgrounds/buttons/cards
    - SEM sombras pesadas (máximo shadow-md)
@@ -21,7 +20,36 @@
 ============================================================================ */
 @layer base {
   :root {
-    /* Primary — SIS Lens Violet */
+    /* ── Standardized Design Tokens (SIS DIGIAI) ──────────────────────── */
+    --radius: 0.625rem;
+    --background: #ffffff;
+    --foreground: #0f172a;
+    --card: #ffffff;
+    --card-foreground: #0f172a;
+    --popover: #ffffff;
+    --popover-foreground: #0f172a;
+    --primary: #8b5cf6;
+    --primary-foreground: #ffffff;
+    --secondary: #f1f5f9;
+    --secondary-foreground: #0f172a;
+    --muted: #f1f5f9;
+    --muted-foreground: #64748b;
+    --accent: #f1f5f9;
+    --accent-foreground: #0f172a;
+    --destructive: #d4183d;
+    --border: #e2e8f0;
+    --input: #e2e8f0;
+    --ring: #8b5cf6;
+    --sidebar: #ffffff;
+    --sidebar-foreground: #0f172a;
+    --sidebar-primary: #8b5cf6;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #f1f5f9;
+    --sidebar-accent-foreground: #0f172a;
+    --sidebar-border: #e2e8f0;
+    --sidebar-ring: #8b5cf6;
+
+    /* ── Primary Scale — SIS Lens Violet ──────────────────────────────── */
     --primary-50:  #f5f3ff;
     --primary-100: #ede9fe;
     --primary-200: #ddd6fe;
@@ -33,7 +61,7 @@
     --primary-800: #5b21b6;
     --primary-900: #4c1d95;
 
-    /* Neutrals — Slate (padrão ecossistema) */
+    /* ── Neutrals — Slate (padrão ecossistema) ────────────────────────── */
     --neutral-50:  #f8fafc;
     --neutral-100: #f1f5f9;
     --neutral-200: #e2e8f0;
@@ -45,7 +73,7 @@
     --neutral-800: #1e293b;
     --neutral-900: #0f172a;
 
-    /* Semantic */
+    /* ── Semantic ─────────────────────────────────────────────────────── */
     --success:       #10b981;
     --success-light: #d1fae5;
     --success-dark:  #047857;
@@ -59,7 +87,7 @@
     --info-light:    #dbeafe;
     --info-dark:     #1d4ed8;
 
-    /* Shadows — flat e contidos */
+    /* ── Shadows — flat e contidos ────────────────────────────────────── */
     --shadow-sm:   0 1px 2px 0 rgba(0,0,0,.05);
     --shadow-card: 0 1px 3px 0 rgba(0,0,0,.07), 0 1px 2px -1px rgba(0,0,0,.05);
     --shadow-md:   0 4px 6px -1px rgba(0,0,0,.08), 0 2px 4px -2px rgba(0,0,0,.05);
@@ -67,6 +95,33 @@
 
   /* Dark Mode */
   .dark {
+    --background: #0f172a;
+    --foreground: #f1f5f9;
+    --card: #1e293b;
+    --card-foreground: #f1f5f9;
+    --popover: #1e293b;
+    --popover-foreground: #f1f5f9;
+    --primary: #a78bfa;
+    --primary-foreground: #ffffff;
+    --secondary: #1e293b;
+    --secondary-foreground: #f1f5f9;
+    --muted: #1e293b;
+    --muted-foreground: #94a3b8;
+    --accent: #1e293b;
+    --accent-foreground: #f1f5f9;
+    --destructive: #ef4444;
+    --border: #334155;
+    --input: #334155;
+    --ring: #a78bfa;
+    --sidebar: #0f172a;
+    --sidebar-foreground: #f1f5f9;
+    --sidebar-primary: #a78bfa;
+    --sidebar-primary-foreground: #ffffff;
+    --sidebar-accent: #1e293b;
+    --sidebar-accent-foreground: #f1f5f9;
+    --sidebar-border: #334155;
+    --sidebar-ring: #a78bfa;
+
     --neutral-50:  #020617;
     --neutral-100: #0f172a;
     --neutral-200: #1e293b;

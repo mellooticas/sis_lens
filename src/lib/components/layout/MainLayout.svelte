@@ -28,7 +28,7 @@
     <Header on:menuClick={toggleSidebar} collapsed={sidebarCollapsed} />
 
     <!-- Page Content -->
-    <main class="flex-1 p-6">
+    <main class="flex-1 p-8">
       <div class="container mx-auto max-w-7xl animate-fade-in">
         <slot />
       </div>

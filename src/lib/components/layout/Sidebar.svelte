@@ -7,6 +7,7 @@
   import { page } from "$app/stores";
   import Logo from "$lib/components/layout/Logo.svelte";
   import ThemeToggle from "$lib/components/ui/ThemeToggle.svelte";
+  import { currentUser } from "$lib/stores/auth";
 
   export let collapsed = false;
 
@@ -117,11 +118,23 @@
     bg-white dark:bg-neutral-900
   "
 >
-  <!-- Logo -->
+  <!-- Logo + Branding -->
   <div
-    class="h-16 flex items-center justify-center border-b border-neutral-200 dark:border-neutral-700 px-3 shrink-0"
+    class="flex flex-col items-center justify-center border-b border-neutral-200 dark:border-neutral-700 px-3 shrink-0
+           {collapsed ? 'h-16' : 'h-20 gap-0.5 py-2'}"
   >
-    <Logo size="lg" variant={collapsed ? "icon" : "full"} />
+    {#if collapsed}
+      <!-- Collapsed: icon badge -->
+      <div class="w-9 h-9 rounded-lg bg-[var(--primary)] flex items-center justify-center text-white font-headline font-bold text-sm">
+        SL
+      </div>
+    {:else}
+      <!-- Expanded: full logo + subtitle -->
+      <Logo size="lg" variant="full" />
+      <span class="text-[9px] font-medium uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500">
+        SIS DIGIAI
+      </span>
+    {/if}
   </div>
 
   <nav class="flex-1 overflow-y-auto custom-scrollbar pt-3 pb-6 px-2 space-y-6">
@@ -303,11 +316,32 @@
     {/each}
   </nav>
 
-  <!-- Footer: tema -->
-  <div class="border-t border-neutral-200 dark:border-neutral-700 p-2 shrink-0">
+  <!-- Footer: tema + user -->
+  <div class="border-t border-neutral-200 dark:border-neutral-700 p-2 shrink-0 space-y-2">
     <!-- Theme Toggle -->
     <div class="flex items-center justify-center py-1">
       <ThemeToggle size="sm" />
     </div>
+
+    <!-- User Profile -->
+    {#if $currentUser}
+      {#if !collapsed}
+        <div class="flex items-center gap-3 px-3 py-2 rounded-lg">
+          <div class="h-7 w-7 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-xs font-bold shrink-0">
+            {$currentUser.initials}
+          </div>
+          <div class="flex flex-col min-w-0">
+            <span class="text-sm font-medium truncate">{$currentUser.firstName}</span>
+            <span class="text-xs text-neutral-400 dark:text-neutral-500">{$currentUser.roleLabel}</span>
+          </div>
+        </div>
+      {:else}
+        <div class="flex justify-center py-1">
+          <div class="h-7 w-7 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-xs font-bold" title="{$currentUser.firstName}">
+            {$currentUser.initials}
+          </div>
+        </div>
+      {/if}
+    {/if}
   </div>
 </aside>
