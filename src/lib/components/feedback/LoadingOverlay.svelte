@@ -41,7 +41,7 @@
 <style>
   .loading-overlay {
     @apply fixed inset-0 z-50;
-    @apply bg-card/80;
+    background-color: hsl(var(--card) / 0.8);
     @apply backdrop-blur-sm;
     @apply flex items-center justify-center;
   }

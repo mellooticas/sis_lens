@@ -27,8 +27,39 @@ export default {
           800: '#5b21b6',
           900: '#4c1d95',
           950: '#2e1065',
-          DEFAULT: '#7c3aed'
+          DEFAULT: 'var(--primary)'
         },
+
+        // ── Standardized Design Tokens (CSS Variables) ──────────────
+        background: 'var(--background)',
+        foreground: 'var(--foreground)',
+        card: {
+          DEFAULT: 'var(--card)',
+          foreground: 'var(--card-foreground)'
+        },
+        popover: {
+          DEFAULT: 'var(--popover)',
+          foreground: 'var(--popover-foreground)'
+        },
+        secondary: {
+          DEFAULT: 'var(--secondary)',
+          foreground: 'var(--secondary-foreground)'
+        },
+        muted: {
+          DEFAULT: 'var(--muted)',
+          foreground: 'var(--muted-foreground)'
+        },
+        accent: {
+          DEFAULT: 'var(--accent)',
+          foreground: 'var(--accent-foreground)'
+        },
+        destructive: {
+          DEFAULT: 'var(--destructive)'
+        },
+        border: 'var(--border)',
+        input: 'var(--input)',
+        ring: 'var(--ring)',
+        'primary-foreground': 'var(--primary-foreground)',
 
         // Semantic Colors (padrão ecossistema)
         success: {
@@ -75,6 +106,12 @@ export default {
           950: '#451a03',
           DEFAULT: '#f59e0b'
         }
+      },
+
+      borderRadius: {
+        lg: 'var(--radius)',
+        md: 'calc(var(--radius) - 2px)',
+        sm: 'calc(var(--radius) - 4px)'
       },
 
       fontFamily: {

@@ -11,10 +11,14 @@ declare global {
       user: User | null;
     }
     interface PageData {
-      /** Sessão ativa do Supabase (fornecida pelo +layout.server.ts) */
+      /** Sessão ativa do Supabase (fornecida pelo +layout.ts) */
       session?: Session | null;
-      /** Usuário autenticado — necessário para o authStore (currentUser) */
+      /** Usuário autenticado — fornecido pelo +layout.server.ts */
       user?: User | null;
+      /** Cliente Supabase (browser ou server) — fornecido pelo +layout.ts */
+      supabase?: SupabaseClient;
+      /** Cookies do request — passados pelo +layout.server.ts para o +layout.ts */
+      cookies?: Array<{ name: string; value: string }>;
     }
     // interface Error {}
     // interface Platform {}
