@@ -3,8 +3,12 @@
  * Token Relay Receiver — Padrão SSO do Ecossistema SIS_DIGIAI
  *
  * O SIS Gateway envia access_token + refresh_token via query params.
- * Este handler cria a sessão local com cookies HttpOnly e redireciona
- * para a rota original.
+ * Este handler cria a sessão local com cookies HttpOnly e navega
+ * para a rota original via HTML 200 (não 303 redirect).
+ *
+ * ⚠️ Netlify CDN pode remover Set-Cookie de respostas 3xx (redirect).
+ * Usar HTML 200 com meta refresh garante que os cookies de sessão
+ * sejam preservados. Ref: sso_autenticacao.md seção 10.1
  *
  * Fluxo: Gateway → /auth/callback?access_token=X&refresh_token=Y&next=/catalog
  */
@@ -34,8 +38,28 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     const { error } = await supabase.auth.setSession({ access_token, refresh_token });
 
     if (!error) {
-      // Sessão estabelecida com sucesso → redireciona para destino original
-      throw redirect(303, next);
+      // ── HTML 200 com navegação client-side ──────────────────────────
+      // Netlify CDN pode strip Set-Cookie de 3xx redirects.
+      // Responder com 200 garante que os cookies de sessão sejam entregues
+      // ao browser antes da navegação para a página destino.
+      return new Response(
+        `<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8">
+  <meta http-equiv="refresh" content="0;url=${next}">
+  <title>Autenticando...</title>
+</head>
+<body>
+  <p>Autenticando...</p>
+  <script>window.location.href = ${JSON.stringify(next)};</script>
+</body>
+</html>`,
+        {
+          status: 200,
+          headers: { 'content-type': 'text/html' },
+        }
+      );
     }
 
     console.error('[auth/callback] Erro ao estabelecer sessão:', error.message);
