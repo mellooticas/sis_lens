@@ -47,23 +47,23 @@
   <div class="grid grid-cols-1 md:grid-cols-2 gap-8 relative">
     <!-- VS Badge Central -->
     <div
-      class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-white border-4 border-gray-100 font-bold text-gray-400 shadow-lg font-headline"
+      class="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 z-10 hidden md:flex items-center justify-center w-12 h-12 rounded-full bg-card border-4 border-border font-bold text-muted-foreground shadow-lg font-headline"
     >
       VS
     </div>
 
     <!-- COLUNA 1: GRIFE (Padrão de Mercado) -->
     <div
-      class="bg-white rounded-2xl border border-gray-200 shadow-sm overflow-hidden hover:shadow-md transition-shadow group"
+      class="bg-card rounded-2xl border border-border shadow-sm overflow-hidden hover:shadow-md transition-shadow group"
     >
       <div
-        class="bg-gray-50 p-6 border-b border-gray-100 group-hover:bg-gray-100 transition-colors"
+        class="bg-muted p-6 border-b border-border group-hover:bg-accent transition-colors"
       >
         <span
-          class="text-xs font-bold tracking-wider text-gray-500 uppercase font-headline"
+          class="text-xs font-bold tracking-wider text-muted-foreground uppercase font-headline"
           >Referência de Mercado</span
         >
-        <h3 class="text-2xl font-bold text-gray-800 mt-1 font-headline">
+        <h3 class="text-2xl font-bold text-foreground mt-1 font-headline">
           {brandOption.nome}
         </h3>
         <p class="text-primary-600 font-medium font-sans">
@@ -73,32 +73,32 @@
 
       <div class="p-6 space-y-4">
         <div class="space-y-2">
-          <div class="flex items-center gap-2 text-sm text-gray-600">
-            <span class="font-semibold text-gray-900">Tecnologia:</span>
+          <div class="flex items-center gap-2 text-sm text-muted-foreground">
+            <span class="font-semibold text-foreground">Tecnologia:</span>
             {brandOption.tecnologia}
           </div>
-          <div class="flex items-start gap-2 text-sm text-gray-600">
-            <span class="font-semibold text-gray-900">Tratamentos:</span>
+          <div class="flex items-start gap-2 text-sm text-muted-foreground">
+            <span class="font-semibold text-foreground">Tratamentos:</span>
             <div class="flex flex-wrap gap-1">
               {#each brandOption.tratamentos as t}
                 <span
-                  class="px-2 py-0.5 bg-gray-100 rounded-md text-xs font-medium text-gray-700 border border-gray-200"
+                  class="px-2 py-0.5 bg-muted rounded-md text-xs font-medium text-foreground border border-border"
                   >{t}</span
                 >
               {/each}
             </div>
           </div>
-          <div class="flex items-center gap-2 text-sm text-gray-600">
-            <span class="font-semibold text-gray-900">Prazo Estimado:</span>
+          <div class="flex items-center gap-2 text-sm text-muted-foreground">
+            <span class="font-semibold text-foreground">Prazo Estimado:</span>
             {brandOption.prazo}
           </div>
         </div>
 
-        <div class="mt-6 pt-6 border-t border-gray-100">
+        <div class="mt-6 pt-6 border-t border-border">
           <div class="flex justify-between items-end">
             <div>
-              <span class="text-sm text-gray-500 block mb-1">Investimento</span>
-              <span class="text-3xl font-bold text-gray-900 font-headline">
+              <span class="text-sm text-muted-foreground block mb-1">Investimento</span>
+              <span class="text-3xl font-bold text-foreground font-headline">
                 {new Intl.NumberFormat("pt-BR", {
                   style: "currency",
                   currency: "BRL",
@@ -106,7 +106,7 @@
               </span>
             </div>
             <button
-              class="px-6 py-2 bg-gray-900 text-white rounded-lg hover:bg-gray-800 transition-colors font-medium text-sm shadow-lg shadow-gray-200 uppercase tracking-wide"
+              class="px-6 py-2 bg-foreground text-background rounded-lg hover:bg-foreground/90 transition-colors font-medium text-sm shadow-lg shadow-border uppercase tracking-wide"
             >
               Selecionar
             </button>
@@ -143,7 +143,7 @@
 
     <!-- COLUNA 2: MARCA PRÓPRIA (Foco em Lucro) -->
     <div
-      class="bg-white rounded-2xl border-2 border-brand-gold-400 shadow-xl overflow-hidden relative transform md:-translate-y-2 ring-4 ring-brand-gold-100/50"
+      class="bg-card rounded-2xl border-2 border-brand-gold-400 shadow-xl overflow-hidden relative transform md:-translate-y-2 ring-4 ring-brand-gold-100/50"
     >
       <!-- Faixa de Destaque -->
       <div
@@ -169,7 +169,7 @@
           >Marca Própria Premium</span
         >
         <h3
-          class="text-2xl font-bold text-gray-900 mt-1 font-headline relative z-10"
+          class="text-2xl font-bold text-foreground mt-1 font-headline relative z-10"
         >
           {privateLabelOption.nome}
         </h3>
@@ -180,16 +180,16 @@
 
       <div class="p-6 space-y-4">
         <div class="space-y-2">
-          <div class="flex items-center gap-2 text-sm text-gray-700">
-            <span class="font-semibold text-gray-900">Tecnologia:</span>
+          <div class="flex items-center gap-2 text-sm text-foreground">
+            <span class="font-semibold text-foreground">Tecnologia:</span>
             <span
               class="px-2 py-0.5 bg-brand-gold-100 text-brand-gold-800 rounded font-bold text-[10px] tracking-wide border border-brand-gold-200"
               >EQUIVALENTE</span
             >
             {privateLabelOption.tecnologia}
           </div>
-          <div class="flex items-start gap-2 text-sm text-gray-700">
-            <span class="font-semibold text-gray-900">Tratamentos:</span>
+          <div class="flex items-start gap-2 text-sm text-foreground">
+            <span class="font-semibold text-foreground">Tratamentos:</span>
             <div class="flex flex-wrap gap-1">
               {#each privateLabelOption.tratamentos as t}
                 <span
@@ -199,9 +199,9 @@
               {/each}
             </div>
           </div>
-          <div class="flex items-center gap-2 text-sm text-gray-700">
+          <div class="flex items-center gap-2 text-sm text-foreground">
             <!-- Destaque para prazo menor (sourcing local) -->
-            <span class="font-semibold text-gray-900">Prazo Otimizado:</span>
+            <span class="font-semibold text-foreground">Prazo Otimizado:</span>
             <span
               class="text-green-600 font-bold flex items-center gap-1 bg-green-50 px-2 py-0.5 rounded-full text-xs border border-green-100"
             >
@@ -213,12 +213,12 @@
         <div class="mt-6 pt-6 border-t border-brand-gold-100">
           <div class="flex justify-between items-end">
             <div>
-              <span class="text-sm text-gray-500 block mb-1"
+              <span class="text-sm text-muted-foreground block mb-1"
                 >Condição Especial</span
               >
               <div class="flex items-center gap-3">
                 <span
-                  class="text-lg text-gray-400 line-through decoration-red-300 decoration-2 opacity-60"
+                  class="text-lg text-muted-foreground line-through decoration-red-300 decoration-2 opacity-60"
                 >
                   {new Intl.NumberFormat("pt-BR", {
                     style: "currency",
@@ -296,7 +296,7 @@
     </div>
   </div>
 
-  <p class="text-center text-gray-400 text-xs mt-8 opacity-70">
+  <p class="text-center text-muted-foreground text-xs mt-8 opacity-70">
     Comparação técnica baseada em índice de refração 1.67 e antirreflexo
     premium.<br />
     <span class="font-bold text-primary-900"

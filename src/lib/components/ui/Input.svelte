@@ -1,71 +1,60 @@
-﻿<script lang="ts">
+<script lang="ts">
   /**
-   * Input Component
-   * Input field padronizado para o sistema
+   * Input — SIS Lens Component Contract
+   * h-10 rounded-md border border-input bg-background px-3 py-2 text-sm
    */
-  
-  export let value = '';
-  export let label = '';
-  export let placeholder = '';
-  export let type: 'text' | 'email' | 'password' | 'number' | 'search' = 'text';
-  export let disabled = false;
-  export let required = false;
-  export let error = '';
-  export let name = '';
-  export let id = '';
-  export let min: string | undefined = undefined;
-  export let max: string | undefined = undefined;
-  export let step: string | undefined = undefined;
-  
-  // Classes base
-  const baseClasses = 'w-full rounded-lg border bg-white dark:bg-neutral-800 px-4 py-2.5 text-sm text-neutral-900 dark:text-neutral-100 transition-all duration-200 focus:outline-none focus:ring-2 disabled:opacity-50 disabled:cursor-not-allowed';
-  
-  $: inputClasses = `${baseClasses} ${
-    error 
-      ? 'border-error focus:border-error focus:ring-error/20' 
-      : 'border-neutral-300 dark:border-neutral-600 focus:border-primary-500 focus:ring-primary-500/20'
-  }`;
-  
-  // Gerar ID único se não fornecido
+  import type { HTMLInputAttributes } from 'svelte/elements';
+
+  interface Props extends HTMLInputAttributes {
+    label?: string;
+    error?: string;
+  }
+
+  let {
+    value = $bindable(''),
+    label = '',
+    error = '',
+    required = false,
+    id,
+    class: className = '',
+    ...restProps
+  }: Props = $props();
+
   const uniqueId = id || `input-${Math.random().toString(36).substr(2, 9)}`;
+
+  const baseClasses = 'flex h-10 w-full rounded-md border bg-background px-3 py-2 text-sm transition-colors file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:cursor-not-allowed disabled:opacity-50';
+
+  let inputClasses = $derived(
+    `${baseClasses} ${
+      error
+        ? 'border-destructive focus-visible:ring-destructive/50'
+        : 'border-input'
+    } ${className}`.trim()
+  );
 </script>
 
-<div class="space-y-1">
+<div class="space-y-1.5">
   {#if label}
-    <label 
+    <label
       for={uniqueId}
-      class="block text-sm font-medium text-neutral-700 dark:text-neutral-300"
+      class="block text-sm font-medium text-foreground"
     >
       {label}
       {#if required}
-        <span class="text-error ml-1">*</span>
+        <span class="text-destructive ml-1">*</span>
       {/if}
     </label>
   {/if}
-  
+
   <input
-    {name}
-    {type}
-    {placeholder}
-    {disabled}
-    {required}
-    {min}
-    {max}
-    {step}
     id={uniqueId}
+    {required}
     bind:value
     class={inputClasses}
-    on:input
-    on:change
-    on:focus
-    on:blur
-    on:keydown
-    on:keyup
-    on:keypress
-    {...$$restProps}
+    {...restProps}
   />
-  
+
   {#if error}
-    <p class="text-xs text-error mt-1">{error}</p>
+    <p class="text-xs text-destructive mt-1">{error}</p>
   {/if}
 </div>

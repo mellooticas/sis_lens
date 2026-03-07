@@ -220,8 +220,8 @@
 
 <style>
   .filter-panel {
-    @apply bg-white dark:bg-neutral-800;
-    @apply border border-neutral-200 dark:border-neutral-700;
+    @apply bg-card;
+    @apply border border-border;
     @apply rounded-xl;
     @apply transition-all duration-200;
   }
@@ -229,18 +229,18 @@
   .filter-header {
     @apply flex items-center justify-between;
     @apply px-6 py-4;
-    @apply border-b border-neutral-200 dark:border-neutral-700;
+    @apply border-b border-border;
   }
   
   .filter-title {
     @apply text-lg font-semibold;
-    @apply text-neutral-900 dark:text-neutral-100;
+    @apply text-foreground;
   }
   
   .toggle-btn {
     @apply p-2 rounded-lg;
-    @apply text-neutral-600 dark:text-neutral-400;
-    @apply hover:bg-neutral-100 dark:hover:bg-neutral-700;
+    @apply text-muted-foreground;
+    @apply hover:bg-accent;
     @apply transition-all duration-200;
   }
   
@@ -266,7 +266,7 @@
   
   .field-label {
     @apply block text-sm font-medium;
-    @apply text-neutral-700 dark:text-neutral-300;
+    @apply text-foreground;
   }
   
   .checkbox-grid {
@@ -275,7 +275,7 @@
   
   .filter-actions {
     @apply flex items-center justify-end gap-3;
-    @apply pt-4 border-t border-neutral-200 dark:border-neutral-700;
+    @apply pt-4 border-t border-border;
   }
   
   .filter-panel.collapsed .filter-header {

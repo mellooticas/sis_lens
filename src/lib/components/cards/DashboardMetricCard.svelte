@@ -35,10 +35,10 @@
   <!-- Linha superior: badge do ícone + título -->
   <div class="flex items-start justify-between gap-3">
     <div>
-      <p class="text-xs font-medium text-neutral-500 dark:text-neutral-400 uppercase tracking-wide leading-none mb-1">
+      <p class="text-xs font-medium text-muted-foreground uppercase tracking-wide leading-none mb-1">
         {title}
       </p>
-      <p class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 tracking-tight">
+      <p class="text-2xl font-bold text-foreground tracking-tight">
         {value}
       </p>
     </div>
@@ -83,9 +83,9 @@
 
   <!-- Linha inferior: subtitle + trend -->
   {#if subtitle || trend}
-    <div class="flex items-center justify-between gap-2 pt-1 border-t border-neutral-100 dark:border-neutral-700">
+    <div class="flex items-center justify-between gap-2 pt-1 border-t border-border">
       {#if subtitle}
-        <p class="text-xs text-neutral-500 dark:text-neutral-400">{subtitle}</p>
+        <p class="text-xs text-muted-foreground">{subtitle}</p>
       {/if}
       {#if trend}
         <!-- Trend indicator — cor semântica permitida aqui -->

@@ -24,7 +24,7 @@
 </script>
 
 <div
-  class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 hover:shadow-card-hover transition-all duration-300"
+  class="bg-card border border-border rounded-xl p-6 hover:shadow-card-hover transition-all duration-300"
   class:opacity-50={disabled}
 >
   <!-- Header -->
@@ -43,14 +43,14 @@
     >
       <span class="text-2xl">{icon}</span>
     </div>
-    <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100">
+    <h3 class="text-lg font-semibold text-foreground">
       {title}
     </h3>
   </div>
 
   <!-- Description -->
   <p
-    class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed mb-6"
+    class="text-sm text-muted-foreground leading-relaxed mb-6"
   >
     {description}
   </p>

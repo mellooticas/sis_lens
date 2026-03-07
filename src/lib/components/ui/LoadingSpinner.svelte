@@ -16,7 +16,7 @@
   const colorClasses = {
     primary: 'text-primary-500',
     white: 'text-white',
-    neutral: 'text-neutral-500'
+    neutral: 'text-muted-foreground'
   };
 </script>
 

@@ -25,15 +25,15 @@
   <button
     on:click={() => theme.toggle()}
     class="inline-flex items-center justify-center rounded-xl 
-      bg-gradient-to-br from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-900
-      text-neutral-800 dark:text-neutral-100
+      bg-gradient-to-br from-muted to-muted
+      text-foreground
       hover:from-primary-100 hover:to-primary-200 
       dark:hover:from-primary-900/40 dark:hover:to-primary-800/40
-      border border-neutral-300/50 dark:border-neutral-700/50
+      border border-border
       shadow-sm hover:shadow-md
       transition-all duration-300 hover:scale-110
       focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2 
-      dark:focus:ring-offset-neutral-900
+      dark:focus:ring-offset-background
       {sizes[size]}"
     title={$theme === 'light' ? 'Ativar modo escuro' : 'Ativar modo claro'}
     aria-label="Alternar tema"

@@ -1,65 +1,83 @@
-﻿<script lang="ts">
+<script lang="ts">
   /**
-   * Table Component
-   * Tabela de dados responsiva
+   * Table — SIS Lens Component Contract
+   * Header: bg-muted/50 text-muted-foreground px-4 py-3
+   * Row: border-b border-border hover:bg-muted/50
+   * Cell: px-4 py-4
    */
 
-  export let headers: Array<{
+  interface Header {
     key: string;
     label: string;
     sortable?: boolean;
-  }> = [];
-  export let data: Array<Record<string, any>> = [];
-  export let hoverable = true;
-  export let striped = false;
-  export let compact = false;
+  }
 
-  let sortKey = "";
-  let sortDirection: "asc" | "desc" = "asc";
+  interface Props {
+    headers?: Header[];
+    data?: Record<string, any>[];
+    hoverable?: boolean;
+    striped?: boolean;
+    compact?: boolean;
+    class?: string;
+  }
+
+  let {
+    headers = [],
+    data = [],
+    hoverable = true,
+    striped = false,
+    compact = false,
+    class: className = ''
+  }: Props = $props();
+
+  let sortKey = $state('');
+  let sortDirection = $state<'asc' | 'desc'>('asc');
 
   function handleSort(key: string) {
     if (sortKey === key) {
-      sortDirection = sortDirection === "asc" ? "desc" : "asc";
+      sortDirection = sortDirection === 'asc' ? 'desc' : 'asc';
     } else {
       sortKey = key;
-      sortDirection = "asc";
+      sortDirection = 'asc';
     }
   }
 
-  $: sortedData = sortKey
-    ? [...data].sort((a, b) => {
-        const aVal = a[sortKey];
-        const bVal = b[sortKey];
-        const modifier = sortDirection === "asc" ? 1 : -1;
+  let sortedData = $derived(
+    sortKey
+      ? [...data].sort((a, b) => {
+          const aVal = a[sortKey];
+          const bVal = b[sortKey];
+          const modifier = sortDirection === 'asc' ? 1 : -1;
 
-        if (typeof aVal === "number" && typeof bVal === "number") {
-          return (aVal - bVal) * modifier;
-        }
+          if (typeof aVal === 'number' && typeof bVal === 'number') {
+            return (aVal - bVal) * modifier;
+          }
 
-        return String(aVal).localeCompare(String(bVal)) * modifier;
-      })
-    : data;
+          return String(aVal).localeCompare(String(bVal)) * modifier;
+        })
+      : data
+  );
 </script>
 
-<div class="table-wrapper">
-  <table class="table" class:hoverable class:striped class:compact>
+<div class="w-full overflow-x-auto rounded-lg border border-border {className}">
+  <table class="w-full">
     <thead>
-      <tr>
+      <tr class="bg-muted/50 border-b border-border">
         {#each headers as header}
           <th
-            class:sortable={header.sortable}
-            class:active={sortKey === header.key}
-            on:click={() => header.sortable && handleSort(header.key)}
+            class="text-left text-xs font-semibold text-muted-foreground uppercase tracking-wider {compact ? 'px-3 py-2' : 'px-4 py-3'} {header.sortable ? 'cursor-pointer hover:bg-muted transition-colors select-none' : ''}"
+            class:text-primary={sortKey === header.key}
+            onclick={() => header.sortable && handleSort(header.key)}
           >
-            <div class="th-content">
+            <div class="flex items-center justify-between gap-2">
               <span>{header.label}</span>
 
               {#if header.sortable}
-                <span class="sort-icon">
+                <span class="text-muted-foreground/50">
                   {#if sortKey === header.key}
-                    {sortDirection === "asc" ? "↑" : "↓"}
+                    {sortDirection === 'asc' ? '\u2191' : '\u2193'}
                   {:else}
-                    ↕
+                    \u2195
                   {/if}
                 </span>
               {/if}
@@ -72,24 +90,20 @@
     <tbody>
       {#if sortedData.length === 0}
         <tr>
-          <td colspan={headers.length} class="empty-row">
-            <slot name="empty">
-              <div
-                class="text-center text-neutral-500 dark:text-neutral-400 py-8"
-              >
-                Nenhum dado disponível
-              </div>
-            </slot>
+          <td colspan={headers.length}>
+            <div class="text-center text-muted-foreground py-8">
+              Nenhum dado disponivel
+            </div>
           </td>
         </tr>
       {:else}
         {#each sortedData as row, i}
-          <tr>
+          <tr
+            class="border-b border-border last:border-b-0 {hoverable ? 'hover:bg-muted/50 transition-colors' : ''} {striped && i % 2 === 1 ? 'bg-muted/30' : ''}"
+          >
             {#each headers as header}
-              <td>
-                <slot name="cell" {row} column={header.key}>
-                  {row[header.key] ?? "-"}
-                </slot>
+              <td class="text-sm text-foreground {compact ? 'px-3 py-2' : 'px-4 py-4'}">
+                {row[header.key] ?? '-'}
               </td>
             {/each}
           </tr>
@@ -98,76 +112,3 @@
     </tbody>
   </table>
 </div>
-
-<style>
-  .table-wrapper {
-    @apply w-full overflow-x-auto;
-    @apply rounded-lg border border-neutral-200 dark:border-neutral-700;
-  }
-
-  .table {
-    @apply w-full;
-    @apply bg-transparent; /* Transparency for glass effect */
-  }
-
-  thead {
-    @apply bg-neutral-50/50 dark:bg-neutral-900/50; /* Semi-transparent header */
-    @apply border-b border-neutral-200/50 dark:border-neutral-700/50;
-  }
-
-  th {
-    @apply px-4 py-3;
-    @apply text-left text-xs font-semibold;
-    @apply text-neutral-700 dark:text-neutral-300;
-    @apply uppercase tracking-wider;
-  }
-
-  th.sortable {
-    @apply cursor-pointer;
-    @apply hover:bg-neutral-100 dark:hover:bg-neutral-800;
-    @apply transition-colors;
-  }
-
-  th.active {
-    @apply text-primary-600 dark:text-primary-400;
-  }
-
-  .th-content {
-    @apply flex items-center justify-between gap-2;
-  }
-
-  .sort-icon {
-    @apply text-neutral-400;
-  }
-
-  td {
-    @apply px-4 py-3;
-    @apply text-sm text-neutral-900 dark:text-neutral-100;
-  }
-
-  tbody tr {
-    @apply border-b border-neutral-200 dark:border-neutral-700;
-  }
-
-  tbody tr:last-child {
-    @apply border-b-0;
-  }
-
-  .table.hoverable tbody tr {
-    @apply hover:bg-neutral-50 dark:hover:bg-neutral-900/50;
-    @apply transition-colors;
-  }
-
-  .table.striped tbody tr:nth-child(even) {
-    @apply bg-neutral-50 dark:bg-neutral-900/30;
-  }
-
-  .table.compact th,
-  .table.compact td {
-    @apply px-3 py-2;
-  }
-
-  .empty-row {
-    @apply border-0;
-  }
-</style>

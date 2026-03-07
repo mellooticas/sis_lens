@@ -70,14 +70,14 @@
 	$: filtrosAtivos = contarFiltrosAtivos();
 </script>
 
-<div class="filtros-lentes bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg">
+<div class="filtros-lentes bg-card border border-border rounded-lg">
 	<!-- Header -->
-	<div class="px-4 py-3 border-b border-gray-200 dark:border-gray-700 flex items-center justify-between">
+	<div class="px-4 py-3 border-b border-border flex items-center justify-between">
 		<div class="flex items-center gap-3">
-			<svg class="h-5 w-5 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+			<svg class="h-5 w-5 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
 				<path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z" />
 			</svg>
-			<h3 class="text-lg font-semibold text-gray-900 dark:text-white">
+			<h3 class="text-lg font-semibold font-heading text-foreground">
 				Filtros
 			</h3>
 			{#if filtrosAtivos > 0}
@@ -101,12 +101,12 @@
 			<!-- Tipo de Lente -->
 			{#if $filtrosState.filtros?.tipos_lente}
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+					<label class="block text-sm font-medium text-foreground mb-2">
 						Tipo de Lente
 					</label>
 					<select
 						bind:value={filtrosLocais.tipo_lente}
-						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+						class="w-full px-3 py-2 border border-border bg-card rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-foreground"
 					>
 						<option value={undefined}>Todos os tipos</option>
 						{#each $filtrosState.filtros.tipos_lente as tipo}
@@ -119,12 +119,12 @@
 			<!-- Material -->
 			{#if $filtrosState.filtros?.materiais}
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+					<label class="block text-sm font-medium text-foreground mb-2">
 						Material
 					</label>
 					<select
 						bind:value={filtrosLocais.material}
-						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+						class="w-full px-3 py-2 border border-border bg-card rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-foreground"
 					>
 						<option value={undefined}>Todos os materiais</option>
 						{#each $filtrosState.filtros.materiais as material}
@@ -137,12 +137,12 @@
 			<!-- Índice de Refração -->
 			{#if $filtrosState.filtros?.indices_refracao}
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+					<label class="block text-sm font-medium text-foreground mb-2">
 						Índice de Refração
 					</label>
 					<select
 						bind:value={filtrosLocais.indice_refracao}
-						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+						class="w-full px-3 py-2 border border-border bg-card rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-foreground"
 					>
 						<option value={undefined}>Todos os índices</option>
 						{#each $filtrosState.filtros.indices_refracao as indice}
@@ -156,12 +156,12 @@
 			<!-- Marca -->
 			{#if $marcasState.marcas.length > 0}
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+					<label class="block text-sm font-medium text-foreground mb-2">
 						Marca
 					</label>
 					<select
 						bind:value={filtrosLocais.marca_id}
-						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+						class="w-full px-3 py-2 border border-border bg-card rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-foreground"
 					>
 						<option value={undefined}>Todas as marcas</option>
 						{#each $marcasState.marcas as marca}
@@ -176,12 +176,12 @@
 			<!-- Fornecedor -->
 			{#if $fornecedoresState.fornecedores.length > 0}
 				<div>
-					<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+					<label class="block text-sm font-medium text-foreground mb-2">
 						Fornecedor
 					</label>
 					<select
 						bind:value={filtrosLocais.fornecedor_id}
-						class="w-full px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+						class="w-full px-3 py-2 border border-border bg-card rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-foreground"
 					>
 						<option value={undefined}>Todos os fornecedores</option>
 						{#each $fornecedoresState.fornecedores as fornecedor}
@@ -197,9 +197,9 @@
 					<input
 						type="checkbox"
 						bind:checked={filtrosLocais.com_fotossensivel}
-						class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+						class="rounded border-border text-blue-600 focus:ring-blue-500"
 					/>
-					<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Fotossensível (Transitions)</span>
+					<span class="ml-2 text-sm text-foreground">Fotossensível (Transitions)</span>
 				</label>
 			</div>
 			
@@ -209,15 +209,15 @@
 					<input
 						type="checkbox"
 						bind:checked={filtrosLocais.apenas_premium}
-						class="rounded border-gray-300 text-blue-600 focus:ring-blue-500"
+						class="rounded border-border text-blue-600 focus:ring-blue-500"
 					/>
-					<span class="ml-2 text-sm text-gray-700 dark:text-gray-300">Apenas lentes premium</span>
+					<span class="ml-2 text-sm text-foreground">Apenas lentes premium</span>
 				</label>
 			</div>
 			
 			<!-- Faixa de Preço -->
 			<div>
-				<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
+				<label class="block text-sm font-medium text-foreground mb-2">
 					Faixa de Preço
 				</label>
 				<div class="grid grid-cols-2 gap-2">
@@ -225,23 +225,23 @@
 						type="number"
 						bind:value={filtrosLocais.preco_min}
 						placeholder="Mínimo"
-						class="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+						class="px-3 py-2 border border-border bg-card rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-foreground"
 					/>
 					<input
 						type="number"
 						bind:value={filtrosLocais.preco_max}
 						placeholder="Máximo"
-						class="px-3 py-2 border border-gray-300 dark:border-gray-600 bg-white dark:bg-gray-700 rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-gray-900 dark:text-white"
+						class="px-3 py-2 border border-border bg-card rounded-md shadow-sm focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-blue-500 text-foreground"
 					/>
 				</div>
 			</div>
 		</div>
 		
 		<!-- Footer com Ações -->
-		<div class="px-4 py-3 bg-gray-50 dark:bg-gray-900 border-t border-gray-200 dark:border-gray-700 flex items-center justify-between gap-3">
+		<div class="px-4 py-3 bg-muted border-t border-border flex items-center justify-between gap-3">
 			<button
 				on:click={limparFiltros}
-				class="flex-1 px-4 py-2 border border-gray-300 dark:border-gray-600 text-gray-700 dark:text-gray-300 text-sm font-medium rounded-md hover:bg-gray-50 dark:hover:bg-gray-800 focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
+				class="flex-1 px-4 py-2 border border-border text-foreground text-sm font-medium rounded-md hover:bg-accent focus:outline-none focus:ring-2 focus:ring-blue-500 transition-colors"
 			>
 				Limpar Filtros
 			</button>

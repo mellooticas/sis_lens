@@ -143,7 +143,7 @@
 
   /* ── Base ─────────────────────────────────────────────────────────────── */
   * {
-    @apply border-neutral-200 dark:border-neutral-700;
+    @apply border-border;
   }
 
   html {
@@ -151,7 +151,7 @@
   }
 
   body {
-    @apply bg-neutral-50 dark:bg-neutral-950 text-neutral-900 dark:text-neutral-100;
+    @apply bg-background text-foreground;
     @apply font-sans antialiased;
     /* Fundo plano — SEM gradientes animados, SEM orbs */
   }
@@ -180,8 +180,8 @@
   /* ── Cards ───────────────────────────────────────────────────────────── */
   /* Regra: fundo neutro, sem cores, sem gradiente */
   .card {
-    @apply rounded-lg bg-white dark:bg-neutral-800
-           border border-neutral-200 dark:border-neutral-700
+    @apply rounded-lg bg-card
+           border border-border
            shadow-sm transition-shadow duration-150;
   }
 
@@ -212,17 +212,17 @@
   }
 
   .btn-secondary {
-    @apply btn bg-neutral-100 dark:bg-neutral-700
-           text-neutral-700 dark:text-neutral-200
-           hover:bg-neutral-200 dark:hover:bg-neutral-600
-           border border-neutral-200 dark:border-neutral-600
-           focus:ring-neutral-400;
+    @apply btn bg-muted
+           text-foreground
+           hover:bg-accent
+           border border-border
+           focus:ring-ring;
   }
 
   .btn-ghost {
-    @apply btn bg-transparent text-neutral-600 dark:text-neutral-400
-           hover:bg-neutral-100 dark:hover:bg-neutral-800
-           focus:ring-neutral-400;
+    @apply btn bg-transparent text-muted-foreground
+           hover:bg-accent
+           focus:ring-ring;
   }
 
   .btn-destructive {
@@ -239,10 +239,10 @@
 
   /* ── Inputs ──────────────────────────────────────────────────────────── */
   .input {
-    @apply w-full rounded-lg border border-neutral-300 dark:border-neutral-600
-           bg-white dark:bg-neutral-800
-           px-3 py-2 text-sm text-neutral-900 dark:text-neutral-100
-           placeholder:text-neutral-400 dark:placeholder:text-neutral-500
+    @apply w-full rounded-lg border border-border
+           bg-card
+           px-3 py-2 text-sm text-foreground
+           placeholder:text-muted-foreground
            focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20
            dark:focus:border-primary-400 dark:focus:ring-primary-400/20
            transition-colors duration-150;
@@ -259,7 +259,7 @@
   .badge-error    { @apply bg-red-100    text-red-700    dark:bg-red-900/30    dark:text-red-400; }
   .badge-info     { @apply bg-blue-100   text-blue-700   dark:bg-blue-900/30   dark:text-blue-400; }
   .badge-primary  { @apply bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400; }
-  .badge-neutral  { @apply bg-neutral-100 text-neutral-600 dark:bg-neutral-700 dark:text-neutral-400; }
+  .badge-neutral  { @apply bg-muted text-muted-foreground; }
 
   /* Ranking */
   .badge-melhor-opcao    { @apply badge bg-amber-500  text-white font-semibold; }

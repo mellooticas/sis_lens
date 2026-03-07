@@ -65,13 +65,13 @@
   }
   
   .toggle-text {
-    @apply text-sm text-neutral-700 dark:text-neutral-300;
+    @apply text-sm text-foreground;
   }
   
   .toggle-switch {
     @apply relative flex items-center;
     @apply rounded-full;
-    @apply bg-neutral-300 dark:bg-neutral-600;
+    @apply bg-muted;
     @apply transition-all duration-200;
   }
   

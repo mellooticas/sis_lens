@@ -62,7 +62,7 @@
             uv:      "bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300",
             photo:   "bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300",
         };
-        return mapa[code] ?? "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300";
+        return mapa[code] ?? "bg-muted text-foreground";
     }
 
     // ── Ações ─────────────────────────────────────────────────────────────────
@@ -141,8 +141,8 @@
     <div class="mt-8 space-y-6">
 
         <!-- ── Tipo de Lente ────────────────────────────────────────────────── -->
-        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-5 rounded-xl shadow-sm">
-            <h3 class="text-sm font-bold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-4">
+        <div class="bg-card border border-border p-5 rounded-xl shadow-sm">
+            <h3 class="text-sm font-bold text-muted-foreground uppercase tracking-wider mb-4">
                 🔭 Tipo de Lente
             </h3>
             <div class="flex gap-3 flex-wrap">
@@ -155,7 +155,7 @@
                         class="flex items-center gap-2.5 px-4 py-2.5 rounded-xl cursor-pointer border-2 transition-all duration-200 font-semibold text-sm select-none
                             {tipoLente === opt.value
                                 ? 'border-primary-500 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                                : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-900 text-neutral-600 dark:text-neutral-400 hover:border-primary-300 dark:hover:border-primary-600'}"
+                                : 'border-border bg-card text-muted-foreground hover:border-primary-300 dark:hover:border-primary-600'}"
                     >
                         <input type="radio" bind:group={tipoLente} value={opt.value} class="sr-only" />
                         <span>{opt.emoji}</span>
@@ -178,8 +178,8 @@
                         <Eye size={16} class="text-white" />
                     </div>
                     <div>
-                        <h3 class="font-bold text-neutral-900 dark:text-white text-sm">OD — Olho Direito</h3>
-                        <p class="text-[11px] text-neutral-500 dark:text-neutral-500 font-mono">{formatarGrau(od.esferico)} / {formatarGrau(od.cilindrico)} × {od.eixo}°</p>
+                        <h3 class="font-bold text-foreground text-sm">OD — Olho Direito</h3>
+                        <p class="text-[11px] text-muted-foreground font-mono">{formatarGrau(od.esferico)} / {formatarGrau(od.cilindrico)} × {od.eixo}°</p>
                     </div>
                 </div>
                 <div class="receita-body">
@@ -237,10 +237,10 @@
                         <Eye size={16} class="text-white" />
                     </div>
                     <div>
-                        <h3 class="font-bold text-neutral-900 dark:text-white text-sm">OE — Olho Esquerdo</h3>
-                        <p class="text-[11px] text-neutral-500 dark:text-neutral-500 font-mono">{formatarGrau(oe.esferico)} / {formatarGrau(oe.cilindrico)} × {oe.eixo}°</p>
+                        <h3 class="font-bold text-foreground text-sm">OE — Olho Esquerdo</h3>
+                        <p class="text-[11px] text-muted-foreground font-mono">{formatarGrau(oe.esferico)} / {formatarGrau(oe.cilindrico)} × {oe.eixo}°</p>
                     </div>
-                    <label class="ml-auto flex items-center gap-2 text-xs cursor-pointer text-neutral-500 dark:text-neutral-400 font-medium">
+                    <label class="ml-auto flex items-center gap-2 text-xs cursor-pointer text-muted-foreground font-medium">
                         <input type="checkbox" bind:checked={usarMesmaReceita} class="w-3.5 h-3.5 accent-orange-500 cursor-pointer" />
                         Mesma do OD
                     </label>
@@ -310,7 +310,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <tr class="bg-white dark:bg-neutral-900">
+                        <tr class="bg-card">
                             <td class="preview-td label-td">OD</td>
                             <td class="preview-td">{formatarGrau(od.esferico)}</td>
                             <td class="preview-td">{formatarGrau(od.cilindrico)}</td>
@@ -318,7 +318,7 @@
                             {#if tipoLente !== "single_vision"}<td class="preview-td">{formatarGrau(od.adicao)}</td>{/if}
                             <td class="preview-td">{od.dnp} mm</td>
                         </tr>
-                        <tr class="bg-neutral-50 dark:bg-neutral-900/60">
+                        <tr class="bg-muted">
                             <td class="preview-td label-td">OE</td>
                             <td class="preview-td">{formatarGrau(oe.esferico)}</td>
                             <td class="preview-td">{formatarGrau(oe.cilindrico)}</td>
@@ -361,7 +361,7 @@
             <!-- Header + filtros rápidos -->
             <div class="flex items-center justify-between flex-wrap gap-4 pt-4">
                 <div class="flex items-center gap-3">
-                    <h3 class="text-xl font-black text-neutral-900 dark:text-white">Conceitos Compatíveis</h3>
+                    <h3 class="text-xl font-black text-foreground">Conceitos Compatíveis</h3>
                     <span class="px-3 py-1 rounded-full bg-gradient-to-r from-primary-600 to-indigo-600 text-white text-sm font-bold">
                         {totalResultados}
                     </span>
@@ -372,7 +372,7 @@
                         class="px-3 py-1.5 rounded-lg text-xs font-bold border-2 transition-all
                             {mostrarStandard
                                 ? 'border-primary-400 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300'
-                                : 'border-neutral-200 dark:border-neutral-700 text-neutral-400 opacity-50'}"
+                                : 'border-border text-muted-foreground opacity-50'}"
                     >
                         📦 Standard ({resultadosStandard.length})
                     </button>
@@ -381,7 +381,7 @@
                         class="px-3 py-1.5 rounded-lg text-xs font-bold border-2 transition-all
                             {mostrarPremium
                                 ? 'border-amber-400 bg-amber-50 dark:bg-amber-900/20 text-amber-700 dark:text-amber-300'
-                                : 'border-neutral-200 dark:border-neutral-700 text-neutral-400 opacity-50'}"
+                                : 'border-border text-muted-foreground opacity-50'}"
                     >
                         ★ Premium ({resultadosPremium.length})
                     </button>
@@ -393,25 +393,25 @@
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <Package size={16} class="text-primary-500" />
-                        <h4 class="font-bold text-sm text-neutral-600 dark:text-neutral-400">Lentes Standard</h4>
-                        <div class="h-px flex-1 bg-neutral-200 dark:bg-neutral-700"></div>
-                        <span class="text-xs text-neutral-400 font-mono">{resultadosStandard.length} conceito{resultadosStandard.length !== 1 ? 's' : ''}</span>
+                        <h4 class="font-bold text-sm text-muted-foreground">Lentes Standard</h4>
+                        <div class="h-px flex-1 bg-border"></div>
+                        <span class="text-xs text-muted-foreground font-mono">{resultadosStandard.length} conceito{resultadosStandard.length !== 1 ? 's' : ''}</span>
                     </div>
                     <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         {#each resultadosStandard as res (res.id)}
-                            <a href="/standard/{res.id}" class="result-card group border-neutral-200 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600">
+                            <a href="/standard/{res.id}" class="result-card group border-border hover:border-primary-400 dark:hover:border-primary-600">
                                 <!-- Header -->
                                 <div class="px-4 pt-4 pb-3 bg-gradient-to-br from-primary-50 to-blue-50 dark:from-primary-950/20 dark:to-blue-950/20">
                                     <div class="flex items-start justify-between gap-2 mb-2">
                                         <span class="inline-flex items-center px-2 py-0.5 rounded-md text-[11px] font-black tracking-wider font-mono bg-primary-100 text-primary-800 dark:bg-primary-900/40 dark:text-primary-300 border border-primary-200 dark:border-primary-700">
                                             {res.sku}
                                         </span>
-                                        <span class="text-[10px] font-mono text-neutral-400">{res.tenant_lens_count} lente{res.tenant_lens_count !== 1 ? 's' : ''}</span>
+                                        <span class="text-[10px] font-mono text-muted-foreground">{res.tenant_lens_count} lente{res.tenant_lens_count !== 1 ? 's' : ''}</span>
                                     </div>
-                                    <h5 class="font-bold text-neutral-900 dark:text-white text-sm leading-snug line-clamp-2 group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
+                                    <h5 class="font-bold text-foreground text-sm leading-snug line-clamp-2 group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
                                         {res.canonical_name}
                                     </h5>
-                                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                                    <p class="text-xs text-muted-foreground mt-1">
                                         {res.material_display} · n={res.refractive_index}
                                     </p>
                                 </div>
@@ -427,7 +427,7 @@
                                             {/each}
                                         </div>
                                     {:else}
-                                        <span class="text-[11px] text-neutral-400 italic">Sem tratamentos adicionais</span>
+                                        <span class="text-[11px] text-muted-foreground italic">Sem tratamentos adicionais</span>
                                     {/if}
                                 </div>
 
@@ -450,8 +450,8 @@
                                         </div>
                                     </div>
                                 {:else}
-                                    <div class="px-4 py-2 bg-neutral-100 dark:bg-neutral-800">
-                                        <p class="text-[10px] text-neutral-400 font-medium">Sem pricing cadastrado</p>
+                                    <div class="px-4 py-2 bg-muted">
+                                        <p class="text-[10px] text-muted-foreground font-medium">Sem pricing cadastrado</p>
                                     </div>
                                 {/if}
                             </a>
@@ -465,9 +465,9 @@
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <Star size={16} class="text-amber-500" />
-                        <h4 class="font-bold text-sm text-neutral-600 dark:text-neutral-400">Lentes Premium</h4>
+                        <h4 class="font-bold text-sm text-muted-foreground">Lentes Premium</h4>
                         <div class="h-px flex-1 bg-amber-200/60 dark:bg-amber-800/30"></div>
-                        <span class="text-xs text-neutral-400 font-mono">{resultadosPremium.length} conceito{resultadosPremium.length !== 1 ? 's' : ''}</span>
+                        <span class="text-xs text-muted-foreground font-mono">{resultadosPremium.length} conceito{resultadosPremium.length !== 1 ? 's' : ''}</span>
                     </div>
                     <div class="grid sm:grid-cols-2 xl:grid-cols-3 gap-4">
                         {#each resultadosPremium as res (res.id)}
@@ -479,13 +479,13 @@
                                             {res.sku}
                                         </span>
                                         <span class="flex items-center gap-1 text-[10px] text-amber-500 font-bold">
-                                            ★ <span class="text-neutral-400 font-normal font-mono">{res.tenant_lens_count}L</span>
+                                            ★ <span class="text-muted-foreground font-normal font-mono">{res.tenant_lens_count}L</span>
                                         </span>
                                     </div>
-                                    <h5 class="font-bold text-neutral-900 dark:text-white text-sm leading-snug line-clamp-2 group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
+                                    <h5 class="font-bold text-foreground text-sm leading-snug line-clamp-2 group-hover:text-amber-700 dark:group-hover:text-amber-300 transition-colors">
                                         {res.canonical_name}
                                     </h5>
-                                    <p class="text-xs text-neutral-500 dark:text-neutral-400 mt-1">
+                                    <p class="text-xs text-muted-foreground mt-1">
                                         {res.material_display} · n={res.refractive_index}
                                     </p>
                                 </div>
@@ -501,7 +501,7 @@
                                             {/each}
                                         </div>
                                     {:else}
-                                        <span class="text-[11px] text-neutral-400 italic">Sem tratamentos adicionais</span>
+                                        <span class="text-[11px] text-muted-foreground italic">Sem tratamentos adicionais</span>
                                     {/if}
                                 </div>
 
@@ -536,10 +536,10 @@
 
         {:else if jaBuscou && totalResultados === 0 && !loading}
             <!-- Zero resultados -->
-            <div class="text-center py-16 border-2 border-dashed border-neutral-200 dark:border-neutral-700 rounded-2xl">
+            <div class="text-center py-16 border-2 border-dashed border-border rounded-2xl">
                 <div class="text-5xl mb-4">🔍</div>
-                <h4 class="text-lg font-bold text-neutral-700 dark:text-neutral-300 mb-2">Nenhum conceito encontrado</h4>
-                <p class="text-sm text-neutral-500 max-w-sm mx-auto">
+                <h4 class="text-lg font-bold text-foreground mb-2">Nenhum conceito encontrado</h4>
+                <p class="text-sm text-muted-foreground max-w-sm mx-auto">
                     Não encontramos conceitos compatíveis com essa receita. Tente ajustar os graus ou o tipo de lente.
                 </p>
             </div>
@@ -548,10 +548,10 @@
             <!-- Estado inicial -->
             <div class="text-center py-16 opacity-60">
                 <div class="text-5xl mb-4">👓</div>
-                <p class="text-base text-neutral-500 dark:text-neutral-400 mb-1">
+                <p class="text-base text-muted-foreground mb-1">
                     Preencha a receita e clique em <strong>Buscar Conceitos Compatíveis</strong>
                 </p>
-                <p class="text-sm text-neutral-400">
+                <p class="text-sm text-muted-foreground">
                     Retorna conceitos Standard (CST) e Premium (CPR) com faixa de preço do pricing_book
                 </p>
             </div>

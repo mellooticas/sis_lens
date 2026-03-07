@@ -35,7 +35,7 @@
 </script>
 
 <div class="criterio-selector">
-  <label class="block text-sm font-medium text-neutral-700 mb-3">
+  <label class="block text-sm font-medium text-foreground mb-3">
     Critério de Decisão
   </label>
   
@@ -51,7 +51,7 @@
           <span class="text-2xl">{criterio.icon}</span>
           <div class="text-left">
             <div class="font-semibold">{criterio.label}</div>
-            <div class="text-xs text-neutral-600">{criterio.description}</div>
+            <div class="text-xs text-muted-foreground">{criterio.description}</div>
           </div>
         </div>
         
@@ -68,7 +68,7 @@
 <style>
   .criterio-option {
     @apply relative p-4 rounded-lg border-2 transition-all duration-200;
-    @apply bg-white border-neutral-200;
+    @apply bg-card border-border;
     @apply hover:border-primary-300 hover:shadow-sm;
     @apply text-left;
   }
@@ -81,7 +81,7 @@
   .radio-indicator {
     @apply absolute top-3 right-3;
     @apply w-5 h-5 rounded-full border-2;
-    @apply border-neutral-300;
+    @apply border-border;
     @apply flex items-center justify-center;
   }
   

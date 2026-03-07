@@ -54,8 +54,8 @@
     },
     neutral: {
       icon: Minus,
-      color: "text-neutral-600 dark:text-neutral-400",
-      bg: "bg-neutral-100 dark:bg-neutral-700/30",
+      color: "text-muted-foreground",
+      bg: "bg-muted",
     },
   };
 
@@ -64,7 +64,7 @@
 </script>
 
 <div
-  class="bg-white dark:bg-neutral-900 rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300 border {currentColor.border}"
+  class="bg-card rounded-xl overflow-hidden group hover:shadow-xl transition-all duration-300 border {currentColor.border}"
 >
   <!-- Header com gradiente -->
   <div

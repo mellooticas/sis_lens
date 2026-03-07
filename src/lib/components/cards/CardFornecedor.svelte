@@ -50,7 +50,7 @@
       <h3 class="font-headline text-xl font-bold text-primary-700 mb-1">
         {laboratorio.nome}
       </h3>
-      <p class="text-sm text-neutral-600">SKU: {laboratorio.sku}</p>
+      <p class="text-sm text-muted-foreground">SKU: {laboratorio.sku}</p>
     </div>
     
     {#if destaque}
@@ -64,18 +64,18 @@
   <div class="grid grid-cols-2 gap-4 mb-4">
     <!-- Preço -->
     <div>
-      <div class="text-sm text-neutral-600 mb-1">Preço Final</div>
+      <div class="text-sm text-muted-foreground mb-1">Preço Final</div>
       <div class="text-2xl font-bold text-primary-700">
         R$ {laboratorio.preco_final.toFixed(2)}
       </div>
-      <div class="text-xs text-neutral-500">
+      <div class="text-xs text-muted-foreground">
         Margem: {laboratorio.margem_pct}% (R$ {laboratorio.margem_valor.toFixed(2)})
       </div>
     </div>
 
     <!-- Prazo -->
     <div>
-      <div class="text-sm text-neutral-600 mb-1">Prazo de Entrega</div>
+      <div class="text-sm text-muted-foreground mb-1">Prazo de Entrega</div>
       <div class="flex items-center gap-2">
         <span 
           class="text-2xl font-bold" 
@@ -84,14 +84,14 @@
           {laboratorio.prazo_dias} dias
         </span>
       </div>
-      <div class="text-xs text-neutral-500">
+      <div class="text-xs text-muted-foreground">
         Frete: R$ {laboratorio.custo_frete.toFixed(2)}
       </div>
     </div>
   </div>
 
   <!-- Score de Qualidade -->
-  <div class="flex items-center gap-2 mb-4 pb-4 border-b border-neutral-200">
+  <div class="flex items-center gap-2 mb-4 pb-4 border-b border-border">
     <div class="flex items-center gap-1">
       <span class="text-lg">⭐</span>
       <span 
@@ -100,15 +100,15 @@
       >
         {laboratorio.score_qualidade.toFixed(1)}
       </span>
-      <span class="text-sm text-neutral-600">/ 10</span>
+      <span class="text-sm text-muted-foreground">/ 10</span>
     </div>
-    <span class="text-xs text-neutral-500">Score de Qualidade</span>
+    <span class="text-xs text-muted-foreground">Score de Qualidade</span>
   </div>
 
   <!-- Justificativa -->
   {#if laboratorio.justificativa}
-    <div class="bg-neutral-50 rounded-lg p-3 mb-4">
-      <div class="text-sm text-neutral-700">
+    <div class="bg-muted rounded-lg p-3 mb-4">
+      <div class="text-sm text-foreground">
         <strong class="text-primary-700">Por que {destaque ? 'é a melhor opção' : `está na posição ${laboratorio.rank_posicao}`}?</strong><br>
         {laboratorio.justificativa}
       </div>
@@ -131,7 +131,7 @@
 
 <style>
   .card-fornecedor {
-    @apply rounded-xl bg-white p-6 shadow-card transition-shadow duration-200;
+    @apply rounded-xl bg-card p-6 shadow-card transition-shadow duration-200;
     @apply border-2 border-transparent;
   }
   

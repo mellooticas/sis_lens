@@ -16,19 +16,19 @@
         <div class="flex items-center gap-2">
           <!-- Ranking badge -->
           <span
-            class="text-xs font-bold text-neutral-400 dark:text-neutral-500 w-6"
+            class="text-xs font-bold text-muted-foreground w-6"
           >
             #{index + 1}
           </span>
           <span
-            class="text-sm font-semibold text-neutral-700 dark:text-neutral-300 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+            class="text-sm font-semibold text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
           >
             {item.label}
           </span>
         </div>
         {#if showValues}
           <span
-            class="text-sm font-bold text-neutral-900 dark:text-white font-mono bg-neutral-100 dark:bg-neutral-700/50 px-3 py-1 rounded-full"
+            class="text-sm font-bold text-foreground font-mono bg-muted px-3 py-1 rounded-full"
           >
             {item.value.toLocaleString("pt-BR")}
           </span>
@@ -38,7 +38,7 @@
       <!-- Barra de progresso premium -->
       <div class="relative">
         <div
-          class="w-full bg-gradient-to-r from-neutral-100 to-neutral-200 dark:from-neutral-800 dark:to-neutral-700 rounded-full h-10 overflow-hidden shadow-inner"
+          class="w-full bg-gradient-to-r from-muted to-muted rounded-full h-10 overflow-hidden shadow-inner"
         >
           <div
             class="h-full rounded-full transition-all duration-700 ease-out flex items-center justify-end pr-4 relative overflow-hidden group-hover:shadow-lg"
@@ -63,7 +63,7 @@
         <!-- Percentual fora da barra (para valores pequenos) -->
         {#if percentage <= 20}
           <span
-            class="absolute left-full top-1/2 -translate-y-1/2 ml-3 text-xs font-bold text-neutral-600 dark:text-neutral-400"
+            class="absolute left-full top-1/2 -translate-y-1/2 ml-3 text-xs font-bold text-muted-foreground"
           >
             {percentage.toFixed(1)}%
           </span>

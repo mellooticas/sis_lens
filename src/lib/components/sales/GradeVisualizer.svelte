@@ -39,15 +39,15 @@
     }
 </script>
 
-<div class="bg-white p-4 rounded-xl border border-gray-200 inline-block">
-    <h4 class="text-sm font-bold text-gray-700 mb-2">
+<div class="bg-card p-4 rounded-xl border border-border inline-block">
+    <h4 class="text-sm font-bold font-heading text-foreground mb-2">
         Grade de Disponibilidade
     </h4>
 
     <div class="flex">
         <!-- Eixo Y (Cilíndrico) -->
         <div
-            class="flex flex-col justify-between pr-2 text-xs text-gray-400 font-mono py-6"
+            class="flex flex-col justify-between pr-2 text-xs text-muted-foreground font-mono py-6"
         >
             {#each cilindricos as cil}
                 <span>{cil.toFixed(2)}</span>
@@ -72,7 +72,7 @@
                                 ? 'bg-blue-600 ring-2 ring-blue-300 z-10 scale-125'
                                 : available
                                   ? 'bg-green-100 hover:bg-green-200'
-                                  : 'bg-gray-100 opacity-50'}"
+                                  : 'bg-muted opacity-50'}"
                             title="Esf {esf} / Cil {cil}"
                         >
                             {#if selected}
@@ -86,13 +86,13 @@
 
             <!-- Label Eixo X (Esférico) -->
             <div
-                class="flex justify-between pt-2 text-xs text-gray-400 font-mono px-1"
+                class="flex justify-between pt-2 text-xs text-muted-foreground font-mono px-1"
             >
                 {#each esfericos.filter((_, i) => i % 2 === 0) as esf}
                     <span>{esf > 0 ? "+" : ""}{esf}</span>
                 {/each}
             </div>
-            <div class="text-center text-[10px] text-gray-400 mt-1">
+            <div class="text-center text-[10px] text-muted-foreground mt-1">
                 SPH (Esférico)
             </div>
         </div>
@@ -101,11 +101,11 @@
     <div class="flex items-center justify-center gap-4 mt-4 text-xs">
         <div class="flex items-center gap-1">
             <div class="w-3 h-3 bg-green-100 rounded-sm"></div>
-            <span class="text-gray-600">Disponível</span>
+            <span class="text-muted-foreground">Disponível</span>
         </div>
         <div class="flex items-center gap-1">
-            <div class="w-3 h-3 bg-gray-100 rounded-sm"></div>
-            <span class="text-gray-400">Indisponível</span>
+            <div class="w-3 h-3 bg-muted rounded-sm"></div>
+            <span class="text-muted-foreground">Indisponível</span>
         </div>
         <div class="flex items-center gap-1">
             <div class="w-3 h-3 bg-blue-600 rounded-sm"></div>

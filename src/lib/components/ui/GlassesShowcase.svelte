@@ -72,10 +72,10 @@
 <div class="glasses-showcase">
   <!-- Header -->
   <div class="text-center mb-8">
-    <h2 class="text-3xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+    <h2 class="text-3xl font-bold text-foreground mb-2">
       {title}
     </h2>
-    <p class="text-neutral-600 dark:text-neutral-400">
+    <p class="text-muted-foreground">
       {subtitle}
     </p>
   </div>
@@ -94,10 +94,10 @@
 
       <!-- Info -->
       <div class="mt-6 text-center">
-        <h3 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+        <h3 class="text-2xl font-bold text-foreground">
           {glassesStyles[selectedStyle].name}
         </h3>
-        <p class="text-neutral-600 dark:text-neutral-400 mt-2">
+        <p class="text-muted-foreground mt-2">
           {glassesStyles[selectedStyle].description}
         </p>
         {#if glassesStyles[selectedStyle].popular}

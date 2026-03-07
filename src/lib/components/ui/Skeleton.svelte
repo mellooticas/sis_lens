@@ -1,67 +1,55 @@
 <script lang="ts">
   /**
-   * Skeleton Loader Component
-   * Placeholder de loading
+   * Skeleton — SIS Lens Component Contract
+   * bg-muted animate-pulse rounded-md
    */
-  
-  export let variant: 'text' | 'title' | 'card' | 'circle' | 'button' = 'text';
-  export let width: string | undefined = undefined;
-  export let height: string | undefined = undefined;
-  export let count = 1;
+  import type { HTMLAttributes } from 'svelte/elements';
+
+  interface Props extends HTMLAttributes<HTMLDivElement> {
+    variant?: 'text' | 'title' | 'card' | 'circle' | 'button';
+    width?: string;
+    height?: string;
+    count?: number;
+  }
+
+  let {
+    variant = 'text',
+    width,
+    height,
+    count = 1,
+    class: className = '',
+    ...restProps
+  }: Props = $props();
+
+  const variantClasses: Record<string, string> = {
+    text: 'h-4 w-full',
+    title: 'h-8 w-3/4',
+    card: 'w-full h-48',
+    circle: 'w-12 h-12 rounded-full',
+    button: 'h-10 w-24 rounded-md'
+  };
+
+  const baseClasses = 'bg-muted animate-pulse rounded-md';
 </script>
 
 {#if variant === 'text'}
-  {#each Array(count) as _, i}
-    <div 
-      class="skeleton skeleton-text" 
+  {#each Array(count) as _}
+    <div
+      class="{baseClasses} {variantClasses.text} mb-2 {className}"
       style={width ? `width: ${width}` : ''}
+      {...restProps}
     ></div>
   {/each}
-{:else if variant === 'title'}
-  <div 
-    class="skeleton skeleton-title"
-    style={width ? `width: ${width}` : ''}
-  ></div>
-{:else if variant === 'card'}
-  <div 
-    class="skeleton skeleton-card"
-    style={`${width ? `width: ${width};` : ''} ${height ? `height: ${height};` : ''}`}
-  ></div>
 {:else if variant === 'circle'}
-  <div 
-    class="skeleton skeleton-circle"
+  <div
+    class="{baseClasses} {variantClasses.circle} {className}"
     style={width ? `width: ${width}; height: ${width}` : ''}
+    {...restProps}
   ></div>
-{:else if variant === 'button'}
-  <div class="skeleton skeleton-button"></div>
+{:else}
+  <div
+    class="{baseClasses} {variantClasses[variant]} {className}"
+    style="{width ? `width: ${width};` : ''} {height ? `height: ${height};` : ''}"
+    {...restProps}
+  ></div>
 {/if}
-
-<style>
-  .skeleton {
-    @apply animate-pulse;
-    @apply bg-neutral-200 dark:bg-neutral-700;
-    @apply rounded;
-  }
-  
-  .skeleton-text {
-    @apply h-4 w-full mb-2;
-  }
-  
-  .skeleton-title {
-    @apply h-8 w-3/4 mb-4;
-  }
-  
-  .skeleton-card {
-    @apply w-full h-48;
-  }
-  
-  .skeleton-circle {
-    @apply w-12 h-12;
-    @apply rounded-full;
-  }
-  
-  .skeleton-button {
-    @apply h-10 w-24;
-    @apply rounded-lg;
-  }
-</style>

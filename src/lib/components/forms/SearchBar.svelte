@@ -177,22 +177,22 @@
   .searchbar-input {
     @apply relative flex items-center;
     @apply w-full rounded-lg;
-    @apply bg-white dark:bg-neutral-800;
-    @apply border border-neutral-300 dark:border-neutral-700;
+    @apply bg-card;
+    @apply border border-border;
     @apply transition-all duration-200;
     @apply focus-within:border-primary-500 focus-within:ring-2 focus-within:ring-primary-500/20;
   }
   
   .search-icon {
     @apply absolute left-3;
-    @apply text-neutral-400 dark:text-neutral-500;
+    @apply text-muted-foreground;
   }
   
   .search-field {
     @apply w-full pl-10 pr-10 py-3;
     @apply bg-transparent;
-    @apply text-sm text-neutral-900 dark:text-neutral-100;
-    @apply placeholder:text-neutral-400 dark:placeholder:text-neutral-500;
+    @apply text-sm text-foreground;
+    @apply placeholder:text-muted-foreground;
     @apply focus:outline-none;
   }
   
@@ -202,7 +202,7 @@
   
   .spinner-sm {
     @apply w-4 h-4;
-    @apply border-2 border-neutral-300 dark:border-neutral-600;
+    @apply border-2 border-border;
     @apply border-t-primary-500;
     @apply rounded-full;
     @apply animate-spin;
@@ -211,16 +211,15 @@
   .search-clear {
     @apply absolute right-3;
     @apply p-1 rounded;
-    @apply text-neutral-400 hover:text-neutral-600;
-    @apply dark:text-neutral-500 dark:hover:text-neutral-300;
-    @apply hover:bg-neutral-100 dark:hover:bg-neutral-700;
+    @apply text-muted-foreground hover:text-foreground;
+    @apply hover:bg-accent;
     @apply transition-colors;
   }
   
   .searchbar-dropdown {
     @apply absolute z-50 w-full mt-2;
-    @apply bg-white dark:bg-neutral-800;
-    @apply border border-neutral-200 dark:border-neutral-700;
+    @apply bg-card;
+    @apply border border-border;
     @apply rounded-lg shadow-lg;
     @apply max-h-96 overflow-y-auto;
   }
@@ -231,7 +230,7 @@
   
   .section-title {
     @apply px-4 py-2 text-xs font-semibold;
-    @apply text-neutral-500 dark:text-neutral-400;
+    @apply text-muted-foreground;
     @apply uppercase tracking-wider;
   }
   
@@ -239,12 +238,12 @@
     @apply w-full flex items-start gap-3;
     @apply px-4 py-2;
     @apply text-left;
-    @apply hover:bg-neutral-50 dark:hover:bg-neutral-700;
+    @apply hover:bg-accent;
     @apply transition-colors;
   }
   
   .dropdown-item.highlighted {
-    @apply bg-neutral-100 dark:bg-neutral-700;
+    @apply bg-muted;
   }
   
   .item-icon {
@@ -257,15 +256,15 @@
   
   .item-label {
     @apply text-sm font-medium;
-    @apply text-neutral-900 dark:text-neutral-100;
+    @apply text-foreground;
   }
   
   .item-description {
-    @apply text-xs text-neutral-500 dark:text-neutral-400;
+    @apply text-xs text-muted-foreground;
   }
   
   .dropdown-empty {
     @apply px-4 py-8 text-center;
-    @apply text-sm text-neutral-500 dark:text-neutral-400;
+    @apply text-sm text-muted-foreground;
   }
 </style>

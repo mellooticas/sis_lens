@@ -58,12 +58,12 @@
       <!-- Ícone com fundo -->
       <div class="flex-shrink-0 flex items-center gap-2">
         <div
-          class="w-12 h-12 rounded-xl bg-white dark:bg-neutral-800 shadow-md flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
+          class="w-12 h-12 rounded-xl bg-card shadow-md flex items-center justify-center group-hover:scale-110 transition-transform duration-300"
         >
           <span class="text-2xl">{icon}</span>
         </div>
         <div
-          class="hidden sm:flex w-10 h-10 rounded-lg bg-white/50 dark:bg-neutral-800/50 items-center justify-center"
+          class="hidden sm:flex w-10 h-10 rounded-lg bg-card/50 items-center justify-center"
         >
           <svelte:component
             this={config.iconComponent}

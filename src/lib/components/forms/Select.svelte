@@ -162,8 +162,8 @@
   .select-trigger {
     @apply w-full flex items-center justify-between;
     @apply px-4 py-2 rounded-lg;
-    @apply bg-white dark:bg-neutral-800;
-    @apply border border-neutral-300 dark:border-neutral-700;
+    @apply bg-card;
+    @apply border border-border;
     @apply text-sm text-left;
     @apply transition-all duration-200;
     @apply hover:border-primary-400 dark:hover:border-primary-600;
@@ -184,16 +184,16 @@
   }
   
   .select-value {
-    @apply flex-1 text-neutral-900 dark:text-neutral-100;
+    @apply flex-1 text-foreground;
   }
   
   .select-trigger:not(.disabled) .select-value:empty::before {
     content: attr(placeholder);
-    @apply text-neutral-400;
+    @apply text-muted-foreground;
   }
   
   .select-icon {
-    @apply text-neutral-400 transition-transform duration-200;
+    @apply text-muted-foreground transition-transform duration-200;
   }
   
   .select-icon.rotate {
@@ -202,20 +202,20 @@
   
   .select-dropdown {
     @apply absolute z-50 w-full mt-2;
-    @apply bg-white dark:bg-neutral-800;
-    @apply border border-neutral-200 dark:border-neutral-700;
+    @apply bg-card;
+    @apply border border-border;
     @apply rounded-lg shadow-lg;
     @apply overflow-hidden;
   }
   
   .select-search {
-    @apply p-2 border-b border-neutral-200 dark:border-neutral-700;
+    @apply p-2 border-b border-border;
   }
   
   .search-input {
     @apply w-full px-3 py-2 rounded-lg;
-    @apply bg-neutral-50 dark:bg-neutral-900;
-    @apply border border-neutral-200 dark:border-neutral-700;
+    @apply bg-muted;
+    @apply border border-border;
     @apply text-sm;
     @apply focus:outline-none focus:ring-2 focus:ring-primary-500/20;
   }
@@ -227,8 +227,8 @@
   .select-option {
     @apply w-full flex items-center justify-between;
     @apply px-4 py-2 text-sm text-left;
-    @apply text-neutral-700 dark:text-neutral-300;
-    @apply hover:bg-neutral-100 dark:hover:bg-neutral-700;
+    @apply text-foreground;
+    @apply hover:bg-accent;
     @apply transition-colors;
   }
   
@@ -239,12 +239,12 @@
   }
   
   .select-option.highlighted {
-    @apply bg-neutral-100 dark:bg-neutral-700;
+    @apply bg-muted;
   }
   
   .select-empty {
     @apply px-4 py-8 text-center text-sm;
-    @apply text-neutral-500 dark:text-neutral-400;
+    @apply text-muted-foreground;
   }
   
   .select-error {

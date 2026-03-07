@@ -58,10 +58,10 @@
   .textarea {
     @apply w-full rounded-lg;
     @apply px-4 py-2;
-    @apply bg-white dark:bg-neutral-800;
-    @apply border border-neutral-300 dark:border-neutral-700;
-    @apply text-sm text-neutral-900 dark:text-neutral-100;
-    @apply placeholder:text-neutral-400 dark:placeholder:text-neutral-500;
+    @apply bg-card;
+    @apply border border-border;
+    @apply text-sm text-foreground;
+    @apply placeholder:text-muted-foreground;
     @apply transition-all duration-200;
     @apply focus:border-primary-500 focus:ring-2 focus:ring-primary-500/20;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
@@ -81,7 +81,7 @@
   }
   
   .textarea-counter {
-    @apply text-neutral-500 dark:text-neutral-400;
+    @apply text-muted-foreground;
     @apply ml-auto;
   }
   

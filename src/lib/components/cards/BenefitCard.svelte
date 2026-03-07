@@ -21,12 +21,12 @@
   </div>
   
   <!-- Title -->
-  <h4 class="font-semibold text-neutral-900 dark:text-neutral-100">
+  <h4 class="font-semibold text-foreground">
     {title}
   </h4>
   
   <!-- Description -->
-  <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+  <p class="text-sm text-muted-foreground leading-relaxed">
     {description}
   </p>
 </div>

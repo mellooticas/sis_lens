@@ -59,8 +59,8 @@
   
   .radio-circle {
     @apply w-5 h-5 rounded-full;
-    @apply border-2 border-neutral-300 dark:border-neutral-600;
-    @apply bg-white dark:bg-neutral-800;
+    @apply border-2 border-border;
+    @apply bg-card;
     @apply flex items-center justify-center;
     @apply transition-all duration-200;
   }
@@ -74,7 +74,7 @@
   }
   
   .radio-input:disabled + .radio-label .radio-circle {
-    @apply bg-neutral-100 dark:bg-neutral-700;
+    @apply bg-muted;
   }
   
   .radio-dot {
@@ -83,6 +83,6 @@
   }
   
   .radio-text {
-    @apply text-sm text-neutral-700 dark:text-neutral-300;
+    @apply text-sm text-foreground;
   }
 </style>

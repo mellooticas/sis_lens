@@ -1,76 +1,62 @@
 <script lang="ts">
   /**
-   * ErrorState Component
-   * Estado de erro com opção de retry
+   * ErrorState — SIS Lens Component Contract
+   * Error state with retry action
    */
-  
   import Button from './Button.svelte';
-  
-  export let title = 'Algo deu errado';
-  export let message = 'Não foi possível carregar os dados. Tente novamente.';
-  export let showRetry = true;
-  export let onRetry: (() => void) | undefined = undefined;
+  import type { Snippet } from 'svelte';
+
+  interface Props {
+    title?: string;
+    message?: string;
+    showRetry?: boolean;
+    onretry?: () => void;
+    children?: Snippet;
+  }
+
+  let {
+    title = 'Algo deu errado',
+    message = 'Nao foi possivel carregar os dados. Tente novamente.',
+    showRetry = true,
+    onretry,
+    children
+  }: Props = $props();
 </script>
 
-<div class="error-state">
+<div class="flex flex-col items-center justify-center text-center py-12 px-4">
   <!-- Icon -->
-  <div class="error-icon">
+  <div class="text-destructive mb-4">
     <svg width="64" height="64" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-      <path 
-        stroke-linecap="round" 
-        stroke-linejoin="round" 
-        stroke-width="2" 
-        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" 
+      <path
+        stroke-linecap="round"
+        stroke-linejoin="round"
+        stroke-width="2"
+        d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
       />
     </svg>
   </div>
-  
+
   <!-- Title -->
-  <h3 class="error-title">
+  <h3 class="text-xl font-semibold text-foreground mb-2">
     {title}
   </h3>
-  
+
   <!-- Message -->
-  <p class="error-message">
+  <p class="text-sm text-muted-foreground max-w-md mb-6">
     {message}
   </p>
-  
-  <!-- Slot para conteúdo adicional -->
-  <slot />
-  
+
+  <!-- Custom content -->
+  {#if children}
+    {@render children()}
+  {/if}
+
   <!-- Retry Button -->
-  {#if showRetry && onRetry}
-    <div class="error-action">
-      <Button variant="primary" on:click={onRetry}>
-        🔄 Tentar Novamente
+  {#if showRetry && onretry}
+    <div class="mt-4">
+      <Button variant="default" onclick={onretry}>
+        Tentar Novamente
       </Button>
     </div>
   {/if}
 </div>
-
-<style>
-  .error-state {
-    @apply flex flex-col items-center justify-center;
-    @apply text-center;
-    @apply py-12 px-4;
-  }
-  
-  .error-icon {
-    @apply text-error mb-4;
-  }
-  
-  .error-title {
-    @apply text-xl font-semibold;
-    @apply text-neutral-900 dark:text-neutral-100;
-    @apply mb-2;
-  }
-  
-  .error-message {
-    @apply text-sm text-neutral-600 dark:text-neutral-400;
-    @apply max-w-md mb-6;
-  }
-  
-  .error-action {
-    @apply mt-4;
-  }
-</style>

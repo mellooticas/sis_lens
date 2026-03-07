@@ -1,7 +1,9 @@
 <script lang="ts">
   /**
-   * Modal — Re-export from ui/Modal for backward compatibility
-   * Use $lib/components/ui/Modal.svelte directly for new code
+   * Modal — SIS Lens Component Contract
+   * Overlay: bg-black/50 fixed inset-0 z-50
+   * Content: bg-background rounded-lg shadow-lg p-6
+   * Transitions: fade + scale
    */
   import { fade, scale } from 'svelte/transition';
   import type { Snippet } from 'svelte';
@@ -70,6 +72,7 @@
 <svelte:window onkeydown={handleKeydown} />
 
 {#if open}
+  <!-- Overlay -->
   <!-- svelte-ignore a11y_no_static_element_interactions -->
   <div
     class="bg-black/50 fixed inset-0 z-50 flex items-center justify-center p-4"
@@ -78,6 +81,7 @@
     onkeydown={handleKeydown}
     role="presentation"
   >
+    <!-- Content -->
     <div
       class="relative w-full {sizes[size]} bg-background rounded-lg shadow-lg max-h-[90vh] overflow-hidden flex flex-col"
       transition:scale={{ duration: 200, start: 0.95 }}
@@ -85,6 +89,7 @@
       aria-modal="true"
       aria-labelledby={title ? 'modal-title' : undefined}
     >
+      <!-- Header -->
       {#if title || showClose}
         <div class="flex items-center justify-between px-6 py-4 border-b border-border">
           {#if title}
@@ -107,12 +112,14 @@
         </div>
       {/if}
 
+      <!-- Body -->
       <div class="p-6 overflow-y-auto text-foreground">
         {#if children}
           {@render children()}
         {/if}
       </div>
 
+      <!-- Footer -->
       {#if footer}
         <div class="px-6 py-4 border-t border-border flex items-center justify-end gap-3">
           {@render footer()}

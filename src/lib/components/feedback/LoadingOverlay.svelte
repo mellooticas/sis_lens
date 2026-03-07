@@ -30,7 +30,7 @@
       
       <!-- Mensagem -->
       {#if message}
-        <p class="text-neutral-700 dark:text-neutral-300 text-lg">
+        <p class="text-foreground text-lg">
           {message}
         </p>
       {/if}
@@ -41,7 +41,7 @@
 <style>
   .loading-overlay {
     @apply fixed inset-0 z-50;
-    @apply bg-white/80 dark:bg-neutral-900/80;
+    @apply bg-card/80;
     @apply backdrop-blur-sm;
     @apply flex items-center justify-center;
   }
@@ -52,7 +52,7 @@
   
   .spinner {
     @apply w-12 h-12;
-    @apply border-4 border-neutral-200 dark:border-neutral-700;
+    @apply border-4 border-border;
     @apply border-t-primary-500;
     @apply rounded-full;
     @apply animate-spin;

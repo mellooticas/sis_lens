@@ -109,13 +109,13 @@
     <title>{lente?.lens_name ?? 'Lente'} | SIS Lens</title>
 </svelte:head>
 
-<main class="min-h-screen bg-neutral-50 dark:bg-neutral-950 pb-24">
+<main class="min-h-screen bg-muted pb-24">
 
     <!-- Back bar -->
-    <div class="bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800">
+    <div class="bg-card border-b border-border">
         <Container maxWidth="xl" padding="sm">
             <div class="py-3">
-                <a href="/lentes" class="inline-flex items-center gap-2 text-sm font-bold text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors">
+                <a href="/lentes" class="inline-flex items-center gap-2 text-sm font-bold text-muted-foreground hover:text-foreground transition-colors">
                     <svg class="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
                         <path stroke-linecap="round" stroke-linejoin="round" d="M15 19l-7-7 7-7"/>
                     </svg>
@@ -129,13 +129,13 @@
         <div class="mt-6">
 
             {#if loading}
-                <div class="flex flex-col items-center justify-center py-24 bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl">
+                <div class="flex flex-col items-center justify-center py-24 bg-card border border-border rounded-2xl">
                     <div class="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p class="text-neutral-500 text-sm">Carregando dados da lente...</p>
+                    <p class="text-muted-foreground text-sm">Carregando dados da lente...</p>
                 </div>
 
             {:else if erro || !lente}
-                <div class="py-16 text-center bg-white dark:bg-neutral-900 border border-red-200 dark:border-red-900 rounded-2xl">
+                <div class="py-16 text-center bg-card border border-red-200 dark:border-red-900 rounded-2xl">
                     <div class="text-5xl mb-4">😕</div>
                     <p class="text-red-500 font-semibold">{erro ?? 'Lente não encontrada'}</p>
                     <a href="/lentes" class="mt-4 inline-block px-4 py-2 bg-primary-600 text-white text-sm font-bold rounded-lg">
@@ -150,13 +150,13 @@
                     <div class="lg:col-span-2 space-y-4">
 
                         <!-- Header card -->
-                        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-6">
+                        <div class="bg-card border border-border rounded-2xl p-6">
                             <div class="flex items-start justify-between gap-4 mb-4">
                                 <div>
-                                    <h1 class="text-xl font-black text-neutral-900 dark:text-white leading-tight">
+                                    <h1 class="text-xl font-black text-foreground leading-tight">
                                         {lente.lens_name ?? '—'}
                                     </h1>
-                                    <p class="text-sm text-neutral-500 mt-0.5">
+                                    <p class="text-sm text-muted-foreground mt-0.5">
                                         {lente.supplier_name ?? '—'}{#if lente.brand_name} · {lente.brand_name}{/if}
                                     </p>
                                 </div>
@@ -175,38 +175,38 @@
                             <!-- Specs grid -->
                             <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
                                 {#if lente.lens_type}
-                                    <div class="bg-neutral-50 dark:bg-neutral-800 rounded-xl px-3 py-2.5">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-0.5">Tipo</div>
-                                        <div class="text-sm font-semibold text-neutral-900 dark:text-white">{TIPO_LABELS[lente.lens_type] ?? lente.lens_type}</div>
+                                    <div class="bg-muted rounded-xl px-3 py-2.5">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Tipo</div>
+                                        <div class="text-sm font-semibold text-foreground">{TIPO_LABELS[lente.lens_type] ?? lente.lens_type}</div>
                                     </div>
                                 {/if}
                                 {#if lente.material_name}
-                                    <div class="bg-neutral-50 dark:bg-neutral-800 rounded-xl px-3 py-2.5">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-0.5">Material</div>
-                                        <div class="text-sm font-semibold text-neutral-900 dark:text-white">{lente.material_name}</div>
+                                    <div class="bg-muted rounded-xl px-3 py-2.5">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Material</div>
+                                        <div class="text-sm font-semibold text-foreground">{lente.material_name}</div>
                                     </div>
                                 {/if}
                                 {#if lente.refractive_index}
-                                    <div class="bg-neutral-50 dark:bg-neutral-800 rounded-xl px-3 py-2.5">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-0.5">Índice</div>
-                                        <div class="text-sm font-semibold text-neutral-900 dark:text-white">n = {lente.refractive_index}</div>
+                                    <div class="bg-muted rounded-xl px-3 py-2.5">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Índice</div>
+                                        <div class="text-sm font-semibold text-foreground">n = {lente.refractive_index}</div>
                                     </div>
                                 {/if}
                                 {#if lente.category}
-                                    <div class="bg-neutral-50 dark:bg-neutral-800 rounded-xl px-3 py-2.5">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-0.5">Categoria</div>
-                                        <div class="text-sm font-semibold text-neutral-900 dark:text-white capitalize">{lente.category}</div>
+                                    <div class="bg-muted rounded-xl px-3 py-2.5">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Categoria</div>
+                                        <div class="text-sm font-semibold text-foreground capitalize">{lente.category}</div>
                                     </div>
                                 {/if}
                                 {#if lente.sku}
-                                    <div class="bg-neutral-50 dark:bg-neutral-800 rounded-xl px-3 py-2.5">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-0.5">SKU</div>
-                                        <div class="font-mono text-sm font-semibold text-neutral-900 dark:text-white">{lente.sku}</div>
+                                    <div class="bg-muted rounded-xl px-3 py-2.5">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">SKU</div>
+                                        <div class="font-mono text-sm font-semibold text-foreground">{lente.sku}</div>
                                     </div>
                                 {/if}
                                 {#if lente.stock_available != null}
-                                    <div class="bg-neutral-50 dark:bg-neutral-800 rounded-xl px-3 py-2.5">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-0.5">Estoque</div>
+                                    <div class="bg-muted rounded-xl px-3 py-2.5">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Estoque</div>
                                         <div class="text-sm font-semibold {lente.stock_available > 0 ? 'text-emerald-600 dark:text-emerald-400' : 'text-red-500'}">{lente.stock_available} unid.</div>
                                     </div>
                                 {/if}
@@ -215,8 +215,8 @@
 
                         <!-- Tratamentos -->
                         {#if tratamentos.length > 0}
-                            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5">
-                                <h2 class="text-sm font-black uppercase tracking-wide text-neutral-400 mb-3">Tratamentos</h2>
+                            <div class="bg-card border border-border rounded-2xl p-5">
+                                <h2 class="text-sm font-black uppercase tracking-wide text-muted-foreground mb-3">Tratamentos</h2>
                                 <div class="flex flex-wrap gap-2">
                                     {#each tratamentos as t}
                                         <span class="px-3 py-1.5 bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300 text-xs font-bold rounded-lg border border-primary-100 dark:border-primary-800">{t}</span>
@@ -227,27 +227,27 @@
 
                         <!-- Faixa de prescrição -->
                         {#if lente.spherical_min != null || lente.cylindrical_min != null}
-                            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5">
-                                <h2 class="text-sm font-black uppercase tracking-wide text-neutral-400 mb-3">Faixa de Prescrição</h2>
+                            <div class="bg-card border border-border rounded-2xl p-5">
+                                <h2 class="text-sm font-black uppercase tracking-wide text-muted-foreground mb-3">Faixa de Prescrição</h2>
                                 <div class="grid grid-cols-3 gap-3">
-                                    <div class="text-center bg-neutral-50 dark:bg-neutral-800 rounded-xl p-3">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1">Esférico</div>
-                                        <div class="text-sm font-bold text-neutral-900 dark:text-white">{fmtNum(lente.spherical_min)}</div>
-                                        <div class="text-xs text-neutral-400">a</div>
-                                        <div class="text-sm font-bold text-neutral-900 dark:text-white">{fmtNum(lente.spherical_max)}</div>
+                                    <div class="text-center bg-muted rounded-xl p-3">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1">Esférico</div>
+                                        <div class="text-sm font-bold text-foreground">{fmtNum(lente.spherical_min)}</div>
+                                        <div class="text-xs text-muted-foreground">a</div>
+                                        <div class="text-sm font-bold text-foreground">{fmtNum(lente.spherical_max)}</div>
                                     </div>
-                                    <div class="text-center bg-neutral-50 dark:bg-neutral-800 rounded-xl p-3">
-                                        <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1">Cilíndrico</div>
-                                        <div class="text-sm font-bold text-neutral-900 dark:text-white">{fmtNum(lente.cylindrical_min)}</div>
-                                        <div class="text-xs text-neutral-400">a</div>
-                                        <div class="text-sm font-bold text-neutral-900 dark:text-white">{fmtNum(lente.cylindrical_max)}</div>
+                                    <div class="text-center bg-muted rounded-xl p-3">
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1">Cilíndrico</div>
+                                        <div class="text-sm font-bold text-foreground">{fmtNum(lente.cylindrical_min)}</div>
+                                        <div class="text-xs text-muted-foreground">a</div>
+                                        <div class="text-sm font-bold text-foreground">{fmtNum(lente.cylindrical_max)}</div>
                                     </div>
                                     {#if lente.addition_min != null}
-                                        <div class="text-center bg-neutral-50 dark:bg-neutral-800 rounded-xl p-3">
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400 mb-1">Adição</div>
-                                            <div class="text-sm font-bold text-neutral-900 dark:text-white">{fmtNum(lente.addition_min)}</div>
-                                            <div class="text-xs text-neutral-400">a</div>
-                                            <div class="text-sm font-bold text-neutral-900 dark:text-white">{fmtNum(lente.addition_max)}</div>
+                                        <div class="text-center bg-muted rounded-xl p-3">
+                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1">Adição</div>
+                                            <div class="text-sm font-bold text-foreground">{fmtNum(lente.addition_min)}</div>
+                                            <div class="text-xs text-muted-foreground">a</div>
+                                            <div class="text-sm font-bold text-foreground">{fmtNum(lente.addition_max)}</div>
                                         </div>
                                     {/if}
                                 </div>
@@ -257,9 +257,9 @@
 
                     <!-- Sidebar preço -->
                     <div class="space-y-4">
-                        <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5">
+                        <div class="bg-card border border-border rounded-2xl p-5">
                             <div class="flex items-center justify-between mb-4">
-                                <h2 class="text-sm font-black uppercase tracking-wide text-neutral-400">Preços</h2>
+                                <h2 class="text-sm font-black uppercase tracking-wide text-muted-foreground">Preços</h2>
                                 {#if !editando}
                                     <button on:click={abrirEdicao}
                                         class="text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">
@@ -278,17 +278,17 @@
                                 <!-- Modo edição -->
                                 <div class="space-y-3">
                                     <div>
-                                        <label class="text-[10px] font-black uppercase tracking-wider text-neutral-400 block mb-1">Custo (R$)</label>
+                                        <label class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1">Custo (R$)</label>
                                         <input type="number" step="0.01" min="0" bind:value={editCost}
-                                            class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg text-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
                                     </div>
                                     <div>
-                                        <label class="text-[10px] font-black uppercase tracking-wider text-neutral-400 block mb-1">Preço Sugerido (R$)</label>
+                                        <label class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1">Preço Sugerido (R$)</label>
                                         <input type="number" step="0.01" min="0" bind:value={editSugerido}
-                                            class="w-full px-3 py-2 border border-neutral-300 dark:border-neutral-600 rounded-lg text-sm bg-white dark:bg-neutral-800 text-neutral-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
                                     </div>
                                     {#if editCost > 0 && editSugerido > 0}
-                                        <div class="text-xs text-neutral-400 text-right">
+                                        <div class="text-xs text-muted-foreground text-right">
                                             Margem: <span class="font-bold text-emerald-600 dark:text-emerald-400">
                                                 {(((editSugerido - editCost) / editSugerido) * 100).toFixed(1)}%
                                             </span>
@@ -303,7 +303,7 @@
                                             {editSalvando ? 'Salvando…' : 'Salvar'}
                                         </button>
                                         <button on:click={() => { editando = false; editErro = null; }}
-                                            class="px-3 py-2 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-600 dark:text-neutral-400 text-xs font-bold rounded-lg transition-colors">
+                                            class="px-3 py-2 bg-muted hover:bg-accent text-muted-foreground text-xs font-bold rounded-lg transition-colors">
                                             Cancelar
                                         </button>
                                     </div>
@@ -313,19 +313,19 @@
                                 <div class="space-y-4">
                                     {#if lente.price_suggested}
                                         <div>
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Preço Sugerido</div>
-                                            <div class="text-3xl font-black text-neutral-900 dark:text-white mt-0.5">{fmt(lente.price_suggested)}</div>
+                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Preço Sugerido</div>
+                                            <div class="text-3xl font-black text-foreground mt-0.5">{fmt(lente.price_suggested)}</div>
                                         </div>
                                     {/if}
                                     {#if lente.price_cost}
-                                        <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800">
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Custo</div>
-                                            <div class="text-xl font-bold text-neutral-500 dark:text-neutral-400 mt-0.5">{fmt(lente.price_cost)}</div>
+                                        <div class="pt-3 border-t border-border">
+                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Custo</div>
+                                            <div class="text-xl font-bold text-muted-foreground dark:text-muted-foreground mt-0.5">{fmt(lente.price_cost)}</div>
                                         </div>
                                     {/if}
                                     {#if lente.price_cost && lente.price_suggested}
-                                        <div class="pt-3 border-t border-neutral-100 dark:border-neutral-800">
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-neutral-400">Margem</div>
+                                        <div class="pt-3 border-t border-border">
+                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground">Margem</div>
                                             <div class="text-lg font-bold text-emerald-600 dark:text-emerald-400 mt-0.5">
                                                 {(((lente.price_suggested - lente.price_cost) / lente.price_suggested) * 100).toFixed(1)}%
                                             </div>
@@ -336,19 +336,19 @@
                         </div>
 
                         {#if lente.lead_time_days || lente.stock_minimum}
-                            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-2xl p-5">
-                                <h2 class="text-sm font-black uppercase tracking-wide text-neutral-400 mb-3">Logística</h2>
+                            <div class="bg-card border border-border rounded-2xl p-5">
+                                <h2 class="text-sm font-black uppercase tracking-wide text-muted-foreground mb-3">Logística</h2>
                                 <div class="space-y-2">
                                     {#if lente.lead_time_days}
                                         <div class="flex items-center justify-between">
-                                            <span class="text-xs text-neutral-500">Prazo entrega</span>
-                                            <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300">{lente.lead_time_days} dias</span>
+                                            <span class="text-xs text-muted-foreground">Prazo entrega</span>
+                                            <span class="text-xs font-bold text-foreground">{lente.lead_time_days} dias</span>
                                         </div>
                                     {/if}
                                     {#if lente.stock_minimum}
                                         <div class="flex items-center justify-between">
-                                            <span class="text-xs text-neutral-500">Estoque mínimo</span>
-                                            <span class="text-xs font-bold text-neutral-700 dark:text-neutral-300">{lente.stock_minimum} unid.</span>
+                                            <span class="text-xs text-muted-foreground">Estoque mínimo</span>
+                                            <span class="text-xs font-bold text-foreground">{lente.stock_minimum} unid.</span>
                                         </div>
                                     {/if}
                                 </div>
@@ -356,7 +356,7 @@
                         {/if}
 
                         <a href="/lentes"
-                            class="block w-full text-center px-4 py-3 bg-neutral-100 dark:bg-neutral-800 hover:bg-neutral-200 dark:hover:bg-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm font-bold rounded-xl transition-colors">
+                            class="block w-full text-center px-4 py-3 bg-muted hover:bg-accent text-foreground text-sm font-bold rounded-xl transition-colors">
                             ← Voltar ao Catálogo
                         </a>
                     </div>

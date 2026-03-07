@@ -64,21 +64,21 @@
 </script>
 
 <div
-    class="bg-white rounded-xl shadow-sm border border-gray-200 overflow-hidden font-sans"
+    class="bg-card rounded-xl shadow-sm border border-border overflow-hidden font-sans"
 >
     <div
-        class="p-6 border-b border-gray-100 flex justify-between items-center bg-gray-50"
+        class="p-6 border-b border-border flex justify-between items-center bg-muted"
     >
         <div>
             <h3
-                class="text-lg font-bold text-gray-800 flex items-center gap-2 font-headline"
+                class="text-lg font-bold text-foreground flex items-center gap-2 font-headline"
             >
                 <Building2 size={20} class="text-primary-500" />
                 SIS Lens Sourcing
             </h3>
-            <p class="text-sm text-gray-500">
+            <p class="text-sm text-muted-foreground">
                 Gestão de fornecedores para: <span
-                    class="font-medium text-gray-900">{lenteVirtual.nome}</span
+                    class="font-medium text-foreground">{lenteVirtual.nome}</span
                 >
             </p>
         </div>
@@ -99,7 +99,7 @@
 
     <div class="p-0 overflow-x-auto">
         <table class="w-full text-left text-sm">
-            <thead class="bg-gray-50 text-gray-500 border-b border-gray-100">
+            <thead class="bg-muted text-muted-foreground border-b border-border">
                 <tr>
                     <th
                         class="px-6 py-3 font-medium uppercase text-xs tracking-wider"
@@ -127,15 +127,15 @@
                     >
                 </tr>
             </thead>
-            <tbody class="divide-y divide-gray-100">
+            <tbody class="divide-y divide-border">
                 {#each sortedOptions as opt, i}
                     <tr
-                        class="hover:bg-gray-50 transition-colors {i === 0
+                        class="hover:bg-accent transition-colors {i === 0
                             ? 'bg-green-50/30'
                             : ''}"
                     >
                         <td
-                            class="px-6 py-4 font-medium text-gray-900 flex items-center gap-2"
+                            class="px-6 py-4 font-medium text-foreground flex items-center gap-2"
                         >
                             {#if i === 0}
                                 <span
@@ -146,14 +146,14 @@
                             {/if}
                             {opt.lab_nome}
                         </td>
-                        <td class="px-6 py-4 text-gray-600"
+                        <td class="px-6 py-4 text-muted-foreground"
                             >{opt.produto_real}</td
                         >
                         <td
                             class="px-6 py-4 text-right font-mono font-medium {i ===
                             0
                                 ? 'text-green-700'
-                                : 'text-gray-600'}"
+                                : 'text-muted-foreground'}"
                         >
                             {new Intl.NumberFormat("pt-BR", {
                                 style: "currency",
@@ -165,7 +165,7 @@
                                 class="inline-flex items-center gap-1 px-2 py-1 rounded-md {opt.prazo >
                                 7
                                     ? 'bg-red-50 text-red-700'
-                                    : 'bg-gray-100 text-gray-700'}"
+                                    : 'bg-muted text-foreground'}"
                             >
                                 <Clock size={14} />
                                 {opt.prazo}d
@@ -179,7 +179,7 @@
                                         : 'text-yellow-600'}"
                                     >{opt.quality_score}</span
                                 >
-                                <span class="text-gray-400 text-xs">/10</span>
+                                <span class="text-muted-foreground text-xs">/10</span>
                             </div>
                         </td>
                         <td class="px-6 py-4 text-right">
@@ -197,7 +197,7 @@
                                 </span>
                             {:else}
                                 <span
-                                    class="inline-flex items-center gap-1 text-gray-500 font-medium text-xs bg-gray-100 px-2 py-1 rounded-full border border-gray-200"
+                                    class="inline-flex items-center gap-1 text-muted-foreground font-medium text-xs bg-muted px-2 py-1 rounded-full border border-border"
                                 >
                                     <CheckCircle size={12} /> Homologado
                                 </span>
@@ -210,7 +210,7 @@
     </div>
 
     <div
-        class="bg-gray-50 p-4 border-t border-gray-200 text-xs text-center text-gray-500"
+        class="bg-muted p-4 border-t border-border text-xs text-center text-muted-foreground"
     >
         <p>
             O <strong>SIS Lens</strong> redireciona automaticamente os pedidos

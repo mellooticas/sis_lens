@@ -14,11 +14,10 @@
 </script>
 
 <div 
-  class="bg-white dark:bg-neutral-800 rounded-xl border p-6 transition-all duration-200"
+  class="bg-card rounded-xl border p-6 transition-all duration-200"
   class:border-brand-gold-500={highlighted}
   class:shadow-elevated={highlighted}
-  class:border-neutral-200={!highlighted}
-  class:dark:border-neutral-700={!highlighted}
+  class:border-border={!highlighted}
   class:hover:shadow-card-hover={!highlighted}
 >
   <!-- Icon + Badge -->
@@ -34,12 +33,12 @@
   </div>
   
   <!-- Title -->
-  <h3 class="text-lg font-semibold text-neutral-900 dark:text-neutral-100 mb-2">
+  <h3 class="text-lg font-semibold text-foreground mb-2">
     {title}
   </h3>
   
   <!-- Description -->
-  <p class="text-sm text-neutral-600 dark:text-neutral-400 leading-relaxed">
+  <p class="text-sm text-muted-foreground leading-relaxed">
     {description}
   </p>
   

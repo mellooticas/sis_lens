@@ -82,7 +82,7 @@
 </svelte:head>
 
 <main
-  class="min-h-screen bg-gradient-to-br from-neutral-50 via-blue-50 to-neutral-100 dark:from-neutral-900 dark:via-neutral-800 dark:to-neutral-900"
+  class="min-h-screen bg-gradient-to-br from-muted via-blue-50 to-muted dark:from-background dark:via-background dark:to-background"
 >
   <Container>
     <PageHero
@@ -110,7 +110,7 @@
         <div class="grid grid-cols-1 lg:grid-cols-3 gap-6 mt-6">
           <!-- Mais Caros -->
           <div
-            class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+            class="bg-card rounded-xl shadow-lg border border-border overflow-hidden"
           >
             <div
               class="bg-gradient-to-r from-amber-500 to-orange-500 px-6 py-4"
@@ -123,7 +123,7 @@
             <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
               {#each topCaros as lens, index}
                 <div
-                  class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                  class="flex items-start gap-3 p-3 rounded-lg bg-muted hover:bg-accent transition-colors"
                 >
                   <span
                     class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 font-bold text-sm"
@@ -132,11 +132,11 @@
                   </span>
                   <div class="flex-1 min-w-0">
                     <h4
-                      class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1"
+                      class="font-semibold text-foreground text-sm leading-tight mb-1"
                     >
                       {lens.lens_name}
                     </h4>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                    <p class="text-xs text-muted-foreground">
                       {formatarTexto(lens.lens_type)} • {lens.brand_name}
                     </p>
                   </div>
@@ -154,7 +154,7 @@
 
           <!-- Mais Populares -->
           <div
-            class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+            class="bg-card rounded-xl shadow-lg border border-border overflow-hidden"
           >
             <div
               class="bg-gradient-to-r from-green-500 to-emerald-500 px-6 py-4"
@@ -167,7 +167,7 @@
             <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
               {#each topPopulares as lens, index}
                 <div
-                  class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                  class="flex items-start gap-3 p-3 rounded-lg bg-muted hover:bg-accent transition-colors"
                 >
                   <span
                     class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-400 font-bold text-sm"
@@ -176,11 +176,11 @@
                   </span>
                   <div class="flex-1 min-w-0">
                     <h4
-                      class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1"
+                      class="font-semibold text-foreground text-sm leading-tight mb-1"
                     >
                       {lens.lens_name}
                     </h4>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                    <p class="text-xs text-muted-foreground">
                       {formatarTexto(lens.lens_type)} • {lens.brand_name}
                     </p>
                   </div>
@@ -198,7 +198,7 @@
 
           <!-- Premium -->
           <div
-            class="bg-white dark:bg-neutral-800 rounded-xl shadow-lg border border-neutral-200 dark:border-neutral-700 overflow-hidden"
+            class="bg-card rounded-xl shadow-lg border border-border overflow-hidden"
           >
             <div class="bg-gradient-to-r from-purple-500 to-pink-500 px-6 py-4">
               <h3 class="text-lg font-bold text-white flex items-center gap-2">
@@ -209,7 +209,7 @@
             <div class="p-6 space-y-3 max-h-[600px] overflow-y-auto">
               {#each topPremium as lens, index}
                 <div
-                  class="flex items-start gap-3 p-3 rounded-lg bg-neutral-50 dark:bg-neutral-700/50 hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
+                  class="flex items-start gap-3 p-3 rounded-lg bg-muted hover:bg-accent transition-colors"
                 >
                   <span
                     class="flex-shrink-0 w-8 h-8 flex items-center justify-center rounded-full bg-purple-100 dark:bg-purple-900/30 text-purple-700 dark:text-purple-400 font-bold text-sm"
@@ -218,11 +218,11 @@
                   </span>
                   <div class="flex-1 min-w-0">
                     <h4
-                      class="font-semibold text-neutral-900 dark:text-white text-sm leading-tight mb-1"
+                      class="font-semibold text-foreground text-sm leading-tight mb-1"
                     >
                       {lens.lens_name}
                     </h4>
-                    <p class="text-xs text-neutral-600 dark:text-neutral-400">
+                    <p class="text-xs text-muted-foreground">
                       {formatarTexto(lens.lens_type)} • {lens.brand_name}
                     </p>
                   </div>
@@ -249,9 +249,9 @@
 
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mt-6">
           <div
-            class="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700"
+            class="bg-card rounded-xl p-6 shadow-lg border border-border"
           >
-            <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
+            <h3 class="text-lg font-bold text-foreground mb-4">
               Por Tipo de Lente
             </h3>
             <div class="space-y-4">
@@ -261,18 +261,18 @@
                 <div>
                   <div class="flex justify-between items-center mb-2">
                     <span
-                      class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                      class="text-sm font-medium text-foreground"
                     >
                       {formatarTexto(item.tipo_lente)}
                     </span>
                     <span
-                      class="text-sm text-neutral-600 dark:text-neutral-400"
+                      class="text-sm text-muted-foreground"
                     >
                       {item.count.toLocaleString("pt-BR")} ({percentual}%)
                     </span>
                   </div>
                   <div
-                    class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5"
+                    class="w-full bg-border rounded-full h-2.5"
                   >
                     <div
                       class="bg-gradient-to-r from-blue-500 to-blue-600 h-2.5 rounded-full transition-all duration-500"
@@ -285,9 +285,9 @@
           </div>
 
           <div
-            class="bg-white dark:bg-neutral-800 rounded-xl p-6 shadow-lg border border-neutral-200 dark:border-neutral-700"
+            class="bg-card rounded-xl p-6 shadow-lg border border-border"
           >
-            <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-4">
+            <h3 class="text-lg font-bold text-foreground mb-4">
               Por Material
             </h3>
             <div class="space-y-4">
@@ -297,18 +297,18 @@
                 <div>
                   <div class="flex justify-between items-center mb-2">
                     <span
-                      class="text-sm font-medium text-neutral-700 dark:text-neutral-300"
+                      class="text-sm font-medium text-foreground"
                     >
                       {formatarTexto(item.material)}
                     </span>
                     <span
-                      class="text-sm text-neutral-600 dark:text-neutral-400"
+                      class="text-sm text-muted-foreground"
                     >
                       {item.count.toLocaleString("pt-BR")} ({percentual}%)
                     </span>
                   </div>
                   <div
-                    class="w-full bg-neutral-200 dark:bg-neutral-700 rounded-full h-2.5"
+                    class="w-full bg-border rounded-full h-2.5"
                   >
                     <div
                       class="bg-gradient-to-r from-green-500 to-emerald-600 h-2.5 rounded-full transition-all duration-500"

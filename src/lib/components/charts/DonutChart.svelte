@@ -91,7 +91,7 @@
         cy={size / 2}
         r={(size / 2) * 0.65}
         fill="white"
-        class="dark:fill-neutral-800"
+        class="dark:fill-background"
         opacity="0.95"
       />
       <text
@@ -108,7 +108,7 @@
         y={size / 2 + 16}
         text-anchor="middle"
         dominant-baseline="middle"
-        class="text-xs font-medium fill-neutral-500 dark:fill-neutral-400 uppercase tracking-wider"
+        class="text-xs font-medium fill-muted-foreground uppercase tracking-wider"
       >
         Categorias
       </text>
@@ -119,17 +119,17 @@
   <div class="flex-1 w-full space-y-3">
     {#each arcs as arc, i}
       <div
-        class="group flex items-center gap-3 p-3 rounded-lg hover:bg-neutral-50 dark:hover:bg-neutral-800/50 transition-all duration-200 cursor-pointer"
+        class="group flex items-center gap-3 p-3 rounded-lg hover:bg-accent transition-all duration-200 cursor-pointer"
       >
         <!-- Indicador de cor com gradiente -->
         <div
-          class="w-5 h-5 rounded-md flex-shrink-0 shadow-sm ring-2 ring-white dark:ring-neutral-800 group-hover:scale-110 transition-transform"
+          class="w-5 h-5 rounded-md flex-shrink-0 shadow-sm ring-2 ring-card dark:ring-background group-hover:scale-110 transition-transform"
           style="background: linear-gradient(135deg, {arc.color}, {arc.color}dd)"
         ></div>
 
         <!-- Label -->
         <span
-          class="text-sm font-medium text-neutral-700 dark:text-neutral-300 flex-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
+          class="text-sm font-medium text-foreground flex-1 group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
         >
           {arc.label}
         </span>
@@ -142,7 +142,7 @@
             {arc.percentage}%
           </span>
           <span
-            class="text-xs text-neutral-500 dark:text-neutral-400 font-mono bg-neutral-100 dark:bg-neutral-700/50 px-2 py-1 rounded"
+            class="text-xs text-muted-foreground font-mono bg-muted px-2 py-1 rounded"
           >
             {arc.value}
           </span>

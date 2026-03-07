@@ -22,11 +22,11 @@
 
 <div class="flex items-center justify-between gap-4 mb-6">
   <div class="flex-1">
-    <h2 class="text-2xl font-bold text-neutral-900 dark:text-neutral-100">
+    <h2 class="text-2xl font-bold text-foreground">
       {title}
     </h2>
     {#if subtitle}
-      <p class="text-sm text-neutral-600 dark:text-neutral-400 mt-1">
+      <p class="text-sm text-muted-foreground mt-1">
         {subtitle}
       </p>
     {/if}

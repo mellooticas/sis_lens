@@ -1,73 +1,61 @@
 <script lang="ts">
   /**
-   * EmptyState Component
-   * Estado vazio com ícone e mensagem
+   * EmptyState — SIS Lens Component Contract
+   * flex flex-col items-center text-center py-12
    */
-  
   import Button from './Button.svelte';
-  
-  export let icon = '📭';
-  export let title = 'Nenhum resultado encontrado';
-  export let description = '';
-  export let actionLabel = '';
-  export let onAction: (() => void) | undefined = undefined;
+  import type { Snippet } from 'svelte';
+
+  interface Props {
+    icon?: string;
+    title?: string;
+    description?: string;
+    actionLabel?: string;
+    onaction?: () => void;
+    children?: Snippet;
+  }
+
+  let {
+    icon = '',
+    title = 'Nenhum resultado encontrado',
+    description = '',
+    actionLabel = '',
+    onaction,
+    children
+  }: Props = $props();
 </script>
 
-<div class="empty-state">
+<div class="flex flex-col items-center justify-center text-center py-12 px-4">
   <!-- Icon -->
-  <div class="empty-icon">
-    {icon}
-  </div>
-  
+  {#if icon}
+    <div class="text-6xl mb-4 opacity-50">
+      {icon}
+    </div>
+  {/if}
+
   <!-- Title -->
-  <h3 class="empty-title">
+  <h3 class="text-xl font-semibold text-foreground mb-2">
     {title}
   </h3>
-  
+
   <!-- Description -->
   {#if description}
-    <p class="empty-description">
+    <p class="text-sm text-muted-foreground max-w-md mb-6">
       {description}
     </p>
   {/if}
-  
-  <!-- Slot para conteúdo customizado -->
-  <slot />
-  
+
+  <!-- Custom content -->
+  {#if children}
+    {@render children()}
+  {/if}
+
   <!-- Action Button -->
-  {#if actionLabel && onAction}
-    <div class="empty-action">
-      <Button variant="primary" on:click={onAction}>
+  {#if actionLabel && onaction}
+    <div class="mt-4">
+      <Button variant="default" onclick={onaction}>
         {actionLabel}
       </Button>
     </div>
   {/if}
 </div>
-
-<style>
-  .empty-state {
-    @apply flex flex-col items-center justify-center;
-    @apply text-center;
-    @apply py-12 px-4;
-  }
-  
-  .empty-icon {
-    @apply text-6xl mb-4;
-    @apply opacity-50;
-  }
-  
-  .empty-title {
-    @apply text-xl font-semibold;
-    @apply text-neutral-900 dark:text-neutral-100;
-    @apply mb-2;
-  }
-  
-  .empty-description {
-    @apply text-sm text-neutral-600 dark:text-neutral-400;
-    @apply max-w-md mb-6;
-  }
-  
-  .empty-action {
-    @apply mt-4;
-  }
-</style>

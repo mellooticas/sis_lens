@@ -52,7 +52,7 @@
 <div class="pagination">
   <!-- Info -->
   <div class="pagination-info">
-    <span class="text-sm text-neutral-600 dark:text-neutral-400">
+    <span class="text-sm text-muted-foreground">
       Mostrando <strong>{startItem}</strong> a <strong>{endItem}</strong> de <strong>{totalItems}</strong> resultados
     </span>
   </div>
@@ -141,10 +141,10 @@
     @apply flex items-center justify-center;
     @apply rounded-lg;
     @apply text-sm font-medium;
-    @apply text-neutral-700 dark:text-neutral-300;
-    @apply border border-neutral-300 dark:border-neutral-600;
-    @apply bg-white dark:bg-neutral-800;
-    @apply hover:bg-neutral-50 dark:hover:bg-neutral-700;
+    @apply text-foreground;
+    @apply border border-border;
+    @apply bg-card;
+    @apply hover:bg-accent;
     @apply transition-colors;
     @apply disabled:opacity-50 disabled:cursor-not-allowed;
   }

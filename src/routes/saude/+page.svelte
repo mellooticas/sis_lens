@@ -21,14 +21,14 @@
         if (status === "healthy") return "text-emerald-500";
         if (status === "warning") return "text-amber-500";
         if (status === "critical") return "text-rose-500";
-        return "text-neutral-500";
+        return "text-muted-foreground";
     };
 
     const getZonaColor = (zona: string) => {
         if (zona.includes("Seguranca")) return "bg-emerald-500";
         if (zona.includes("Competitiva")) return "bg-blue-500";
         if (zona.includes("Performance")) return "bg-amber-500";
-        return "bg-neutral-500";
+        return "bg-muted-foreground";
     };
 </script>
 
@@ -39,11 +39,11 @@
 <div class="p-6 space-y-8 max-w-7xl mx-auto">
     <!-- Header -->
     <div
-        class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-neutral-200 dark:border-neutral-700 pb-6"
+        class="flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-border pb-6"
     >
         <div>
             <h1
-                class="text-3xl font-bold text-neutral-900 dark:text-neutral-100 flex items-center gap-3"
+                class="text-3xl font-bold text-foreground flex items-center gap-3"
             >
                 <span
                     class="p-2 bg-primary-100 dark:bg-primary-900/40 rounded-lg text-primary-600 dark:text-primary-400"
@@ -64,7 +64,7 @@
                 </span>
                 Diagnóstico Vital do Motor Óptico
             </h1>
-            <p class="mt-2 text-neutral-500 dark:text-neutral-400 max-w-2xl">
+            <p class="mt-2 text-muted-foreground max-w-2xl">
                 Monitoramento em tempo real do ecossistema SIS_DIGIAI. O
                 "Cérebro" financeiro e clínico calibra o catálogo baseado em
                 margens e integridade dos dados.
@@ -122,13 +122,13 @@
         <div class="lg:col-span-2 space-y-8">
             <!-- Seção: Saúde das Tabelas -->
             <section
-                class="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm"
+                class="bg-card rounded-2xl border border-border overflow-hidden shadow-sm"
             >
                 <div
-                    class="px-6 py-4 bg-neutral-50 dark:bg-neutral-900/50 border-b border-neutral-200 dark:border-neutral-700"
+                    class="px-6 py-4 bg-muted border-b border-border"
                 >
                     <h2
-                        class="font-bold text-neutral-800 dark:text-neutral-200 uppercase tracking-wider text-xs"
+                        class="font-bold text-foreground uppercase tracking-wider text-xs"
                     >
                         Auditoria de Dados Vitais
                     </h2>
@@ -137,7 +137,7 @@
                     <table class="w-full text-left border-collapse">
                         <thead>
                             <tr
-                                class="text-xs text-neutral-400 font-bold border-b border-neutral-100 dark:border-neutral-700"
+                                class="text-xs text-muted-foreground font-bold border-b border-border"
                             >
                                 <th class="px-6 py-3 uppercase"
                                     >Módulo / Tabela</th
@@ -151,20 +151,20 @@
                             </tr>
                         </thead>
                         <tbody
-                            class="divide-y divide-neutral-100 dark:divide-neutral-700"
+                            class="divide-y divide-border"
                         >
                             {#each systemHealth as item}
                                 <tr
-                                    class="hover:bg-neutral-50 dark:hover:bg-neutral-900/20 transition-colors"
+                                    class="hover:bg-accent transition-colors"
                                 >
                                     <td class="px-6 py-4">
                                         <span
-                                            class="font-semibold text-neutral-700 dark:text-neutral-300"
+                                            class="font-semibold text-foreground"
                                             >{item.table_name}</span
                                         >
                                     </td>
                                     <td
-                                        class="px-6 py-4 font-mono text-sm text-neutral-600 dark:text-neutral-400"
+                                        class="px-6 py-4 font-mono text-sm text-muted-foreground"
                                     >
                                         {item.row_count.toLocaleString()}
                                     </td>
@@ -199,29 +199,29 @@
             <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 {#each catalogSummary as type}
                     <div
-                        class="bg-white dark:bg-neutral-800 p-6 rounded-2xl border border-neutral-200 dark:border-neutral-700 shadow-sm relative overflow-hidden group"
+                        class="bg-card p-6 rounded-2xl border border-border shadow-sm relative overflow-hidden group"
                     >
                         <div class="relative z-10">
                             <p
-                                class="text-xs font-bold text-neutral-400 uppercase tracking-widest mb-1"
+                                class="text-xs font-bold text-muted-foreground uppercase tracking-widest mb-1"
                             >
                                 {type.tipo}
                             </p>
                             <div class="flex items-baseline gap-2">
                                 <span
-                                    class="text-4xl font-black text-neutral-900 dark:text-neutral-100 tracking-tight"
+                                    class="text-4xl font-black text-foreground tracking-tight"
                                     >{type.total}</span
                                 >
                                 <span
-                                    class="text-sm font-medium text-neutral-500 uppercase"
+                                    class="text-sm font-medium text-muted-foreground uppercase"
                                     >Itens</span
                                 >
                             </div>
                             <div
-                                class="mt-4 p-3 bg-neutral-50 dark:bg-neutral-900/40 rounded-xl inline-flex items-center gap-2"
+                                class="mt-4 p-3 bg-muted rounded-xl inline-flex items-center gap-2"
                             >
                                 <span
-                                    class="text-xs text-neutral-500 dark:text-neutral-400"
+                                    class="text-xs text-muted-foreground"
                                     >Markup Médio:</span
                                 >
                                 <span
@@ -237,7 +237,7 @@
                             class="absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity"
                         >
                             <svg
-                                class="w-16 h-16 text-neutral-900 dark:text-white"
+                                class="w-16 h-16 text-foreground"
                                 fill="currentColor"
                                 viewBox="0 0 20 20"
                             >
@@ -265,10 +265,10 @@
         <!-- Coluna 2: Saúde da Precificação -->
         <div class="space-y-6">
             <section
-                class="bg-neutral-900 text-white rounded-2xl p-6 shadow-xl border border-neutral-700 relative overflow-hidden"
+                class="bg-foreground text-white rounded-2xl p-6 shadow-xl border border-border relative overflow-hidden"
             >
                 <h2
-                    class="text-sm font-bold text-neutral-400 uppercase tracking-widest mb-6 flex items-center gap-2"
+                    class="text-sm font-bold text-muted-foreground uppercase tracking-widest mb-6 flex items-center gap-2"
                 >
                     <svg
                         class="w-4 h-4 text-primary-400"
@@ -291,15 +291,15 @@
                         <div class="space-y-2">
                             <div class="flex justify-between items-baseline">
                                 <span
-                                    class="text-sm font-medium text-neutral-300"
+                                    class="text-sm font-medium text-muted-foreground"
                                     >{zone.zona_comercial}</span
                                 >
-                                <span class="text-xs font-bold text-neutral-500"
+                                <span class="text-xs font-bold text-muted-foreground"
                                     >{zone.qtd_lentes} lentes</span
                                 >
                             </div>
                             <div
-                                class="h-4 w-full bg-neutral-800 rounded-full overflow-hidden flex"
+                                class="h-4 w-full bg-foreground rounded-full overflow-hidden flex"
                             >
                                 <div
                                     class="h-full {getZonaColor(
@@ -314,7 +314,7 @@
                             </div>
                             <div class="flex justify-end">
                                 <span
-                                    class="text-xs font-black text-neutral-100"
+                                    class="text-xs font-black text-card"
                                     >Markup: {(zone.markup_medio || 0).toFixed(
                                         2,
                                     )}x</span
@@ -325,9 +325,9 @@
                 </div>
 
                 <div
-                    class="mt-8 pt-6 border-t border-neutral-800 flex flex-col gap-2"
+                    class="mt-8 pt-6 border-t border-border flex flex-col gap-2"
                 >
-                    <p class="text-[10px] text-neutral-500 leading-tight">
+                    <p class="text-[10px] text-muted-foreground leading-tight">
                         * O sistema utiliza uma curva assintótica dinâmica.
                         Quando o markup médio desvia do alvo, use o botão
                         "Auto-Calibrar" para recalcular os parâmetros α e β.

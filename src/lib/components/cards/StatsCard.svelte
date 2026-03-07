@@ -25,7 +25,7 @@
 </script>
 
 <div
-  class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-6 flex items-start gap-4 hover:shadow-card-hover transition-all duration-300"
+  class="bg-card border border-border rounded-xl p-6 flex items-start gap-4 hover:shadow-card-hover transition-all duration-300"
 >
   <!-- Icon -->
   <div
@@ -43,16 +43,16 @@
   <!-- Content -->
   <div class="flex-1">
     <div
-      class="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1"
+      class="text-sm font-medium text-muted-foreground mb-1"
     >
       {title}
     </div>
-    <div class="text-2xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+    <div class="text-2xl font-bold text-foreground mb-2">
       {value}
     </div>
     
     {#if subtitle}
-      <div class="text-xs text-neutral-500 dark:text-neutral-500 mb-2">
+      <div class="text-xs text-muted-foreground mb-2">
         {subtitle}
       </div>
     {/if}

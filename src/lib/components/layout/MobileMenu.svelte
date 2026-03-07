@@ -172,8 +172,8 @@
   .mobile-menu-drawer {
     @apply fixed top-0 left-0 bottom-0 z-50;
     @apply w-80 max-w-[85vw];
-    @apply bg-white dark:bg-neutral-900;
-    @apply border-r border-neutral-200 dark:border-neutral-800;
+    @apply bg-background;
+    @apply border-r border-border;
     @apply flex flex-col;
     @apply overflow-hidden;
   }
@@ -181,13 +181,13 @@
   .drawer-header {
     @apply flex items-center justify-between;
     @apply px-6 py-4;
-    @apply border-b border-neutral-200 dark:border-neutral-800;
+    @apply border-b border-border;
   }
 
   .close-btn {
     @apply p-2 rounded-lg;
-    @apply text-neutral-600 dark:text-neutral-400;
-    @apply hover:bg-neutral-100 dark:hover:bg-neutral-800;
+    @apply text-muted-foreground;
+    @apply hover:bg-accent;
     @apply transition-colors;
   }
 
@@ -199,8 +199,8 @@
   .nav-item {
     @apply flex items-center gap-3;
     @apply px-6 py-3;
-    @apply text-neutral-700 dark:text-neutral-300;
-    @apply hover:bg-neutral-100 dark:hover:bg-neutral-800;
+    @apply text-foreground;
+    @apply hover:bg-accent;
     @apply transition-colors;
   }
 
@@ -220,7 +220,7 @@
   }
 
   .drawer-footer {
-    @apply border-t border-neutral-200 dark:border-neutral-800;
+    @apply border-t border-border;
     @apply p-4 space-y-3;
   }
 
@@ -231,13 +231,13 @@
 
   .footer-label {
     @apply text-sm font-medium;
-    @apply text-neutral-700 dark:text-neutral-300;
+    @apply text-foreground;
   }
 
   .user-btn {
     @apply w-full flex items-center gap-3;
     @apply px-2 py-2 rounded-lg;
-    @apply hover:bg-neutral-100 dark:hover:bg-neutral-800;
+    @apply hover:bg-accent;
     @apply transition-colors;
     @apply text-left;
   }
@@ -255,11 +255,11 @@
 
   .user-name {
     @apply text-sm font-medium;
-    @apply text-neutral-900 dark:text-neutral-100;
+    @apply text-foreground;
   }
 
   .user-email {
     @apply text-xs;
-    @apply text-neutral-500 dark:text-neutral-400;
+    @apply text-muted-foreground;
   }
 </style>

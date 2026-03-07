@@ -1,54 +1,74 @@
-﻿<script lang="ts">
+<script lang="ts">
   /**
-   * Componente Badge SIS Lens
-   * Badges para status e destaques
+   * Badge — SIS Lens Component Contract
+   * Core variants: default, secondary, destructive, outline
+   * Domain variants: melhor-opcao, promocao, entrega-expressa, success, warning, info, gold, orange, neutral
    */
+  import type { Snippet } from 'svelte';
+  import type { HTMLAttributes } from 'svelte/elements';
 
-  export let variant:
-    | "primary"
-    | "success"
-    | "warning"
-    | "error"
-    | "gold"
-    | "orange"
-    | "melhor-opcao"
-    | "promocao"
-    | "entrega-expressa"
-    | "neutral"
-    | "info"
-    | "secondary" = "primary";
-  export let size: "sm" | "md" = "md";
+  interface Props extends HTMLAttributes<HTMLSpanElement> {
+    variant?:
+      | 'default'
+      | 'secondary'
+      | 'destructive'
+      | 'outline'
+      | 'success'
+      | 'warning'
+      | 'info'
+      | 'gold'
+      | 'orange'
+      | 'neutral'
+      | 'melhor-opcao'
+      | 'promocao'
+      | 'entrega-expressa'
+      | 'primary';
+    size?: 'sm' | 'md';
+    children?: Snippet;
+  }
 
-  // Classes base
-  const baseClasses = "inline-flex items-center gap-1 rounded-full font-medium";
+  let {
+    variant = 'default',
+    size = 'md',
+    children,
+    class: className = '',
+    ...restProps
+  }: Props = $props();
 
-  // Variantes
-  const variants = {
-    primary: "bg-primary-100 text-primary-700",
-    success: "bg-success/10 text-success-dark",
-    warning: "bg-warning/10 text-warning-dark",
-    error: "bg-error/10 text-error-dark",
-    gold: "bg-brand-gold-100 text-brand-gold-700",
-    orange: "bg-orange-100 text-orange-700",
-    "melhor-opcao": "bg-brand-gold-500 text-white font-semibold shadow-md",
-    promocao: "bg-orange-500 text-white",
-    "entrega-expressa": "bg-success text-white",
-    neutral:
-      "bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300",
-    info: "bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-300",
-    secondary:
-      "bg-purple-100 text-purple-700 dark:bg-purple-900/40 dark:text-purple-300",
+  const baseClasses = 'inline-flex items-center gap-1 rounded-full font-semibold';
+
+  const variantClasses: Record<string, string> = {
+    // Core contract variants
+    default: 'bg-primary text-primary-foreground',
+    secondary: 'bg-secondary text-secondary-foreground',
+    destructive: 'bg-destructive text-white',
+    outline: 'border border-border text-foreground bg-transparent',
+
+    // Semantic / domain-specific variants
+    primary: 'bg-primary-100 text-primary-700 dark:bg-primary-900/30 dark:text-primary-400',
+    success: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400',
+    warning: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400',
+    info: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400',
+    gold: 'bg-brand-gold-100 text-brand-gold-700 dark:bg-brand-gold-900/30 dark:text-brand-gold-400',
+    orange: 'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400',
+    neutral: 'bg-muted text-muted-foreground',
+    'melhor-opcao': 'bg-brand-gold-500 text-white font-semibold shadow-md',
+    promocao: 'bg-orange-500 text-white',
+    'entrega-expressa': 'bg-success text-white'
   };
 
-  // Tamanhos
-  const sizes = {
-    sm: "px-2 py-0.5 text-xs",
-    md: "px-3 py-1 text-xs",
+  const sizeClasses: Record<string, string> = {
+    sm: 'px-2 py-0.5 text-xs',
+    md: 'px-2.5 py-0.5 text-xs'
   };
 
-  $: classes = `${baseClasses} ${variants[variant]} ${sizes[size]}`;
+  let classes = $derived(
+    `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${className}`.trim()
+  );
 </script>
 
-<span class={classes} {...$$restProps}>
-  <slot />
+<span class={classes} {...restProps}>
+  {#if children}
+    {@render children()}
+  {/if}
 </span>

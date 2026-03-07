@@ -49,7 +49,7 @@
 <header
   class="
   sticky top-0 h-16 z-30
-  bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-800
+  bg-background border-b border-border
   transition-all duration-300
   flex items-center justify-between px-6
 "
@@ -57,7 +57,7 @@
   <!-- Esquerda: Menu Toggle + Saudação -->
   <div class="flex items-center gap-4">
     <button
-      class="p-2.5 rounded-xl text-neutral-500 hover:text-primary-600 dark:text-neutral-400 dark:hover:text-primary-400
+      class="p-2.5 rounded-xl text-muted-foreground hover:text-primary-600 dark:hover:text-primary-400
              hover:bg-primary-50 dark:hover:bg-primary-900/30 transition-all duration-200"
       on:click={() => dispatch("menuClick")}
       title={collapsed ? "Expandir menu" : "Recolher menu"}
@@ -98,12 +98,12 @@
           })}
         </span>
         <h1
-          class="text-lg font-bold text-neutral-800 dark:text-white leading-tight"
+          class="text-lg font-bold text-foreground leading-tight"
         >
           {greeting}{#if $currentUser}, {$currentUser.firstName}{/if} 👋
         </h1>
       </div>
-      <span class="text-xs font-medium text-neutral-500 dark:text-neutral-400">
+      <span class="text-xs font-medium text-muted-foreground">
         Ecossistema SIS_DIGIAI
       </span>
     </div>
@@ -116,7 +116,7 @@
       <div id="user-menu-container" class="relative">
         <button
           class="flex items-center gap-2.5 p-1.5 pr-3 rounded-xl
-                 hover:bg-neutral-100 dark:hover:bg-neutral-800
+                 hover:bg-accent
                  transition-colors duration-200 group"
           on:click={toggleUserMenu}
           aria-label="Menu do usuário"
@@ -134,19 +134,19 @@
           <!-- Nome + Role -->
           <div class="hidden md:flex flex-col items-start">
             <span
-              class="text-sm font-semibold text-neutral-800 dark:text-neutral-200 leading-none"
+              class="text-sm font-semibold text-foreground leading-none"
             >
               {$currentUser.firstName}
             </span>
             <span
-              class="text-xs text-neutral-500 dark:text-neutral-400 leading-none mt-0.5"
+              class="text-xs text-muted-foreground leading-none mt-0.5"
             >
               {$currentUser.roleLabel}
             </span>
           </div>
           <!-- Chevron -->
           <svg
-            class="w-4 h-4 text-neutral-400 transition-transform duration-200 {showUserMenu
+            class="w-4 h-4 text-muted-foreground transition-transform duration-200 {showUserMenu
               ? 'rotate-180'
               : ''}"
             fill="none"
@@ -165,22 +165,22 @@
         <!-- Dropdown Menu -->
         {#if showUserMenu}
           <div
-            class="absolute right-0 top-full mt-2 w-56 bg-white dark:bg-neutral-800
-                   border border-neutral-200 dark:border-neutral-700
+            class="absolute right-0 top-full mt-2 w-56 bg-card
+                   border border-border
                    rounded-xl shadow-xl overflow-hidden z-50"
             in:fade={{ duration: 150 }}
           >
             <!-- Info do usuário -->
             <div
-              class="px-4 py-3 border-b border-neutral-100 dark:border-neutral-700"
+              class="px-4 py-3 border-b border-border"
             >
               <p
-                class="text-sm font-semibold text-neutral-900 dark:text-white truncate"
+                class="text-sm font-semibold text-foreground truncate"
               >
                 {$currentUser.name || $currentUser.email}
               </p>
               <p
-                class="text-xs text-neutral-500 dark:text-neutral-400 truncate"
+                class="text-xs text-muted-foreground truncate"
               >
                 {$currentUser.email}
               </p>
@@ -195,13 +195,13 @@
             <!-- Tenant -->
             {#if $currentUser.tenantName}
               <div
-                class="px-4 py-2 border-b border-neutral-100 dark:border-neutral-700"
+                class="px-4 py-2 border-b border-border"
               >
-                <p class="text-xs text-neutral-500 dark:text-neutral-400">
+                <p class="text-xs text-muted-foreground">
                   Óptica
                 </p>
                 <p
-                  class="text-sm font-medium text-neutral-800 dark:text-neutral-200 truncate"
+                  class="text-sm font-medium text-foreground truncate"
                 >
                   {$currentUser.tenantName}
                 </p>
@@ -240,7 +240,7 @@
     {:else}
       <!-- Fallback: usuário não carregado ainda -->
       <div
-        class="w-8 h-8 rounded-full bg-neutral-200 dark:bg-neutral-700 animate-pulse"
+        class="w-8 h-8 rounded-full bg-border animate-pulse"
       ></div>
     {/if}
   </div>

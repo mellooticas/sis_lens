@@ -1,45 +1,61 @@
-﻿<script lang="ts">
+<script lang="ts">
   /**
-   * Componente Button SIS Lens
-   * Botões padronizados com variantes
+   * Button — SIS Lens Component Contract
+   * Variants: default, destructive, outline, secondary, ghost, link
+   * Sizes: xs, sm, default, lg, icon
    */
-  
-  export let variant: 'primary' | 'secondary' | 'ghost' | 'success' | 'danger' = 'primary';
-  export let size: 'sm' | 'md' | 'lg' = 'md';
-  export let disabled = false;
-  export let fullWidth = false;
-  export let type: 'button' | 'submit' | 'reset' = 'button';
-  
-  // Classes base
-  const baseClasses = 'inline-flex items-center justify-center gap-2 rounded-lg font-medium transition-all duration-200 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed';
-  
-  // Variantes de estilo
-  const variants = {
-    primary: 'bg-primary-500 dark:bg-primary-400 text-white hover:bg-primary-600 dark:hover:bg-primary-500 focus:ring-primary-500 dark:focus:ring-primary-400',
-    secondary: 'bg-neutral-200 dark:bg-neutral-700 text-neutral-900 dark:text-neutral-100 hover:bg-neutral-300 dark:hover:bg-neutral-600 focus:ring-neutral-400 dark:focus:ring-neutral-500',
-    ghost: 'bg-transparent text-neutral-700 dark:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800',
-    success: 'bg-success dark:bg-success-dark text-white hover:bg-success-dark dark:hover:bg-success focus:ring-success dark:focus:ring-success-light',
-    danger: 'bg-error dark:bg-error-dark text-white hover:bg-error-dark dark:hover:bg-error focus:ring-error dark:focus:ring-error-light'
+  import type { Snippet } from 'svelte';
+  import type { HTMLButtonAttributes } from 'svelte/elements';
+
+  interface Props extends HTMLButtonAttributes {
+    variant?: 'default' | 'destructive' | 'outline' | 'secondary' | 'ghost' | 'link' | 'primary' | 'danger' | 'success';
+    size?: 'xs' | 'sm' | 'default' | 'lg' | 'icon' | 'md';
+    fullWidth?: boolean;
+    children?: Snippet;
+  }
+
+  let {
+    variant = 'default',
+    size = 'default',
+    fullWidth = false,
+    children,
+    class: className = '',
+    ...restProps
+  }: Props = $props();
+
+  const baseClasses = 'inline-flex items-center justify-center gap-2 rounded-md font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring/50 disabled:pointer-events-none disabled:opacity-50';
+
+  const variantClasses: Record<string, string> = {
+    default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    primary: 'bg-primary text-primary-foreground hover:bg-primary/90',
+    destructive: 'bg-destructive text-white hover:bg-destructive/90',
+    danger: 'bg-destructive text-white hover:bg-destructive/90',
+    outline: 'border border-input bg-background hover:bg-accent hover:text-accent-foreground',
+    secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+    ghost: 'hover:bg-accent hover:text-accent-foreground',
+    link: 'text-primary underline-offset-4 hover:underline',
+    success: 'bg-success text-white hover:bg-success-dark'
   };
-  
-  // Tamanhos
-  const sizes = {
-    sm: 'px-3 py-1.5 text-sm',
-    md: 'px-4 py-2 text-sm',
-    lg: 'px-6 py-3 text-base'
+
+  const sizeClasses: Record<string, string> = {
+    xs: 'h-6 px-2 text-xs',
+    sm: 'h-8 px-3 text-xs',
+    default: 'h-9 px-4 py-2 text-sm',
+    md: 'h-9 px-4 py-2 text-sm',
+    lg: 'h-10 px-6 text-sm',
+    icon: 'size-9'
   };
-  
-  $: classes = `${baseClasses} ${variants[variant]} ${sizes[size]} ${fullWidth ? 'w-full' : ''}`;
+
+  let classes = $derived(
+    `${baseClasses} ${variantClasses[variant]} ${sizeClasses[size]} ${fullWidth ? 'w-full' : ''} ${className}`.trim()
+  );
 </script>
 
 <button
-  {type}
-  {disabled}
   class={classes}
-  on:click
-  on:mouseenter
-  on:mouseleave
-  {...$$restProps}
+  {...restProps}
 >
-  <slot />
+  {#if children}
+    {@render children()}
+  {/if}
 </button>

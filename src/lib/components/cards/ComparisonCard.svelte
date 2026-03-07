@@ -35,7 +35,7 @@
 <div class="comparison-card">
   <!-- Header -->
   <div class="comparison-header">
-    <h3 class="text-xl font-bold text-neutral-900 dark:text-neutral-100">
+    <h3 class="text-xl font-bold text-foreground">
       Comparação de Fornecedores
     </h3>
   </div>
@@ -212,14 +212,14 @@
 
 <style>
   .comparison-card {
-    @apply bg-white dark:bg-neutral-800;
-    @apply border border-neutral-200 dark:border-neutral-700;
+    @apply bg-card;
+    @apply border border-border;
     @apply rounded-xl p-6;
   }
   
   .comparison-header {
     @apply mb-6 pb-4;
-    @apply border-b border-neutral-200 dark:border-neutral-700;
+    @apply border-b border-border;
   }
   
   .comparison-grid {
@@ -252,7 +252,7 @@
   
   .metric {
     @apply flex items-center justify-between;
-    @apply py-2 border-b border-neutral-100 dark:border-neutral-700;
+    @apply py-2 border-b border-border;
   }
   
   .metric:last-child {
@@ -260,12 +260,12 @@
   }
   
   .metric-label {
-    @apply text-sm text-neutral-600 dark:text-neutral-400;
+    @apply text-sm text-muted-foreground;
   }
   
   .metric-value {
     @apply text-sm font-semibold;
-    @apply text-neutral-900 dark:text-neutral-100;
+    @apply text-foreground;
     @apply flex items-center gap-2;
   }
   
@@ -286,12 +286,12 @@
   .divider-line {
     @apply hidden lg:block;
     @apply absolute inset-y-0 left-1/2;
-    @apply w-px bg-neutral-200 dark:bg-neutral-700;
+    @apply w-px bg-border;
   }
   
   .differences {
     @apply space-y-4;
-    @apply bg-neutral-50 dark:bg-neutral-900;
+    @apply bg-muted;
     @apply rounded-lg p-4;
   }
   
@@ -301,7 +301,7 @@
   
   .diff-label {
     @apply text-xs font-medium;
-    @apply text-neutral-500 dark:text-neutral-400;
+    @apply text-muted-foreground;
     @apply mb-1;
   }
   
@@ -311,7 +311,7 @@
   }
   
   .diff-value .text-xs {
-    @apply block text-neutral-500 dark:text-neutral-400;
+    @apply block text-muted-foreground;
     @apply font-normal mt-1;
   }
 </style>

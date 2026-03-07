@@ -53,17 +53,17 @@
   
   .breadcrumb-link {
     @apply text-sm font-medium;
-    @apply text-neutral-600 dark:text-neutral-400;
+    @apply text-muted-foreground;
     @apply hover:text-primary-600 dark:hover:text-primary-400;
     @apply transition-colors;
   }
   
   .breadcrumb-current {
     @apply text-sm font-medium;
-    @apply text-neutral-900 dark:text-neutral-100;
+    @apply text-foreground;
   }
   
   .breadcrumb-separator {
-    @apply text-neutral-400 dark:text-neutral-600;
+    @apply text-muted-foreground;
   }
 </style>

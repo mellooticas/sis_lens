@@ -103,10 +103,10 @@
   const activeItem =
     "bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300";
   const inactiveItem =
-    "text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 hover:text-neutral-900 dark:hover:text-neutral-100";
+    "text-muted-foreground hover:bg-accent hover:text-foreground";
   const activeIcon = "text-primary-600 dark:text-primary-400";
   const inactiveIcon =
-    "text-neutral-500 dark:text-neutral-500 group-hover:text-neutral-700 dark:group-hover:text-neutral-300";
+    "text-muted-foreground group-hover:text-foreground";
 </script>
 
 <aside
@@ -114,13 +114,13 @@
     fixed left-0 top-0 h-full z-50 flex flex-col
     transition-all duration-300 ease-in-out
     {collapsed ? 'w-[4.5rem]' : 'w-[16rem]'}
-    border-r border-neutral-200 dark:border-neutral-700
-    bg-white dark:bg-neutral-900
+    border-r border-border
+    bg-background
   "
 >
   <!-- Logo + Branding -->
   <div
-    class="flex flex-col items-center justify-center border-b border-neutral-200 dark:border-neutral-700 px-3 shrink-0
+    class="flex flex-col items-center justify-center border-b border-border px-3 shrink-0
            {collapsed ? 'h-16' : 'h-20 gap-0.5 py-2'}"
   >
     {#if collapsed}
@@ -131,7 +131,7 @@
     {:else}
       <!-- Expanded: full logo + subtitle -->
       <Logo size="lg" variant="full" />
-      <span class="text-[9px] font-medium uppercase tracking-[0.2em] text-neutral-400 dark:text-neutral-500">
+      <span class="text-[9px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
         SIS DIGIAI
       </span>
     {/if}
@@ -142,7 +142,7 @@
       <div class="space-y-1">
         {#if section.label && !collapsed}
           <h4
-            class="px-3 text-[10px] font-bold uppercase tracking-wider text-neutral-400 dark:text-neutral-500 mb-2"
+            class="px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2"
           >
             {section.label}
           </h4>
@@ -317,7 +317,7 @@
   </nav>
 
   <!-- Footer: tema + user -->
-  <div class="border-t border-neutral-200 dark:border-neutral-700 p-2 shrink-0 space-y-2">
+  <div class="border-t border-border p-2 shrink-0 space-y-2">
     <!-- Theme Toggle -->
     <div class="flex items-center justify-center py-1">
       <ThemeToggle size="sm" />
@@ -332,7 +332,7 @@
           </div>
           <div class="flex flex-col min-w-0">
             <span class="text-sm font-medium truncate">{$currentUser.firstName}</span>
-            <span class="text-xs text-neutral-400 dark:text-neutral-500">{$currentUser.roleLabel}</span>
+            <span class="text-xs text-muted-foreground">{$currentUser.roleLabel}</span>
           </div>
         </div>
       {:else}

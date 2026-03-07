@@ -17,11 +17,11 @@
         {/if}
     </div>
 
-    <h1 class="text-4xl font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+    <h1 class="text-4xl font-bold text-foreground mb-2">
         {statusCode}
     </h1>
 
-    <p class="text-xl text-neutral-600 dark:text-neutral-400 mb-8 max-w-md">
+    <p class="text-xl text-muted-foreground mb-8 max-w-md">
         {message}
     </p>
 

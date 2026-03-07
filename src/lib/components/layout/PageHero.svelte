@@ -36,13 +36,13 @@
   {/if}
   
   {#if title}
-    <h1 class="text-4xl md:text-5xl font-bold text-neutral-900 dark:text-neutral-100">
+    <h1 class="text-4xl md:text-5xl font-bold text-foreground">
       {title}
     </h1>
   {/if}
   
   {#if subtitle}
-    <p class="text-xl text-neutral-600 dark:text-neutral-400">
+    <p class="text-xl text-muted-foreground">
       {subtitle}
     </p>
   {/if}

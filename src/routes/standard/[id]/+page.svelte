@@ -78,12 +78,12 @@
     <title>{conceito?.canonical_name || "Conceito Standard"} | SIS Lens Oracle</title>
 </svelte:head>
 
-<main class="min-h-screen bg-neutral-50 dark:bg-neutral-900 pb-20">
+<main class="min-h-screen bg-muted pb-20">
     <!-- Top Bar -->
-    <div class="bg-white dark:bg-neutral-800 border-b border-neutral-200 dark:border-neutral-700 sticky top-0 z-30">
+    <div class="bg-card border-b border-border sticky top-0 z-30">
         <Container maxWidth="xl" padding="sm">
             <div class="flex items-center justify-between py-3">
-                <button on:click={() => history.back()} class="flex items-center gap-2 text-neutral-500 hover:text-primary-600 transition-colors text-sm font-medium">
+                <button on:click={() => history.back()} class="flex items-center gap-2 text-muted-foreground hover:text-primary-600 transition-colors text-sm font-medium">
                     <ChevronLeft class="w-4 h-4" /> Voltar
                 </button>
                 <div class="flex items-center gap-3">
@@ -116,39 +116,39 @@
                             </div>
                         {/if}
 
-                        <h1 class="text-3xl md:text-5xl font-black text-neutral-900 dark:text-white leading-tight mb-4">
+                        <h1 class="text-3xl md:text-5xl font-black text-foreground leading-tight mb-4">
                             {conceito?.canonical_name}
                         </h1>
 
                         <div class="flex flex-wrap gap-3">
-                            <div class="flex items-center gap-2 bg-white dark:bg-neutral-800 px-4 py-2 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-700">
+                            <div class="flex items-center gap-2 bg-card px-4 py-2 rounded-xl shadow-sm border border-border">
                                 <Zap class="w-4 h-4 text-blue-500" />
-                                <span class="font-bold text-neutral-900 dark:text-white capitalize">{formatarLensType(conceito?.lens_type)}</span>
+                                <span class="font-bold text-foreground capitalize">{formatarLensType(conceito?.lens_type)}</span>
                             </div>
-                            <div class="flex items-center gap-2 bg-white dark:bg-neutral-800 px-4 py-2 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-700">
+                            <div class="flex items-center gap-2 bg-card px-4 py-2 rounded-xl shadow-sm border border-border">
                                 <ShieldCheck class="w-4 h-4 text-green-500" />
-                                <span class="font-bold text-neutral-900 dark:text-white">{conceito?.material_display}</span>
+                                <span class="font-bold text-foreground">{conceito?.material_display}</span>
                             </div>
-                            <div class="flex items-center gap-2 bg-white dark:bg-neutral-800 px-4 py-2 rounded-xl shadow-sm border border-neutral-100 dark:border-neutral-700">
+                            <div class="flex items-center gap-2 bg-card px-4 py-2 rounded-xl shadow-sm border border-border">
                                 <TrendingUp class="w-4 h-4 text-primary-500" />
-                                <span class="font-bold text-neutral-900 dark:text-white">n = {conceito?.refractive_index}</span>
+                                <span class="font-bold text-foreground">n = {conceito?.refractive_index}</span>
                             </div>
                         </div>
                     </div>
 
-                    <div class="bg-white dark:bg-neutral-900 p-6 rounded-2xl border-l-4 border-primary-500" in:fade={{ delay: 200 }}>
+                    <div class="bg-card p-6 rounded-2xl border-l-4 border-primary-500" in:fade={{ delay: 200 }}>
                         <div class="flex gap-4">
                             <div class="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-xl h-fit">
                                 <Brain class="w-6 h-6 text-primary-600 dark:text-primary-400" />
                             </div>
                             <div>
-                                <h3 class="text-lg font-bold text-neutral-900 dark:text-white mb-1">Inteligência do Conceito</h3>
-                                <p class="text-neutral-600 dark:text-neutral-400 text-sm leading-relaxed">
+                                <h3 class="text-lg font-bold text-foreground mb-1">Inteligência do Conceito</h3>
+                                <p class="text-muted-foreground text-sm leading-relaxed">
                                     Agrupa <strong>{conceito?.mapped_lens_count ?? 0} lente(s)</strong> de
                                     <strong>{conceito?.mapped_brand_count ?? 0} marca(s)</strong> com a mesma física ótica.
                                     Todas são intercambiáveis tecnicamente.
                                 </p>
-                                <div class="flex gap-4 mt-3 text-xs font-semibold text-neutral-500">
+                                <div class="flex gap-4 mt-3 text-xs font-semibold text-muted-foreground">
                                     <span>📦 {conceito?.mapped_lens_count ?? 0} lentes</span>
                                     <span>🏷️ {conceito?.mapped_brand_count ?? 0} marcas</span>
                                     <span>🚚 {conceito?.mapped_supplier_count ?? 0} fornecedores</span>
@@ -201,39 +201,39 @@
 
         <!-- Specs -->
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-8 rounded-2xl">
+            <div class="bg-card border border-border p-8 rounded-2xl">
                 <SectionHeader title="🧬 Especificações Fisiológicas" subtitle="Range de fabricação garantido" />
                 <div class="grid grid-cols-2 gap-5 mt-6">
                     <div>
-                        <p class="text-[10px] text-neutral-400 uppercase font-black tracking-widest">Esférico</p>
-                        <p class="text-lg font-bold dark:text-white mt-1">
+                        <p class="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Esférico</p>
+                        <p class="text-lg font-bold text-foreground mt-1">
                             {conceito?.spherical_min != null ? (conceito.spherical_min > 0 ? '+' : '') + conceito.spherical_min : '—'} a
                             {conceito?.spherical_max != null ? (conceito.spherical_max > 0 ? '+' : '') + conceito.spherical_max : '—'}
                         </p>
                     </div>
                     <div>
-                        <p class="text-[10px] text-neutral-400 uppercase font-black tracking-widest">Cilíndrico</p>
-                        <p class="text-lg font-bold dark:text-white mt-1">{conceito?.cylindrical_min ?? '—'} a {conceito?.cylindrical_max ?? '—'}</p>
+                        <p class="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Cilíndrico</p>
+                        <p class="text-lg font-bold text-foreground mt-1">{conceito?.cylindrical_min ?? '—'} a {conceito?.cylindrical_max ?? '—'}</p>
                     </div>
                     {#if conceito?.addition_max}
                         <div>
-                            <p class="text-[10px] text-neutral-400 uppercase font-black tracking-widest">Adição</p>
-                            <p class="text-lg font-bold dark:text-white mt-1">+{conceito.addition_min ?? 0} a +{conceito.addition_max}</p>
+                            <p class="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Adição</p>
+                            <p class="text-lg font-bold text-foreground mt-1">+{conceito.addition_min ?? 0} a +{conceito.addition_max}</p>
                         </div>
                     {/if}
                 </div>
             </div>
-            <div class="bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 p-8 rounded-2xl flex flex-col justify-center">
+            <div class="bg-card border border-border p-8 rounded-2xl flex flex-col justify-center">
                 <div class="text-center">
                     <div class="inline-flex items-center justify-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-full mb-4">
                         <CheckCircle2 class="w-8 h-8 text-blue-600 dark:text-blue-400" />
                     </div>
-                    <h3 class="text-xl font-black text-neutral-900 dark:text-white">Paridade Comercial</h3>
-                    <p class="text-neutral-500 text-sm mt-2 max-w-xs mx-auto">
+                    <h3 class="text-xl font-black text-foreground">Paridade Comercial</h3>
+                    <p class="text-muted-foreground text-sm mt-2 max-w-xs mx-auto">
                         Substituição entre marcas sem afetar a adaptação do paciente.
                     </p>
                     {#if conceito?.sku}
-                        <div class="mt-4 text-xs text-neutral-400">
+                        <div class="mt-4 text-xs text-muted-foreground">
                             ID Canônico: <span class="font-mono font-bold text-primary-600 dark:text-primary-400">{conceito.sku}</span>
                         </div>
                     {/if}
@@ -249,10 +249,10 @@
             />
 
             {#if lentes.length === 0}
-                <div class="bg-white dark:bg-neutral-900 border border-dashed border-neutral-300 dark:border-neutral-700 p-16 text-center rounded-2xl">
-                    <Package class="w-12 h-12 text-neutral-300 mx-auto mb-4" />
-                    <h3 class="text-xl font-bold dark:text-white mb-2">Nenhuma lente vinculada</h3>
-                    <p class="text-neutral-500 text-sm">Sem lentes com pricing_book neste conceito.</p>
+                <div class="bg-card border border-dashed border-border p-16 text-center rounded-2xl">
+                    <Package class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
+                    <h3 class="text-xl font-bold text-foreground mb-2">Nenhuma lente vinculada</h3>
+                    <p class="text-muted-foreground text-sm">Sem lentes com pricing_book neste conceito.</p>
                 </div>
             {:else}
                 <!-- Lente Preferida -->
@@ -266,13 +266,13 @@
                             class="block bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl p-6 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700 transition-all no-underline">
                             <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
                                 <div class="flex-1">
-                                    <div class="font-bold text-neutral-900 dark:text-white text-lg">{lentePreferida.lens_name}</div>
-                                    <div class="text-sm text-neutral-500">{lentePreferida.brand_name ?? '—'} · {lentePreferida.supplier_name ?? '—'}</div>
+                                    <div class="font-bold text-foreground text-lg">{lentePreferida.lens_name}</div>
+                                    <div class="text-sm text-muted-foreground">{lentePreferida.brand_name ?? '—'} · {lentePreferida.supplier_name ?? '—'}</div>
                                     {#if lentePreferida.lens_sku}
-                                        <div class="font-mono text-[11px] text-neutral-400 mt-0.5">{lentePreferida.lens_sku}</div>
+                                        <div class="font-mono text-[11px] text-muted-foreground mt-0.5">{lentePreferida.lens_sku}</div>
                                     {/if}
                                     {#if lentePreferida.material_name || lentePreferida.refractive_index}
-                                        <div class="text-xs text-neutral-500 mt-1">
+                                        <div class="text-xs text-muted-foreground mt-1">
                                             {lentePreferida.material_name ?? ''}{lentePreferida.material_name && lentePreferida.refractive_index ? ' · ' : ''}{lentePreferida.refractive_index ? `n = ${lentePreferida.refractive_index}` : ''}
                                         </div>
                                     {/if}
@@ -286,15 +286,15 @@
                                 </div>
                                 <div class="flex items-center gap-6">
                                     <div class="text-center">
-                                        <div class="text-[10px] text-neutral-400 uppercase font-bold">Custo</div>
-                                        <div class="font-bold text-neutral-700 dark:text-neutral-300">{formatarPreco(lentePreferida.cost_price)}</div>
+                                        <div class="text-[10px] text-muted-foreground uppercase font-bold">Custo</div>
+                                        <div class="font-bold text-foreground">{formatarPreco(lentePreferida.cost_price)}</div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-[10px] text-neutral-400 uppercase font-bold">Venda</div>
+                                        <div class="text-[10px] text-muted-foreground uppercase font-bold">Venda</div>
                                         <div class="font-black text-primary-700 dark:text-primary-400 text-2xl">{formatarPreco(lentePreferida.sell_price)}</div>
                                     </div>
                                     <div class="text-center">
-                                        <div class="text-[10px] text-neutral-400 uppercase font-bold">Markup</div>
+                                        <div class="text-[10px] text-muted-foreground uppercase font-bold">Markup</div>
                                         <div class="font-bold text-green-600 dark:text-green-400">{formatarMarkup(lentePreferida.effective_markup)}</div>
                                     </div>
                                     <span class="text-xs font-bold text-primary-600 dark:text-primary-400 whitespace-nowrap">Ver detalhes →</span>
@@ -309,18 +309,18 @@
                     {#each outrasLentes as lente, i (lente.lens_id)}
                         <div in:fly={{ y: 30, delay: i * 40, duration: 400 }}>
                             <a href="/lentes/{lente.lens_id}"
-                                class="block bg-white dark:bg-neutral-900 border border-neutral-200 dark:border-neutral-700 rounded-xl p-5 hover:shadow-lg transition-all duration-200 hover:border-primary-300 dark:hover:border-primary-700 relative group no-underline">
+                                class="block bg-card border border-border rounded-xl p-5 hover:shadow-lg transition-all duration-200 hover:border-primary-300 dark:hover:border-primary-700 relative group no-underline">
                                 <div class="mb-3">
-                                    <div class="font-semibold text-neutral-900 dark:text-white text-sm line-clamp-2">{lente.lens_name}</div>
-                                    <div class="text-xs text-neutral-500 mt-0.5">{lente.brand_name ?? '—'}</div>
+                                    <div class="font-semibold text-foreground text-sm line-clamp-2">{lente.lens_name}</div>
+                                    <div class="text-xs text-muted-foreground mt-0.5">{lente.brand_name ?? '—'}</div>
                                     {#if lente.supplier_name}
-                                        <div class="text-xs text-neutral-400 mt-0.5">🚚 {lente.supplier_name}</div>
+                                        <div class="text-xs text-muted-foreground mt-0.5">🚚 {lente.supplier_name}</div>
                                     {/if}
                                     {#if lente.lens_sku}
-                                        <div class="font-mono text-[10px] text-neutral-400 mt-0.5">{lente.lens_sku}</div>
+                                        <div class="font-mono text-[10px] text-muted-foreground mt-0.5">{lente.lens_sku}</div>
                                     {/if}
                                     {#if lente.material_name || lente.refractive_index}
-                                        <div class="text-[11px] text-neutral-400 mt-1">
+                                        <div class="text-[11px] text-muted-foreground mt-1">
                                             {lente.material_name ?? ''}{lente.material_name && lente.refractive_index ? ' · ' : ''}{lente.refractive_index ? `n = ${lente.refractive_index}` : ''}
                                         </div>
                                     {/if}
@@ -333,25 +333,25 @@
                                     {/if}
                                 </div>
 
-                                <div class="space-y-1.5 border-t border-neutral-100 dark:border-neutral-800 pt-3">
+                                <div class="space-y-1.5 border-t border-border pt-3">
                                     <div class="flex justify-between text-xs">
-                                        <span class="text-neutral-500">Custo</span>
+                                        <span class="text-muted-foreground">Custo</span>
                                         <span class="font-medium">{formatarPreco(lente.cost_price)}</span>
                                     </div>
                                     <div class="flex justify-between text-sm">
-                                        <span class="font-medium text-neutral-600 dark:text-neutral-400">Venda</span>
+                                        <span class="font-medium text-muted-foreground">Venda</span>
                                         <span class="font-bold text-primary-700 dark:text-primary-400">{formatarPreco(lente.sell_price)}</span>
                                     </div>
                                     {#if lente.effective_markup}
                                         <div class="flex justify-between text-xs">
-                                            <span class="text-neutral-500">Markup</span>
+                                            <span class="text-muted-foreground">Markup</span>
                                             <span class="font-semibold text-green-600 dark:text-green-400">{formatarMarkup(lente.effective_markup)}</span>
                                         </div>
                                     {/if}
                                 </div>
 
                                 <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span class="text-[9px] text-neutral-400 font-mono bg-neutral-100 dark:bg-neutral-800 px-1.5 py-0.5 rounded">
+                                    <span class="text-[9px] text-muted-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
                                         {lente.match_method}
                                     </span>
                                 </div>

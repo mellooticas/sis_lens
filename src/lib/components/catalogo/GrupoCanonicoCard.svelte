@@ -51,7 +51,7 @@
       uv:      'bg-purple-100 text-purple-800 dark:bg-purple-900/40 dark:text-purple-300',
       photo:   'bg-orange-100 text-orange-800 dark:bg-orange-900/40 dark:text-orange-300',
     };
-    return mapa[code] ?? 'bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300';
+    return mapa[code] ?? 'bg-muted text-foreground';
   }
 
   $: faixaEsf = (grupo.spherical_min != null && grupo.spherical_max != null)
@@ -63,7 +63,7 @@
 
   $: cardBorder = isPremium
     ? 'border-amber-200 dark:border-amber-800/50 hover:border-amber-400 dark:hover:border-amber-600'
-    : 'border-neutral-200 dark:border-neutral-700 hover:border-primary-400 dark:hover:border-primary-600';
+    : 'border-border hover:border-primary-400 dark:hover:border-primary-600';
 
   $: skuBadgeClass = isPremium
     ? 'bg-amber-100 text-amber-800 dark:bg-amber-900/40 dark:text-amber-300 border border-amber-200 dark:border-amber-700'
@@ -80,7 +80,7 @@
 
 <a
   href="{linkBase}/{grupo.id}"
-  class="grupo-card flex flex-col bg-white dark:bg-neutral-900 border {cardBorder} rounded-2xl hover:shadow-xl transition-all duration-300 overflow-hidden group"
+  class="grupo-card flex flex-col bg-card border {cardBorder} rounded-2xl hover:shadow-xl transition-all duration-300 overflow-hidden group"
 >
   <!-- ── Header ─────────────────────────────────────────────────────────── -->
   <div class="px-5 pt-5 pb-3 bg-gradient-to-br {headerBg}">
@@ -93,11 +93,11 @@
       {/if}
     </div>
 
-    <h3 class="font-bold text-neutral-900 dark:text-white text-base leading-tight line-clamp-2 mb-1.5 group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
+    <h3 class="font-bold text-foreground text-base leading-tight line-clamp-2 mb-1.5 group-hover:text-primary-700 dark:group-hover:text-primary-300 transition-colors">
       {grupo.canonical_name}
     </h3>
 
-    <div class="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
+    <div class="text-xs text-muted-foreground font-medium">
       {formatarLensType(grupo.lens_type)}
     </div>
   </div>
@@ -106,10 +106,10 @@
   <div class="px-5 py-3 flex-1 space-y-2.5">
     <!-- Material + Índice -->
     <div class="flex items-center gap-2 flex-wrap">
-      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-neutral-100 text-neutral-700 dark:bg-neutral-800 dark:text-neutral-300">
+      <span class="inline-flex items-center px-2 py-0.5 rounded-md text-xs font-semibold bg-muted text-foreground">
         {grupo.material_display}
       </span>
-      <span class="text-[11px] text-neutral-400 dark:text-neutral-500">n={grupo.refractive_index}</span>
+      <span class="text-[11px] text-muted-foreground">n={grupo.refractive_index}</span>
     </div>
 
     <!-- Tratamentos -->
@@ -122,16 +122,16 @@
         {/each}
       </div>
     {:else}
-      <div class="text-[11px] text-neutral-400 italic">Sem tratamentos adicionais</div>
+      <div class="text-[11px] text-muted-foreground italic">Sem tratamentos adicionais</div>
     {/if}
 
     <!-- Faixa de Graus -->
     {#if faixaEsf}
-      <div class="text-xs text-neutral-500 dark:text-neutral-400">
-        <span class="font-semibold text-neutral-700 dark:text-neutral-300">Esf:</span>
+      <div class="text-xs text-muted-foreground">
+        <span class="font-semibold text-foreground">Esf:</span>
         {faixaEsf}
         {#if grupo.addition_max}
-          &nbsp;<span class="font-semibold text-neutral-700 dark:text-neutral-300">Add:</span>
+          &nbsp;<span class="font-semibold text-foreground">Add:</span>
           até +{grupo.addition_max}
         {/if}
       </div>
@@ -165,8 +165,8 @@
   {/if}
 
   <!-- ── Footer: Counters ────────────────────────────────────────────────── -->
-  <div class="px-5 py-2.5 bg-neutral-50 dark:bg-neutral-800/50 border-t border-neutral-100 dark:border-neutral-800">
-    <div class="flex items-center justify-between text-[10px] text-neutral-500 dark:text-neutral-400 font-semibold">
+  <div class="px-5 py-2.5 bg-muted/50 border-t border-border">
+    <div class="flex items-center justify-between text-[10px] text-muted-foreground font-semibold">
       <span title="Lentes mapeadas">📦 {grupo.mapped_lens_count ?? 0} lentes</span>
       <span title="Marcas">🏷️ {grupo.mapped_brand_count ?? 0} marcas</span>
       <span title="Fornecedores">🚚 {grupo.mapped_supplier_count ?? 0} fornec.</span>
