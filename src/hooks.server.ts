@@ -81,6 +81,18 @@ const ENFORCE_AUTH = true;
 const PUBLIC_PATHS = ['/auth', '/api/'];
 
 const authGuard: Handle = async ({ event, resolve }) => {
+  // ── Gateway SSO: interceptar tokens em qualquer URL ─────────────────────
+  // O Gateway (v2) pode enviar access_token + refresh_token na URL raiz:
+  //   /?app=sis_lens&app_key=sis_lens&next=/&access_token=...&refresh_token=...
+  // Precisamos redirecionar para /auth/callback que faz setSession server-side.
+  const accessToken = event.url.searchParams.get('access_token');
+  const refreshToken = event.url.searchParams.get('refresh_token');
+
+  if (accessToken && refreshToken && !event.url.pathname.startsWith('/auth')) {
+    const next = event.url.searchParams.get('next') ?? '/';
+    throw redirect(303, `/auth/callback?access_token=${accessToken}&refresh_token=${refreshToken}&next=${encodeURIComponent(next)}`);
+  }
+
   const { session, user } = await event.locals.safeGetSession();
   event.locals.session = session;
   event.locals.user = user;
