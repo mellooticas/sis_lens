@@ -38,10 +38,49 @@ export const load: PageServerLoad = async ({ params, locals }) => {
                 throw error(404, 'Conceito ótico não encontrado');
             }
 
-            // Retorna sem pricing
+            // Mesmo sem pricing, busca lentes reais via rpc_canonical_detail
+            console.log('🔍 [Oracle v2] Fallback: buscando lentes sem pricing...');
+            const { data: lentesFallback } = await supabase
+                .rpc('rpc_canonical_detail', {
+                    p_canonical_id: conceitoId,
+                    p_is_premium: false,
+                });
+
+            const lentesBaseFallback = (lentesFallback || []) as CanonicalDetail[];
+            let lentesEnriquecidasFallback: CanonicalDetailEnriched[] = lentesBaseFallback;
+            const fallbackIds = lentesBaseFallback.map((l) => l.lens_id).filter(Boolean);
+
+            if (fallbackIds.length > 0) {
+                const { data: detalhesFb } = await supabase
+                    .from('v_catalog_lenses')
+                    .select('id, sku, anti_reflective, anti_scratch, uv_filter, blue_light, photochromic, polarized, refractive_index, material_name')
+                    .in('id', fallbackIds);
+
+                const mapaFb = new Map<string, Record<string, unknown>>(
+                    (detalhesFb || []).map((d: Record<string, unknown>) => [d.id as string, d])
+                );
+
+                lentesEnriquecidasFallback = lentesBaseFallback.map((l) => {
+                    const d = mapaFb.get(l.lens_id);
+                    if (!d) return l;
+                    return {
+                        ...l,
+                        lens_sku: l.lens_sku ?? (d.sku as string | null) ?? null,
+                        anti_reflective: d.anti_reflective as boolean | undefined,
+                        anti_scratch: d.anti_scratch as boolean | undefined,
+                        uv_filter: d.uv_filter as boolean | undefined,
+                        blue_light: d.blue_light as boolean | undefined,
+                        photochromic: d.photochromic as boolean | undefined,
+                        polarized: d.polarized as boolean | undefined,
+                        refractive_index: d.refractive_index as number | null | undefined,
+                        material_name: d.material_name as string | null | undefined,
+                    };
+                });
+            }
+
             return {
                 conceito: conceitoBase as CanonicalWithPricing,
-                lentes: [] as CanonicalDetailEnriched[],
+                lentes: lentesEnriquecidasFallback,
                 isPremium: false,
                 sucesso: true
             };
