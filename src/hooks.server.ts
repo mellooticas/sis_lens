@@ -81,16 +81,25 @@ const ENFORCE_AUTH = true;
 const PUBLIC_PATHS = ['/auth', '/api/'];
 
 const authGuard: Handle = async ({ event, resolve }) => {
-  // ── Gateway SSO: interceptar tokens em qualquer URL ─────────────────────
-  // O Gateway (v2) pode enviar access_token + refresh_token na URL raiz:
-  //   /?app=sis_lens&app_key=sis_lens&next=/&access_token=...&refresh_token=...
-  // Precisamos redirecionar para /auth/callback que faz setSession server-side.
+  // ── Gateway SSO: interceptar tokens/tickets em qualquer URL ─────────────
+  // V2: ticket opaco que é trocado server-to-server
+  // V1 (legacy): access_token + refresh_token nos query params
+  const ticket = event.url.searchParams.get('ticket');
   const accessToken = event.url.searchParams.get('access_token');
   const refreshToken = event.url.searchParams.get('refresh_token');
 
-  if (accessToken && refreshToken && !event.url.pathname.startsWith('/auth')) {
-    const next = event.url.searchParams.get('next') ?? '/';
-    throw redirect(303, `/auth/callback?access_token=${accessToken}&refresh_token=${refreshToken}&next=${encodeURIComponent(next)}`);
+  if (!event.url.pathname.startsWith('/auth')) {
+    if (ticket) {
+      const next = event.url.searchParams.get('next') ?? '/';
+      const params = new URLSearchParams({ ticket, next });
+      const appKey = event.url.searchParams.get('app_key');
+      if (appKey) params.set('app_key', appKey);
+      throw redirect(303, `/auth/callback?${params.toString()}`);
+    }
+    if (accessToken && refreshToken) {
+      const next = event.url.searchParams.get('next') ?? '/';
+      throw redirect(303, `/auth/callback?access_token=${accessToken}&refresh_token=${refreshToken}&next=${encodeURIComponent(next)}`);
+    }
   }
 
   const { session, user } = await event.locals.safeGetSession();

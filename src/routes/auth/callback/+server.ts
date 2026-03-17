@@ -1,27 +1,95 @@
 /**
  * SIS Lens — /auth/callback
- * Token Relay Receiver — Padrão SSO do Ecossistema SIS_DIGIAI
+ * Token Relay Receiver — Padrao SSO do Ecossistema SIS_DIGIAI
  *
- * O SIS Gateway envia access_token + refresh_token via query params.
- * Este handler cria a sessão local com cookies HttpOnly e navega
- * para a rota original via HTML 200 (não 303 redirect).
+ * V1 (legacy): Gateway envia access_token + refresh_token via query params.
+ * V2 (ticket): Gateway envia ticket opaco trocado server-to-server.
  *
- * ⚠️ Netlify CDN pode remover Set-Cookie de respostas 3xx (redirect).
- * Usar HTML 200 com meta refresh garante que os cookies de sessão
- * sejam preservados. Ref: sso_autenticacao.md seção 10.1
+ * Este handler cria a sessao local com cookies HttpOnly e navega
+ * para a rota original via HTML 200 (nao 303 redirect).
  *
- * Fluxo: Gateway → /auth/callback?access_token=X&refresh_token=Y&next=/catalog
+ * Netlify CDN pode remover Set-Cookie de respostas 3xx (redirect).
+ * Usar HTML 200 com meta refresh garante que os cookies de sessao
+ * sejam preservados.
  */
 
 import { createServerClient } from '@supabase/ssr';
 import { redirect } from '@sveltejs/kit';
 import type { RequestHandler } from './$types';
 import { PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY } from '$env/static/public';
+import { PUBLIC_SIS_GATEWAY_URL } from '$env/static/public';
+import { env } from '$env/dynamic/private';
+import { SSO_APP_KEY, SSO_TICKET_PARAM, normalizeSsoNext, SSO_DEFAULT_NEXT } from '$lib/auth/sso';
+
+async function exchangeSsoTicket(ticket: string): Promise<{
+  accessToken: string;
+  refreshToken: string;
+  next: string;
+} | null> {
+  const gatewayUrl = PUBLIC_SIS_GATEWAY_URL;
+  if (!gatewayUrl) {
+    return null;
+  }
+
+  const headers = new Headers({
+    'Content-Type': 'application/json',
+    'Cache-Control': 'no-store',
+  });
+
+  const sharedSecret = env.SSO_EXCHANGE_SHARED_SECRET;
+  if (sharedSecret) {
+    headers.set('x-sso-exchange-secret', sharedSecret);
+  }
+
+  const response = await fetch(new URL('/api/sso/exchange', gatewayUrl), {
+    method: 'POST',
+    headers,
+    body: JSON.stringify({
+      ticket,
+      app_key: SSO_APP_KEY,
+    }),
+  });
+
+  if (!response.ok) {
+    console.error(`[SSO] Ticket exchange failed: ${response.status} ${response.statusText}`);
+    return null;
+  }
+
+  const payload = await response.json().catch(() => null);
+  const accessToken = payload?.session?.access_token;
+  const refreshToken = payload?.session?.refresh_token;
+
+  if (!accessToken || !refreshToken) {
+    return null;
+  }
+
+  return {
+    accessToken,
+    refreshToken,
+    next: normalizeSsoNext(payload?.next, SSO_DEFAULT_NEXT),
+  };
+}
 
 export const GET: RequestHandler = async ({ url, cookies }) => {
-  const access_token  = url.searchParams.get('access_token');
-  const refresh_token = url.searchParams.get('refresh_token');
-  const next          = url.searchParams.get('next') ?? '/';
+  const ticket = url.searchParams.get(SSO_TICKET_PARAM);
+  const legacyAccessToken = url.searchParams.get('access_token');
+  const legacyRefreshToken = url.searchParams.get('refresh_token');
+  let access_token = legacyAccessToken;
+  let refresh_token = legacyRefreshToken;
+  let next = normalizeSsoNext(url.searchParams.get('next'), SSO_DEFAULT_NEXT);
+
+  // V2: Ticket-based exchange
+  if (ticket) {
+    const exchanged = await exchangeSsoTicket(ticket);
+
+    if (!exchanged) {
+      throw redirect(303, `/?error=ticket_exchange_failed`);
+    }
+
+    access_token = exchanged.accessToken;
+    refresh_token = exchanged.refreshToken;
+    next = exchanged.next;
+  }
 
   if (access_token && refresh_token) {
     const supabase = createServerClient(PUBLIC_SUPABASE_URL, PUBLIC_SUPABASE_ANON_KEY, {
@@ -38,10 +106,6 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     const { error } = await supabase.auth.setSession({ access_token, refresh_token });
 
     if (!error) {
-      // ── HTML 200 com navegação client-side ──────────────────────────
-      // Netlify CDN pode strip Set-Cookie de 3xx redirects.
-      // Responder com 200 garante que os cookies de sessão sejam entregues
-      // ao browser antes da navegação para a página destino.
       return new Response(
         `<!DOCTYPE html>
 <html>
@@ -62,9 +126,9 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
       );
     }
 
-    console.error('[auth/callback] Erro ao estabelecer sessão:', error.message);
+    console.error('[auth/callback] Erro ao estabelecer sessao:', error.message);
   }
 
-  // Tokens inválidos ou ausentes → authGuard redirecionará para Gateway
+  // Tokens invalidos ou ausentes — authGuard redirecionara para Gateway
   throw redirect(303, '/');
 };
