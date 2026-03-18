@@ -78,7 +78,7 @@
         style="background-color: var(--sidebar-primary); color: var(--sidebar-primary-foreground);"
       >
         <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={iconPaths.sparkles} />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={iconPaths.eye} />
         </svg>
       </div>
       {#if !collapsed}

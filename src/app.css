@@ -1,4 +1,4 @@
-/* SIS DIGIAI Design System — SIS Lens (Violet #8b5cf6) */
+/* SIS DIGIAI Design System — SIS Lens (Indigo #6366f1) */
 /* ============================================================================
    Filosofia: "Base Neutra + Sotaque de Cor" (Ecossistema SIS_DIGIAI)
    Regras: Flat · Sóbrio · Focado em Dados
@@ -47,7 +47,7 @@
     --sidebar-accent: #f1f5f9;
     --sidebar-accent-foreground: #0f172a;
     --sidebar-border: #e2e8f0;
-    --sidebar-ring: #8b5cf6;
+    --sidebar-ring: #6366f1;
 
     /* ── Primary Scale — SIS Lens Violet ──────────────────────────────── */
     --primary-50:  #f5f3ff;
@@ -120,7 +120,7 @@
     --sidebar-accent: #1e293b;
     --sidebar-accent-foreground: #f1f5f9;
     --sidebar-border: #334155;
-    --sidebar-ring: #a78bfa;
+    --sidebar-ring: #818cf8;
 
     --neutral-50:  #020617;
     --neutral-100: #0f172a;
