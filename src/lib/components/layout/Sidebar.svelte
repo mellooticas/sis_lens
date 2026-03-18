@@ -1,26 +1,13 @@
 <script lang="ts">
-  /**
-   * Sidebar — SIS Lens
-   * Design System SIS_DIGIAI: Base Neutra + Sotaque Violet (primary)
-   * SEM glassmorphism · SEM gradientes · SEM scale effects
-   */
   import { page } from "$app/stores";
-  import Logo from "$lib/components/layout/Logo.svelte";
-  import ThemeToggle from "$lib/components/ui/ThemeToggle.svelte";
   import { currentUser } from "$lib/stores/auth";
+  import ThemeToggle from "$lib/components/ui/ThemeToggle.svelte";
 
   export let collapsed = false;
 
-  type MenuItem = {
-    id: string;
-    label: string;
-    href?: string;
-    icon: string;
-  };
-
   type NavSection = {
     label?: string;
-    items: MenuItem[];
+    items: { id: string; label: string; href: string; icon: string }[];
   };
 
   const sections: NavSection[] = [
@@ -28,65 +15,30 @@
       items: [{ id: "home", label: "Dashboard", href: "/", icon: "home" }],
     },
     {
-      label: "Catálogos",
+      label: "CATALOGOS",
       items: [
-        {
-          id: "lentes",
-          label: "Lentes",
-          href: "/lentes",
-          icon: "grid",
-        },
-        {
-          id: "standard",
-          label: "Standard",
-          href: "/standard",
-          icon: "box",
-        },
-        {
-          id: "premium",
-          label: "Premium",
-          href: "/premium",
-          icon: "sparkles",
-        },
-        {
-          id: "contato",
-          label: "Contato",
-          href: "/contato",
-          icon: "eye",
-        },
+        { id: "lentes", label: "Lentes", href: "/lentes", icon: "grid" },
+        { id: "standard", label: "Standard", href: "/standard", icon: "box" },
+        { id: "premium", label: "Premium", href: "/premium", icon: "sparkles" },
+        { id: "contato", label: "Contato", href: "/contato", icon: "eye" },
       ],
     },
     {
-      label: "Operação",
+      label: "OPERACAO",
       items: [
-        {
-          id: "simulador",
-          label: "Simulador de Receita",
-          href: "/simulador/receita",
-          icon: "zap",
-        },
+        { id: "simulador", label: "Simulador de Receita", href: "/simulador/receita", icon: "zap" },
       ],
     },
     {
-      label: "Estratégia & BI",
+      label: "ESTRATEGIA & BI",
       items: [
-        {
-          id: "ranking",
-          label: "Ranking de Lentes",
-          href: "/ranking",
-          icon: "trophy",
-        },
+        { id: "ranking", label: "Ranking de Lentes", href: "/ranking", icon: "trophy" },
       ],
     },
     {
-      label: "Gestão do Sistema",
+      label: "GESTAO",
       items: [
-        {
-          id: "saude",
-          label: "Saúde do Sistema",
-          href: "/saude",
-          icon: "shield",
-        },
+        { id: "saude", label: "Saude do Sistema", href: "/saude", icon: "shield" },
       ],
     },
   ];
@@ -94,254 +46,107 @@
   function isActive(path: string) {
     if (!path) return false;
     if (path === "/") return $page.url.pathname === "/";
-    return (
-      $page.url.pathname === path || $page.url.pathname.startsWith(path + "/")
-    );
+    return $page.url.pathname === path || $page.url.pathname.startsWith(path + "/");
   }
 
-  // Classes reutilizáveis
-  const activeItem =
-    "bg-primary-50 dark:bg-primary-900/20 text-primary-700 dark:text-primary-300";
-  const inactiveItem =
-    "text-muted-foreground hover:bg-accent hover:text-foreground";
-  const activeIcon = "text-primary-600 dark:text-primary-400";
-  const inactiveIcon =
-    "text-muted-foreground group-hover:text-foreground";
+  // Simple SVG icon map
+  const iconPaths: Record<string, string> = {
+    home: "M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6",
+    grid: "M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z",
+    box: "M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4",
+    sparkles: "M5 3l3.057 2.197L12 3l1.943 5.197 5.057.803-4 3.197 1.943 5.197L12 15l-4.943 2.197L9 12l-4-3.197 5.057-.803L5 3z",
+    eye: "M15 12a3 3 0 11-6 0 3 3 0 016 0zM2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z",
+    zap: "M13 10V3L4 14h7v7l9-11h-7z",
+    trophy: "M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z",
+    shield: "M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z",
+  };
 </script>
 
 <aside
-  class="
-    fixed left-0 top-0 h-full z-50 flex flex-col
-    transition-all duration-300 ease-in-out
-    {collapsed ? 'w-[4.5rem]' : 'w-[16rem]'}
-    border-r border-border
-    bg-background
-  "
+  class="fixed left-0 top-0 h-full z-50 flex flex-col transition-all duration-300 ease-in-out border-r border-border
+         {collapsed ? 'w-[72px]' : 'w-64'}"
+  style="background-color: var(--sidebar); color: var(--sidebar-foreground);"
 >
-  <!-- Logo + Branding -->
+  <!-- Brand -->
   <div
-    class="flex flex-col items-center justify-center border-b border-border px-3 shrink-0
-           {collapsed ? 'h-16' : 'h-20 gap-0.5 py-2'}"
+    class="flex h-16 shrink-0 items-center border-b {collapsed ? 'justify-center px-3' : 'gap-3 px-4'}"
+    style="border-color: var(--sidebar-border);"
   >
-    {#if collapsed}
-      <!-- Collapsed: icon badge -->
-      <div class="w-9 h-9 rounded-lg bg-[var(--primary)] flex items-center justify-center text-white font-headline font-bold text-sm">
-        SL
+    <a href="/" class="flex items-center {collapsed ? '' : 'gap-3'}">
+      <div
+        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-black text-sm"
+        style="background-color: var(--sidebar-primary); color: var(--sidebar-primary-foreground);"
+      >
+        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={iconPaths.sparkles} />
+        </svg>
       </div>
-    {:else}
-      <!-- Expanded: full logo + subtitle -->
-      <Logo size="lg" variant="full" />
-      <span class="text-[9px] font-medium uppercase tracking-[0.2em] text-muted-foreground">
-        SIS DIGIAI
-      </span>
-    {/if}
+      {#if !collapsed}
+        <div>
+          <p class="text-[11px] font-medium uppercase tracking-wider opacity-50">SIS DIGIAI</p>
+          <p class="text-lg font-black tracking-tight">SIS Lens</p>
+        </div>
+      {/if}
+    </a>
   </div>
 
-  <nav class="flex-1 overflow-y-auto custom-scrollbar pt-3 pb-6 px-2 space-y-6">
+  <!-- Navigation -->
+  <nav class="flex-1 overflow-y-auto px-3 py-4">
     {#each sections as section}
-      <div class="space-y-1">
+      <div class="mt-5 first:mt-0">
         {#if section.label && !collapsed}
-          <h4
-            class="px-3 text-[10px] font-bold uppercase tracking-wider text-muted-foreground mb-2"
-          >
-            {section.label}
-          </h4>
+          <p class="mb-2 px-3 text-[11px] font-semibold uppercase tracking-wider opacity-40">{section.label}</p>
+        {:else if section.label && collapsed}
+          <div class="mx-auto my-3 h-px w-8" style="background-color: var(--sidebar-border);"></div>
         {/if}
-
-        {#each section.items as item}
-          <a
-            href={item.href}
-            title={collapsed ? item.label : ""}
-            class="
-              relative flex items-center gap-3 px-3 py-2.5 rounded-lg
-              transition-colors duration-150 group text-sm font-medium
-              {isActive(item.href || '') ? activeItem : inactiveItem}
-            "
-          >
-            <!-- Active bar -->
-            {#if isActive(item.href || "")}
-              <span
-                class="absolute left-0 w-0.5 h-6 bg-primary-600 rounded-r"
-                aria-hidden="true"
-              ></span>
-            {/if}
-
-            <!-- Icon -->
-            <span
-              class="shrink-0 w-5 h-5 {isActive(item.href || '')
-                ? activeIcon
-                : inactiveIcon}"
+        <div class="space-y-1">
+          {#each section.items as item}
+            {@const active = isActive(item.href)}
+            <a
+              href={item.href}
+              title={collapsed ? item.label : ''}
+              class="flex items-center rounded-lg transition-colors
+                     {collapsed ? 'justify-center p-3' : 'gap-3 px-3 py-2.5 text-sm font-medium'}"
+              style={active ? 'background-color: color-mix(in srgb, var(--sidebar-primary) 12%, transparent); color: var(--sidebar-primary);' : ''}
             >
-              {#if item.icon === "home"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6"
-                  />
+              <span style={active ? 'color: var(--sidebar-primary);' : 'opacity: 0.6;'}>
+                <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5 shrink-0">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.75" d={iconPaths[item.icon] || ''} />
                 </svg>
-              {:else if item.icon === "search"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"
-                  />
-                </svg>
-              {:else if item.icon === "grid"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M4 6a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2V6zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V6zM4 16a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2H6a2 2 0 01-2-2v-2zm10 0a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z"
-                  />
-                </svg>
-              {:else if item.icon === "box"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M20 7l-8-4-8 4m16 0l-8 4m8-4v10l-8 4m0-10L4 7m8 4v10M4 7v10l8 4"
-                  />
-                </svg>
-              {:else if item.icon === "sparkles"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M5 3l3.057 2.197L12 3l1.943 5.197 5.057.803-4 3.197 1.943 5.197L12 15l-4.943 2.197L9 12l-4-3.197 5.057-.803L5 3z"
-                  />
-                </svg>
-              {:else if item.icon === "eye"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M15 12a3 3 0 11-6 0 3 3 0 016 0z"
-                  />
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z"
-                  />
-                </svg>
-              {:else if item.icon === "zap"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M13 10V3L4 14h7v7l9-11h-7z"
-                  />
-                </svg>
-              {:else if item.icon === "trophy"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M9 12l2 2 4-4M7.835 4.697a3.42 3.42 0 001.946-.806 3.42 3.42 0 014.438 0 3.42 3.42 0 001.946.806 3.42 3.42 0 013.138 3.138 3.42 3.42 0 00.806 1.946 3.42 3.42 0 010 4.438 3.42 3.42 0 00-.806 1.946 3.42 3.42 0 01-3.138 3.138 3.42 3.42 0 00-1.946.806 3.42 3.42 0 01-4.438 0 3.42 3.42 0 00-1.946-.806 3.42 3.42 0 01-3.138-3.138 3.42 3.42 0 00-.806-1.946 3.42 3.42 0 010-4.438 3.42 3.42 0 00.806-1.946 3.42 3.42 0 013.138-3.138z"
-                  />
-                </svg>
-              {:else if item.icon === "shield"}
-                <svg
-                  fill="none"
-                  viewBox="0 0 24 24"
-                  stroke="currentColor"
-                  class="w-5 h-5"
-                >
-                  <path
-                    stroke-linecap="round"
-                    stroke-linejoin="round"
-                    stroke-width="1.75"
-                    d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z"
-                  />
-                </svg>
+              </span>
+              {#if !collapsed}
+                <span class="min-w-0 flex-1 truncate">{item.label}</span>
               {/if}
-            </span>
-
-            {#if !collapsed}
-              <span class="truncate">{item.label}</span>
-            {/if}
-          </a>
-        {/each}
+            </a>
+          {/each}
+        </div>
       </div>
     {/each}
   </nav>
 
-  <!-- Footer: tema + user -->
-  <div class="border-t border-border p-2 shrink-0 space-y-2">
+  <!-- Footer -->
+  <div class="border-t p-3 space-y-2" style="border-color: var(--sidebar-border);">
     <!-- Theme Toggle -->
-    <div class="flex items-center justify-center py-1">
+    <div class="flex items-center {collapsed ? 'justify-center' : 'px-1'}">
       <ThemeToggle size="sm" />
     </div>
 
     <!-- User Profile -->
     {#if $currentUser}
-      {#if !collapsed}
-        <div class="flex items-center gap-3 px-3 py-2 rounded-lg">
-          <div class="h-7 w-7 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-xs font-bold shrink-0">
-            {$currentUser.initials}
-          </div>
-          <div class="flex flex-col min-w-0">
-            <span class="text-sm font-medium truncate">{$currentUser.firstName}</span>
-            <span class="text-xs text-muted-foreground">{$currentUser.roleLabel}</span>
-          </div>
+      <div class="flex items-center gap-3 rounded-lg px-3 py-2 {collapsed ? 'justify-center px-0' : ''}" title={collapsed ? $currentUser.firstName : ''}>
+        <div
+          class="flex h-7 w-7 shrink-0 items-center justify-center rounded-full text-[11px] font-bold"
+          style="background-color: var(--sidebar-primary); color: var(--sidebar-primary-foreground);"
+        >
+          {$currentUser.initials}
         </div>
-      {:else}
-        <div class="flex justify-center py-1">
-          <div class="h-7 w-7 rounded-full bg-[var(--primary)] flex items-center justify-center text-white text-xs font-bold" title="{$currentUser.firstName}">
-            {$currentUser.initials}
+        {#if !collapsed}
+          <div class="min-w-0">
+            <p class="truncate text-sm font-semibold">{$currentUser.firstName}</p>
+            <p class="truncate text-xs opacity-60">{$currentUser.roleLabel}</p>
           </div>
-        </div>
-      {/if}
+        {/if}
+      </div>
     {/if}
   </div>
 </aside>

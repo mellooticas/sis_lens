@@ -1,8 +1,4 @@
 <script lang="ts">
-  /**
-   * Main Layout
-   * Estrutura principal: Sidebar + Header + Content
-   */
   import Sidebar from "./Sidebar.svelte";
   import Header from "./Header.svelte";
 
@@ -13,23 +9,17 @@
   }
 </script>
 
-<div
-  class="min-h-screen text-foreground transition-colors"
->
-  <!-- Sidebar (Left) -->
+<div class="min-h-screen bg-background transition-colors duration-300">
   <Sidebar collapsed={sidebarCollapsed} />
 
-  <!-- Main Content (Right) -->
   <div
-    class="transition-all duration-500 ease-out flex flex-col min-h-screen"
-    style="padding-left: {sidebarCollapsed ? '7.25rem' : '18rem'}"
+    class="transition-all duration-300 flex flex-col min-h-screen"
+    style="padding-left: {sidebarCollapsed ? '72px' : '16rem'}"
   >
-    <!-- Header (Top) -->
     <Header on:menuClick={toggleSidebar} collapsed={sidebarCollapsed} />
 
-    <!-- Page Content -->
-    <main class="flex-1 p-8">
-      <div class="container mx-auto max-w-7xl animate-fade-in">
+    <main class="flex-1 p-4 md:p-8">
+      <div class="mx-auto max-w-7xl">
         <slot />
       </div>
     </main>
