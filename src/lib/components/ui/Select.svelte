@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Select — SIS Lens Component Contract
+   * Select — Clearix Lens Component Contract
    * Styled consistently with Input contract
    */
   import type { HTMLSelectAttributes } from 'svelte/elements';

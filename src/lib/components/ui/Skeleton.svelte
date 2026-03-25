@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Skeleton — SIS Lens Component Contract
+   * Skeleton — Clearix Lens Component Contract
    * bg-muted animate-pulse rounded-md
    */
   import type { HTMLAttributes } from 'svelte/elements';

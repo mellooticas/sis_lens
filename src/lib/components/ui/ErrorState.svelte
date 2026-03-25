@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * ErrorState — SIS Lens Component Contract
+   * ErrorState — Clearix Lens Component Contract
    * Error state with retry action
    */
   import Button from './Button.svelte';

@@ -9,8 +9,8 @@
 
     // Dados mockados que viriam da view vw_opcoes_marca_propria
     export let lenteVirtual = {
-        nome: "SIS Lens Gold Digital 1.67",
-        sku: "SIS-GOLD-167-DIG",
+        nome: "Clearix Lens Gold Digital 1.67",
+        sku: "CLX-GOLD-167-DIG",
     };
 
     export let sourcingOptions = [
@@ -74,7 +74,7 @@
                 class="text-lg font-bold text-foreground flex items-center gap-2 font-headline"
             >
                 <Building2 size={20} class="text-primary-500" />
-                SIS Lens Sourcing
+                Clearix Lens Sourcing
             </h3>
             <p class="text-sm text-muted-foreground">
                 Gestão de fornecedores para: <span
@@ -213,7 +213,7 @@
         class="bg-muted p-4 border-t border-border text-xs text-center text-muted-foreground"
     >
         <p>
-            O <strong>SIS Lens</strong> redireciona automaticamente os pedidos
+            O <strong>Clearix Lens</strong> redireciona automaticamente os pedidos
             para o <strong>{currentBestOption.lab_nome}</strong> para maximizar a
             margem.
         </p>

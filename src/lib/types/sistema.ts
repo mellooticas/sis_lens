@@ -1,6 +1,6 @@
 // ============================================================================
-// SIS_LENS — Tipos do Sistema
-// Versão: 3.0 — Alinhada com SIS_DIGIAI Ecosystem (Migrations 208-221)
+// Clearix Lens — Tipos do Sistema
+// Versão: 3.0 — Alinhada com Clearix by DIGIAI Ecosystem (Migrations 208-221)
 // ============================================================================
 
 import type { VCatalogLens, VContactLens, VBrand, VCanonicalLens } from './database-views';
@@ -39,7 +39,7 @@ export interface ContactLens extends VContactLens { }
 export interface Brand extends VBrand { }
 export interface CanonicalLens extends VCanonicalLens { }
 
-// Rank criteria according to SIS Lens logic
+// Rank criteria according to Clearix Lens logic
 export type RankingCriteria = 'normal' | 'urgent' | 'special';
 
 export interface RankingOption {

@@ -13,7 +13,7 @@
   };
 
   export let privateLabelOption = {
-    nome: "SIS Lens Gold Digital",
+    nome: "Clearix Lens Gold Digital",
     marca: "Marca Própria",
     tecnologia: "Freeform HD Personalizada",
     tratamentos: ["Ultra AR", "Bluetech"],
@@ -152,7 +152,7 @@
         <span
           class="text-xs font-bold text-white tracking-widest uppercase flex items-center justify-center gap-2 font-headline drop-shadow-sm"
         >
-          ⭐ Recomendação SIS Lens
+          Recomendação Clearix Lens
         </span>
       </div>
 
@@ -300,7 +300,7 @@
     Comparação técnica baseada em índice de refração 1.67 e antirreflexo
     premium.<br />
     <span class="font-bold text-primary-900"
-      >SIS Lens Intelligence System</span
+      >Clearix Lens Intelligence System</span
     > v2.0
   </p>
 </div>

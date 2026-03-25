@@ -1,6 +1,6 @@
 /**
- * SIS Lens — JWT Claims Helper
- * Padrão do Ecossistema SIS_DIGIAI (seção 5.5c)
+ * Clearix Lens — JWT Claims Helper
+ * Padrão do Ecossistema Clearix by DIGIAI (seção 5.5c)
  *
  * Decodifica o access_token do Supabase para extrair claims customizadas:
  * tenant_id, role_code, full_name, tenant_name
@@ -121,7 +121,7 @@ export function buildUserDisplay(
     firstName,
     initials,
     roleLabel:  ROLE_LABELS[claims.role_code] ?? 'Vendedor',
-    tenantName: claims.tenant_name || (userMetadata?.tenant_name as string) || 'SIS Lens',
+    tenantName: claims.tenant_name || (userMetadata?.tenant_name as string) || 'Clearix Lens',
     email:      email || '',
     claims,
   };

@@ -1,5 +1,5 @@
 /**
- * SIS Lens Design Tokens
+ * Clearix Lens Design Tokens
  * Sistema completo de design tokens para uso em TypeScript/JavaScript
  */
 

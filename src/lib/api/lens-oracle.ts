@@ -1,6 +1,6 @@
 /**
- * SIS Lens — LensOracleAPI
- * O Cérebro Clínico e Comercial do Ecossistema SIS_DIGIAI
+ * Clearix Lens — LensOracleAPI
+ * O Cérebro Clínico e Comercial do Ecossistema Clearix by DIGIAI
  *
  * Banco: mhgbuplnxtfgipbemchb
  *

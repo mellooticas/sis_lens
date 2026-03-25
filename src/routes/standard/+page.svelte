@@ -175,7 +175,7 @@
 </script>
 
 <svelte:head>
-    <title>Standard ({total.toLocaleString('pt-BR')}) | SIS Lens</title>
+    <title>Standard ({total.toLocaleString('pt-BR')}) | Clearix Lens</title>
 </svelte:head>
 
 <main class="min-h-screen bg-muted pb-24">

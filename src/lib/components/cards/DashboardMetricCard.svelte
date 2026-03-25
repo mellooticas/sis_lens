@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * DashboardMetricCard — Padrão SIS_DIGIAI v2
+   * DashboardMetricCard — Padrão Clearix by DIGIAI v2
    *
    * Regras de design:
    * - Fundo NEUTRO (bg-white / dark:bg-neutral-800) — nunca colorido

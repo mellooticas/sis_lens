@@ -1,5 +1,5 @@
 /**
- * SIS Lens — Layout Root Server
+ * Clearix Lens — Layout Root Server
  * Expõe session, user e cookies para todo o app via $page.data
  *
  * cookies.getAll() é necessário para o +layout.ts criar o server client

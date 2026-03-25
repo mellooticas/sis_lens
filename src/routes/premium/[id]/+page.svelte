@@ -65,7 +65,7 @@
 </script>
 
 <svelte:head>
-    <title>{conceito?.canonical_name || "Conceito Premium"} ★ | SIS Lens Oracle</title>
+    <title>{conceito?.canonical_name || "Conceito Premium"} | Clearix Lens</title>
 </svelte:head>
 
 <main class="min-h-screen bg-muted pb-20">

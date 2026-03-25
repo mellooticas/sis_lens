@@ -231,7 +231,7 @@
 </script>
 
 <svelte:head>
-    <title>Lentes ({total.toLocaleString('pt-BR')}) | SIS Lens Oracle</title>
+    <title>Lentes ({total.toLocaleString('pt-BR')}) | Clearix Lens</title>
 </svelte:head>
 
 <main class="min-h-screen bg-muted pb-24">

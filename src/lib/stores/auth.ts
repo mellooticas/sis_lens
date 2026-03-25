@@ -1,6 +1,6 @@
 /**
- * SIS Lens — authStore (currentUser)
- * Padrão SvelteKit do Ecossistema SIS_DIGIAI (seção 3.2)
+ * Clearix Lens — authStore (currentUser)
+ * Padrão SvelteKit do Ecossistema Clearix by DIGIAI (seção 3.2)
  *
  * Derived store que extrai os dados do usuário do page store,
  * lendo JWT claims + user_metadata + fallback para email.

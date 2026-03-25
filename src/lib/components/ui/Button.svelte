@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Button — SIS Lens Component Contract
+   * Button — Clearix Lens Component Contract
    * Variants: default, destructive, outline, secondary, ghost, link
    * Sizes: xs, sm, default, lg, icon
    */

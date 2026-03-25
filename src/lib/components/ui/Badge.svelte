@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Badge — SIS Lens Component Contract
+   * Badge — Clearix Lens Component Contract
    * Core variants: default, secondary, destructive, outline
    * Domain variants: melhor-opcao, promocao, entrega-expressa, success, warning, info, gold, orange, neutral
    */

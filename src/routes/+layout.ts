@@ -1,6 +1,6 @@
 /**
- * SIS Lens — Layout Universal (client + server)
- * Padrão Supabase SSR para SvelteKit — Ecossistema SIS_DIGIAI
+ * Clearix Lens — Layout Universal (client + server)
+ * Padrão Supabase SSR para SvelteKit — Ecossistema Clearix by DIGIAI
  *
  * Cria o browser client (singleton) e inicializa a sessão a partir dos
  * cookies definidos pelo server. Sem este arquivo, o browser client

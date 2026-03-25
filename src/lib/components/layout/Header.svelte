@@ -8,14 +8,14 @@
   const dispatch = createEventDispatcher();
 
   const ROUTE_META: Record<string, { kicker: string; title: string }> = {
-    '/': { kicker: 'SIS DIGIAI', title: 'Dashboard' },
-    '/lentes': { kicker: 'SIS DIGIAI', title: 'Lentes' },
-    '/standard': { kicker: 'SIS DIGIAI', title: 'Standard' },
-    '/premium': { kicker: 'SIS DIGIAI', title: 'Premium' },
-    '/contato': { kicker: 'SIS DIGIAI', title: 'Contato' },
-    '/simulador/receita': { kicker: 'SIS DIGIAI', title: 'Simulador de Receita' },
-    '/ranking': { kicker: 'SIS DIGIAI', title: 'Ranking de Lentes' },
-    '/saude': { kicker: 'SIS DIGIAI', title: 'Saude do Sistema' },
+    '/': { kicker: 'Clearix', title: 'Dashboard' },
+    '/lentes': { kicker: 'Clearix', title: 'Lentes' },
+    '/standard': { kicker: 'Clearix', title: 'Standard' },
+    '/premium': { kicker: 'Clearix', title: 'Premium' },
+    '/contato': { kicker: 'Clearix', title: 'Contato' },
+    '/simulador/receita': { kicker: 'Clearix', title: 'Simulador de Receita' },
+    '/ranking': { kicker: 'Clearix', title: 'Ranking de Lentes' },
+    '/saude': { kicker: 'Clearix', title: 'Saude do Sistema' },
   };
 
   function getRouteMeta(path: string) {
@@ -24,7 +24,7 @@
     for (const key of sorted) {
       if (path.startsWith(key + '/')) return ROUTE_META[key];
     }
-    return { kicker: 'SIS DIGIAI', title: 'SIS Lens' };
+    return { kicker: 'Clearix', title: 'Clearix Lens' };
   }
 
   $: meta = getRouteMeta($page.url.pathname);

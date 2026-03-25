@@ -1,5 +1,5 @@
 /**
- * Hook para buscar lentes do catálogo (SIS Lens Oracle)
+ * Hook para buscar lentes do catálogo (Clearix Lens Oracle)
  * Usa a nova API consolidada LensOracleAPI
  */
 

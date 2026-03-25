@@ -1,6 +1,6 @@
 ﻿<script lang="ts">
   /**
-   * Componente Input SIS Lens
+   * Componente Input Clearix Lens
    * Input field padronizado
    */
   

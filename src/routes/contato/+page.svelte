@@ -187,7 +187,7 @@
 </script>
 
 <svelte:head>
-    <title>Contato ({total.toLocaleString('pt-BR')}) | SIS Lens</title>
+    <title>Contato ({total.toLocaleString('pt-BR')}) | Clearix Lens</title>
 </svelte:head>
 
 <main class="min-h-screen bg-muted pb-24">

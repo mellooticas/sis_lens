@@ -1,5 +1,5 @@
 /**
- * SIS Lens — Dashboard Principal
+ * Clearix Lens — Dashboard Principal
  * Campos reais da v_catalog_lens_stats (migration 271 + 280):
  *   total, premium, economica, with_ar, with_blue, with_uv, with_photochromic,
  *   price_min, price_max, price_avg, suppliers_count, brands_count, materials_count

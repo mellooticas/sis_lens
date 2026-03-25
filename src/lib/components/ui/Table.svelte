@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Table — SIS Lens Component Contract
+   * Table — Clearix Lens Component Contract
    * Header: bg-muted/50 text-muted-foreground px-4 py-3
    * Row: border-b border-border hover:bg-muted/50
    * Cell: px-4 py-4

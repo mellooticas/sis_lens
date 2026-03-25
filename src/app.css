@@ -1,6 +1,6 @@
-/* SIS DIGIAI Design System — SIS Lens (Indigo #6366f1) */
+/* Clearix Design System — Clearix Lens (Teal #14B8A6) */
 /* ============================================================================
-   Filosofia: "Base Neutra + Sotaque de Cor" (Ecossistema SIS_DIGIAI)
+   Filosofia: "Base Neutra + Sotaque de Cor" (Ecossistema Clearix by DIGIAI)
    Regras: Flat · Sóbrio · Focado em Dados
    - SEM gradientes em backgrounds/buttons/cards
    - SEM sombras pesadas (máximo shadow-md)
@@ -20,7 +20,7 @@
 ============================================================================ */
 @layer base {
   :root {
-    /* ── Standardized Design Tokens (SIS DIGIAI) ──────────────────────── */
+    /* ── Standardized Design Tokens (Clearix by DIGIAI) ─────────────── */
     --radius: 0.625rem;
     --background: #ffffff;
     --foreground: #0f172a;
@@ -49,7 +49,7 @@
     --sidebar-border: #e2e8f0;
     --sidebar-ring: #6366f1;
 
-    /* ── Primary Scale — SIS Lens Violet ──────────────────────────────── */
+    /* ── Primary Scale — Clearix Lens Teal ────────────────────────────── */
     --primary-50:  #f5f3ff;
     --primary-100: #ede9fe;
     --primary-200: #ddd6fe;
@@ -203,7 +203,7 @@
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Primary — violet (cor do SIS Lens) */
+  /* Primary — teal (cor do Clearix Lens) */
   .btn-primary {
     @apply btn bg-primary-600 text-white
            hover:bg-primary-700

@@ -1,7 +1,14 @@
 {
   "permissions": {
     "allow": [
-      "Bash(grep:*)"
+      "Bash(grep:*)",
+      "Bash(npx svelte-check --tsconfig ./tsconfig.json)",
+      "Bash(npx tsc --noEmit --skipLibCheck)",
+      "Bash(npm run build)",
+      "Bash(ls -la \"D:/projetos/SIS_Estoque/src/routes/\\(auth\\)/\")",
+      "Bash(npx svelte-kit sync)",
+      "mcp__Claude_Preview__preview_start",
+      "WebFetch(domain:sislens.netlify.app)"
     ]
   }
 }

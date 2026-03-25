@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Modal — SIS Lens Component Contract
+   * Modal — Clearix Lens Component Contract
    * Overlay: bg-black/50 fixed inset-0 z-50
    * Content: bg-background rounded-lg shadow-lg p-6
    * Transitions: fade + scale

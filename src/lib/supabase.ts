@@ -1,6 +1,6 @@
 // ============================================================================
-// SIS_LENS — Supabase Browser Client
-// Usa @supabase/ssr com PUBLIC_* (padrão SvelteKit + ecossistema SIS_DIGIAI)
+// Clearix Lens — Supabase Browser Client
+// Usa @supabase/ssr com PUBLIC_* (padrão SvelteKit + ecossistema Clearix by DIGIAI)
 //
 // Para uso server-side: event.locals.supabase (criado em hooks.server.ts)
 // Para uso client-side: importar este módulo

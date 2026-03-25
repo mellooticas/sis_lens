@@ -1,7 +1,7 @@
 <!--
-  SIS Lens — Dashboard Principal
+  Clearix Lens — Dashboard Principal
   KPIs reais de v_catalog_lenses + v_catalog_lens_groups
-  Design System SIS_DIGIAI: Base Neutra + Sotaque Violet
+  Design System Clearix by DIGIAI: Base Neutra + Sotaque Teal
   SEM glassmorphism · SEM gradientes · SEM scale effects
 -->
 <script lang="ts">
@@ -62,7 +62,7 @@
 </script>
 
 <svelte:head>
-  <title>Dashboard — SIS Lens</title>
+  <title>Dashboard — Clearix Lens</title>
   <meta name="description" content="Visão geral do catálogo de lentes oftálmicas" />
 </svelte:head>
 

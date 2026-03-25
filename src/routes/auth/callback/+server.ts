@@ -1,6 +1,6 @@
 /**
- * SIS Lens — /auth/callback
- * Token Relay Receiver — Padrao SSO do Ecossistema SIS_DIGIAI
+ * Clearix Lens — /auth/callback
+ * Token Relay Receiver — Padrao SSO do Ecossistema Clearix by DIGIAI
  *
  * V1 (legacy): Gateway envia access_token + refresh_token via query params.
  * V2 (ticket): Gateway envia ticket opaco trocado server-to-server.
@@ -83,7 +83,21 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     const exchanged = await exchangeSsoTicket(ticket);
 
     if (!exchanged) {
-      throw redirect(303, `/?error=ticket_exchange_failed`);
+      // NAO redirecionar para / (authGuard mandaria de volta ao Gateway → loop infinito)
+      const gatewayUrl = PUBLIC_SIS_GATEWAY_URL || 'https://sisgateway.netlify.app';
+      const retryUrl = `${gatewayUrl}/login?app=sis_lens&app_key=sis_lens&next=${encodeURIComponent(next)}`;
+      return new Response(
+        `<!DOCTYPE html>
+<html lang="pt-BR"><head><meta charset="utf-8"><title>Erro SSO</title></head>
+<body style="display:grid;place-items:center;min-height:100vh;margin:0;font-family:system-ui;background:#fef2f2">
+  <div style="text-align:center;padding:32px;border-radius:16px;background:white;box-shadow:0 4px 24px rgba(0,0,0,.08)">
+    <p style="font-size:18px;font-weight:600;color:#dc2626">Falha na autenticacao</p>
+    <p style="color:#6b7280;margin:12px 0">O ticket SSO nao pode ser validado.</p>
+    <a href="${retryUrl}" style="display:inline-block;margin-top:8px;padding:10px 24px;background:#2563eb;color:white;border-radius:8px;text-decoration:none">Tentar novamente</a>
+  </div>
+</body></html>`,
+        { status: 200, headers: { 'content-type': 'text/html; charset=utf-8' } }
+      );
     }
 
     access_token = exchanged.accessToken;
@@ -129,6 +143,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     console.error('[auth/callback] Erro ao estabelecer sessao:', error.message);
   }
 
-  // Tokens invalidos ou ausentes — authGuard redirecionara para Gateway
-  throw redirect(303, '/');
+  // Tokens invalidos ou ausentes — redirecionar direto para Gateway (nao para / que causaria loop)
+  const gatewayUrl = PUBLIC_SIS_GATEWAY_URL || 'https://sisgateway.netlify.app';
+  throw redirect(303, `${gatewayUrl}/login?app=sis_lens&app_key=sis_lens&next=${encodeURIComponent(next)}`);
 };

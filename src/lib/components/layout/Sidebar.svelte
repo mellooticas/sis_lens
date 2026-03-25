@@ -83,8 +83,8 @@
       </div>
       {#if !collapsed}
         <div>
-          <p class="text-[11px] font-medium uppercase tracking-wider opacity-50">SIS DIGIAI</p>
-          <p class="text-lg font-black tracking-tight">SIS Lens</p>
+          <p class="text-[11px] font-medium uppercase tracking-wider opacity-50">DIGIAI</p>
+          <p class="text-lg font-black tracking-tight">Clearix Lens</p>
         </div>
       {/if}
     </a>

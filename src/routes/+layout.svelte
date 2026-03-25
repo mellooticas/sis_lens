@@ -36,7 +36,7 @@
 </script>
 
 <!-- Layout Principal (Sidebar + Header + Content) -->
-<!-- Auth é controlada pelo hooks.server.ts via SIS Gateway SSO -->
+<!-- Auth é controlada pelo hooks.server.ts via Clearix Hub SSO -->
 <MainLayout currentPage={$page.url.pathname}>
   <slot />
 </MainLayout>

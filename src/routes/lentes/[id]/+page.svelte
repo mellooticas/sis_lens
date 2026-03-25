@@ -106,7 +106,7 @@
 </script>
 
 <svelte:head>
-    <title>{lente?.lens_name ?? 'Lente'} | SIS Lens</title>
+    <title>{lente?.lens_name ?? 'Lente'} | Clearix Lens</title>
 </svelte:head>
 
 <main class="min-h-screen bg-muted pb-24">

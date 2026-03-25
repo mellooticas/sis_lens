@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Card — SIS Lens Component Contract
+   * Card — Clearix Lens Component Contract
    * Composable card with header/content/footer snippets
    */
   import type { Snippet } from 'svelte';

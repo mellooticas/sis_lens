@@ -1,5 +1,5 @@
 <!--
-  🏆 Rankings de Lentes - SIS Lens
+  Rankings de Lentes - Clearix Lens
   Análise completa dos grupos mais relevantes utilizando LensOracleAPI
 -->
 <script lang="ts">
@@ -78,7 +78,7 @@
 </script>
 
 <svelte:head>
-  <title>Rankings | SIS Lens Oracle</title>
+  <title>Rankings | Clearix Lens</title>
 </svelte:head>
 
 <main

@@ -35,10 +35,10 @@
 
 <div class={cn("flex items-center gap-2", className)}>
   {#if variant === "icon"}
-    <!-- Apenas ícone - usa sis_lens_icon.svg REAL -->
+    <!-- Apenas ícone - usa clearix-icon.svg -->
     <img
-      src="/sis_lens_icon.svg"
-      alt="SIS Lens"
+      src="/clearix-icon.svg"
+      alt="Clearix Lens"
       class={cn(
         "object-contain transition-all duration-300",
         sizeClasses[size]
@@ -46,10 +46,10 @@
       style={isDark ? "filter: invert(1) hue-rotate(180deg) brightness(1.2);" : ""}
     />
   {:else if variant === "full"}
-    <!-- Logo completo - usa SISlens.svg REAL -->
+    <!-- Logo completo - usa clearix-icon.svg -->
     <img
-      src="/SISlens.svg"
-      alt="SIS Lens Intelligence"
+      src="/clearix-icon.svg"
+      alt="Clearix Lens"
       class={cn(
         "object-contain transition-all duration-300",
         sizeClasses[size]
@@ -66,7 +66,7 @@
           themeColorClass,
         )}
       >
-        SIS<span class="text-amber-500 ml-0.5">Lens</span>
+        Clearix<span class="text-teal-500 ml-0.5">Lens</span>
       </h1>
 
       {#if size === "lg" || size === "xl"}

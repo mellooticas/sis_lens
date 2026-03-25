@@ -1,6 +1,6 @@
 /**
- * SIS Lens — Tipos TypeScript das Views e RPCs do Banco
- * Banco: mhgbuplnxtfgipbemchb (SIS_DIGIAI)
+ * Clearix Lens — Tipos TypeScript das Views e RPCs do Banco
+ * Banco: mhgbuplnxtfgipbemchb (Clearix by DIGIAI)
  *
  * ─── Canonical Engine v2 (migrations 274–278) ───────────────────────────────
  *   CanonicalLensV2          → v_canonical_lenses / v_canonical_lenses_premium

@@ -1,5 +1,5 @@
 /**
- * SIS Lens — Hooks Index
+ * Clearix Lens — Hooks Index
  * Novo padrão: todos os hooks usam LensOracleAPI (banco mhgbuplnxtfgipbemchb)
  */
 

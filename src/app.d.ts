@@ -1,5 +1,5 @@
 // See https://svelte.dev/docs/kit/types#app.d.ts
-// Padrão do Ecossistema SIS_DIGIAI — seção 4.4
+// Padrão do Ecossistema Clearix by DIGIAI — seção 4.4
 import type { Session, SupabaseClient, User } from '@supabase/supabase-js';
 
 declare global {

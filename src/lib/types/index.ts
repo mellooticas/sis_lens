@@ -1,6 +1,6 @@
 // ============================================================================
-// SIS_LENS — Types Index (barrel)
-// Banco: mhgbuplnxtfgipbemchb (SIS_DIGIAI)
+// Clearix Lens — Types Index (barrel)
+// Banco: mhgbuplnxtfgipbemchb (Clearix by DIGIAI)
 // ============================================================================
 // REGRA: Importe tipos daqui, nunca diretamente dos sub-arquivos.
 //

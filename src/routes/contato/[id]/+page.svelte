@@ -95,7 +95,7 @@
 </script>
 
 <svelte:head>
-    <title>{lente?.product_name ?? 'Lente de Contato'} | SIS Lens</title>
+    <title>{lente?.product_name ?? 'Lente de Contato'} | Clearix Lens</title>
 </svelte:head>
 
 <main class="min-h-screen bg-muted pb-24">

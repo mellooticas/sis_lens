@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Input — SIS Lens Component Contract
+   * Input — Clearix Lens Component Contract
    * h-10 rounded-md border border-input bg-background px-3 py-2 text-sm
    */
   import type { HTMLInputAttributes } from 'svelte/elements';

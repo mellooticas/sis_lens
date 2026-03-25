@@ -12,8 +12,8 @@ export default {
     extend: {
       colors: {
         // ============================================================
-        // SIS_LENS — Accent Color: Violeta (violet-600 / #7c3aed)
-        // Ecossistema SIS_DIGIAI — "Base Neutra + Sotaque de Cor"
+        // Clearix Lens — Accent Color: Teal (#14B8A6)
+        // Ecossistema Clearix by DIGIAI — "Base Neutra + Sotaque de Cor"
         // ============================================================
         primary: {
           50: '#f5f3ff',
@@ -22,7 +22,7 @@ export default {
           300: '#c4b5fd',
           400: '#a78bfa',
           500: '#8b5cf6',
-          600: '#7c3aed', // ← COR PRINCIPAL do SIS_Lens
+          600: '#7c3aed', // ← COR PRINCIPAL do Clearix Lens
           700: '#6d28d9',
           800: '#5b21b6',
           900: '#4c1d95',
@@ -91,7 +91,7 @@ export default {
         'preco-bom': '#f59e0b',
         'preco-alto': '#ef4444',
 
-        // Brand Colors (SIS_DIGIAI Legacy & Special Accents)
+        // Brand Colors (Clearix by DIGIAI Legacy & Special Accents)
         'brand-gold': {
           50: '#fffbeb',
           100: '#fef3c7',

@@ -128,7 +128,7 @@
 </script>
 
 <svelte:head>
-    <title>Simulador de Receita - SIS Lens</title>
+    <title>Simulador de Receita - Clearix Lens</title>
 </svelte:head>
 
 <Container maxWidth="xl" padding="md">

@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * EmptyState — SIS Lens Component Contract
+   * EmptyState — Clearix Lens Component Contract
    * flex flex-col items-center text-center py-12
    */
   import Button from './Button.svelte';

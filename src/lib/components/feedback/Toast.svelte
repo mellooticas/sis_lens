@@ -1,6 +1,6 @@
 <script lang="ts">
   /**
-   * Toast — SIS Lens Component Contract
+   * Toast — Clearix Lens Component Contract
    * 4 variants: success, error, warning, info
    */
   import { fly } from 'svelte/transition';

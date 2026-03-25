@@ -33,7 +33,7 @@
 </script>
 
 <svelte:head>
-    <title>Saúde do Motor Óptico — SIS Lens</title>
+    <title>Saúde do Motor Óptico — Clearix Lens</title>
 </svelte:head>
 
 <div class="p-6 space-y-8 max-w-7xl mx-auto">
@@ -65,7 +65,7 @@
                 Diagnóstico Vital do Motor Óptico
             </h1>
             <p class="mt-2 text-muted-foreground max-w-2xl">
-                Monitoramento em tempo real do ecossistema SIS_DIGIAI. O
+                Monitoramento em tempo real do ecossistema Clearix. O
                 "Cérebro" financeiro e clínico calibra o catálogo baseado em
                 margens e integridade dos dados.
             </p>

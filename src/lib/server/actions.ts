@@ -1,5 +1,5 @@
 // ============================================================================
-// SERVER ACTIONS — SIS LENS (refatorado para LensOracleAPI)
+// SERVER ACTIONS — Clearix Lens (refatorado para LensOracleAPI)
 // ============================================================================
 // Nota: Este módulo era legado e usava DatabaseClient (removido).
 // As actions estão migradas para as rotas SvelteKit.
@@ -74,8 +74,8 @@ export const gerarRankingAction = async ({ request }: { request: Request }) => {
 };
 
 export const confirmarDecisaoAction = async ({ request: _request }: { request: Request }) => {
-  // Decisão de compra agora é tratada pelo SIS Vendas / SIS OS
-  return fail(501, { error: 'Decisões de compra são gerenciadas pelo SIS OS' });
+  // Decisão de compra agora é tratada pelo Clearix Vendas / Clearix OS
+  return fail(501, { error: 'Decisões de compra são gerenciadas pelo Clearix OS' });
 };
 
 // ============================================================================
@@ -83,7 +83,7 @@ export const confirmarDecisaoAction = async ({ request: _request }: { request: R
 // ============================================================================
 
 export const listarDecisoesAction = async ({ request: _request }: { request: Request }) => {
-  return fail(501, { error: 'Histórico de decisões é gerenciado pelo SIS Financeiro' });
+  return fail(501, { error: 'Histórico de decisões é gerenciado pelo Clearix Financeiro' });
 };
 
 export const obterDashboardAction = async () => {

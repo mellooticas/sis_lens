@@ -1,6 +1,6 @@
 // ============================================================================
-// SIS_LENS — hooks.server.ts
-// Auth via @supabase/ssr + redirect para SIS Gateway SSO
+// Clearix Lens — hooks.server.ts
+// Auth via @supabase/ssr + redirect para Clearix Hub SSO
 //
 // SvelteKit env convention:
 //   PUBLIC_*  → $env/static/public  (cliente + servidor)
@@ -67,7 +67,7 @@ const supabaseHandle: Handle = async ({ event, resolve }) => {
 };
 
 // ============================================================================
-// Handle 2: Auth Guard — redireciona para SIS Gateway se não autenticado
+// Handle 2: Auth Guard — redireciona para Clearix Hub se não autenticado
 //
 // ENFORCE_AUTH = false  →  modo soft (dev / staging sem Gateway)
 // ENFORCE_AUTH = true   →  produção — requer Gateway a tratar ?returnTo=
@@ -77,7 +77,7 @@ const supabaseHandle: Handle = async ({ event, resolve }) => {
 const ENFORCE_AUTH = true;
 
 // Rotas que NÃO precisam de autenticação
-// Nota: /login foi removido do app — auth é 100% via SIS Gateway
+// Nota: /login foi removido do app — auth é 100% via Clearix Hub
 const PUBLIC_PATHS = ['/auth', '/api/'];
 
 const authGuard: Handle = async ({ event, resolve }) => {
@@ -110,8 +110,9 @@ const authGuard: Handle = async ({ event, resolve }) => {
     const isPublicPath = PUBLIC_PATHS.some((p) => event.url.pathname.startsWith(p));
 
     if (!session && !isPublicPath) {
-      const returnTo = encodeURIComponent(event.url.href);
-      throw redirect(303, `${PUBLIC_SIS_GATEWAY_URL}/login?returnTo=${returnTo}&app=sis_lens`);
+      const appNext = `${event.url.pathname}${event.url.search}`;
+      const returnTo = encodeURIComponent(`${event.url.origin}/auth/callback`);
+      throw redirect(303, `${PUBLIC_SIS_GATEWAY_URL}/login?app=sis_lens&app_key=sis_lens&next=${encodeURIComponent(appNext)}&returnTo=${returnTo}`);
     }
   }
 
