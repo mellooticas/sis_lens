@@ -66,7 +66,7 @@
           themeColorClass,
         )}
       >
-        Clearix<span class="text-teal-500 ml-0.5">Lens</span>
+        Clearix<span class="text-violet-500 ml-0.5">Lens</span>
       </h1>
 
       {#if size === "lg" || size === "xl"}

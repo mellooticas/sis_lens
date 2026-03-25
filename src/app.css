@@ -1,4 +1,4 @@
-/* Clearix Design System — Clearix Lens (Teal #14B8A6) */
+/* Clearix Design System — Clearix Lens (Violet #8B5CF6) */
 /* ============================================================================
    Filosofia: "Base Neutra + Sotaque de Cor" (Ecossistema Clearix by DIGIAI)
    Regras: Flat · Sóbrio · Focado em Dados
@@ -49,7 +49,7 @@
     --sidebar-border: #e2e8f0;
     --sidebar-ring: #6366f1;
 
-    /* ── Primary Scale — Clearix Lens Teal ────────────────────────────── */
+    /* ── Primary Scale — Clearix Lens Violet ───────────────────────────── */
     --primary-50:  #f5f3ff;
     --primary-100: #ede9fe;
     --primary-200: #ddd6fe;
@@ -203,7 +203,7 @@
            disabled:opacity-50 disabled:cursor-not-allowed;
   }
 
-  /* Primary — teal (cor do Clearix Lens) */
+  /* Primary — violet (cor do Clearix Lens) */
   .btn-primary {
     @apply btn bg-primary-600 text-white
            hover:bg-primary-700

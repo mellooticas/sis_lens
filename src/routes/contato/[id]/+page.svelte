@@ -253,7 +253,7 @@
                                 {/if}
                                 <div class="flex flex-wrap gap-2">
                                     {#if lente.uv_protection}
-                                        <span class="px-3 py-1.5 bg-teal-50 dark:bg-teal-900/20 text-teal-700 dark:text-teal-300 text-xs font-bold rounded-lg">Proteção UV</span>
+                                        <span class="px-3 py-1.5 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 text-xs font-bold rounded-lg">Proteção UV</span>
                                     {/if}
                                     {#if lente.is_colored}
                                         <span class="px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 text-xs font-bold rounded-lg">Colorida</span>

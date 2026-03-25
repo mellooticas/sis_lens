@@ -12,7 +12,7 @@ export default {
     extend: {
       colors: {
         // ============================================================
-        // Clearix Lens — Accent Color: Teal (#14B8A6)
+        // Clearix Lens — Accent Color: Violet (#8B5CF6)
         // Ecossistema Clearix by DIGIAI — "Base Neutra + Sotaque de Cor"
         // ============================================================
         primary: {

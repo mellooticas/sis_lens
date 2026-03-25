@@ -1,7 +1,7 @@
 <script lang="ts">
   export let size = 32;
   export let primary = "#1A3A5C";
-  export let accent = "#06B6D4";
+  export let accent = "#8B5CF6";
   export let moduleName = "Hub";
   export let variant: "icon" | "horizontal" | "stacked" | "lens" = "horizontal";
 
@@ -9,7 +9,7 @@
   export { className as class };
 
   // Lens variant overrides
-  $: effectiveAccent = variant === "lens" ? "#14B8A6" : accent;
+  $: effectiveAccent = variant === "lens" ? "#8B5CF6" : accent;
   $: effectiveModuleName = variant === "lens" ? "Lens" : moduleName;
 </script>
 

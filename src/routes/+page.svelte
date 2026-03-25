@@ -1,7 +1,7 @@
 <!--
   Clearix Lens — Dashboard Principal
   KPIs reais de v_catalog_lenses + v_catalog_lens_groups
-  Design System Clearix by DIGIAI: Base Neutra + Sotaque Teal
+  Design System Clearix by DIGIAI: Base Neutra + Sotaque Violet
   SEM glassmorphism · SEM gradientes · SEM scale effects
 -->
 <script lang="ts">

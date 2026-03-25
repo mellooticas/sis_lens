@@ -1,4 +1,4 @@
-# SIS Lens — Catálogo Inteligente de Lentes Oftálmicas
+# Clearix Lens — Catálogo Inteligente de Lentes Oftálmicas
 
 > Sistema de gestão e consulta de catálogo de lentes para óticas, com engine canônica de equivalência, pricing por contrato e filtros avançados.
 
@@ -190,4 +190,4 @@ Todas as páginas de catálogo usam fetch client-side para evitar problemas de S
 
 ---
 
-Projeto privado — SIS Lens © 2026
+Projeto privado — Clearix Lens © 2026
