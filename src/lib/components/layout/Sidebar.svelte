@@ -73,18 +73,14 @@
     style="border-color: var(--sidebar-border);"
   >
     <a href="/" class="flex items-center {collapsed ? '' : 'gap-3'}">
-      <div
-        class="flex h-9 w-9 shrink-0 items-center justify-center rounded-lg font-black text-sm"
-        style="background-color: var(--sidebar-primary); color: var(--sidebar-primary-foreground);"
-      >
-        <svg fill="none" viewBox="0 0 24 24" stroke="currentColor" class="h-5 w-5">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d={iconPaths.eye} />
-        </svg>
-      </div>
+      <svg viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg" width="36" height="36">
+        <circle cx="85" cy="50" r="7" fill="#6366F1" />
+        <path d="M 74.75 25.25 A 35 35 0 1 0 74.75 74.75" stroke="#1A3A5C" stroke-width="14" stroke-linecap="round" />
+      </svg>
       {#if !collapsed}
         <div>
-          <p class="text-[11px] font-medium uppercase tracking-wider opacity-50">DIGIAI</p>
-          <p class="text-lg font-black tracking-tight">Clearix Lens</p>
+          <p class="text-[11px] font-semibold uppercase tracking-[0.15em] opacity-50">Clearix</p>
+          <p class="text-lg font-black tracking-tight">Lens</p>
         </div>
       {/if}
     </a>
