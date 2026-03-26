@@ -11,7 +11,7 @@
   PUBLIC_SUPABASE_ANON_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Im1oZ2J1cGxueHRmZ2lwYmVtY2hiIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NDQwODAwMDQsImV4cCI6MjA1OTY1NjAwNH0.478ltLNyzDefQFZjnMHxuM2Qk8Aw8lsIpIrdb-h7rl0"
 
   # ── Clearix Hub SSO ───────────────────────────────────────────────────────────
-  PUBLIC_SIS_GATEWAY_URL   = "https://sisgateway.netlify.app"
+  PUBLIC_SIS_GATEWAY_URL   = "https://clearixhub.netlify.app"
 
   # ── App metadata ──────────────────────────────────────────────────────────────
   VITE_APP_NAME        = "Clearix_Lens"
