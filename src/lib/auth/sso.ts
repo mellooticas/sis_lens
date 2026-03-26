@@ -1,4 +1,4 @@
-export const SSO_APP_KEY = 'sis_lens'
+export const SSO_APP_KEY = 'clearix_lens'
 export const SSO_TICKET_PARAM = 'ticket'
 export const SSO_DEFAULT_NEXT = '/'
 
