@@ -467,3 +467,106 @@ export interface RpcLensSearchResult {
   category: string | null;
 }
 
+// ============================================================================
+// CANONICAL ENGINE v3 — Filtros Estruturados (migration 0074)
+// ============================================================================
+
+/** Item de filtro retornado pelas RPCs de filter_options */
+export interface FilterOption {
+  value: string;
+  count: number;
+}
+
+/** Item de material retornado pelas RPCs de filter_options */
+export interface MaterialFilterOption {
+  id: string;
+  name: string;
+  index: number;
+  count: number;
+  class?: string;
+}
+
+/** Resposta da rpc_premium_filter_options */
+export interface PremiumFilterOptions {
+  brands: FilterOption[] | null;
+  product_lines: FilterOption[] | null;
+  lens_types: FilterOption[] | null;
+  materials: MaterialFilterOption[] | null;
+  coatings: FilterOption[] | null;
+  photochromics: FilterOption[] | null;
+  total_count: number;
+}
+
+/** Resposta da rpc_standard_filter_options */
+export interface StandardFilterOptions {
+  lens_types: FilterOption[] | null;
+  materials: MaterialFilterOption[] | null;
+  treatments: FilterOption[] | null;
+  supplier_range: { min_suppliers: number; max_suppliers: number } | null;
+  prescription_ranges: {
+    sph_min: number; sph_max: number;
+    cyl_min: number; cyl_max: number;
+    add_min: number | null; add_max: number | null;
+  } | null;
+  total_count: number;
+}
+
+/** Item da v_canonical_premium (com colunas estruturadas) */
+export interface CanonicalPremiumV3 {
+  id: string;
+  canonical_name: string;
+  sku: string | null;
+  brand: string;
+  product_line: string | null;
+  coating_name: string | null;
+  photochromic_type: string | null;
+  lens_type: string;
+  canonical_material_id: string;
+  material_name: string;
+  material_class: string;
+  refractive_index: number;
+  spherical_min: number | null;
+  spherical_max: number | null;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  addition_min: number | null;
+  addition_max: number | null;
+  treatment_codes: string[];
+  mapped_lens_count: number;
+  mapped_supplier_count: number;
+  mapped_brand_count: number;
+  fingerprint: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Item da v_canonical_standard */
+export interface CanonicalStandardV3 {
+  id: string;
+  canonical_name: string;
+  sku: string | null;
+  lens_type: string;
+  canonical_material_id: string;
+  material_name: string;
+  material_class: string;
+  refractive_index: number;
+  spherical_min: number | null;
+  spherical_max: number | null;
+  cylindrical_min: number | null;
+  cylindrical_max: number | null;
+  addition_min: number | null;
+  addition_max: number | null;
+  treatment_codes: string[];
+  mapped_lens_count: number;
+  mapped_supplier_count: number;
+  fingerprint: string;
+  created_at: string;
+  updated_at: string;
+}
+
+/** Resposta genérica de busca com paginação */
+export interface CanonicalSearchResult<T> {
+  total: number;
+  items: T[];
+}
+

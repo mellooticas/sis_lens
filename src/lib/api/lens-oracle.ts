@@ -11,6 +11,13 @@
  *          getCanonicalStandardWithPricing, getCanonicalPremiumWithPricing
  *          getCanonicalLenses, getCanonicalStandard, getCanonicalPremium
  *
+ * ── Canonical Engine v3 — Filtros Estruturados (migration 0074) ─────────
+ * RPCs:    rpc_premium_filter_options | rpc_premium_search
+ *          rpc_standard_filter_options | rpc_standard_search
+ *          rpc_catalog_summary
+ * Métodos: getPremiumFilterOptions, searchPremium
+ *          getStandardFilterOptions, searchStandard, getCatalogSummaryV3
+ *
  * ── Catálogo & Busca (migrations 111, 208, 210, 214) ─────────────────────
  * RPCs: rpc_lens_search | rpc_lens_get_alternatives | rpc_contact_lens_search
  *       rpc_brands_list | rpc_pricing_simulate
@@ -31,6 +38,11 @@ import type {
   CanonicalWithPricing,
   PrescriptionSearchResult,
   CanonicalDetail,
+  PremiumFilterOptions,
+  StandardFilterOptions,
+  CanonicalPremiumV3,
+  CanonicalStandardV3,
+  CanonicalSearchResult,
 } from '$lib/types/database-views';
 import type { ApiResponse } from '$lib/types/sistema';
 
@@ -539,6 +551,155 @@ export class LensOracleAPI {
       const { data, error } = await query;
       if (error) throw error;
       return { data: data ?? [] };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  // ════════════════════════════════════════════════════════════
+  // CANONICAL ENGINE v3 — Filtros Estruturados (migration 0074)
+  // RPCs: rpc_premium_filter_options | rpc_premium_search
+  //       rpc_standard_filter_options | rpc_standard_search
+  //       rpc_catalog_summary
+  // ════════════════════════════════════════════════════════════
+
+  /**
+   * Filtros dinâmicos PREMIUM em cascata.
+   * Retorna opções válidas com contagem, baseado no que já foi selecionado.
+   * Ex: selecionar brand="Varilux" → só mostra linhas da Varilux.
+   */
+  static async getPremiumFilterOptions(params: {
+    brand?: string;
+    product_line?: string;
+    lens_type?: string;
+    material_id?: string;
+    coating?: string;
+    photochromic?: string;
+  } = {}): Promise<ApiResponse<PremiumFilterOptions>> {
+    try {
+      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_premium_filter_options', {
+        p_brand:        params.brand        ?? null,
+        p_product_line: params.product_line ?? null,
+        p_lens_type:    params.lens_type    ?? null,
+        p_material_id:  params.material_id  ?? null,
+        p_coating:      params.coating      ?? null,
+        p_photochromic: params.photochromic ?? null,
+      });
+
+      if (error) throw error;
+      return { data: data as PremiumFilterOptions };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Busca PREMIUM com todos os filtros estruturados + prescrição.
+   */
+  static async searchPremium(params: {
+    brand?: string;
+    product_line?: string;
+    lens_type?: string;
+    material_id?: string;
+    coating?: string;
+    photochromic?: string;
+    spherical?: number;
+    cylindrical?: number;
+    addition?: number;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<ApiResponse<CanonicalSearchResult<CanonicalPremiumV3>>> {
+    try {
+      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_premium_search', {
+        p_brand:        params.brand        ?? null,
+        p_product_line: params.product_line ?? null,
+        p_lens_type:    params.lens_type    ?? null,
+        p_material_id:  params.material_id  ?? null,
+        p_coating:      params.coating      ?? null,
+        p_photochromic: params.photochromic ?? null,
+        p_spherical:    params.spherical    ?? null,
+        p_cylindrical:  params.cylindrical  ?? null,
+        p_addition:     params.addition     ?? null,
+        p_limit:        params.limit        ?? 50,
+        p_offset:       params.offset       ?? 0,
+      });
+
+      if (error) throw error;
+      return { data: data as CanonicalSearchResult<CanonicalPremiumV3> };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Filtros dinâmicos STANDARD em cascata.
+   * Sem marca! Só specs técnicos + tratamentos.
+   */
+  static async getStandardFilterOptions(params: {
+    lens_type?: string;
+    material_id?: string;
+    treatments?: string[];
+    spherical?: number;
+    cylindrical?: number;
+    addition?: number;
+  } = {}): Promise<ApiResponse<StandardFilterOptions>> {
+    try {
+      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_standard_filter_options', {
+        p_lens_type:   params.lens_type   ?? null,
+        p_material_id: params.material_id ?? null,
+        p_treatments:  params.treatments  ?? null,
+        p_spherical:   params.spherical   ?? null,
+        p_cylindrical: params.cylindrical ?? null,
+        p_addition:    params.addition    ?? null,
+      });
+
+      if (error) throw error;
+      return { data: data as StandardFilterOptions };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Busca STANDARD com filtros técnicos + prescrição.
+   */
+  static async searchStandard(params: {
+    lens_type?: string;
+    material_id?: string;
+    treatments?: string[];
+    spherical?: number;
+    cylindrical?: number;
+    addition?: number;
+    limit?: number;
+    offset?: number;
+  } = {}): Promise<ApiResponse<CanonicalSearchResult<CanonicalStandardV3>>> {
+    try {
+      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_standard_search', {
+        p_lens_type:   params.lens_type   ?? null,
+        p_material_id: params.material_id ?? null,
+        p_treatments:  params.treatments  ?? null,
+        p_spherical:   params.spherical   ?? null,
+        p_cylindrical: params.cylindrical ?? null,
+        p_addition:    params.addition    ?? null,
+        p_limit:       params.limit       ?? 50,
+        p_offset:      params.offset      ?? 0,
+      });
+
+      if (error) throw error;
+      return { data: data as CanonicalSearchResult<CanonicalStandardV3> };
+    } catch (error: any) {
+      return { error: { code: error.code, message: error.message } };
+    }
+  }
+
+  /**
+   * Resumo do catálogo para dashboard.
+   */
+  static async getCatalogSummaryV3(): Promise<ApiResponse<any>> {
+    try {
+      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_catalog_summary');
+      if (error) throw error;
+      return { data };
     } catch (error: any) {
       return { error: { code: error.code, message: error.message } };
     }

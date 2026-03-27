@@ -1,16 +1,16 @@
 /**
- * Catálogo Premium — Server Load (minimal v4)
+ * Premium Collection — Server Load v3
+ * Filtros por marca/linha/coating/fotossensível
  */
 import type { PageServerLoad } from './$types';
 
 export const load: PageServerLoad = async ({ url }) => {
-    const busca          = url.searchParams.get('busca')    || null;
-    const lens_type      = url.searchParams.get('tipo')     || null;
-    const material_class = url.searchParams.get('material') || null;
-    const has_ar         = url.searchParams.get('ar')    === '1';
-    const has_uv         = url.searchParams.get('uv')    === '1';
-    const has_blue       = url.searchParams.get('blue')  === '1';
-    const has_photo      = url.searchParams.get('foto')  === '1';
-    const pagina         = Math.max(1, parseInt(url.searchParams.get('pagina') || '1'));
-    return { busca, lens_type, material_class, has_ar, has_uv, has_blue, has_photo, pagina };
+    const brand        = url.searchParams.get('marca')    || null;
+    const product_line = url.searchParams.get('linha')    || null;
+    const lens_type    = url.searchParams.get('tipo')     || null;
+    const coating      = url.searchParams.get('coating')  || null;
+    const photochromic = url.searchParams.get('foto')     || null;
+    const material_id  = url.searchParams.get('material') || null;
+    const pagina       = Math.max(1, parseInt(url.searchParams.get('pagina') || '1'));
+    return { brand, product_line, lens_type, coating, photochromic, material_id, pagina };
 };
