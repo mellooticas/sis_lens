@@ -1,371 +1,76 @@
 <script lang="ts">
-    /**
-     * 🔬 Detalhes do Conceito Canônico Standard — Canonical Engine v2
-     * Exibe SKU canônico, pricing agregado, tratamentos e lentes mapeadas.
-     */
-    import { goto } from "$app/navigation";
-    import { fade, fly } from "svelte/transition";
+    import { ChevronLeft } from "lucide-svelte";
     import type { PageData } from "./$types";
-    import type { CanonicalDetailEnriched } from "$lib/types/database-views";
-
-    // Componentes
     import Container from "$lib/components/layout/Container.svelte";
-    import SectionHeader from "$lib/components/layout/SectionHeader.svelte";
-    import Button from "$lib/components/ui/Button.svelte";
-    import Badge from "$lib/components/ui/Badge.svelte";
-    import {
-        ChevronLeft,
-        Layers,
-        Zap,
-        ShieldCheck,
-        Brain,
-        TrendingUp,
-        CheckCircle2,
-        Package,
-        Star,
-    } from "lucide-svelte";
-
+    
     export let data: PageData;
-
-    $: conceito = data.conceito;
-    $: lentes = (data.lentes || []) as CanonicalDetailEnriched[];
-
-    function formatarPreco(valor: number | null | undefined): string {
-        if (valor == null) return "—";
-        return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(valor);
+    
+    function formatPrice(value: number | null | undefined): string {
+        if (value == null) return "—";
+        return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
     }
-
-    function formatarMarkup(valor: number | null | undefined): string {
-        if (valor == null) return "—";
-        return `${valor.toFixed(2)}x`;
-    }
-
-    function formatarLensType(lt: string | null): string {
-        const mapa: Record<string, string> = {
-            single_vision: "Visão Simples",
-            multifocal: "Multifocal",
-            bifocal: "Bifocal",
-            reading: "Leitura",
-            occupational: "Ocupacional",
-        };
-        return lt ? (mapa[lt] ?? lt.replace(/_/g, " ")) : "—";
-    }
-
-    function formatarTratamento(code: string): string {
-        const mapa: Record<string, string> = {
-            ar: "Anti-Reflexo", scratch: "Anti-Risco",
-            blue: "Blue Cut", uv: "UV", photo: "Fotossensível",
-        };
-        return mapa[code] ?? code.toUpperCase();
-    }
-
-    function getTratamentosLente(l: CanonicalDetailEnriched): string[] {
-        const t: string[] = [];
-        if (l.anti_reflective) t.push('Anti-Reflexo');
-        if (l.anti_scratch)    t.push('Anti-Risco');
-        if (l.uv_filter)       t.push('UV');
-        if (l.blue_light)      t.push('Blue Cut');
-        if (l.photochromic)    t.push('Fotossensível');
-        if (l.polarized)       t.push('Polarizado');
-        return t;
-    }
-
-    $: lentePreferida = lentes.find((l) => l.is_preferred);
-    $: outrasLentes   = lentes.filter((l) => !l.is_preferred);
 </script>
 
 <svelte:head>
-    <title>{conceito?.canonical_name || "Conceito Standard"} | Clearix Lens</title>
+    <title>Standard | Clearix Lens</title>
 </svelte:head>
 
 <main class="min-h-screen bg-muted pb-20">
     <!-- Top Bar -->
     <div class="bg-card border-b border-border sticky top-0 z-30">
-        <Container maxWidth="xl" padding="sm">
-            <div class="flex items-center justify-between py-3">
-                <button on:click={() => history.back()} class="flex items-center gap-2 text-muted-foreground hover:text-primary-600 transition-colors text-sm font-medium">
-                    <ChevronLeft class="w-4 h-4" /> Voltar
-                </button>
-                <div class="flex items-center gap-3">
-                    {#if conceito?.sku}
-                        <span class="px-3 py-1 bg-primary-100 dark:bg-primary-900/40 text-primary-800 dark:text-primary-300 text-xs font-black rounded-full font-mono tracking-wider">
-                            {conceito.sku}
-                        </span>
-                    {/if}
-                    <Badge variant="neutral" class="flex items-center gap-1">
-                        <Layers class="w-3 h-3" /> Oracle Standard
-                    </Badge>
-                </div>
+        <Container>
+            <div class="flex items-center justify-between py-4">
+                <a href="/lentes" class="flex items-center gap-2 text-muted-foreground hover:text-cyan-600 transition-colors text-sm font-medium">
+                    <ChevronLeft class="h-4 w-4" /> Voltar
+                </a>
+                <span class="px-3 py-1 bg-cyan-100 dark:bg-cyan-900/40 text-cyan-800 dark:text-cyan-300 text-xs font-bold rounded-full">
+                    Standard
+                </span>
             </div>
         </Container>
     </div>
 
-    <Container maxWidth="xl" padding="lg">
-        <!-- Hero -->
-        <div class="mt-8 mb-12">
+    <Container>
+        <div class="py-12">
             <div class="grid grid-cols-1 lg:grid-cols-3 gap-8">
+                <!-- Main Info -->
                 <div class="lg:col-span-2 space-y-6">
-                    <div in:fly={{ y: 20, duration: 500 }}>
-                        {#if conceito?.treatment_codes?.length}
-                            <div class="flex flex-wrap gap-2 mb-4">
-                                {#each conceito.treatment_codes as code}
-                                    <span class="px-2.5 py-1 bg-blue-100 dark:bg-blue-900/40 text-blue-800 dark:text-blue-300 text-xs font-bold rounded-full uppercase tracking-wide">
-                                        {formatarTratamento(code)}
-                                    </span>
-                                {/each}
-                            </div>
-                        {/if}
-
-                        <h1 class="text-3xl md:text-5xl font-black text-foreground leading-tight mb-4">
-                            {conceito?.canonical_name}
-                        </h1>
-
-                        <div class="flex flex-wrap gap-3">
-                            <div class="flex items-center gap-2 bg-card px-4 py-2 rounded-xl shadow-sm border border-border">
-                                <Zap class="w-4 h-4 text-blue-500" />
-                                <span class="font-bold text-foreground capitalize">{formatarLensType(conceito?.lens_type)}</span>
-                            </div>
-                            <div class="flex items-center gap-2 bg-card px-4 py-2 rounded-xl shadow-sm border border-border">
-                                <ShieldCheck class="w-4 h-4 text-green-500" />
-                                <span class="font-bold text-foreground">{conceito?.material_display}</span>
-                            </div>
-                            <div class="flex items-center gap-2 bg-card px-4 py-2 rounded-xl shadow-sm border border-border">
-                                <TrendingUp class="w-4 h-4 text-primary-500" />
-                                <span class="font-bold text-foreground">n = {conceito?.refractive_index}</span>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="bg-card p-6 rounded-2xl border-l-4 border-primary-500" in:fade={{ delay: 200 }}>
-                        <div class="flex gap-4">
-                            <div class="p-3 bg-primary-50 dark:bg-primary-900/20 rounded-xl h-fit">
-                                <Brain class="w-6 h-6 text-primary-600 dark:text-primary-400" />
-                            </div>
-                            <div>
-                                <h3 class="text-lg font-bold text-foreground mb-1">Inteligência do Conceito</h3>
-                                <p class="text-muted-foreground text-sm leading-relaxed">
-                                    Agrupa <strong>{conceito?.mapped_lens_count ?? 0} lente(s)</strong> de
-                                    <strong>{conceito?.mapped_brand_count ?? 0} marca(s)</strong> com a mesma física ótica.
-                                    Todas são intercambiáveis tecnicamente.
-                                </p>
-                                <div class="flex gap-4 mt-3 text-xs font-semibold text-muted-foreground">
-                                    <span>📦 {conceito?.mapped_lens_count ?? 0} lentes</span>
-                                    <span>🏷️ {conceito?.mapped_brand_count ?? 0} marcas</span>
-                                    <span>🚚 {conceito?.mapped_supplier_count ?? 0} fornecedores</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- Price Card -->
-                <div in:fly={{ x: 20, duration: 500 }}>
-                    <div class="bg-gradient-to-br from-primary-900 to-indigo-900 text-white rounded-3xl p-8 shadow-2xl relative overflow-hidden h-full">
-                        <div class="absolute -right-10 -bottom-10 opacity-10"><Layers size={200} /></div>
-                        <div class="relative z-10 space-y-5">
-                            {#if conceito?.price_avg}
-                                <div>
-                                    <p class="text-primary-300 text-xs font-bold uppercase tracking-widest mb-2">Ticket Médio</p>
-                                    <h2 class="text-5xl font-black">{formatarPreco(conceito.price_avg)}</h2>
-                                </div>
-                            {:else}
-                                <div>
-                                    <p class="text-primary-300 text-xs font-bold uppercase tracking-widest mb-2">Pricing</p>
-                                    <h2 class="text-2xl font-bold opacity-50">Sem dados</h2>
-                                </div>
-                            {/if}
-
-                            <div class="space-y-2.5">
-                                <div class="flex justify-between text-sm border-b border-white/10 pb-2">
-                                    <span class="opacity-60">Piso de Venda</span>
-                                    <span class="font-bold text-primary-200">{formatarPreco(conceito?.price_min)}</span>
-                                </div>
-                                <div class="flex justify-between text-sm border-b border-white/10 pb-2">
-                                    <span class="opacity-60">Teto de Venda</span>
-                                    <span class="font-bold text-primary-200">{formatarPreco(conceito?.price_max)}</span>
-                                </div>
-                                <div class="flex justify-between text-sm border-b border-white/10 pb-2">
-                                    <span class="opacity-60">Piso de Custo</span>
-                                    <span class="font-bold text-green-300">{formatarPreco(conceito?.cost_min)}</span>
-                                </div>
-                                <div class="flex justify-between text-sm">
-                                    <span class="opacity-60">Markup</span>
-                                    <span class="font-bold">{formatarMarkup(conceito?.markup_min)} — {formatarMarkup(conceito?.markup_max)}</span>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-
-        <!-- Specs -->
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 mb-16">
-            <div class="bg-card border border-border p-8 rounded-2xl">
-                <SectionHeader title="🧬 Especificações Fisiológicas" subtitle="Range de fabricação garantido" />
-                <div class="grid grid-cols-2 gap-5 mt-6">
-                    <div>
-                        <p class="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Esférico</p>
-                        <p class="text-lg font-bold text-foreground mt-1">
-                            {conceito?.spherical_min != null ? (conceito.spherical_min > 0 ? '+' : '') + conceito.spherical_min : '—'} a
-                            {conceito?.spherical_max != null ? (conceito.spherical_max > 0 ? '+' : '') + conceito.spherical_max : '—'}
+                    <h1 class="text-4xl font-black bg-gradient-to-r from-cyan-600 to-blue-600 bg-clip-text text-transparent">
+                        Conceito Standard
+                    </h1>
+                    
+                    <p class="text-muted-foreground text-lg">
+                        Categoria de lentes Standard — conjunto de lentes similares de diferentes marcas com a mesma óptica base.
+                    </p>
+                    
+                    <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 rounded-xl p-6">
+                        <p class="text-sm text-blue-700 dark:text-blue-300">
+                            ID: <span class="font-mono font-bold">{data.id}</span>
                         </p>
                     </div>
-                    <div>
-                        <p class="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Cilíndrico</p>
-                        <p class="text-lg font-bold text-foreground mt-1">{conceito?.cylindrical_min ?? '—'} a {conceito?.cylindrical_max ?? '—'}</p>
-                    </div>
-                    {#if conceito?.addition_max}
-                        <div>
-                            <p class="text-[10px] text-muted-foreground uppercase font-black tracking-widest">Adição</p>
-                            <p class="text-lg font-bold text-foreground mt-1">+{conceito.addition_min ?? 0} a +{conceito.addition_max}</p>
-                        </div>
-                    {/if}
                 </div>
-            </div>
-            <div class="bg-card border border-border p-8 rounded-2xl flex flex-col justify-center">
-                <div class="text-center">
-                    <div class="inline-flex items-center justify-center p-4 bg-blue-50 dark:bg-blue-900/20 rounded-full mb-4">
-                        <CheckCircle2 class="w-8 h-8 text-blue-600 dark:text-blue-400" />
-                    </div>
-                    <h3 class="text-xl font-black text-foreground">Paridade Comercial</h3>
-                    <p class="text-muted-foreground text-sm mt-2 max-w-xs mx-auto">
-                        Substituição entre marcas sem afetar a adaptação do paciente.
-                    </p>
-                    {#if conceito?.sku}
-                        <div class="mt-4 text-xs text-muted-foreground">
-                            ID Canônico: <span class="font-mono font-bold text-primary-600 dark:text-primary-400">{conceito.sku}</span>
-                        </div>
-                    {/if}
-                </div>
-            </div>
-        </div>
 
-        <!-- Lentes Mapeadas -->
-        <div class="space-y-6">
-            <SectionHeader
-                title="🔍 Opções do Catálogo Real"
-                subtitle="{lentes.length} lente(s) vinculada(s) com pricing do seu contrato."
-            />
-
-            {#if lentes.length === 0}
-                <div class="bg-card border border-dashed border-border p-16 text-center rounded-2xl">
-                    <Package class="w-12 h-12 text-muted-foreground mx-auto mb-4" />
-                    <h3 class="text-xl font-bold text-foreground mb-2">Nenhuma lente vinculada</h3>
-                    <p class="text-muted-foreground text-sm">Sem lentes com pricing_book neste conceito.</p>
-                </div>
-            {:else}
-                <!-- Lente Preferida -->
-                {#if lentePreferida}
-                    <div in:fly={{ y: 20, duration: 400 }}>
-                        <div class="flex items-center gap-2 mb-2">
-                            <Star class="w-4 h-4 text-amber-500 fill-amber-500" />
-                            <span class="text-sm font-bold text-amber-700 dark:text-amber-400">Opção Preferida</span>
-                        </div>
-                        <a href="/lentes/{lentePreferida.lens_id}"
-                            class="block bg-gradient-to-r from-amber-50 to-orange-50 dark:from-amber-950/20 dark:to-orange-950/20 border-2 border-amber-200 dark:border-amber-800 rounded-2xl p-6 hover:shadow-md hover:border-amber-300 dark:hover:border-amber-700 transition-all no-underline">
-                            <div class="flex flex-col md:flex-row md:items-start justify-between gap-4">
-                                <div class="flex-1">
-                                    <div class="font-bold text-foreground text-lg">{lentePreferida.lens_name}</div>
-                                    <div class="text-sm text-muted-foreground">{lentePreferida.brand_name ?? '—'} · {lentePreferida.supplier_name ?? '—'}</div>
-                                    {#if lentePreferida.lens_sku}
-                                        <div class="font-mono text-[11px] text-muted-foreground mt-0.5">{lentePreferida.lens_sku}</div>
-                                    {/if}
-                                    {#if lentePreferida.material_name || lentePreferida.refractive_index}
-                                        <div class="text-xs text-muted-foreground mt-1">
-                                            {lentePreferida.material_name ?? ''}{lentePreferida.material_name && lentePreferida.refractive_index ? ' · ' : ''}{lentePreferida.refractive_index ? `n = ${lentePreferida.refractive_index}` : ''}
-                                        </div>
-                                    {/if}
-                                    {#if getTratamentosLente(lentePreferida).length > 0}
-                                        <div class="flex flex-wrap gap-1 mt-2">
-                                            {#each getTratamentosLente(lentePreferida) as trat}
-                                                <span class="px-1.5 py-0.5 bg-blue-100 dark:bg-blue-900/40 text-blue-700 dark:text-blue-300 text-[10px] font-bold rounded uppercase">{trat}</span>
-                                            {/each}
-                                        </div>
-                                    {/if}
-                                </div>
-                                <div class="flex items-center gap-6">
-                                    <div class="text-center">
-                                        <div class="text-[10px] text-muted-foreground uppercase font-bold">Custo</div>
-                                        <div class="font-bold text-foreground">{formatarPreco(lentePreferida.cost_price)}</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-[10px] text-muted-foreground uppercase font-bold">Venda</div>
-                                        <div class="font-black text-primary-700 dark:text-primary-400 text-2xl">{formatarPreco(lentePreferida.sell_price)}</div>
-                                    </div>
-                                    <div class="text-center">
-                                        <div class="text-[10px] text-muted-foreground uppercase font-bold">Markup</div>
-                                        <div class="font-bold text-green-600 dark:text-green-400">{formatarMarkup(lentePreferida.effective_markup)}</div>
-                                    </div>
-                                    <span class="text-xs font-bold text-primary-600 dark:text-primary-400 whitespace-nowrap">Ver detalhes →</span>
-                                </div>
+                <!-- Pricing Sidebar -->
+                <div class="lg:col-span-1">
+                    <div class="bg-card border border-cyan-100 dark:border-cyan-900/30 rounded-xl p-6 sticky top-20">
+                        <h3 class="font-bold text-lg mb-4">💰 Preços</h3>
+                        <div class="space-y-3">
+                            <div>
+                                <p class="text-xs text-muted-foreground mb-1">Mínimo</p>
+                                <p class="text-xl font-bold text-foreground">—</p>
                             </div>
-                        </a>
-                    </div>
-                {/if}
-
-                <!-- Grid de outras lentes -->
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
-                    {#each outrasLentes as lente, i (lente.lens_id)}
-                        <div in:fly={{ y: 30, delay: i * 40, duration: 400 }}>
-                            <a href="/lentes/{lente.lens_id}"
-                                class="block bg-card border border-border rounded-xl p-5 hover:shadow-lg transition-all duration-200 hover:border-primary-300 dark:hover:border-primary-700 relative group no-underline">
-                                <div class="mb-3">
-                                    <div class="font-semibold text-foreground text-sm line-clamp-2">{lente.lens_name}</div>
-                                    <div class="text-xs text-muted-foreground mt-0.5">{lente.brand_name ?? '—'}</div>
-                                    {#if lente.supplier_name}
-                                        <div class="text-xs text-muted-foreground mt-0.5">🚚 {lente.supplier_name}</div>
-                                    {/if}
-                                    {#if lente.lens_sku}
-                                        <div class="font-mono text-[10px] text-muted-foreground mt-0.5">{lente.lens_sku}</div>
-                                    {/if}
-                                    {#if lente.material_name || lente.refractive_index}
-                                        <div class="text-[11px] text-muted-foreground mt-1">
-                                            {lente.material_name ?? ''}{lente.material_name && lente.refractive_index ? ' · ' : ''}{lente.refractive_index ? `n = ${lente.refractive_index}` : ''}
-                                        </div>
-                                    {/if}
-                                    {#if getTratamentosLente(lente).length > 0}
-                                        <div class="flex flex-wrap gap-1 mt-2">
-                                            {#each getTratamentosLente(lente) as trat}
-                                                <span class="px-1 py-0.5 bg-blue-50 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400 text-[9px] font-bold rounded uppercase leading-none">{trat}</span>
-                                            {/each}
-                                        </div>
-                                    {/if}
-                                </div>
-
-                                <div class="space-y-1.5 border-t border-border pt-3">
-                                    <div class="flex justify-between text-xs">
-                                        <span class="text-muted-foreground">Custo</span>
-                                        <span class="font-medium">{formatarPreco(lente.cost_price)}</span>
-                                    </div>
-                                    <div class="flex justify-between text-sm">
-                                        <span class="font-medium text-muted-foreground">Venda</span>
-                                        <span class="font-bold text-primary-700 dark:text-primary-400">{formatarPreco(lente.sell_price)}</span>
-                                    </div>
-                                    {#if lente.effective_markup}
-                                        <div class="flex justify-between text-xs">
-                                            <span class="text-muted-foreground">Markup</span>
-                                            <span class="font-semibold text-green-600 dark:text-green-400">{formatarMarkup(lente.effective_markup)}</span>
-                                        </div>
-                                    {/if}
-                                </div>
-
-                                <div class="absolute top-2 right-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                                    <span class="text-[9px] text-muted-foreground font-mono bg-muted px-1.5 py-0.5 rounded">
-                                        {lente.match_method}
-                                    </span>
-                                </div>
-                            </a>
+                            <div class="border-t border-border pt-3">
+                                <p class="text-xs text-muted-foreground mb-1">Máximo</p>
+                                <p class="text-xl font-bold text-foreground">—</p>
+                            </div>
+                            <div class="border-t border-border pt-3">
+                                <p class="text-xs text-muted-foreground mb-1">Médio</p>
+                                <p class="text-xl font-bold text-cyan-600 dark:text-cyan-400">—</p>
+                            </div>
                         </div>
-                    {/each}
+                    </div>
                 </div>
-            {/if}
-        </div>
-
-        <!-- Ações -->
-        <div class="flex gap-4 justify-center mt-16">
-            <Button variant="secondary" on:click={() => history.back()}>← Voltar</Button>
-            <Button variant="primary" on:click={() => goto('/simulador/receita')}>👓 Simular com Receita</Button>
+            </div>
         </div>
     </Container>
 </main>
