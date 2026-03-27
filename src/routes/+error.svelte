@@ -26,10 +26,10 @@
     </p>
 
     <div class="flex gap-4">
-        <Button variant="secondary" on:click={() => history.back()}>
+        <Button variant="secondary" onclick={() => history.back()}>
             Voltar
         </Button>
-        <Button on:click={() => (window.location.href = "/")}>
+        <Button onclick={() => (window.location.href = "/")}>
             Ir para Início
         </Button>
     </div>

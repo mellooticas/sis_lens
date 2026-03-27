@@ -21,6 +21,11 @@
   let expanded = false
   let searchText = ''
 
+  $: premiumFilters = filters as PremiumFilterParamsV3
+  $: standardFilters = filters as StandardFilterParamsV3
+  $: premiumOpts = isPremium ? (filterOptions as PremiumFilterOptions) : null
+  $: standardOpts = !isPremium ? (filterOptions as StandardFilterOptions) : null
+
   function countActiveFilters(): number {
     return Object.values(filters)
       .filter(v => v !== undefined && v !== null && (typeof v !== 'string' || v !== ''))
@@ -55,11 +60,11 @@
         </span>
       {/if}
     </div>
-    {expanded ? (
+    {#if expanded}
       <ChevronUp class="h-5 w-5 text-muted-foreground" />
-    ) : (
+    {:else}
       <ChevronDown class="h-5 w-5 text-muted-foreground" />
-    )}
+    {/if}
   </button>
 
   <!-- Content -->
@@ -67,10 +72,11 @@
     <div class="border-t border-border px-6 py-4 space-y-4" transition:slide>
       <!-- Search -->
       <div>
-        <label class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
+        <label for="search-input" class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
           Buscar
         </label>
         <input
+          id="search-input"
           type="text"
           bind:value={searchText}
           placeholder="Digite para buscar..."
@@ -78,21 +84,23 @@
         />
       </div>
 
-      {#if isPremium && filterOptions}
+      {#if isPremium && premiumOpts}
         <!-- Premium Filters -->
         
         <!-- Brands -->
-        {#if filterOptions.brands?.length}
+        {#if premiumOpts.brands?.length}
           <div>
-            <label class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
-              Marcas ({filterOptions.brands.length})
+            <label for="brand-select" class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
+              Marcas ({premiumOpts.brands.length})
             </label>
             <select
-              bind:value={filters.brand}
+              id="brand-select"
+              bind:value={premiumFilters.brand}
+              disabled={!premiumFilters}
               class="w-full px-3 py-2 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">— Todas —</option>
-              {#each filterOptions.brands as opt}
+              {#each premiumOpts.brands as opt}
                 <option value={opt.value}>{opt.value} ({opt.count})</option>
               {/each}
             </select>
@@ -100,17 +108,19 @@
         {/if}
 
         <!-- Lens Types -->
-        {#if filterOptions.lens_types?.length}
+        {#if premiumOpts.lens_types?.length}
           <div>
-            <label class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
-              Tipo de Lente ({filterOptions.lens_types.length})
+            <label for="lens-type-premium" class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
+              Tipo de Lente ({premiumOpts.lens_types.length})
             </label>
             <select
-              bind:value={filters.lens_type}
+              id="lens-type-premium"
+              bind:value={premiumFilters.lens_type}
+              disabled={!premiumFilters}
               class="w-full px-3 py-2 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">— Todos —</option>
-              {#each filterOptions.lens_types as opt}
+              {#each premiumOpts.lens_types as opt}
                 <option value={opt.value}>{opt.value} ({opt.count})</option>
               {/each}
             </select>
@@ -118,37 +128,41 @@
         {/if}
 
         <!-- Materials -->
-        {#if filterOptions.materials?.length}
+        {#if premiumOpts.materials?.length}
           <div>
-            <label class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
-              Material ({filterOptions.materials.length})
+            <label for="material-premium" class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
+              Material ({premiumOpts.materials.length})
             </label>
             <select
-              bind:value={filters.material_id}
+              id="material-premium"
+              bind:value={premiumFilters.material_id}
+              disabled={!premiumFilters}
               class="w-full px-3 py-2 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">— Todos —</option>
-              {#each filterOptions.materials as opt}
+              {#each premiumOpts.materials as opt}
                 <option value={opt.id}>{opt.name} (n={opt.index}) {opt.count}</option>
               {/each}
             </select>
           </div>
         {/if}
-      {:else if !isPremium && filterOptions}
+      {:else if !isPremium && standardOpts}
         <!-- Standard Filters -->
 
         <!-- Lens Types -->
-        {#if filterOptions.lens_types?.length}
+        {#if standardOpts.lens_types?.length}
           <div>
-            <label class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
-              Tipo de Lente ({filterOptions.lens_types.length})
+            <label for="lens-type-standard" class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
+              Tipo de Lente ({standardOpts.lens_types.length})
             </label>
             <select
-              bind:value={filters.lens_type}
+              id="lens-type-standard"
+              bind:value={standardFilters.lens_type}
+              disabled={!standardFilters}
               class="w-full px-3 py-2 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">— Todos —</option>
-              {#each filterOptions.lens_types as opt}
+              {#each standardOpts.lens_types as opt}
                 <option value={opt.value}>{opt.value} ({opt.count})</option>
               {/each}
             </select>
@@ -156,17 +170,19 @@
         {/if}
 
         <!-- Materials -->
-        {#if filterOptions.materials?.length}
+        {#if standardOpts.materials?.length}
           <div>
-            <label class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
-              Material ({filterOptions.materials.length})
+            <label for="material-standard" class="text-xs font-bold uppercase tracking-wide text-muted-foreground block mb-2">
+              Material ({standardOpts.materials.length})
             </label>
             <select
-              bind:value={filters.material_id}
+              id="material-standard"
+              bind:value={standardFilters.material_id}
+              disabled={!standardFilters}
               class="w-full px-3 py-2 bg-muted border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
             >
               <option value="">— Todos —</option>
-              {#each filterOptions.materials as opt}
+              {#each standardOpts.materials as opt}
                 <option value={opt.id}>{opt.name} (n={opt.index})</option>
               {/each}
             </select>

@@ -61,7 +61,7 @@
     size="md"
     fullWidth
     {disabled}
-    on:click={handleClick}
+    onclick={handleClick}
   >
     {actionLabel}
   </Button>

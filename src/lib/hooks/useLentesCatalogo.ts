@@ -5,7 +5,7 @@
  * All logic lives in the DB RPCs — these stores just cache & manage state.
  */
 
-import { writable, derived } from 'svelte/store'
+import { writable, derived, get } from 'svelte/store'
 import {
   buscarCanonicos,
   buscarCanonicosPorReceita,
@@ -17,6 +17,7 @@ import {
   searchPremiumV3,
   getStandardFilterOptionsV3,
   searchStandardV3,
+  type LensSupplier,
 } from '$lib/api/lentes-repository'
 import type {
   CanonicalFilters,
@@ -36,7 +37,6 @@ import type {
   CanonicalLens,
   CatalogLens,
   LensFilterOptions,
-  LensSupplier,
 } from '$lib/types/lentes'
 
 // Re-export types for components
@@ -224,6 +224,12 @@ export function usePremiumFilterOptionsV3(params: PremiumFilterParamsV3 = {}) {
   const data = writable<PremiumFilterOptions | null>(null)
   const error = writable<string | null>(null)
 
+  const store = derived([loading, data, error], ([$loading, $data, $error]) => ({
+    loading: $loading,
+    data: $data,
+    error: $error,
+  }))
+
   async function fetch() {
     loading.set(true)
     error.set(null)
@@ -237,13 +243,20 @@ export function usePremiumFilterOptionsV3(params: PremiumFilterParamsV3 = {}) {
     }
   }
 
-  return { loading, data, error, fetch }
+  fetch() // Carrega inicial
+  return { subscribe: store.subscribe, fetch }
 }
 
 export function usePremiumSearchV3(params: PremiumSearchParamsV3 = {}) {
   const loading = writable(true)
   const data = writable<CanonicalSearchResultV3<CanonicalPremiumV3> | null>(null)
   const error = writable<string | null>(null)
+
+  const store = derived([loading, data, error], ([$loading, $data, $error]) => ({
+    loading: $loading,
+    data: $data,
+    error: $error,
+  }))
 
   async function fetch() {
     loading.set(true)
@@ -258,7 +271,8 @@ export function usePremiumSearchV3(params: PremiumSearchParamsV3 = {}) {
     }
   }
 
-  return { loading, data, error, fetch }
+  fetch() // Carrega inicial
+  return { subscribe: store.subscribe, fetch }
 }
 
 // ============================================================================
@@ -269,6 +283,12 @@ export function useStandardFilterOptionsV3(params: StandardFilterParamsV3 = {}) 
   const loading = writable(true)
   const data = writable<StandardFilterOptions | null>(null)
   const error = writable<string | null>(null)
+
+  const store = derived([loading, data, error], ([$loading, $data, $error]) => ({
+    loading: $loading,
+    data: $data,
+    error: $error,
+  }))
 
   async function fetch() {
     loading.set(true)
@@ -283,13 +303,20 @@ export function useStandardFilterOptionsV3(params: StandardFilterParamsV3 = {}) 
     }
   }
 
-  return { loading, data, error, fetch }
+  fetch() // Carrega inicial
+  return { subscribe: store.subscribe, fetch }
 }
 
 export function useStandardSearchV3(params: StandardSearchParamsV3 = {}) {
   const loading = writable(true)
   const data = writable<CanonicalSearchResultV3<CanonicalStandardV3> | null>(null)
   const error = writable<string | null>(null)
+
+  const store = derived([loading, data, error], ([$loading, $data, $error]) => ({
+    loading: $loading,
+    data: $data,
+    error: $error,
+  }))
 
   async function fetch() {
     loading.set(true)
@@ -304,5 +331,6 @@ export function useStandardSearchV3(params: StandardSearchParamsV3 = {}) {
     }
   }
 
-  return { loading, data, error, fetch }
+  fetch() // Carrega inicial
+  return { subscribe: store.subscribe, fetch }
 }

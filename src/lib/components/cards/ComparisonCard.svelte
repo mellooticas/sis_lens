@@ -102,7 +102,7 @@
         </div>
       </div>
       
-      <Button variant="primary" fullWidth on:click={() => onSelect?.(labA)}>
+      <Button variant="primary" fullWidth onclick={() => onSelect?.(labA)}>
         Escolher {labA.nome}
       </Button>
     </div>
@@ -203,7 +203,7 @@
         </div>
       </div>
       
-      <Button variant="primary" fullWidth on:click={() => onSelect?.(labB)}>
+      <Button variant="primary" fullWidth onclick={() => onSelect?.(labB)}>
         Escolher {labB.nome}
       </Button>
     </div>

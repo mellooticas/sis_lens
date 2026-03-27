@@ -333,7 +333,7 @@
 
         <!-- ── Ações ────────────────────────────────────────────────────────── -->
         <div class="flex gap-3 justify-center flex-wrap">
-            <Button variant="primary" on:click={buscarConceitos} disabled={loading}>
+            <Button variant="primary" onclick={buscarConceitos} disabled={loading}>
                 {#if loading}
                     <LoadingSpinner size="sm" />
                     Buscando...
@@ -342,7 +342,7 @@
                     Buscar Conceitos Compatíveis
                 {/if}
             </Button>
-            <Button variant="secondary" on:click={limparReceita} disabled={loading}>
+            <Button variant="secondary" onclick={limparReceita} disabled={loading}>
                 <RotateCcw size={18} />
                 Limpar
             </Button>

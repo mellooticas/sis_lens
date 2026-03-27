@@ -23,7 +23,10 @@
     colorThemeStore.init();
 
     // Sincronizar mudanças de auth (login/logout/refresh) com SvelteKit
-    const { data: { subscription } } = $page.data.supabase.auth.onAuthStateChange(
+    const sb = $page.data.supabase;
+    if (!sb) return;
+
+    const { data: { subscription } } = sb.auth.onAuthStateChange(
       (_event: string, session: { expires_at?: number } | null) => {
         if (session?.expires_at !== $page.data.session?.expires_at) {
           invalidateAll();

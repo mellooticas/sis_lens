@@ -11,27 +11,11 @@
     import { supabase }      from '$lib/supabase';
     import Container         from '$lib/components/layout/Container.svelte';
     import ContactLensCard   from '$lib/components/catalogo/ContactLensCard.svelte';
+    import type { RpcContactLensSearchResult as ContactLens } from '$lib/types/database-views';
 
     export let data: PageData;
 
     const LIMITE = 24;
-
-    interface ContactLens {
-        id: string;
-        brand_name: string | null;
-        manufacturer_name: string | null;
-        product_name: string | null;
-        lens_type: string | null;
-        purpose: string | null;
-        material: string | null;
-        is_colored: boolean | null;
-        usage_days: number | null;
-        units_per_box: number | null;
-        dk_t: number | null;
-        price_suggested: number | null;
-        stock_available: number | null;
-        uv_protection: boolean | null;
-    }
 
     // ── Estado ──────────────────────────────────────────────────────────────────
     let lentes: ContactLens[] = [];
@@ -91,7 +75,7 @@
         let query = supabase
             .from('v_contact_lenses')
             .select(
-                'id,brand_name,manufacturer_name,product_name,lens_type,purpose,material,is_colored,usage_days,units_per_box,dk_t,price_suggested,stock_available,uv_protection',
+                'id,brand_name,manufacturer_name,is_premium,product_name,slug,lens_type,purpose,material,is_colored,available_colors,usage_days,units_per_box,dk_t,price_suggested,stock_available,uv_protection',
                 { count: 'exact' }
             )
             .eq('status', 'active');

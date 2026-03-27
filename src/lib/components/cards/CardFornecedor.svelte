@@ -119,7 +119,7 @@
   <Button 
     variant={destaque ? 'success' : 'primary'} 
     fullWidth
-    on:click={() => onEscolher?.()}
+    onclick={() => onEscolher?.()}
   >
     {#if destaque}
       ✓ Escolher {laboratorio.nome}

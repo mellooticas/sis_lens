@@ -17,42 +17,42 @@
   } from '$lib/hooks/useLentesCatalogo'
   import type {
     PremiumFilterParamsV3,
-    PremiumSearchParamsV3,
     StandardFilterParamsV3,
-    StandardSearchParamsV3,
   } from '$lib/types/lentes'
 
   let activeTab: 'premium' | 'standard' = 'premium'
   let premiumFilters: PremiumFilterParamsV3 = {}
   let standardFilters: StandardFilterParamsV3 = {}
   let currentPage = 1
-  let itemsPerPage = 24
+  const itemsPerPage = 24
 
-  // Premium hooks
-  $: premiumSearchParams: PremiumSearchParamsV3 = {
-    ...premiumFilters,
-    limit: itemsPerPage,
-    offset: (currentPage - 1) * itemsPerPage,
-  }
+  // Hooks para dados
+  const premiumFilterOpts = usePremiumFilterOptionsV3()
+  const standardFilterOpts = useStandardFilterOptionsV3()
+  const premiumOptsForKpi = usePremiumFilterOptionsV3()
+  const standardOptsForKpi = useStandardFilterOptionsV3()
 
-  const premiumFilterOpts = usePremiumFilterOptionsV3(premiumFilters)
-  const premiumResults = usePremiumSearchV3(premiumSearchParams)
-
-  // Standard hooks
-  $: standardSearchParams: StandardSearchParamsV3 = {
-    ...standardFilters,
-    limit: itemsPerPage,
-    offset: (currentPage - 1) * itemsPerPage,
-  }
-
-  const standardFilterOpts = useStandardFilterOptionsV3(standardFilters)
-  const standardResults = useStandardSearchV3(standardSearchParams)
-
-  // KPIs
-  const premiumOptsForKpi = usePremiumFilterOptionsV3({})
-  const standardOptsForKpi = useStandardFilterOptionsV3({})
+  // Computed stores
+  let premiumResults: any
+  let standardResults: any
 
   // État computed
+  $: {
+    premiumResults = usePremiumSearchV3({
+      ...premiumFilters,
+      limit: itemsPerPage,
+      offset: (currentPage - 1) * itemsPerPage,
+    })
+  }
+
+  $: {
+    standardResults = useStandardSearchV3({
+      ...standardFilters,
+      limit: itemsPerPage,
+      offset: (currentPage - 1) * itemsPerPage,
+    })
+  }
+
   $: isLoading = activeTab === 'premium' ? $premiumResults.loading : $standardResults.loading
   $: totalItems = activeTab === 'premium' ? ($premiumResults.data?.total ?? 0) : ($standardResults.data?.total ?? 0)
   $: totalPages = Math.ceil(totalItems / itemsPerPage)
@@ -66,43 +66,31 @@
     await premiumOptsForKpi.fetch()
     await standardOptsForKpi.fetch()
     await premiumFilterOpts.fetch()
-    await premiumResults.fetch()
+    await standardFilterOpts.fetch()
   })
 
   const resetFilters = async () => {
+    currentPage = 1
     if (activeTab === 'premium') {
       premiumFilters = {}
     } else {
       standardFilters = {}
     }
-    currentPage = 1
-    await refetch()
   }
 
-  const applyFilters = async (filters: any) => {
+  const applyFilters = (filters: any) => {
     if (activeTab === 'premium') {
       premiumFilters = filters
     } else {
       standardFilters = filters
     }
     currentPage = 1
-    await refetch()
   }
 
-  const refetch = async () => {
-    if (activeTab === 'premium') {
-      await premiumFilterOpts.fetch()
-      await premiumResults.fetch()
-    } else {
-      await standardFilterOpts.fetch()
-      await standardResults.fetch()
-    }
+  const goToPage = (page: number) => {
+    currentPage = Math.max(1, Math.min(page, totalPages))
   }
 
-  const handleTabChange = async () => {
-    currentPage = 1
-    await refetch()
-  }
 </script>
 
 <svelte:head>
@@ -164,8 +152,8 @@
       <!-- Tabs -->
       <TabSelector
         bind:activeTab
-        {premiumTotal}
-        {standardTotal}
+        premiumCount={premiumTotal}
+        standardCount={standardTotal}
       />
 
       <!-- Content -->

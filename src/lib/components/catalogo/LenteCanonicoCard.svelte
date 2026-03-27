@@ -46,6 +46,7 @@
   $: badgeText = isPremium
     ? 'text-amber-700 dark:text-amber-300'
     : 'text-cyan-700 dark:text-cyan-300'
+  $: premiumLente = isPremium ? (lente as CanonicalPremiumV3) : null
 </script>
 
 <a {href} class="group">
@@ -56,11 +57,11 @@
         <h3 class="font-bold text-foreground text-sm line-clamp-2 group-hover:text-primary-600 transition-colors">
           {lente.canonical_name}
         </h3>
-        {#if lente.brand}
+        {#if isPremium && premiumLente?.brand}
           <p class="text-[11px] text-muted-foreground mt-1 truncate">
-            {lente.brand}
-            {#if lente.product_line}
-              • {lente.product_line}
+            {premiumLente.brand}
+            {#if premiumLente.product_line}
+              • {premiumLente.product_line}
             {/if}
           </p>
         {/if}
@@ -131,7 +132,9 @@
     <!-- Metadata -->
     <div class="text-[10px] text-muted-foreground space-y-0.5 border-t border-border pt-2 mt-1">
       <div>📦 {lente.mapped_lens_count} lente(s)</div>
-      <div>🏷️ {lente.mapped_brand_count} marca(s)</div>
+      {#if isPremium && premiumLente}
+        <div>🏷️ {premiumLente.mapped_brand_count} marca(s)</div>
+      {/if}
       <div>🚚 {lente.mapped_supplier_count} fornecedor(es)</div>
     </div>
   </div>

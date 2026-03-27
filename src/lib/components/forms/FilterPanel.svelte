@@ -207,10 +207,10 @@
       
       <!-- Actions -->
       <div class="filter-actions">
-        <Button variant="secondary" on:click={handleClear}>
+        <Button variant="secondary" onclick={handleClear}>
           Limpar Filtros
         </Button>
-        <Button variant="primary" on:click={handleApply}>
+        <Button variant="primary" onclick={handleApply}>
           Aplicar Filtros
         </Button>
       </div>

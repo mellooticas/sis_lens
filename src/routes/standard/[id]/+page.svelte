@@ -1,9 +1,9 @@
 <script lang="ts">
+    import { page } from '$app/stores'
     import { ChevronLeft } from "lucide-svelte";
-    import type { PageData } from "./$types";
     import Container from "$lib/components/layout/Container.svelte";
     
-    export let data: PageData;
+    export const data = null;
     
     function formatPrice(value: number | null | undefined): string {
         if (value == null) return "—";
@@ -45,7 +45,7 @@
                     
                     <div class="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 rounded-xl p-6">
                         <p class="text-sm text-blue-700 dark:text-blue-300">
-                            ID: <span class="font-mono font-bold">{data.id}</span>
+                            ID: <span class="font-mono font-bold">{$page.params.id}</span>
                         </p>
                     </div>
                 </div>

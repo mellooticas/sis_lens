@@ -38,7 +38,7 @@
       <Button
         variant={actionVariant}
         size={actionSize}
-        on:click={handleAction}
+        onclick={handleAction}
       >
         {actionLabel}
       </Button>
