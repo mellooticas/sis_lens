@@ -1,564 +1,259 @@
 <script lang="ts">
-    /**
-     * Catálogo de Lentes — client-side data fetching
-     * Fonte: public.v_catalog_lenses (browser supabase client)
-     * Filtros via goto() → URL params → server re-render → client re-fetch
-     */
-    import { onMount }         from 'svelte';
-    import { afterNavigate }   from '$app/navigation';
-    import { goto }            from '$app/navigation';
-    import type { PageData }   from './$types';
-    import { supabase }        from '$lib/supabase';
-    import Container           from '$lib/components/layout/Container.svelte';
+  /**
+   * +page.svelte — Catálogo de Lentes Canônicas
+   * Premium | Standard com filtros avançados (v3)
+   */
+  import { onMount } from 'svelte'
+  import { Crown, Sparkles } from 'lucide-svelte'
+  import Container from '$lib/components/layout/Container.svelte'
+  import TabSelector from '$lib/components/catalogo/TabSelector.svelte'
+  import FilterPanelV3 from '$lib/components/catalogo/FilterPanelV3.svelte'
+  import LensGrid from '$lib/components/catalogo/LensGrid.svelte'
+  import {
+    usePremiumFilterOptionsV3,
+    usePremiumSearchV3,
+    useStandardFilterOptionsV3,
+    useStandardSearchV3,
+  } from '$lib/hooks/useLentesCatalogo'
+  import type {
+    PremiumFilterParamsV3,
+    PremiumSearchParamsV3,
+    StandardFilterParamsV3,
+    StandardSearchParamsV3,
+  } from '$lib/types/lentes'
 
-    export let data: PageData;
+  let activeTab: 'premium' | 'standard' = 'premium'
+  let premiumFilters: PremiumFilterParamsV3 = {}
+  let standardFilters: StandardFilterParamsV3 = {}
+  let currentPage = 1
+  let itemsPerPage = 24
 
-    const LIMITE = 24;
+  // Premium hooks
+  $: premiumSearchParams: PremiumSearchParamsV3 = {
+    ...premiumFilters,
+    limit: itemsPerPage,
+    offset: (currentPage - 1) * itemsPerPage,
+  }
 
-    // ── Tipos locais ────────────────────────────────────────────────────────────
-    interface Fornecedor { id: string; name: string; }
-    interface Material   { id: string; name: string; refractive_index: number | null; }
-    interface Marca      { id: string; name: string; }
-    interface Lente {
-        id: string;
-        lens_name: string | null;
-        supplier_name: string | null;
-        brand_name: string | null;
-        lens_type: string | null;
-        material_name: string | null;
-        refractive_index: number | null;
-        sku: string | null;
-        is_premium: boolean | null;
-        treatment_names: string[] | null;
-        anti_reflective: boolean | null;
-        anti_scratch: boolean | null;
-        uv_filter: boolean | null;
-        blue_light: boolean | null;
-        photochromic: boolean | null;
-        polarized: boolean | null;
-        price_suggested: number | null;
+  const premiumFilterOpts = usePremiumFilterOptionsV3(premiumFilters)
+  const premiumResults = usePremiumSearchV3(premiumSearchParams)
+
+  // Standard hooks
+  $: standardSearchParams: StandardSearchParamsV3 = {
+    ...standardFilters,
+    limit: itemsPerPage,
+    offset: (currentPage - 1) * itemsPerPage,
+  }
+
+  const standardFilterOpts = useStandardFilterOptionsV3(standardFilters)
+  const standardResults = useStandardSearchV3(standardSearchParams)
+
+  // KPIs
+  const premiumOptsForKpi = usePremiumFilterOptionsV3({})
+  const standardOptsForKpi = useStandardFilterOptionsV3({})
+
+  // État computed
+  $: isLoading = activeTab === 'premium' ? $premiumResults.loading : $standardResults.loading
+  $: totalItems = activeTab === 'premium' ? ($premiumResults.data?.total ?? 0) : ($standardResults.data?.total ?? 0)
+  $: totalPages = Math.ceil(totalItems / itemsPerPage)
+  $: premiumTotal = $premiumFilterOpts.data?.total_count ?? $premiumOptsForKpi.data?.total_count ?? 0
+  $: standardTotal = $standardFilterOpts.data?.total_count ?? $standardOptsForKpi.data?.total_count ?? 0
+  $: hasActiveFilters = activeTab === 'premium'
+    ? Object.values(premiumFilters).some(v => v !== undefined)
+    : Object.values(standardFilters).some(v => v !== undefined)
+
+  onMount(async () => {
+    await premiumOptsForKpi.fetch()
+    await standardOptsForKpi.fetch()
+    await premiumFilterOpts.fetch()
+    await premiumResults.fetch()
+  })
+
+  const resetFilters = async () => {
+    if (activeTab === 'premium') {
+      premiumFilters = {}
+    } else {
+      standardFilters = {}
     }
+    currentPage = 1
+    await refetch()
+  }
 
-    // ── Estado ──────────────────────────────────────────────────────────────────
-    let lentes: Lente[]     = [];
-    let total               = 0;
-    let total_paginas       = 0;
-    let loading             = true;
-    let erro: string | null = null;
-
-    let fornecedores: Fornecedor[] = [];
-    let materiais: Material[]      = [];
-    let marcas: Marca[]            = [];
-    let opcoesCarregadas           = false;
-
-    // ── Estado local de filtros (sincronizado com data via afterNavigate) ───────
-    let busca      = data.busca       ?? '';
-    let tipo       = data.lens_type   ?? '';
-    let fornecedor = data.supplier_id ?? '';
-    let marca      = data.brand_id    ?? '';
-    let material   = data.material_id ?? '';
-    let premium    = data.is_premium === true ? 'true' : data.is_premium === false ? 'false' : '';
-    let has_ar      = data.has_ar;
-    let has_blue    = data.has_blue;
-    let has_scratch = data.has_scratch;
-    let has_uv      = data.has_uv;
-    let has_photo   = data.has_photo;
-    let has_polar   = data.has_polar;
-    let filtrosAbertos = false;
-
-    $: filtrosAtivos = [busca, tipo, fornecedor, marca, material, premium,
-        has_ar ? '1' : '', has_blue ? '1' : '', has_scratch ? '1' : '',
-        has_uv ? '1' : '', has_photo ? '1' : '', has_polar ? '1' : '']
-        .filter(Boolean).length;
-
-    // ── Navegação ───────────────────────────────────────────────────────────────
-    function buildParams(p?: number): string {
-        const params = new URLSearchParams();
-        if (busca)       params.set('busca',     busca);
-        if (tipo)        params.set('tipo',       tipo);
-        if (fornecedor)  params.set('fornecedor', fornecedor);
-        if (marca)       params.set('marca',      marca);
-        if (material)    params.set('material',   material);
-        if (premium)     params.set('premium',    premium);
-        if (has_ar)      params.set('ar',      '1');
-        if (has_blue)    params.set('blue',    '1');
-        if (has_scratch) params.set('scratch', '1');
-        if (has_uv)      params.set('uv',      '1');
-        if (has_photo)   params.set('foto',    '1');
-        if (has_polar)   params.set('polar',   '1');
-        if (p && p > 1)  params.set('pagina',  String(p));
-        const q = params.toString();
-        return q ? `?${q}` : '';
+  const applyFilters = async (filters: any) => {
+    if (activeTab === 'premium') {
+      premiumFilters = filters
+    } else {
+      standardFilters = filters
     }
+    currentPage = 1
+    await refetch()
+  }
 
-    function aplicarFiltros()        { goto(`/lentes${buildParams()}`); }
-    function limparFiltros() {
-        busca = ''; tipo = ''; fornecedor = ''; marca = ''; material = ''; premium = '';
-        has_ar = false; has_blue = false; has_scratch = false; has_uv = false; has_photo = false; has_polar = false;
-        goto('/lentes');
+  const refetch = async () => {
+    if (activeTab === 'premium') {
+      await premiumFilterOpts.fetch()
+      await premiumResults.fetch()
+    } else {
+      await standardFilterOpts.fetch()
+      await standardResults.fetch()
     }
-    function irParaPagina(p: number) { goto(`/lentes${buildParams(p)}`); }
+  }
 
-    // ── Fetch opções de filtro (once) ───────────────────────────────────────────
-    async function fetchOpcoes() {
-        if (opcoesCarregadas) return;
-        const { data: rows } = await supabase
-            .from('v_catalog_lenses')
-            .select('supplier_id, supplier_name, brand_id, brand_name, material_id, material_name, refractive_index')
-            .eq('status', 'active');
-
-        if (rows) {
-            const suppMap  = new Map<string, string>();
-            const brandMap = new Map<string, string>();
-            const matMap   = new Map<string, { name: string; refractive_index: number | null }>();
-            for (const l of rows) {
-                if (l.supplier_id && l.supplier_name) suppMap.set(l.supplier_id, l.supplier_name);
-                if (l.brand_id    && l.brand_name)    brandMap.set(l.brand_id, l.brand_name);
-                if (l.material_id && l.material_name && !matMap.has(l.material_id))
-                    matMap.set(l.material_id, { name: l.material_name, refractive_index: l.refractive_index ?? null });
-            }
-            fornecedores = [...suppMap.entries()]
-                .map(([id, name]) => ({ id, name }))
-                .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
-            marcas = [...brandMap.entries()]
-                .map(([id, name]) => ({ id, name }))
-                .sort((a, b) => a.name.localeCompare(b.name, 'pt-BR'));
-            materiais = [...matMap.entries()]
-                .map(([id, m]) => ({ id, ...m }))
-                .sort((a, b) => (a.refractive_index ?? 0) - (b.refractive_index ?? 0));
-            opcoesCarregadas = true;
-        }
-    }
-
-    // ── Fetch lentes (chamado em todo afterNavigate) ─────────────────────────────
-    async function fetchLentes() {
-        loading = true;
-        erro    = null;
-
-        // Sincroniza form com data atual (após navigation)
-        busca      = data.busca       ?? '';
-        tipo       = data.lens_type   ?? '';
-        fornecedor = data.supplier_id ?? '';
-        marca      = data.brand_id    ?? '';
-        material   = data.material_id ?? '';
-        premium    = data.is_premium === true ? 'true' : data.is_premium === false ? 'false' : '';
-        has_ar      = data.has_ar;
-        has_blue    = data.has_blue;
-        has_scratch = data.has_scratch;
-        has_uv      = data.has_uv;
-        has_photo   = data.has_photo;
-        has_polar   = data.has_polar;
-
-        const offset = (data.pagina - 1) * LIMITE;
-
-        let query = supabase
-            .from('v_catalog_lenses')
-            .select('id,lens_name,supplier_name,brand_name,lens_type,material_name,refractive_index,sku,is_premium,treatment_names,anti_reflective,anti_scratch,uv_filter,blue_light,photochromic,polarized,price_suggested', { count: 'exact' })
-            .eq('status', 'active');
-
-        if (data.busca)               query = query.ilike('lens_name',      `%${data.busca}%`);
-        if (data.lens_type)           query = query.eq('lens_type',         data.lens_type);
-        if (data.supplier_id)         query = query.eq('supplier_id',       data.supplier_id);
-        if (data.brand_id)            query = query.eq('brand_id',          data.brand_id);
-        if (data.material_id)         query = query.eq('material_id',       data.material_id);
-        if (data.is_premium !== null) query = query.eq('is_premium',        data.is_premium);
-        if (data.has_ar)              query = query.eq('anti_reflective',   true);
-        if (data.has_blue)            query = query.eq('blue_light',        true);
-        if (data.has_scratch)         query = query.eq('anti_scratch',      true);
-        if (data.has_uv)              query = query.eq('uv_filter',         true);
-        if (data.has_photo)           query = query.eq('photochromic',      true);
-        if (data.has_polar)           query = query.eq('polarized',         true);
-
-        const { data: rows, count, error: err } = await query
-            .order('supplier_name', { ascending: true, nullsFirst: false })
-            .order('material_name', { ascending: true, nullsFirst: false })
-            .order('lens_name',     { ascending: true })
-            .range(offset, offset + LIMITE - 1);
-
-        if (err) {
-            erro   = err.message;
-            lentes = [];
-        } else {
-            lentes       = (rows ?? []) as Lente[];
-            total        = count ?? 0;
-            total_paginas = Math.ceil(total / LIMITE);
-        }
-        loading = false;
-    }
-
-    // ── Ciclo de vida ────────────────────────────────────────────────────────────
-    onMount(() => { fetchOpcoes(); });
-    afterNavigate(() => { fetchLentes(); });
-
-    // ── Helpers de display ───────────────────────────────────────────────────────
-    const TIPO_LABELS: Record<string, string> = {
-        single_vision: 'Visão Simples',
-        multifocal:    'Multifocal',
-        bifocal:       'Bifocal',
-        occupational:  'Ocupacional',
-    };
-
-    function formatarPreco(valor: number | null | undefined): string {
-        if (!valor) return '—';
-        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(valor);
-    }
-
-    function getTratamentos(lente: Lente): string[] {
-        const nomes = lente.treatment_names ?? [];
-        if (nomes.length > 0) {
-            return nomes.map(n => {
-                const u = n.toUpperCase();
-                if (u.includes('REFLEX') || u.includes('ANTI-RE')) return 'AR';
-                if (u.includes('RISCO'))                            return 'AS';
-                if (u.includes('UV'))                               return 'UV';
-                if (u.includes('BLUE') || u.includes('VIDEO'))      return 'Blue';
-                if (u.includes('FOTOCR'))                           return 'Foto';
-                if (u.includes('TRANSIT'))                          return 'Trans';
-                if (u.includes('POLARIZ'))                          return 'Pol';
-                if (u.includes('ACCLIM'))                           return 'Acc';
-                return n.split(' ')[0];
-            });
-        }
-        const t: string[] = [];
-        if (lente.anti_reflective) t.push('AR');
-        if (lente.anti_scratch)    t.push('AS');
-        if (lente.uv_filter)       t.push('UV');
-        if (lente.blue_light)      t.push('Blue');
-        if (lente.photochromic)    t.push('Foto');
-        if (lente.polarized)       t.push('Pol');
-        return t;
-    }
+  const handleTabChange = async () => {
+    currentPage = 1
+    await refetch()
+  }
 </script>
 
 <svelte:head>
-    <title>Lentes ({total.toLocaleString('pt-BR')}) | Clearix Lens</title>
+  <title>Lentes Canônicas | Clearix Lens</title>
 </svelte:head>
 
-<main class="min-h-screen bg-muted pb-24">
-
-    <!-- ── Hero ──────────────────────────────────────────────────────────── -->
-    <div class="bg-background border-b border-border">
-        <Container maxWidth="xl" padding="sm">
-            <div class="py-6">
-                <div class="flex items-start justify-between gap-4 flex-wrap">
-                    <div>
-                        <h1 class="text-2xl font-black text-foreground">Catálogo de Lentes</h1>
-                        <p class="text-sm text-muted-foreground mt-1">
-                            {#if loading}
-                                Carregando...
-                            {:else}
-                                {total.toLocaleString('pt-BR')} lentes ·
-                                {materiais.length} materiais ·
-                                {fornecedores.length} fornecedores
-                            {/if}
-                        </p>
-                    </div>
-                    <div class="flex gap-2">
-                        <a href="/standard"
-                            class="px-3 py-1.5 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-xs font-bold rounded-lg hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors">
-                            ↗ Standard
-                        </a>
-                        <a href="/premium"
-                            class="px-3 py-1.5 bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 text-xs font-bold rounded-lg hover:bg-amber-100 dark:hover:bg-amber-900/30 transition-colors">
-                            ↗ Premium
-                        </a>
-                    </div>
-                </div>
-            </div>
-        </Container>
-    </div>
-
-    <Container maxWidth="xl" padding="md">
-
-        <!-- ── Filtros ────────────────────────────────────────────────────── -->
-        <div class="mt-6 bg-card border border-border rounded-2xl overflow-hidden">
-
-            <button
-                class="w-full flex items-center justify-between px-5 py-4 hover:bg-accent transition-colors text-left"
-                on:click={() => filtrosAbertos = !filtrosAbertos}
-                type="button"
-            >
-                <div class="flex items-center gap-3">
-                    <svg class="w-4 h-4 text-muted-foreground" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                        <path stroke-linecap="round" stroke-linejoin="round"
-                            d="M3 4a1 1 0 011-1h16a1 1 0 011 1v2.586a1 1 0 01-.293.707l-6.414 6.414a1 1 0 00-.293.707V17l-4 4v-6.586a1 1 0 00-.293-.707L3.293 7.293A1 1 0 013 6.586V4z"/>
-                    </svg>
-                    <span class="text-sm font-bold text-foreground">Filtros</span>
-                    {#if filtrosAtivos > 0}
-                        <span class="px-2 py-0.5 bg-primary-100 dark:bg-primary-900/30 text-primary-700 dark:text-primary-300 text-xs font-black rounded-full">
-                            {filtrosAtivos} {filtrosAtivos === 1 ? 'ativo' : 'ativos'}
-                        </span>
-                    {/if}
-                </div>
-                <svg class="w-4 h-4 text-muted-foreground transition-transform duration-200 {filtrosAbertos ? 'rotate-180' : ''}"
-                    fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                    <path stroke-linecap="round" stroke-linejoin="round" d="M19 9l-7 7-7-7"/>
-                </svg>
-            </button>
-
-            {#if filtrosAbertos}
-                <div class="border-t border-border px-5 py-5">
-                    <!-- Linha 1: Busca + Fornecedor + Marca + Material + Linha -->
-                    <div class="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-4">
-
-                        <div class="lg:col-span-1">
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Buscar</label>
-                            <input type="text" bind:value={busca}
-                                placeholder="Nome da lente..."
-                                on:keydown={(e) => e.key === 'Enter' && aplicarFiltros()}
-                                class="w-full text-sm bg-muted border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-400"/>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Tipo</label>
-                            <select bind:value={tipo}
-                                class="w-full text-sm bg-muted border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
-                                <option value="">Todos</option>
-                                <option value="single_vision">Visão Simples</option>
-                                <option value="multifocal">Multifocal</option>
-                                <option value="bifocal">Bifocal</option>
-                                <option value="occupational">Ocupacional</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Fornecedor</label>
-                            <select bind:value={fornecedor}
-                                class="w-full text-sm bg-muted border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
-                                <option value="">Todos</option>
-                                {#each fornecedores as f (f.id)}
-                                    <option value={f.id}>{f.name}</option>
-                                {/each}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Marca</label>
-                            <select bind:value={marca}
-                                class="w-full text-sm bg-muted border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
-                                <option value="">Todas</option>
-                                {#each marcas as m (m.id)}
-                                    <option value={m.id}>{m.name}</option>
-                                {/each}
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Material</label>
-                            <select bind:value={material}
-                                class="w-full text-sm bg-muted border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
-                                <option value="">Todos</option>
-                                {#each materiais as m (m.id)}
-                                    <option value={m.id}>{m.name}</option>
-                                {/each}
-                            </select>
-                        </div>
-                    </div>
-
-                    <!-- Linha 2: Linha + Tratamentos -->
-                    <div class="mt-4 flex flex-wrap items-end gap-6">
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Linha</label>
-                            <select bind:value={premium}
-                                class="text-sm bg-muted border border-border rounded-lg px-3 py-2 text-foreground focus:outline-none focus:ring-2 focus:ring-primary-400 cursor-pointer">
-                                <option value="">Todas</option>
-                                <option value="false">Standard</option>
-                                <option value="true">Premium</option>
-                            </select>
-                        </div>
-
-                        <div>
-                            <label class="block text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-2">Tratamentos</label>
-                            <div class="flex flex-wrap gap-x-5 gap-y-2">
-                                <label class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="checkbox" bind:checked={has_ar}      class="w-3.5 h-3.5 rounded accent-primary-600"/>
-                                    <span class="text-sm text-foreground">Anti-Reflexo</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="checkbox" bind:checked={has_scratch} class="w-3.5 h-3.5 rounded accent-primary-600"/>
-                                    <span class="text-sm text-foreground">Anti-Risco</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="checkbox" bind:checked={has_uv}      class="w-3.5 h-3.5 rounded accent-primary-600"/>
-                                    <span class="text-sm text-foreground">UV</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="checkbox" bind:checked={has_blue}    class="w-3.5 h-3.5 rounded accent-primary-600"/>
-                                    <span class="text-sm text-foreground">Blue Cut</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="checkbox" bind:checked={has_photo}   class="w-3.5 h-3.5 rounded accent-primary-600"/>
-                                    <span class="text-sm text-foreground">Fotossensível</span>
-                                </label>
-                                <label class="flex items-center gap-1.5 cursor-pointer">
-                                    <input type="checkbox" bind:checked={has_polar}   class="w-3.5 h-3.5 rounded accent-primary-600"/>
-                                    <span class="text-sm text-foreground">Polarizado</span>
-                                </label>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="flex items-center gap-3 mt-5 pt-4 border-t border-border">
-                        <button type="button" on:click={aplicarFiltros}
-                            class="px-5 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-bold rounded-lg transition-colors">
-                            Aplicar Filtros
-                        </button>
-                        {#if filtrosAtivos > 0}
-                            <button type="button" on:click={limparFiltros}
-                                class="px-4 py-2 text-sm text-muted-foreground hover:text-foreground transition-colors">
-                                Limpar tudo
-                            </button>
-                        {/if}
-                        <span class="text-xs text-muted-foreground ml-auto">
-                            {#if !loading}{total.toLocaleString('pt-BR')} resultado{total !== 1 ? 's' : ''}{/if}
-                        </span>
-                    </div>
-                </div>
-            {/if}
+<main class="min-h-screen bg-muted pb-20">
+  <!-- Hero -->
+  <div class="bg-background border-b border-border">
+    <Container>
+      <div class="py-12">
+        <div class="flex items-start justify-between gap-6">
+          <div>
+            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+              Catálogo de Lentes v3
+            </h1>
+            <p class="mt-2 text-muted-foreground">
+              Conceitos canônicos com filtros estruturados — dados do Canonical Engine v3
+            </p>
+          </div>
         </div>
-
-        <!-- ── Grid de Cards ──────────────────────────────────────────────── -->
-        <div class="mt-6">
-            {#if loading}
-                <div class="flex flex-col items-center justify-center py-24 bg-card border border-border rounded-2xl">
-                    <div class="w-8 h-8 border-4 border-primary-500 border-t-transparent rounded-full animate-spin mb-4"></div>
-                    <p class="text-muted-foreground text-sm">Carregando lentes...</p>
-                </div>
-
-            {:else if erro}
-                <div class="py-16 text-center bg-card border border-red-200 rounded-2xl">
-                    <p class="text-red-500 font-semibold">{erro}</p>
-                    <button type="button" on:click={fetchLentes}
-                        class="mt-4 px-4 py-2 bg-primary-600 text-white text-sm font-bold rounded-lg">
-                        Tentar novamente
-                    </button>
-                </div>
-
-            {:else if lentes.length === 0}
-                <div class="py-24 text-center">
-                    <div class="text-5xl mb-4">🔍</div>
-                    <p class="text-muted-foreground text-lg font-semibold">Nenhuma lente encontrada</p>
-                    <p class="text-muted-foreground text-sm mt-1">Tente ajustar os filtros</p>
-                    {#if filtrosAtivos > 0}
-                        <button type="button" on:click={limparFiltros}
-                            class="mt-5 px-4 py-2 text-sm text-primary-600 dark:text-primary-400 hover:text-primary-700 font-semibold transition-colors">
-                            ← Limpar filtros
-                        </button>
-                    {/if}
-                </div>
-
-            {:else}
-                <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                    {#each lentes as lente (lente.id)}
-                        {@const tratamentos = getTratamentos(lente)}
-                        <a href="/lentes/{lente.id}" class="bg-card border border-border rounded-2xl p-5 hover:shadow-md hover:border-primary-200 dark:hover:border-primary-800 transition-all duration-200 flex flex-col gap-3 no-underline">
-
-                            <div class="flex items-start justify-between gap-2">
-                                <div class="flex-1 min-w-0">
-                                    <h3 class="font-bold text-foreground text-sm leading-snug line-clamp-2">
-                                        {lente.lens_name ?? '—'}
-                                    </h3>
-                                    <p class="text-[11px] text-muted-foreground mt-0.5 truncate">
-                                        {lente.supplier_name ?? '—'}
-                                    </p>
-                                </div>
-                                {#if lente.is_premium}
-                                    <span class="shrink-0 px-1.5 py-0.5 bg-amber-100 dark:bg-amber-900/30 text-amber-700 dark:text-amber-400 text-[9px] font-black rounded-full uppercase tracking-wide">★ PRE</span>
-                                {:else}
-                                    <span class="shrink-0 px-1.5 py-0.5 bg-sky-50 dark:bg-sky-900/20 text-sky-600 dark:text-sky-400 text-[9px] font-black rounded-full uppercase tracking-wide">STD</span>
-                                {/if}
-                            </div>
-
-                            <div class="space-y-1.5 flex-1">
-                                {#if lente.brand_name}
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[10px] font-black uppercase tracking-wide text-muted-foreground w-14 shrink-0">Marca</span>
-                                        <span class="text-xs text-muted-foreground truncate">{lente.brand_name}</span>
-                                    </div>
-                                {/if}
-                                {#if lente.lens_type}
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[10px] font-black uppercase tracking-wide text-muted-foreground w-14 shrink-0">Tipo</span>
-                                        <span class="text-xs text-muted-foreground">{TIPO_LABELS[lente.lens_type] ?? lente.lens_type}</span>
-                                    </div>
-                                {/if}
-                                {#if lente.material_name}
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[10px] font-black uppercase tracking-wide text-muted-foreground w-14 shrink-0">Material</span>
-                                        <span class="text-xs text-muted-foreground leading-tight">
-                                            {lente.material_name}{#if lente.refractive_index} · <span class="text-muted-foreground">n={lente.refractive_index}</span>{/if}
-                                        </span>
-                                    </div>
-                                {/if}
-                                {#if lente.sku}
-                                    <div class="flex items-center gap-2">
-                                        <span class="text-[10px] font-black uppercase tracking-wide text-muted-foreground w-14 shrink-0">SKU</span>
-                                        <span class="font-mono text-[10px] bg-muted text-muted-foreground px-1.5 py-0.5 rounded">{lente.sku}</span>
-                                    </div>
-                                {/if}
-                            </div>
-
-                            <div class="flex flex-wrap gap-1 min-h-[18px]">
-                                {#each tratamentos as trat}
-                                    <span class="px-1.5 py-0.5 bg-primary-50 dark:bg-primary-900/20 text-primary-600 dark:text-primary-400 text-[9px] font-black rounded uppercase">{trat}</span>
-                                {/each}
-                            </div>
-
-                            <div class="flex items-center justify-between pt-3 border-t border-border">
-                                <span class="text-[10px] font-black uppercase tracking-wide text-muted-foreground">Sugerido</span>
-                                <span class="text-base font-black text-foreground">
-                                    {formatarPreco(lente.price_suggested)}
-                                </span>
-                            </div>
-                        </a>
-                    {/each}
-                </div>
-
-                <!-- ── Paginação ─────────────────────────────────────────── -->
-                {#if total_paginas > 1}
-                    <div class="flex flex-col items-center gap-3 mt-10">
-                        <div class="flex items-center gap-2">
-                            <button
-                                type="button"
-                                disabled={data.pagina <= 1}
-                                on:click={() => irParaPagina(data.pagina - 1)}
-                                class="px-4 py-2 text-sm font-bold rounded-lg border border-border bg-card text-foreground hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                                ← Anterior
-                            </button>
-
-                            <div class="flex items-center gap-1">
-                                {#each Array.from({ length: total_paginas }, (_, i) => i + 1) as p}
-                                    {#if p === 1 || p === total_paginas || (p >= data.pagina - 2 && p <= data.pagina + 2)}
-                                        <button
-                                            type="button"
-                                            on:click={() => irParaPagina(p)}
-                                            class="w-9 h-9 text-sm font-bold rounded-lg transition-colors
-                                                {p === data.pagina
-                                                    ? 'bg-primary-600 text-white shadow-sm'
-                                                    : 'bg-card border border-border text-muted-foreground hover:bg-accent'}">
-                                            {p}
-                                        </button>
-                                    {:else if p === data.pagina - 3 || p === data.pagina + 3}
-                                        <span class="text-muted-foreground text-sm px-1">…</span>
-                                    {/if}
-                                {/each}
-                            </div>
-
-                            <button
-                                type="button"
-                                disabled={data.pagina >= total_paginas}
-                                on:click={() => irParaPagina(data.pagina + 1)}
-                                class="px-4 py-2 text-sm font-bold rounded-lg border border-border bg-card text-foreground hover:bg-accent disabled:opacity-40 disabled:cursor-not-allowed transition-colors">
-                                Próxima →
-                            </button>
-                        </div>
-
-                        <p class="text-xs text-muted-foreground">
-                            Página {data.pagina} de {total_paginas} · {total.toLocaleString('pt-BR')} lentes no total
-                        </p>
-                    </div>
-                {/if}
-            {/if}
-        </div>
+      </div>
     </Container>
+  </div>
+
+  <Container>
+    <div class="py-8 space-y-6">
+      <!-- KPIs -->
+      <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
+        <div class="rounded-xl bg-amber-50 dark:bg-amber-950/30 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <Crown class="h-4 w-4 text-amber-600 dark:text-amber-400" />
+            <p class="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300">Premium</p>
+          </div>
+          <p class="text-3xl font-black text-amber-900 dark:text-amber-100">{premiumTotal.toLocaleString('pt-BR')}</p>
+        </div>
+
+        <div class="rounded-xl bg-cyan-50 dark:bg-cyan-950/30 p-4">
+          <div class="flex items-center gap-2 mb-2">
+            <Sparkles class="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+            <p class="text-xs font-bold uppercase tracking-wide text-cyan-700 dark:text-cyan-300">Standard</p>
+          </div>
+          <p class="text-3xl font-black text-cyan-900 dark:text-cyan-100">{standardTotal.toLocaleString('pt-BR')}</p>
+        </div>
+
+        {#if activeTab === 'premium' && $premiumFilterOpts.data?.brands}
+          <div class="rounded-xl bg-violet-50 dark:bg-violet-950/30 p-4">
+            <p class="text-xs font-bold uppercase tracking-wide text-violet-700 dark:text-violet-300 mb-2">Marcas</p>
+            <p class="text-3xl font-black text-violet-900 dark:text-violet-100">{$premiumFilterOpts.data.brands.length}</p>
+          </div>
+        {/if}
+
+        <div class="rounded-xl bg-green-50 dark:bg-green-950/30 p-4">
+          <p class="text-xs font-bold uppercase tracking-wide text-green-700 dark:text-green-300 mb-2">Resultados</p>
+          <p class="text-3xl font-black text-green-900 dark:text-green-100">{totalItems.toLocaleString('pt-BR')}</p>
+        </div>
+      </div>
+
+      <!-- Tabs -->
+      <TabSelector
+        bind:activeTab
+        {premiumTotal}
+        {standardTotal}
+      />
+
+      <!-- Content -->
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        <!-- Sidebar Filters -->
+        <div class="lg:col-span-1">
+          <FilterPanelV3
+            isPremium={activeTab === 'premium'}
+            filters={activeTab === 'premium' ? premiumFilters : standardFilters}
+            filterOptions={activeTab === 'premium' ? $premiumFilterOpts.data : $standardFilterOpts.data}
+            loading={isLoading}
+            onApplyFilters={applyFilters}
+            onClearFilters={resetFilters}
+          />
+        </div>
+
+        <!-- Main Content -->
+        <div class="lg:col-span-3 space-y-6">
+          {#if hasActiveFilters}
+            <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 rounded-lg p-4">
+              <p class="text-sm text-blue-700 dark:text-blue-300">
+                <span class="font-semibold">{totalItems} resultado(s)</span> com os filtros aplicados
+              </p>
+              <button
+                on:click={resetFilters}
+                class="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
+              >
+                Limpar filtros
+              </button>
+            </div>
+          {/if}
+
+          <!-- Grid -->
+          <LensGrid
+            lentes={activeTab === 'premium' ? ($premiumResults.data?.items ?? []) : ($standardResults.data?.items ?? [])}
+            loading={isLoading}
+            erro={activeTab === 'premium' ? $premiumResults.error : $standardResults.error}
+            isPremium={activeTab === 'premium'}
+            itemCount={totalItems}
+          />
+
+          <!-- Pagination -->
+          {#if totalPages > 1 && !isLoading}
+            <div class="flex items-center justify-center gap-2 flex-wrap">
+              <button
+                disabled={currentPage === 1}
+                on:click={() => (currentPage = Math.max(1, currentPage - 1))}
+                class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              >
+                ← Anterior
+              </button>
+
+              <div class="flex gap-1">
+                {#each Array.from({ length: Math.min(5, totalPages) }) as _, i}
+                  {@const page = i + 1}
+                  <button
+                    on:click={() => (currentPage = page)}
+                    class={`px-3 py-2 rounded-lg text-sm font-medium ${
+                      currentPage === page
+                        ? 'bg-primary-600 text-white'
+                        : 'border border-border hover:bg-muted'
+                    }`}
+                  >
+                    {page}
+                  </button>
+                {/each}
+                {#if totalPages > 5}
+                  <span class="px-3 py-2 text-muted-foreground">...</span>
+                  <button
+                    on:click={() => (currentPage = totalPages)}
+                    class="px-3 py-2 rounded-lg border border-border hover:bg-muted text-sm font-medium"
+                  >
+                    {totalPages}
+                  </button>
+                {/if}
+              </div>
+
+              <button
+                disabled={currentPage === totalPages}
+                on:click={() => (currentPage = Math.min(totalPages, currentPage + 1))}
+                class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+              >
+                Próxima →
+              </button>
+            </div>
+          {/if}
+        </div>
+      </div>
+    </div>
+  </Container>
 </main>
