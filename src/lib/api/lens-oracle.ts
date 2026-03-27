@@ -577,7 +577,7 @@ export class LensOracleAPI {
     photochromic?: string;
   } = {}): Promise<ApiResponse<PremiumFilterOptions>> {
     try {
-      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_premium_filter_options', {
+      const { data, error } = await supabase.rpc('rpc_premium_filter_options', {
         p_brand:        params.brand        ?? null,
         p_product_line: params.product_line ?? null,
         p_lens_type:    params.lens_type    ?? null,
@@ -610,7 +610,7 @@ export class LensOracleAPI {
     offset?: number;
   } = {}): Promise<ApiResponse<CanonicalSearchResult<CanonicalPremiumV3>>> {
     try {
-      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_premium_search', {
+      const { data, error } = await supabase.rpc('rpc_premium_search', {
         p_brand:        params.brand        ?? null,
         p_product_line: params.product_line ?? null,
         p_lens_type:    params.lens_type    ?? null,
@@ -644,7 +644,7 @@ export class LensOracleAPI {
     addition?: number;
   } = {}): Promise<ApiResponse<StandardFilterOptions>> {
     try {
-      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_standard_filter_options', {
+      const { data, error } = await supabase.rpc('rpc_standard_filter_options', {
         p_lens_type:   params.lens_type   ?? null,
         p_material_id: params.material_id ?? null,
         p_treatments:  params.treatments  ?? null,
@@ -674,7 +674,7 @@ export class LensOracleAPI {
     offset?: number;
   } = {}): Promise<ApiResponse<CanonicalSearchResult<CanonicalStandardV3>>> {
     try {
-      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_standard_search', {
+      const { data, error } = await supabase.rpc('rpc_standard_search', {
         p_lens_type:   params.lens_type   ?? null,
         p_material_id: params.material_id ?? null,
         p_treatments:  params.treatments  ?? null,
@@ -697,7 +697,7 @@ export class LensOracleAPI {
    */
   static async getCatalogSummaryV3(): Promise<ApiResponse<any>> {
     try {
-      const { data, error } = await supabase.schema('catalog_lenses').rpc('rpc_catalog_summary');
+      const { data, error } = await supabase.rpc('rpc_catalog_summary');
       if (error) throw error;
       return { data };
     } catch (error: any) {
