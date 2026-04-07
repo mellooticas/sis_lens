@@ -1,22 +1,23 @@
 <script lang="ts">
-  import Sidebar from "./Sidebar.svelte";
+  import AppSidebar from "$lib/components/sidebar/AppSidebar.svelte";
   import Header from "./Header.svelte";
+  import { sidebarStore } from "$lib/stores/sidebar.svelte";
 
-  let sidebarCollapsed = false;
+  export let currentPage = '';
 
-  function toggleSidebar() {
-    sidebarCollapsed = !sidebarCollapsed;
+  function handleToggleSidebar() {
+    sidebarStore.toggleCollapse();
   }
 </script>
 
 <div class="min-h-screen bg-background transition-colors duration-300">
-  <Sidebar collapsed={sidebarCollapsed} />
+  <AppSidebar />
 
   <div
     class="transition-all duration-300 flex flex-col min-h-screen"
-    style="padding-left: {sidebarCollapsed ? '72px' : '16rem'}"
+    style="padding-left: {sidebarStore.collapsed ? '72px' : '16rem'}"
   >
-    <Header on:menuClick={toggleSidebar} collapsed={sidebarCollapsed} />
+    <Header on:menuClick={handleToggleSidebar} collapsed={sidebarStore.collapsed} />
 
     <main class="flex-1 p-4 md:p-8">
       <div class="mx-auto max-w-7xl">
