@@ -1,247 +1,246 @@
 <script lang="ts">
-  /**
-   * +page.svelte — Catálogo de Lentes Canônicas
-   * Premium | Standard com filtros avançados (v3)
-   */
-  import { onMount } from 'svelte'
-  import { Crown, Sparkles } from 'lucide-svelte'
-  import Container from '$lib/components/layout/Container.svelte'
-  import TabSelector from '$lib/components/catalogo/TabSelector.svelte'
-  import FilterPanelV3 from '$lib/components/catalogo/FilterPanelV3.svelte'
-  import LensGrid from '$lib/components/catalogo/LensGrid.svelte'
-  import {
-    usePremiumFilterOptionsV3,
-    usePremiumSearchV3,
-    useStandardFilterOptionsV3,
-    useStandardSearchV3,
-  } from '$lib/hooks/useLentesCatalogo'
-  import type {
-    PremiumFilterParamsV3,
-    StandardFilterParamsV3,
-  } from '$lib/types/lentes'
+    /**
+     * Catálogo de Lentes Reais
+     *
+     * Mostra TODAS as 3.698 lentes reais (v_catalog_lenses), divididas em
+     * tabs Premium / Standard via flag is_premium. Conceitos canônicos NÃO
+     * aparecem aqui — só no detalhe individual da lente.
+     */
+    import { goto } from '$app/navigation';
+    import { page } from '$app/stores';
+    import { Crown, Sparkles, Search, X } from 'lucide-svelte';
+    import Container from '$lib/components/layout/Container.svelte';
+    import type { PageData } from './$types';
 
-  let activeTab: 'premium' | 'standard' = 'premium'
-  let premiumFilters: PremiumFilterParamsV3 = {}
-  let standardFilters: StandardFilterParamsV3 = {}
-  let currentPage = 1
-  const itemsPerPage = 24
+    export let data: PageData;
 
-  // Hooks para dados
-  const premiumFilterOpts = usePremiumFilterOptionsV3()
-  const standardFilterOpts = useStandardFilterOptionsV3()
-  const premiumOptsForKpi = usePremiumFilterOptionsV3()
-  const standardOptsForKpi = useStandardFilterOptionsV3()
+    $: lentes        = data.lentes;
+    $: total         = data.total;
+    $: premiumTotal  = data.premiumTotal;
+    $: standardTotal = data.standardTotal;
+    $: pagina        = data.pagina;
+    $: pageSize      = data.pageSize;
+    $: totalPages    = Math.max(1, Math.ceil(total / pageSize));
+    $: filtros       = data.filtros;
 
-  // Computed stores
-  let premiumResults: any
-  let standardResults: any
+    // Tab ativo derivado do filtro is_premium
+    $: activeTab = filtros.isPremium === true  ? 'premium'
+                 : filtros.isPremium === false ? 'standard'
+                 : 'todos';
 
-  // État computed
-  $: {
-    premiumResults = usePremiumSearchV3({
-      ...premiumFilters,
-      limit: itemsPerPage,
-      offset: (currentPage - 1) * itemsPerPage,
-    })
-  }
+    // Busca local (input)
+    let buscaInput = '';
+    $: buscaInput  = filtros.busca ?? '';
 
-  $: {
-    standardResults = useStandardSearchV3({
-      ...standardFilters,
-      limit: itemsPerPage,
-      offset: (currentPage - 1) * itemsPerPage,
-    })
-  }
-
-  $: isLoading = activeTab === 'premium' ? $premiumResults.loading : $standardResults.loading
-  $: totalItems = activeTab === 'premium' ? ($premiumResults.data?.total ?? 0) : ($standardResults.data?.total ?? 0)
-  $: totalPages = Math.ceil(totalItems / itemsPerPage)
-  $: premiumTotal = $premiumFilterOpts.data?.total_count ?? $premiumOptsForKpi.data?.total_count ?? 0
-  $: standardTotal = $standardFilterOpts.data?.total_count ?? $standardOptsForKpi.data?.total_count ?? 0
-  $: hasActiveFilters = activeTab === 'premium'
-    ? Object.values(premiumFilters).some(v => v !== undefined)
-    : Object.values(standardFilters).some(v => v !== undefined)
-
-  onMount(async () => {
-    await premiumOptsForKpi.fetch()
-    await standardOptsForKpi.fetch()
-    await premiumFilterOpts.fetch()
-    await standardFilterOpts.fetch()
-  })
-
-  const resetFilters = async () => {
-    currentPage = 1
-    if (activeTab === 'premium') {
-      premiumFilters = {}
-    } else {
-      standardFilters = {}
+    function navegar(params: Record<string, string | number | null>) {
+        const url = new URL($page.url);
+        for (const [k, v] of Object.entries(params)) {
+            if (v === null || v === '') url.searchParams.delete(k);
+            else url.searchParams.set(k, String(v));
+        }
+        // Reset paginação ao mudar filtros
+        if (!('pagina' in params)) url.searchParams.delete('pagina');
+        goto(url.pathname + url.search, { keepFocus: true, noScroll: false });
     }
-  }
 
-  const applyFilters = (filters: any) => {
-    if (activeTab === 'premium') {
-      premiumFilters = filters
-    } else {
-      standardFilters = filters
+    function setTab(tab: 'todos' | 'premium' | 'standard') {
+        const premium = tab === 'premium' ? 'true' : tab === 'standard' ? 'false' : null;
+        navegar({ premium });
     }
-    currentPage = 1
-  }
 
-  const goToPage = (page: number) => {
-    currentPage = Math.max(1, Math.min(page, totalPages))
-  }
+    function aplicarBusca() {
+        navegar({ busca: buscaInput || null });
+    }
 
+    function limparFiltros() {
+        goto('/lentes');
+    }
+
+    function fmtBRL(v: number | null | undefined): string {
+        if (v == null) return '—';
+        return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(v);
+    }
+
+    const TIPO_LABELS: Record<string, string> = {
+        single_vision: 'Visão Simples',
+        multifocal:    'Multifocal',
+        bifocal:       'Bifocal',
+        occupational:  'Ocupacional',
+    };
 </script>
 
 <svelte:head>
-  <title>Lentes Canônicas | Clearix Lens</title>
+    <title>Catálogo de Lentes | Clearix Lens</title>
 </svelte:head>
 
 <main class="min-h-screen bg-muted pb-20">
-  <!-- Hero -->
-  <div class="bg-background border-b border-border">
-    <Container>
-      <div class="py-12">
-        <div class="flex items-start justify-between gap-6">
-          <div>
-            <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
-              Catálogo de Lentes v3
-            </h1>
-            <p class="mt-2 text-muted-foreground">
-              Conceitos canônicos com filtros estruturados — dados do Canonical Engine v3
-            </p>
-          </div>
-        </div>
-      </div>
-    </Container>
-  </div>
-
-  <Container>
-    <div class="py-8 space-y-6">
-      <!-- KPIs -->
-      <div class="grid grid-cols-2 gap-4 md:grid-cols-4">
-        <div class="rounded-xl bg-amber-50 dark:bg-amber-950/30 p-4">
-          <div class="flex items-center gap-2 mb-2">
-            <Crown class="h-4 w-4 text-amber-600 dark:text-amber-400" />
-            <p class="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300">Premium</p>
-          </div>
-          <p class="text-3xl font-black text-amber-900 dark:text-amber-100">{premiumTotal.toLocaleString('pt-BR')}</p>
-        </div>
-
-        <div class="rounded-xl bg-cyan-50 dark:bg-cyan-950/30 p-4">
-          <div class="flex items-center gap-2 mb-2">
-            <Sparkles class="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
-            <p class="text-xs font-bold uppercase tracking-wide text-cyan-700 dark:text-cyan-300">Standard</p>
-          </div>
-          <p class="text-3xl font-black text-cyan-900 dark:text-cyan-100">{standardTotal.toLocaleString('pt-BR')}</p>
-        </div>
-
-        {#if activeTab === 'premium' && $premiumFilterOpts.data?.brands}
-          <div class="rounded-xl bg-violet-50 dark:bg-violet-950/30 p-4">
-            <p class="text-xs font-bold uppercase tracking-wide text-violet-700 dark:text-violet-300 mb-2">Marcas</p>
-            <p class="text-3xl font-black text-violet-900 dark:text-violet-100">{$premiumFilterOpts.data.brands.length}</p>
-          </div>
-        {/if}
-
-        <div class="rounded-xl bg-green-50 dark:bg-green-950/30 p-4">
-          <p class="text-xs font-bold uppercase tracking-wide text-green-700 dark:text-green-300 mb-2">Resultados</p>
-          <p class="text-3xl font-black text-green-900 dark:text-green-100">{totalItems.toLocaleString('pt-BR')}</p>
-        </div>
-      </div>
-
-      <!-- Tabs -->
-      <TabSelector
-        bind:activeTab
-        premiumCount={premiumTotal}
-        standardCount={standardTotal}
-      />
-
-      <!-- Content -->
-      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
-        <!-- Sidebar Filters -->
-        <div class="lg:col-span-1">
-          <FilterPanelV3
-            isPremium={activeTab === 'premium'}
-            filters={activeTab === 'premium' ? premiumFilters : standardFilters}
-            filterOptions={activeTab === 'premium' ? $premiumFilterOpts.data : $standardFilterOpts.data}
-            loading={isLoading}
-            onApplyFilters={applyFilters}
-            onClearFilters={resetFilters}
-          />
-        </div>
-
-        <!-- Main Content -->
-        <div class="lg:col-span-3 space-y-6">
-          {#if hasActiveFilters}
-            <div class="flex items-center justify-between bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-900/50 rounded-lg p-4">
-              <p class="text-sm text-blue-700 dark:text-blue-300">
-                <span class="font-semibold">{totalItems} resultado(s)</span> com os filtros aplicados
-              </p>
-              <button
-                on:click={resetFilters}
-                class="text-sm font-semibold text-blue-600 dark:text-blue-400 hover:text-blue-800 dark:hover:text-blue-200 transition-colors"
-              >
-                Limpar filtros
-              </button>
+    <!-- Hero -->
+    <div class="bg-background border-b border-border">
+        <Container>
+            <div class="py-10">
+                <h1 class="text-4xl font-bold bg-gradient-to-r from-blue-600 via-cyan-600 to-teal-600 bg-clip-text text-transparent">
+                    Catálogo de Lentes
+                </h1>
+                <p class="mt-2 text-muted-foreground">
+                    {total.toLocaleString('pt-BR')} lentes reais — Premium e Standard
+                </p>
             </div>
-          {/if}
-
-          <!-- Grid -->
-          <LensGrid
-            lentes={activeTab === 'premium' ? ($premiumResults.data?.items ?? []) : ($standardResults.data?.items ?? [])}
-            loading={isLoading}
-            erro={activeTab === 'premium' ? $premiumResults.error : $standardResults.error}
-            isPremium={activeTab === 'premium'}
-            itemCount={totalItems}
-          />
-
-          <!-- Pagination -->
-          {#if totalPages > 1 && !isLoading}
-            <div class="flex items-center justify-center gap-2 flex-wrap">
-              <button
-                disabled={currentPage === 1}
-                on:click={() => (currentPage = Math.max(1, currentPage - 1))}
-                class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-              >
-                ← Anterior
-              </button>
-
-              <div class="flex gap-1">
-                {#each Array.from({ length: Math.min(5, totalPages) }) as _, i}
-                  {@const page = i + 1}
-                  <button
-                    on:click={() => (currentPage = page)}
-                    class={`px-3 py-2 rounded-lg text-sm font-medium ${
-                      currentPage === page
-                        ? 'bg-primary-600 text-white'
-                        : 'border border-border hover:bg-muted'
-                    }`}
-                  >
-                    {page}
-                  </button>
-                {/each}
-                {#if totalPages > 5}
-                  <span class="px-3 py-2 text-muted-foreground">...</span>
-                  <button
-                    on:click={() => (currentPage = totalPages)}
-                    class="px-3 py-2 rounded-lg border border-border hover:bg-muted text-sm font-medium"
-                  >
-                    {totalPages}
-                  </button>
-                {/if}
-              </div>
-
-              <button
-                disabled={currentPage === totalPages}
-                on:click={() => (currentPage = Math.min(totalPages, currentPage + 1))}
-                class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-              >
-                Próxima →
-              </button>
-            </div>
-          {/if}
-        </div>
-      </div>
+        </Container>
     </div>
-  </Container>
+
+    <Container>
+        <div class="py-8 space-y-6">
+
+            <!-- KPIs -->
+            <div class="grid grid-cols-2 gap-4 md:grid-cols-3">
+                <div class="rounded-xl bg-card border border-border p-4">
+                    <p class="text-xs font-bold uppercase tracking-wide text-muted-foreground mb-1">Total</p>
+                    <p class="text-3xl font-black text-foreground">{(premiumTotal + standardTotal).toLocaleString('pt-BR')}</p>
+                </div>
+                <div class="rounded-xl bg-amber-50 dark:bg-amber-950/30 p-4">
+                    <div class="flex items-center gap-2 mb-1">
+                        <Crown class="h-4 w-4 text-amber-600 dark:text-amber-400" />
+                        <p class="text-xs font-bold uppercase tracking-wide text-amber-700 dark:text-amber-300">Premium</p>
+                    </div>
+                    <p class="text-3xl font-black text-amber-900 dark:text-amber-100">{premiumTotal.toLocaleString('pt-BR')}</p>
+                </div>
+                <div class="rounded-xl bg-cyan-50 dark:bg-cyan-950/30 p-4">
+                    <div class="flex items-center gap-2 mb-1">
+                        <Sparkles class="h-4 w-4 text-cyan-600 dark:text-cyan-400" />
+                        <p class="text-xs font-bold uppercase tracking-wide text-cyan-700 dark:text-cyan-300">Standard</p>
+                    </div>
+                    <p class="text-3xl font-black text-cyan-900 dark:text-cyan-100">{standardTotal.toLocaleString('pt-BR')}</p>
+                </div>
+            </div>
+
+            <!-- Tabs -->
+            <div class="flex gap-2 border-b border-border">
+                <button
+                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-colors {activeTab === 'todos' ? 'border-foreground text-foreground' : 'border-transparent text-muted-foreground hover:text-foreground'}"
+                    on:click={() => setTab('todos')}
+                >
+                    Todas ({(premiumTotal + standardTotal).toLocaleString('pt-BR')})
+                </button>
+                <button
+                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 {activeTab === 'premium' ? 'border-amber-600 text-amber-700 dark:text-amber-300' : 'border-transparent text-muted-foreground hover:text-foreground'}"
+                    on:click={() => setTab('premium')}
+                >
+                    <Crown class="h-3.5 w-3.5" />
+                    Premium ({premiumTotal.toLocaleString('pt-BR')})
+                </button>
+                <button
+                    class="px-4 py-2 text-sm font-semibold border-b-2 transition-colors flex items-center gap-1.5 {activeTab === 'standard' ? 'border-cyan-600 text-cyan-700 dark:text-cyan-300' : 'border-transparent text-muted-foreground hover:text-foreground'}"
+                    on:click={() => setTab('standard')}
+                >
+                    <Sparkles class="h-3.5 w-3.5" />
+                    Standard ({standardTotal.toLocaleString('pt-BR')})
+                </button>
+            </div>
+
+            <!-- Search bar -->
+            <div class="flex gap-2">
+                <div class="relative flex-1">
+                    <Search class="absolute left-3 top-1/2 -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                    <input
+                        type="text"
+                        placeholder="Buscar por nome, marca, fornecedor ou SKU…"
+                        bind:value={buscaInput}
+                        on:keydown={(e) => e.key === 'Enter' && aplicarBusca()}
+                        class="w-full pl-10 pr-4 py-2 bg-card border border-border rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-primary-500"
+                    />
+                </div>
+                <button
+                    on:click={aplicarBusca}
+                    class="px-4 py-2 bg-primary-600 hover:bg-primary-700 text-white text-sm font-semibold rounded-lg transition-colors"
+                >
+                    Buscar
+                </button>
+                {#if filtros.busca || filtros.tipo || filtros.isPremium !== null || filtros.fornecedor || filtros.marca}
+                    <button
+                        on:click={limparFiltros}
+                        class="px-3 py-2 bg-muted hover:bg-accent text-muted-foreground text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5"
+                    >
+                        <X class="h-4 w-4" /> Limpar
+                    </button>
+                {/if}
+            </div>
+
+            <!-- Resultados -->
+            {#if lentes.length === 0}
+                <div class="bg-card border border-border rounded-2xl p-12 text-center">
+                    <p class="text-muted-foreground">Nenhuma lente encontrada com os filtros atuais.</p>
+                </div>
+            {:else}
+                <div class="bg-card border border-border rounded-2xl overflow-hidden">
+                    <div class="divide-y divide-border">
+                        {#each lentes as lente (lente.id)}
+                            <a
+                                href="/lentes/{lente.id}"
+                                class="flex items-center gap-4 px-5 py-4 hover:bg-accent transition-colors"
+                            >
+                                <!-- Badge premium/standard -->
+                                <div class="shrink-0">
+                                    {#if lente.is_premium}
+                                        <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                                            <Crown class="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                                        </div>
+                                    {:else}
+                                        <div class="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                                            <Sparkles class="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+                                        </div>
+                                    {/if}
+                                </div>
+
+                                <!-- Info principal -->
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-foreground truncate">{lente.lens_name ?? '—'}</p>
+                                    <p class="text-xs text-muted-foreground truncate mt-0.5">
+                                        {lente.brand_name ?? '—'}
+                                        {#if lente.supplier_name} · {lente.supplier_name}{/if}
+                                        {#if lente.material_name} · {lente.material_name}{/if}
+                                        {#if lente.sku} · <span class="font-mono">{lente.sku}</span>{/if}
+                                    </p>
+                                </div>
+
+                                <!-- Tipo -->
+                                <div class="hidden md:block shrink-0 text-right">
+                                    <p class="text-xs text-muted-foreground">Tipo</p>
+                                    <p class="text-sm font-semibold text-foreground">{TIPO_LABELS[lente.lens_type ?? ''] ?? lente.lens_type ?? '—'}</p>
+                                </div>
+
+                                <!-- Preço -->
+                                <div class="shrink-0 text-right min-w-[100px]">
+                                    <p class="text-xs text-muted-foreground">Sugerido</p>
+                                    <p class="text-base font-bold text-primary-600 dark:text-primary-400">{fmtBRL(lente.price_suggested)}</p>
+                                </div>
+                            </a>
+                        {/each}
+                    </div>
+                </div>
+
+                <!-- Paginação -->
+                {#if totalPages > 1}
+                    <div class="flex items-center justify-center gap-2 flex-wrap pt-4">
+                        <button
+                            disabled={pagina === 1}
+                            on:click={() => navegar({ pagina: pagina - 1 })}
+                            class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                        >
+                            ← Anterior
+                        </button>
+                        <span class="text-sm text-muted-foreground">
+                            Página <span class="font-bold text-foreground">{pagina}</span> de <span class="font-bold text-foreground">{totalPages}</span>
+                        </span>
+                        <button
+                            disabled={pagina === totalPages}
+                            on:click={() => navegar({ pagina: pagina + 1 })}
+                            class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                        >
+                            Próxima →
+                        </button>
+                    </div>
+                {/if}
+            {/if}
+        </div>
+    </Container>
 </main>
