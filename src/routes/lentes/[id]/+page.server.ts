@@ -9,7 +9,6 @@
  */
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import { supabase } from '$lib/supabase';
 import type { VCatalogLens, PrescriptionSearchResult } from '$lib/types/database-views';
 
 function midpoint(min: number | null, max: number | null): number | null {
@@ -19,7 +18,9 @@ function midpoint(min: number | null, max: number | null): number | null {
     return (min + max) / 2;
 }
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, locals }) => {
+    const { supabase } = locals;
+
     const { data: row, error: lensErr } = await supabase
         .from('v_catalog_lenses')
         .select('*')

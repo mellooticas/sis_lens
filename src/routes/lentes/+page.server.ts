@@ -8,7 +8,6 @@
  * Fonte: public.v_catalog_lenses (3.698 lentes)
  */
 import type { PageServerLoad } from './$types';
-import { supabase } from '$lib/supabase';
 import type { VCatalogLens } from '$lib/types/database-views';
 
 const PAGE_SIZE = 24;
@@ -23,7 +22,9 @@ export type LenteListItem = Pick<
     | 'addition_min' | 'addition_max' | 'status'
 >;
 
-export const load: PageServerLoad = async ({ url }) => {
+export const load: PageServerLoad = async ({ url, locals }) => {
+    const { supabase } = locals;
+
     // ── URL params
     const busca       = url.searchParams.get('busca') || '';
     const tipo        = url.searchParams.get('tipo')  || null;
