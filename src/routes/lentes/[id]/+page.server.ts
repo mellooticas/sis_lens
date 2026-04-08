@@ -1,26 +1,29 @@
 /**
  * Detalhe da Lente Real — Server Load
  *
+ * Arquitetura N:1 — toda lente real pertence a EXATAMENTE UM conceito canônico.
  * Carrega:
  *   1. Dados completos da lente (public.v_catalog_lenses)
- *   2. Conceitos canônicos aos quais a lente pertence
- *      → via rpc_canonical_for_prescription (mid-point das faixas como receita)
- *      → mesmo is_premium da lente
+ *   2. O conceito canônico AO QUAL a lente pertence (1 único, via
+ *      public.v_canonical_lens_mapping → v_canonical_premium / v_canonical_standard)
  */
 import type { PageServerLoad } from './$types';
 import { error } from '@sveltejs/kit';
-import type { VCatalogLens, PrescriptionSearchResult } from '$lib/types/database-views';
+import type {
+    VCatalogLens,
+    VCanonicalLensMapping,
+    CanonicalPremiumV3,
+    CanonicalStandardV3,
+} from '$lib/types/database-views';
 
-function midpoint(min: number | null, max: number | null): number | null {
-    if (min == null && max == null) return null;
-    if (min == null) return max;
-    if (max == null) return min;
-    return (min + max) / 2;
-}
+export type ConceitoLente =
+    | ({ kind: 'premium' } & CanonicalPremiumV3)
+    | ({ kind: 'standard' } & CanonicalStandardV3);
 
 export const load: PageServerLoad = async ({ params, locals }) => {
     const { supabase } = locals;
 
+    // 1) Lente real
     const { data: row, error: lensErr } = await supabase
         .from('v_catalog_lenses')
         .select('*')
@@ -30,33 +33,47 @@ export const load: PageServerLoad = async ({ params, locals }) => {
     if (lensErr || !row) {
         throw error(404, lensErr?.message ?? 'Lente não encontrada');
     }
-
     const lente = row as unknown as VCatalogLens;
 
-    // Conceitos canônicos que cobrem a receita representativa desta lente
-    let conceitos: PrescriptionSearchResult[] = [];
-    const sph = midpoint(lente.spherical_min, lente.spherical_max);
-    if (sph != null && lente.lens_type) {
-        const { data: rxData, error: rxErr } = await supabase.rpc(
-            'rpc_canonical_for_prescription',
-            {
-                p_spherical:   sph,
-                p_cylindrical: midpoint(lente.cylindrical_min, lente.cylindrical_max),
-                p_addition:    midpoint(lente.addition_min, lente.addition_max),
-                p_lens_type:   lente.lens_type,
-                p_is_premium:  lente.is_premium ?? false,
-            }
-        );
-        if (rxErr) {
-            console.error('[lentes/[id]] rpc_canonical_for_prescription error:', rxErr);
+    // 2) Mapping N:1 — uma única linha por lens_id
+    const { data: mapRow, error: mapErr } = await supabase
+        .from('v_canonical_lens_mapping')
+        .select('lens_id, canonical_lens_id, is_preferred, confidence_score, match_method, is_premium')
+        .eq('lens_id', params.id)
+        .maybeSingle();
+
+    if (mapErr) {
+        console.error('[lentes/[id]] mapping error:', mapErr);
+    }
+
+    const mapping = (mapRow ?? null) as VCanonicalLensMapping | null;
+
+    // 3) Carregar o conceito canônico específico
+    let conceito: ConceitoLente | null = null;
+    if (mapping) {
+        if (mapping.is_premium) {
+            const { data: c, error: cErr } = await supabase
+                .from('v_canonical_premium')
+                .select('*')
+                .eq('id', mapping.canonical_lens_id)
+                .maybeSingle();
+            if (cErr) console.error('[lentes/[id]] canonical_premium error:', cErr);
+            if (c) conceito = { kind: 'premium', ...(c as unknown as CanonicalPremiumV3) };
         } else {
-            conceitos = (rxData as PrescriptionSearchResult[]) ?? [];
+            const { data: c, error: cErr } = await supabase
+                .from('v_canonical_standard')
+                .select('*')
+                .eq('id', mapping.canonical_lens_id)
+                .maybeSingle();
+            if (cErr) console.error('[lentes/[id]] canonical_standard error:', cErr);
+            if (c) conceito = { kind: 'standard', ...(c as unknown as CanonicalStandardV3) };
         }
     }
 
     return {
         lente,
-        conceitos,
+        conceito,
+        mapping,
         isPremium: lente.is_premium ?? false,
     };
 };

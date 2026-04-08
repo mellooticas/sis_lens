@@ -584,3 +584,22 @@ export interface CanonicalSearchResult<T> {
   items: T[];
 }
 
+// ============================================================================
+// NOVO BANCO — VIEW: public.v_canonical_lens_mapping (N:1 lens → canonical)
+// ============================================================================
+
+/**
+ * Mapping N:1 — toda lente real pertence a EXATAMENTE UM conceito canônico.
+ * View pública combina catalog_lenses.canonical_lens_mappings (standard) e
+ * canonical_lens_mappings_premium sob uma única flag is_premium.
+ */
+export interface VCanonicalLensMapping {
+  lens_id: string;
+  canonical_lens_id: string;
+  tenant_id: string | null;
+  confidence_score: number | null;
+  match_method: string | null;
+  is_preferred: boolean | null;
+  is_premium: boolean;
+}
+

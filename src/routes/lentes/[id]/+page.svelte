@@ -7,12 +7,12 @@
     import Container from '$lib/components/layout/Container.svelte';
     import { supabase } from '$lib/supabase';
     import type { PageData } from './$types';
-    import type { VCatalogLens, PrescriptionSearchResult } from '$lib/types/database-views';
+    import type { VCatalogLens } from '$lib/types/database-views';
 
     export let data: PageData;
 
     $: lente = data.lente as unknown as VCatalogLens;
-    $: conceitos = (data.conceitos ?? []) as unknown as PrescriptionSearchResult[];
+    $: conceito = data.conceito;
     $: isPremium = data.isPremium;
 
     const TIPO_LABELS: Record<string, string> = {
@@ -201,48 +201,43 @@
                     </div>
                 {/if}
 
-                <!-- Conceitos canônicos aos quais a lente pertence -->
+                <!-- Conceito canônico ao qual a lente pertence (1:1 — N:1 reverso) -->
                 <div class="bg-card border border-border rounded-2xl overflow-hidden">
                     <div class="px-5 py-4 border-b border-border flex items-center gap-2">
                         <Layers class="h-4 w-4 text-muted-foreground" />
                         <h2 class="text-sm font-black uppercase tracking-wide text-muted-foreground">
-                            Conceito{conceitos.length === 1 ? '' : 's'} Canônico{conceitos.length === 1 ? '' : 's'}
+                            Conceito Canônico
                         </h2>
-                        <span class="ml-auto text-xs text-muted-foreground">
-                            {conceitos.length} {conceitos.length === 1 ? 'conceito' : 'conceitos'}
-                        </span>
                     </div>
-                    {#if conceitos.length === 0}
+                    {#if !conceito}
                         <p class="px-5 py-8 text-sm text-center text-muted-foreground">
-                            Nenhum conceito canônico encontrado para esta lente.
+                            Esta lente ainda não foi mapeada para um conceito canônico.
                         </p>
                     {:else}
-                        <div class="divide-y divide-border">
-                            {#each conceitos as c}
-                                <a
-                                    href="{isPremium ? '/premium' : '/standard'}/{c.id}"
-                                    class="block px-5 py-4 hover:bg-accent transition-colors"
-                                >
-                                    <div class="flex items-start justify-between gap-4">
-                                        <div class="flex-1 min-w-0">
-                                            <p class="font-semibold text-foreground truncate">{c.canonical_name}</p>
-                                            <p class="text-xs text-muted-foreground mt-1 truncate">
-                                                {c.material_display ?? c.material_class}
-                                                {#if c.refractive_index} · n={c.refractive_index}{/if}
-                                                {#if c.treatment_codes && c.treatment_codes.length > 0} · {c.treatment_codes.join(', ')}{/if}
-                                            </p>
-                                            <p class="font-mono text-[10px] text-muted-foreground mt-1">{c.sku}</p>
-                                        </div>
-                                        <div class="text-right shrink-0">
-                                            <p class="text-xs text-muted-foreground">{c.tenant_lens_count} lentes</p>
-                                            {#if c.price_avg != null}
-                                                <p class="text-sm font-bold text-primary-600 dark:text-primary-400 mt-0.5">~{fmt(c.price_avg)}</p>
-                                            {/if}
-                                        </div>
-                                    </div>
-                                </a>
-                            {/each}
-                        </div>
+                        <a
+                            href="{conceito.kind === 'premium' ? '/premium' : '/standard'}/{conceito.id}"
+                            class="block px-5 py-4 hover:bg-accent transition-colors"
+                        >
+                            <div class="flex items-start justify-between gap-4">
+                                <div class="flex-1 min-w-0">
+                                    <p class="font-semibold text-foreground truncate">{conceito.canonical_name}</p>
+                                    <p class="text-xs text-muted-foreground mt-1 truncate">
+                                        {conceito.material_name ?? conceito.material_class}
+                                        {#if conceito.refractive_index} · n={conceito.refractive_index}{/if}
+                                        {#if conceito.treatment_codes && conceito.treatment_codes.length > 0} · {conceito.treatment_codes.join(', ')}{/if}
+                                    </p>
+                                    {#if conceito.sku}
+                                        <p class="font-mono text-[10px] text-muted-foreground mt-1">{conceito.sku}</p>
+                                    {/if}
+                                </div>
+                                <div class="text-right shrink-0">
+                                    <p class="text-xs text-muted-foreground">{conceito.mapped_lens_count} lentes</p>
+                                    {#if conceito.price_avg != null}
+                                        <p class="text-sm font-bold text-primary-600 dark:text-primary-400 mt-0.5">~{fmt(conceito.price_avg)}</p>
+                                    {/if}
+                                </div>
+                            </div>
+                        </a>
                     {/if}
                 </div>
             </div>
