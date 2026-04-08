@@ -14,14 +14,19 @@
 
     export let data: PageData;
 
-    $: lentes        = data.lentes;
-    $: total         = data.total;
-    $: premiumTotal  = data.premiumTotal;
-    $: standardTotal = data.standardTotal;
-    $: pagina        = data.pagina;
-    $: pageSize      = data.pageSize;
-    $: totalPages    = Math.max(1, Math.ceil(total / pageSize));
-    $: filtros       = data.filtros;
+    $: lentes         = data.lentes;
+    $: total          = data.total;
+    $: premiumTotal   = data.premiumTotal;
+    $: standardTotal  = data.standardTotal;
+    $: pagina         = data.pagina;
+    $: pageSize       = data.pageSize;
+    $: totalPages     = Math.max(1, Math.ceil(total / pageSize));
+    $: filtros        = data.filtros;
+    $: filterOptions  = data.filterOptions;
+    $: hasActiveFilters = !!(
+        filtros.busca || filtros.tipo || filtros.fornecedor || filtros.marca ||
+        filtros.material || filtros.indice != null || filtros.isPremium !== null
+    );
 
     // Tab ativo derivado do filtro is_premium
     $: activeTab = filtros.isPremium === true  ? 'premium'
@@ -50,6 +55,10 @@
 
     function aplicarBusca() {
         navegar({ busca: buscaInput || null });
+    }
+
+    function setFiltro(key: 'tipo' | 'fornecedor' | 'material' | 'indice', value: string | null) {
+        navegar({ [key]: value });
     }
 
     function limparFiltros() {
@@ -155,7 +164,7 @@
                 >
                     Buscar
                 </button>
-                {#if filtros.busca || filtros.tipo || filtros.isPremium !== null || filtros.fornecedor || filtros.marca}
+                {#if hasActiveFilters}
                     <button
                         on:click={limparFiltros}
                         class="px-3 py-2 bg-muted hover:bg-accent text-muted-foreground text-sm font-semibold rounded-lg transition-colors flex items-center gap-1.5"
@@ -165,82 +174,183 @@
                 {/if}
             </div>
 
-            <!-- Resultados -->
-            {#if lentes.length === 0}
-                <div class="bg-card border border-border rounded-2xl p-12 text-center">
-                    <p class="text-muted-foreground">Nenhuma lente encontrada com os filtros atuais.</p>
-                </div>
-            {:else}
-                <div class="bg-card border border-border rounded-2xl overflow-hidden">
-                    <div class="divide-y divide-border">
-                        {#each lentes as lente (lente.id)}
-                            <a
-                                href="/lentes/{lente.id}"
-                                class="flex items-center gap-4 px-5 py-4 hover:bg-accent transition-colors"
+            <!-- Sidebar + Lista -->
+            <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+
+                <!-- Sidebar de filtros -->
+                <aside class="lg:col-span-1 space-y-4">
+                    <div class="bg-card border border-border rounded-2xl p-5 sticky top-4">
+                        <h2 class="text-sm font-black uppercase tracking-wider text-foreground mb-4">Filtros</h2>
+
+                        <!-- Laboratório -->
+                        <div class="mb-4">
+                            <label for="filtro-fornecedor" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                Laboratório
+                            </label>
+                            <select
+                                id="filtro-fornecedor"
+                                value={filtros.fornecedor ?? ''}
+                                on:change={(e) => setFiltro('fornecedor', e.currentTarget.value || null)}
+                                class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
                             >
-                                <!-- Badge premium/standard -->
-                                <div class="shrink-0">
-                                    {#if lente.is_premium}
-                                        <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
-                                            <Crown class="h-5 w-5 text-amber-600 dark:text-amber-400" />
-                                        </div>
-                                    {:else}
-                                        <div class="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
-                                            <Sparkles class="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
-                                        </div>
-                                    {/if}
-                                </div>
+                                <option value="">Todos ({filterOptions.laboratorios.length})</option>
+                                {#each filterOptions.laboratorios as opt}
+                                    <option value={opt.value}>{opt.label} ({opt.count})</option>
+                                {/each}
+                            </select>
+                        </div>
 
-                                <!-- Info principal -->
-                                <div class="flex-1 min-w-0">
-                                    <p class="font-semibold text-foreground truncate">{lente.lens_name ?? '—'}</p>
-                                    <p class="text-xs text-muted-foreground truncate mt-0.5">
-                                        {lente.brand_name ?? '—'}
-                                        {#if lente.supplier_name} · {lente.supplier_name}{/if}
-                                        {#if lente.material_name} · {lente.material_name}{/if}
-                                        {#if lente.sku} · <span class="font-mono">{lente.sku}</span>{/if}
-                                    </p>
-                                </div>
+                        <!-- Tipo -->
+                        <div class="mb-4">
+                            <label for="filtro-tipo" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                Tipo
+                            </label>
+                            <select
+                                id="filtro-tipo"
+                                value={filtros.tipo ?? ''}
+                                on:change={(e) => setFiltro('tipo', e.currentTarget.value || null)}
+                                class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            >
+                                <option value="">Todos</option>
+                                {#each filterOptions.tipos as opt}
+                                    <option value={opt.value}>{opt.label} ({opt.count})</option>
+                                {/each}
+                            </select>
+                        </div>
 
-                                <!-- Tipo -->
-                                <div class="hidden md:block shrink-0 text-right">
-                                    <p class="text-xs text-muted-foreground">Tipo</p>
-                                    <p class="text-sm font-semibold text-foreground">{TIPO_LABELS[lente.lens_type ?? ''] ?? lente.lens_type ?? '—'}</p>
-                                </div>
+                        <!-- Material -->
+                        <div class="mb-4">
+                            <label for="filtro-material" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                Material
+                            </label>
+                            <select
+                                id="filtro-material"
+                                value={filtros.material ?? ''}
+                                on:change={(e) => setFiltro('material', e.currentTarget.value || null)}
+                                class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            >
+                                <option value="">Todos ({filterOptions.materiais.length})</option>
+                                {#each filterOptions.materiais as opt}
+                                    <option value={opt.value}>{opt.label} ({opt.count})</option>
+                                {/each}
+                            </select>
+                        </div>
 
-                                <!-- Preço -->
-                                <div class="shrink-0 text-right min-w-[100px]">
-                                    <p class="text-xs text-muted-foreground">Sugerido</p>
-                                    <p class="text-base font-bold text-primary-600 dark:text-primary-400">{fmtBRL(lente.price_suggested)}</p>
-                                </div>
-                            </a>
-                        {/each}
+                        <!-- Índice -->
+                        <div class="mb-4">
+                            <label for="filtro-indice" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                Índice de refração
+                            </label>
+                            <select
+                                id="filtro-indice"
+                                value={filtros.indice != null ? String(filtros.indice) : ''}
+                                on:change={(e) => setFiltro('indice', e.currentTarget.value || null)}
+                                class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                            >
+                                <option value="">Todos</option>
+                                {#each filterOptions.indices as opt}
+                                    <option value={opt.value}>{opt.label} ({opt.count})</option>
+                                {/each}
+                            </select>
+                        </div>
+
+                        {#if hasActiveFilters}
+                            <button
+                                on:click={limparFiltros}
+                                class="w-full mt-2 px-3 py-2 bg-muted hover:bg-accent text-muted-foreground text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5"
+                            >
+                                <X class="h-3.5 w-3.5" /> Limpar todos os filtros
+                            </button>
+                        {/if}
                     </div>
+                </aside>
+
+                <!-- Conteúdo principal -->
+                <div class="lg:col-span-3 space-y-4">
+                    {#if lentes.length === 0}
+                        <div class="bg-card border border-border rounded-2xl p-12 text-center">
+                            <p class="text-muted-foreground">Nenhuma lente encontrada com os filtros atuais.</p>
+                        </div>
+                    {:else}
+                        <p class="text-sm text-muted-foreground">
+                            Mostrando <span class="font-bold text-foreground">{lentes.length}</span> de
+                            <span class="font-bold text-foreground">{total.toLocaleString('pt-BR')}</span>
+                            {total === 1 ? 'lente' : 'lentes'}
+                        </p>
+
+                        <div class="bg-card border border-border rounded-2xl overflow-hidden">
+                            <div class="divide-y divide-border">
+                                {#each lentes as lente (lente.id)}
+                                    <a
+                                        href="/lentes/{lente.id}"
+                                        class="flex items-center gap-4 px-5 py-4 hover:bg-accent transition-colors"
+                                    >
+                                        <!-- Badge premium/standard -->
+                                        <div class="shrink-0">
+                                            {#if lente.is_premium}
+                                                <div class="w-10 h-10 rounded-lg bg-amber-100 dark:bg-amber-900/30 flex items-center justify-center">
+                                                    <Crown class="h-5 w-5 text-amber-600 dark:text-amber-400" />
+                                                </div>
+                                            {:else}
+                                                <div class="w-10 h-10 rounded-lg bg-cyan-100 dark:bg-cyan-900/30 flex items-center justify-center">
+                                                    <Sparkles class="h-5 w-5 text-cyan-600 dark:text-cyan-400" />
+                                                </div>
+                                            {/if}
+                                        </div>
+
+                                        <!-- Info principal -->
+                                        <div class="flex-1 min-w-0">
+                                            <p class="font-semibold text-foreground truncate">{lente.lens_name ?? '—'}</p>
+                                            <p class="text-xs text-muted-foreground truncate mt-0.5">
+                                                {lente.brand_name ?? '—'}
+                                                {#if lente.supplier_name} · {lente.supplier_name}{/if}
+                                                {#if lente.material_name} · {lente.material_name}{/if}
+                                                {#if lente.refractive_index} · n={lente.refractive_index}{/if}
+                                                {#if lente.sku} · <span class="font-mono">{lente.sku}</span>{/if}
+                                            </p>
+                                        </div>
+
+                                        <!-- Tipo -->
+                                        <div class="hidden md:block shrink-0 text-right">
+                                            <p class="text-xs text-muted-foreground">Tipo</p>
+                                            <p class="text-sm font-semibold text-foreground">{TIPO_LABELS[lente.lens_type ?? ''] ?? lente.lens_type ?? '—'}</p>
+                                        </div>
+
+                                        <!-- Preço -->
+                                        <div class="shrink-0 text-right min-w-[100px]">
+                                            <p class="text-xs text-muted-foreground">Sugerido</p>
+                                            <p class="text-base font-bold text-primary-600 dark:text-primary-400">{fmtBRL(lente.price_suggested)}</p>
+                                        </div>
+                                    </a>
+                                {/each}
+                            </div>
+                        </div>
+
+                        <!-- Paginação -->
+                        {#if totalPages > 1}
+                            <div class="flex items-center justify-center gap-2 flex-wrap pt-4">
+                                <button
+                                    disabled={pagina === 1}
+                                    on:click={() => navegar({ pagina: pagina - 1 })}
+                                    class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                                >
+                                    ← Anterior
+                                </button>
+                                <span class="text-sm text-muted-foreground">
+                                    Página <span class="font-bold text-foreground">{pagina}</span> de <span class="font-bold text-foreground">{totalPages}</span>
+                                </span>
+                                <button
+                                    disabled={pagina === totalPages}
+                                    on:click={() => navegar({ pagina: pagina + 1 })}
+                                    class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
+                                >
+                                    Próxima →
+                                </button>
+                            </div>
+                        {/if}
+                    {/if}
                 </div>
-
-                <!-- Paginação -->
-                {#if totalPages > 1}
-                    <div class="flex items-center justify-center gap-2 flex-wrap pt-4">
-                        <button
-                            disabled={pagina === 1}
-                            on:click={() => navegar({ pagina: pagina - 1 })}
-                            class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                        >
-                            ← Anterior
-                        </button>
-                        <span class="text-sm text-muted-foreground">
-                            Página <span class="font-bold text-foreground">{pagina}</span> de <span class="font-bold text-foreground">{totalPages}</span>
-                        </span>
-                        <button
-                            disabled={pagina === totalPages}
-                            on:click={() => navegar({ pagina: pagina + 1 })}
-                            class="px-3 py-2 rounded-lg border border-border hover:bg-muted disabled:opacity-50 disabled:cursor-not-allowed text-sm font-medium"
-                        >
-                            Próxima →
-                        </button>
-                    </div>
-                {/if}
-            {/if}
+            </div>
         </div>
     </Container>
 </main>
