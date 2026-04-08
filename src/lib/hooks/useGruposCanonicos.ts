@@ -1,18 +1,18 @@
 /**
- * Hook para grupos canônicos — Canonical Engine v2
- * Usa v_canonical_lenses_pricing e v_canonical_lenses_premium_pricing (migrations 274–277)
- * Tipos: CanonicalWithPricing (inclui SKU, pricing, treatment_codes)
+ * Hook para grupos canônicos — Canonical Engine v3
+ * Usa public.v_canonical_standard e public.v_canonical_premium (wrappers de catalog_lenses)
+ * Tipos: CanonicalStandardV3 / CanonicalPremiumV3 (inclui brand, product_line, pricing)
  */
 
 import { writable, get } from 'svelte/store';
 import { LensOracleAPI } from '$lib/api/lens-oracle';
-import type { CanonicalWithPricing } from '$lib/types/database-views';
+import type { CanonicalStandardV3, CanonicalPremiumV3 } from '$lib/types/database-views';
 
-export type { CanonicalWithPricing };
+export type { CanonicalStandardV3, CanonicalPremiumV3 };
 
 interface GruposState {
-  gruposGenericos: CanonicalWithPricing[];
-  gruposPremium: CanonicalWithPricing[];
+  gruposGenericos: CanonicalStandardV3[];
+  gruposPremium: CanonicalPremiumV3[];
   loading: boolean;
   error: string | null;
   totalGenericos: number;

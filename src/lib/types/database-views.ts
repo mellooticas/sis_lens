@@ -511,7 +511,10 @@ export interface StandardFilterOptions {
   total_count: number;
 }
 
-/** Item da v_canonical_premium (com colunas estruturadas) */
+/**
+ * Item da public.v_canonical_premium (wrapper v3 para catalog_lenses.v_canonical_premium).
+ * 28 colunas — inclui brand/product_line/coating_name/photochromic_type e pricing agregado.
+ */
 export interface CanonicalPremiumV3 {
   id: string;
   canonical_name: string;
@@ -538,9 +541,16 @@ export interface CanonicalPremiumV3 {
   fingerprint: string;
   created_at: string;
   updated_at: string;
+  // Pricing agregado (sales_finance.pricing_book)
+  price_min: number | null;
+  price_max: number | null;
+  price_avg: number | null;
 }
 
-/** Item da v_canonical_standard */
+/**
+ * Item da public.v_canonical_standard (wrapper v3 para catalog_lenses.v_canonical_standard).
+ * 23 colunas — sem marca por design; inclui pricing agregado.
+ */
 export interface CanonicalStandardV3 {
   id: string;
   canonical_name: string;
@@ -562,6 +572,10 @@ export interface CanonicalStandardV3 {
   fingerprint: string;
   created_at: string;
   updated_at: string;
+  // Pricing agregado
+  price_min: number | null;
+  price_max: number | null;
+  price_avg: number | null;
 }
 
 /** Resposta genérica de busca com paginação */

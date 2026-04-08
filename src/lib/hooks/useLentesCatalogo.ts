@@ -7,7 +7,6 @@
 
 import { writable, derived, get } from 'svelte/store'
 import {
-  buscarCanonicos,
   buscarCanonicosPorReceita,
   buscarLentesDoCanonical,
   buscarLentes,
@@ -20,7 +19,6 @@ import {
   type LensSupplier,
 } from '$lib/api/lentes-repository'
 import type {
-  CanonicalFilters,
   PrescriptionInput,
   LensSearchFilters,
   PremiumFilterOptions,
@@ -34,18 +32,15 @@ import type {
   StandardSearchParamsV3,
   CanonicalForPrescription,
   CanonicalLensOption,
-  CanonicalLens,
   CatalogLens,
   LensFilterOptions,
 } from '$lib/types/lentes'
 
 // Re-export types for components
 export type {
-  CanonicalFilters,
   PrescriptionInput,
   CanonicalForPrescription,
   CanonicalLensOption,
-  CanonicalLens,
   CatalogLens,
   LensFilterOptions,
   LensSearchFilters,
@@ -54,30 +49,6 @@ export type {
 // ============================================================
 // CANONICAL: browse & filter
 // ============================================================
-
-/**
- * Browse canonical lens concepts with optional filters.
- */
-export function useCanonicalLenses(filtros?: CanonicalFilters) {
-  const loading = writable(true)
-  const data = writable<CanonicalLens[]>([])
-  const error = writable<string | null>(null)
-
-  async function fetch() {
-    loading.set(true)
-    error.set(null)
-    try {
-      const result = await buscarCanonicos(filtros)
-      data.set(result)
-    } catch (err: any) {
-      error.set(err.message ?? 'Erro ao buscar lentes canônicas')
-    } finally {
-      loading.set(false)
-    }
-  }
-
-  return { loading, data, error, fetch }
-}
 
 /**
  * Find canonical concepts matching a prescription.

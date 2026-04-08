@@ -25,7 +25,7 @@ export function useMarcas() {
   async function carregarMarcas() {
     state.update(s => ({ ...s, loading: true, error: null }));
 
-    const res = await LensOracleAPI.getBrands({ scope: 'both' });
+    const res = await LensOracleAPI.getBrands({ limit: 500 });
 
     if (res.data) {
       const marcas = res.data;

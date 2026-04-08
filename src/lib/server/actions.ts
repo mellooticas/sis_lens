@@ -99,7 +99,7 @@ export const obterDashboardAction = async () => {
 // ============================================================================
 
 export const listarLaboratoriosAction = async () => {
-  const result = await LensOracleAPI.getBrands({ scope: 'ophthalmic' });
+  const result = await LensOracleAPI.getBrands({ limit: 500 });
   if (result.error) {
     return fail(500, { error: result.error.message });
   }

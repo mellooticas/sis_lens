@@ -1,7 +1,8 @@
 /**
- * Clearix Lens — API Index
- * Ecossistema Clearix by DIGIAI — banco mhgbuplnxtfgipbemchb
- * Canonical Engine v2 (migrations 274–278) + Catálogo (111, 208, 210, 214)
+ * Clearix Lens — API barrel
+ *
+ * Fonte única: `lentes-repository.ts` (camada de acesso ao motor óptico).
+ * Todo o código deve importar daqui (`$lib/api`) ao invés de apontar para
+ * arquivos internos.
  */
-
-export * from './lens-oracle';
+export * from './lentes-repository';
