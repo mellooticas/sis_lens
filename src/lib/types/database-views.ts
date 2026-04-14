@@ -603,3 +603,46 @@ export interface VCanonicalLensMapping {
   is_premium: boolean;
 }
 
+// =====================================================================
+// rpc_lens_edit_options — payload do form de edição de lente real
+// =====================================================================
+
+export interface LensEditBrand {
+  id: string;
+  name: string;
+  is_global_premium: boolean | null;
+}
+
+export interface LensEditMaterial {
+  id: string;
+  name: string;
+  refractive_index: number | null;
+}
+
+export interface LensEditSupplier {
+  id: string;
+  name: string;
+  category: string | null;
+}
+
+export interface LensEditTreatment {
+  id: string;
+  name: string;
+  code: string | null;
+  additional_price: number | null;
+}
+
+export interface LensEditEnumOption {
+  value: string;
+  label: string;
+}
+
+export interface LensEditOptions {
+  brands: LensEditBrand[];
+  materials: LensEditMaterial[];
+  suppliers: LensEditSupplier[];
+  treatments: LensEditTreatment[];
+  lens_types: LensEditEnumOption[];
+  statuses: LensEditEnumOption[];
+}
+
