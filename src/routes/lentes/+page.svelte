@@ -8,7 +8,7 @@
      */
     import { goto } from '$app/navigation';
     import { page } from '$app/stores';
-    import { Crown, Sparkles, Search, X } from 'lucide-svelte';
+    import { Crown, Sparkles, Search, X, Sun, Eye, Droplets, Shield, Zap, Palette } from 'lucide-svelte';
     import Container from '$lib/components/layout/Container.svelte';
     import type { PageData } from './$types';
 
@@ -25,8 +25,24 @@
     $: filterOptions  = data.filterOptions;
     $: hasActiveFilters = !!(
         filtros.busca || filtros.tipo || filtros.fornecedor || filtros.marca ||
-        filtros.material || filtros.indice != null || filtros.isPremium !== null
+        filtros.material || filtros.indice != null || filtros.isPremium !== null ||
+        filtros.coating || filtros.linha || filtros.design || filtros.altura ||
+        filtros.precoMin != null || filtros.precoMax != null ||
+        filtros.ar || filtros.scratch || filtros.uv || filtros.blue || filtros.photo || filtros.pol || filtros.hidro
     );
+
+    // Inputs locais de preço (só navega ao soltar)
+    let precoMinInput: string = '';
+    let precoMaxInput: string = '';
+    $: precoMinInput = filtros.precoMin != null ? String(filtros.precoMin) : '';
+    $: precoMaxInput = filtros.precoMax != null ? String(filtros.precoMax) : '';
+
+    function aplicarPreco() {
+        navegar({
+            precoMin: precoMinInput ? precoMinInput : null,
+            precoMax: precoMaxInput ? precoMaxInput : null,
+        });
+    }
 
     // Tab ativo derivado do filtro is_premium
     $: activeTab = filtros.isPremium === true  ? 'premium'
@@ -57,8 +73,12 @@
         navegar({ busca: buscaInput || null });
     }
 
-    function setFiltro(key: 'tipo' | 'fornecedor' | 'material' | 'indice', value: string | null) {
+    function setFiltro(key: 'tipo' | 'fornecedor' | 'marca' | 'material' | 'indice' | 'coating' | 'linha' | 'design' | 'altura', value: string | null) {
         navegar({ [key]: value });
+    }
+
+    function toggleTratamento(key: 'ar' | 'scratch' | 'uv' | 'blue' | 'photo' | 'pol' | 'hidro') {
+        navegar({ [key]: filtros[key] ? null : 'true' });
     }
 
     function limparFiltros() {
@@ -179,8 +199,18 @@
 
                 <!-- Sidebar de filtros -->
                 <aside class="lg:col-span-1 space-y-4">
-                    <div class="bg-card border border-border rounded-2xl p-5 sticky top-4">
-                        <h2 class="text-sm font-black uppercase tracking-wider text-foreground mb-4">Filtros</h2>
+                    <div class="bg-card border border-border rounded-2xl p-5 sticky top-4 max-h-[calc(100vh-2rem)] overflow-y-auto">
+                        <div class="flex items-center justify-between mb-4">
+                            <h2 class="text-sm font-black uppercase tracking-wider text-foreground">Filtros</h2>
+                            {#if hasActiveFilters}
+                                <button
+                                    on:click={limparFiltros}
+                                    class="text-[10px] font-bold uppercase text-muted-foreground hover:text-foreground flex items-center gap-1"
+                                >
+                                    <X class="h-3 w-3" /> Limpar
+                                </button>
+                            {/if}
+                        </div>
 
                         <!-- Laboratório -->
                         <div class="mb-4">
@@ -199,6 +229,46 @@
                                 {/each}
                             </select>
                         </div>
+
+                        <!-- Marca -->
+                        {#if filterOptions.marcas.length > 0}
+                            <div class="mb-4">
+                                <label for="filtro-marca" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                    Marca
+                                </label>
+                                <select
+                                    id="filtro-marca"
+                                    value={filtros.marca ?? ''}
+                                    on:change={(e) => setFiltro('marca', e.currentTarget.value || null)}
+                                    class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                >
+                                    <option value="">Todas ({filterOptions.marcas.length})</option>
+                                    {#each filterOptions.marcas as opt}
+                                        <option value={opt.value}>{opt.label} ({opt.count})</option>
+                                    {/each}
+                                </select>
+                            </div>
+                        {/if}
+
+                        <!-- Linha de produto -->
+                        {#if filterOptions.product_lines.length > 0}
+                            <div class="mb-4">
+                                <label for="filtro-linha" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                    Linha de produto
+                                </label>
+                                <select
+                                    id="filtro-linha"
+                                    value={filtros.linha ?? ''}
+                                    on:change={(e) => setFiltro('linha', e.currentTarget.value || null)}
+                                    class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                >
+                                    <option value="">Todas ({filterOptions.product_lines.length})</option>
+                                    {#each filterOptions.product_lines as opt}
+                                        <option value={opt.value}>{opt.value} ({opt.count})</option>
+                                    {/each}
+                                </select>
+                            </div>
+                        {/if}
 
                         <!-- Tipo -->
                         <div class="mb-4">
@@ -254,14 +324,149 @@
                             </select>
                         </div>
 
-                        {#if hasActiveFilters}
-                            <button
-                                on:click={limparFiltros}
-                                class="w-full mt-2 px-3 py-2 bg-muted hover:bg-accent text-muted-foreground text-xs font-bold rounded-lg transition-colors flex items-center justify-center gap-1.5"
-                            >
-                                <X class="h-3.5 w-3.5" /> Limpar todos os filtros
-                            </button>
+                        <!-- Coating específico -->
+                        {#if filterOptions.coatings.length > 0}
+                            <div class="mb-4">
+                                <label for="filtro-coating" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                    Coating
+                                </label>
+                                <select
+                                    id="filtro-coating"
+                                    value={filtros.coating ?? ''}
+                                    on:change={(e) => setFiltro('coating', e.currentTarget.value || null)}
+                                    class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                >
+                                    <option value="">Todos ({filterOptions.coatings.length})</option>
+                                    {#each filterOptions.coatings as opt}
+                                        <option value={opt.value}>{opt.value} ({opt.count})</option>
+                                    {/each}
+                                </select>
+                            </div>
                         {/if}
+
+                        <!-- Design -->
+                        {#if filterOptions.lens_designs.length > 0}
+                            <div class="mb-4">
+                                <label for="filtro-design" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                    Design
+                                </label>
+                                <select
+                                    id="filtro-design"
+                                    value={filtros.design ?? ''}
+                                    on:change={(e) => setFiltro('design', e.currentTarget.value || null)}
+                                    class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                >
+                                    <option value="">Todos</option>
+                                    {#each filterOptions.lens_designs as opt}
+                                        <option value={opt.value}>{opt.value} ({opt.count})</option>
+                                    {/each}
+                                </select>
+                            </div>
+                        {/if}
+
+                        <!-- Altura mínima de montagem -->
+                        {#if filterOptions.min_heights.length > 0}
+                            <div class="mb-4">
+                                <label for="filtro-altura" class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                    Altura mínima
+                                </label>
+                                <select
+                                    id="filtro-altura"
+                                    value={filtros.altura ?? ''}
+                                    on:change={(e) => setFiltro('altura', e.currentTarget.value || null)}
+                                    class="w-full px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                >
+                                    <option value="">Todas</option>
+                                    {#each filterOptions.min_heights as opt}
+                                        <option value={opt.value}>{opt.label} ({opt.count})</option>
+                                    {/each}
+                                </select>
+                            </div>
+                        {/if}
+
+                        <!-- Faixa de preço -->
+                        <div class="mb-5 pb-5 border-b border-border">
+                            <label class="text-[10px] font-black uppercase tracking-wider text-muted-foreground block mb-1.5">
+                                Faixa de preço (R$)
+                            </label>
+                            <div class="flex items-center gap-2">
+                                <input
+                                    type="number"
+                                    min={filterOptions.price_min}
+                                    max={filterOptions.price_max}
+                                    step="10"
+                                    placeholder={String(Math.floor(filterOptions.price_min))}
+                                    bind:value={precoMinInput}
+                                    on:blur={aplicarPreco}
+                                    on:keydown={(e) => e.key === 'Enter' && aplicarPreco()}
+                                    class="w-full px-2 py-2 border border-border rounded-lg text-xs bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                />
+                                <span class="text-muted-foreground text-xs">→</span>
+                                <input
+                                    type="number"
+                                    min={filterOptions.price_min}
+                                    max={filterOptions.price_max}
+                                    step="10"
+                                    placeholder={String(Math.ceil(filterOptions.price_max))}
+                                    bind:value={precoMaxInput}
+                                    on:blur={aplicarPreco}
+                                    on:keydown={(e) => e.key === 'Enter' && aplicarPreco()}
+                                    class="w-full px-2 py-2 border border-border rounded-lg text-xs bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500"
+                                />
+                            </div>
+                            <p class="text-[10px] text-muted-foreground mt-1">
+                                R$ {filterOptions.price_min.toLocaleString('pt-BR', { maximumFractionDigits: 0 })} a R$ {filterOptions.price_max.toLocaleString('pt-BR', { maximumFractionDigits: 0 })}
+                            </p>
+                        </div>
+
+                        <!-- TRATAMENTOS (toggles visuais — no fim da sidebar) -->
+                        <div class="mb-2">
+                            <p class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-2">Tratamentos</p>
+                            <div class="grid grid-cols-2 gap-1.5">
+                                <button
+                                    type="button"
+                                    on:click={() => toggleTratamento('ar')}
+                                    class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors {filtros.ar ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/40 dark:text-blue-200' : 'bg-muted text-muted-foreground hover:bg-accent'}"
+                                >
+                                    <Sparkles class="h-3 w-3" /> AR
+                                </button>
+                                <button
+                                    type="button"
+                                    on:click={() => toggleTratamento('blue')}
+                                    class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors {filtros.blue ? 'bg-indigo-100 text-indigo-700 dark:bg-indigo-900/40 dark:text-indigo-200' : 'bg-muted text-muted-foreground hover:bg-accent'}"
+                                >
+                                    <Eye class="h-3 w-3" /> Blue
+                                </button>
+                                <button
+                                    type="button"
+                                    on:click={() => toggleTratamento('photo')}
+                                    class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors {filtros.photo ? 'bg-amber-100 text-amber-700 dark:bg-amber-900/40 dark:text-amber-200' : 'bg-muted text-muted-foreground hover:bg-accent'}"
+                                >
+                                    <Sun class="h-3 w-3" /> Foto
+                                </button>
+                                <button
+                                    type="button"
+                                    on:click={() => toggleTratamento('uv')}
+                                    class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors {filtros.uv ? 'bg-orange-100 text-orange-700 dark:bg-orange-900/40 dark:text-orange-200' : 'bg-muted text-muted-foreground hover:bg-accent'}"
+                                >
+                                    <Zap class="h-3 w-3" /> UV
+                                </button>
+                                <button
+                                    type="button"
+                                    on:click={() => toggleTratamento('scratch')}
+                                    class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors {filtros.scratch ? 'bg-emerald-100 text-emerald-700 dark:bg-emerald-900/40 dark:text-emerald-200' : 'bg-muted text-muted-foreground hover:bg-accent'}"
+                                >
+                                    <Shield class="h-3 w-3" /> Risco
+                                </button>
+                                <button
+                                    type="button"
+                                    on:click={() => toggleTratamento('hidro')}
+                                    class="flex items-center gap-1.5 px-2 py-1.5 rounded-lg text-[11px] font-semibold transition-colors {filtros.hidro ? 'bg-cyan-100 text-cyan-700 dark:bg-cyan-900/40 dark:text-cyan-200' : 'bg-muted text-muted-foreground hover:bg-accent'}"
+                                >
+                                    <Droplets class="h-3 w-3" /> Hidro
+                                </button>
+                            </div>
+                        </div>
                     </div>
                 </aside>
 
@@ -308,6 +513,27 @@
                                                 {#if lente.refractive_index} · n={lente.refractive_index}{/if}
                                                 {#if lente.sku} · <span class="font-mono">{lente.sku}</span>{/if}
                                             </p>
+                                            <!-- Tags visuais de tratamentos -->
+                                            <div class="flex items-center gap-1 mt-1.5 flex-wrap">
+                                                {#if lente.anti_reflective}
+                                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-blue-50 text-blue-700 dark:bg-blue-950/40 dark:text-blue-300 text-[10px] font-bold">AR</span>
+                                                {/if}
+                                                {#if lente.blue_light}
+                                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-indigo-50 text-indigo-700 dark:bg-indigo-950/40 dark:text-indigo-300 text-[10px] font-bold">Blue</span>
+                                                {/if}
+                                                {#if lente.photochromic}
+                                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-amber-50 text-amber-700 dark:bg-amber-950/40 dark:text-amber-300 text-[10px] font-bold">Foto</span>
+                                                {/if}
+                                                {#if lente.uv_filter}
+                                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-orange-50 text-orange-700 dark:bg-orange-950/40 dark:text-orange-300 text-[10px] font-bold">UV</span>
+                                                {/if}
+                                                {#if lente.anti_scratch}
+                                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-emerald-50 text-emerald-700 dark:bg-emerald-950/40 dark:text-emerald-300 text-[10px] font-bold">Risco</span>
+                                                {/if}
+                                                {#if lente.polarized}
+                                                    <span class="inline-flex items-center gap-0.5 px-1.5 py-0.5 rounded bg-purple-50 text-purple-700 dark:bg-purple-950/40 dark:text-purple-300 text-[10px] font-bold">Polar</span>
+                                                {/if}
+                                            </div>
                                         </div>
 
                                         <!-- Tipo -->
