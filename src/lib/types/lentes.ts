@@ -297,6 +297,7 @@ export interface PremiumFilterParamsV3 {
   material_id?: string
   coating?: string
   photochromic?: string
+  treatments?: string[]
 }
 
 /** Parâmetros de busca premium v3 */

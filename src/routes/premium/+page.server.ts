@@ -1,6 +1,6 @@
 /**
- * Premium Collection — Server Load v3
- * Filtros por marca/linha/coating/fotossensível
+ * Premium Collection — Server Load v4
+ * Todos filtros espelham URL. Treatments como CSV.
  */
 import type { PageServerLoad } from './$types';
 
@@ -11,6 +11,15 @@ export const load: PageServerLoad = async ({ url }) => {
     const coating      = url.searchParams.get('coating')  || null;
     const photochromic = url.searchParams.get('foto')     || null;
     const material_id  = url.searchParams.get('material') || null;
+    const tratCsv      = url.searchParams.get('trat')     || null;
+    const treatments   = tratCsv ? tratCsv.split(',').map(s => s.trim()).filter(Boolean) : [];
+    const precoMinPar  = url.searchParams.get('precoMin');
+    const precoMaxPar  = url.searchParams.get('precoMax');
+    const price_min    = precoMinPar ? parseFloat(precoMinPar) : null;
+    const price_max    = precoMaxPar ? parseFloat(precoMaxPar) : null;
     const pagina       = Math.max(1, parseInt(url.searchParams.get('pagina') || '1'));
-    return { brand, product_line, lens_type, coating, photochromic, material_id, pagina };
+    return {
+        brand, product_line, lens_type, coating, photochromic, material_id,
+        treatments, price_min, price_max, pagina,
+    };
 };

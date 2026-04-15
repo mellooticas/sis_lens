@@ -116,6 +116,7 @@ export async function getPremiumFilterOptionsV3(
     p_material_id:  params.material_id  ?? null,
     p_coating:      params.coating      ?? null,
     p_photochromic: params.photochromic ?? null,
+    p_treatments:   params.treatments   ?? null,
   });
   if (error) {
     console.error('[LENTES v3] rpc_premium_filter_options error:', error);
@@ -139,6 +140,7 @@ export async function searchPremiumV3(
     p_addition:     params.addition     ?? null,
     p_limit:        params.limit        ?? 50,
     p_offset:       params.offset       ?? 0,
+    p_treatments:   params.treatments   ?? null,
   });
   if (error) {
     console.error('[LENTES v3] rpc_premium_search error:', error);
