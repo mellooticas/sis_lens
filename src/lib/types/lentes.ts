@@ -305,6 +305,8 @@ export interface PremiumSearchParamsV3 extends PremiumFilterParamsV3 {
   spherical?: number
   cylindrical?: number
   addition?: number
+  price_min?: number
+  price_max?: number
   limit?: number
   offset?: number
 }
@@ -321,6 +323,8 @@ export interface StandardFilterParamsV3 {
 
 /** Parâmetros de busca standard v3 */
 export interface StandardSearchParamsV3 extends StandardFilterParamsV3 {
+  price_min?: number
+  price_max?: number
   limit?: number
   offset?: number
 }

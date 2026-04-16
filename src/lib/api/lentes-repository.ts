@@ -141,6 +141,8 @@ export async function searchPremiumV3(
     p_limit:        params.limit        ?? 50,
     p_offset:       params.offset       ?? 0,
     p_treatments:   params.treatments   ?? null,
+    p_price_min:    params.price_min    ?? null,
+    p_price_max:    params.price_max    ?? null,
   });
   if (error) {
     console.error('[LENTES v3] rpc_premium_search error:', error);
@@ -179,6 +181,8 @@ export async function searchStandardV3(
     p_addition:    params.addition    ?? null,
     p_limit:       params.limit       ?? 50,
     p_offset:      params.offset      ?? 0,
+    p_price_min:   params.price_min   ?? null,
+    p_price_max:   params.price_max   ?? null,
   });
   if (error) {
     console.error('[LENTES v3] rpc_standard_search error:', error);
@@ -194,6 +198,98 @@ export async function getCatalogSummaryV3(): Promise<unknown> {
     throw error;
   }
   return data;
+}
+
+// ============================================================================
+// CANONICAL ENGINE v3 — Prescrição unificada (premium + standard)
+// ============================================================================
+
+export interface PrescriptionSearchV3Params {
+  spherical?: number;
+  cylindrical?: number;
+  addition?: number;
+  lens_type?: string;
+  limit?: number;
+}
+
+export interface PrescriptionSearchV3Result {
+  premium: CanonicalPremiumV3T[];
+  standard: CanonicalStandardV3T[];
+  premium_total: number;
+  standard_total: number;
+}
+
+export async function buscarCanonicosPorReceitaV3(
+  params: PrescriptionSearchV3Params = {}
+): Promise<PrescriptionSearchV3Result> {
+  const { data, error } = await supabase.rpc('rpc_canonical_for_prescription_v3', {
+    p_spherical:   params.spherical   ?? null,
+    p_cylindrical: params.cylindrical ?? null,
+    p_addition:    params.addition    ?? null,
+    p_lens_type:   params.lens_type   ?? null,
+    p_limit:       params.limit       ?? 20,
+  });
+  if (error) {
+    console.error('[LENTES v3] rpc_canonical_for_prescription_v3 error:', error);
+    throw error;
+  }
+  return data as PrescriptionSearchV3Result;
+}
+
+// ============================================================================
+// CATÁLOGO REAL — Busca unificada via RPC (rpc_lens_catalog_search)
+// ============================================================================
+
+export interface LensCatalogSearchParams {
+  search?: string;
+  lens_type?: string;
+  is_premium?: boolean;
+  supplier_id?: string;
+  brand_id?: string;
+  material_id?: string;
+  refractive_index?: number;
+  coating?: string;
+  product_line?: string;
+  lens_design?: string;
+  min_height_mm?: string;
+  price_min?: number;
+  price_max?: number;
+  treatments?: string[];
+  limit?: number;
+  offset?: number;
+}
+
+export interface LensCatalogSearchResult {
+  total: number;
+  items: import('$lib/types/database-views').VCatalogLens[];
+}
+
+export async function searchLensCatalog(
+  params: LensCatalogSearchParams = {}
+): Promise<LensCatalogSearchResult> {
+  const { data, error } = await supabase.rpc('rpc_lens_catalog_search', {
+    p_search:           params.search           ?? null,
+    p_lens_type:        params.lens_type        ?? null,
+    p_is_premium:       params.is_premium       ?? null,
+    p_supplier_id:      params.supplier_id      ?? null,
+    p_brand_id:         params.brand_id         ?? null,
+    p_material_id:      params.material_id      ?? null,
+    p_refractive_index: params.refractive_index ?? null,
+    p_coating:          params.coating          ?? null,
+    p_product_line:     params.product_line     ?? null,
+    p_lens_design:      params.lens_design      ?? null,
+    p_min_height_mm:    params.min_height_mm    ?? null,
+    p_price_min:        params.price_min        ?? null,
+    p_price_max:        params.price_max        ?? null,
+    p_treatments:       params.treatments       ?? null,
+    p_limit:            params.limit            ?? 24,
+    p_offset:           params.offset           ?? 0,
+  });
+  if (error) {
+    console.error('[LENTES] rpc_lens_catalog_search error:', error);
+    throw error;
+  }
+  return data as LensCatalogSearchResult;
 }
 
 // ============================================================================

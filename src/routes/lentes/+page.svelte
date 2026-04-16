@@ -78,7 +78,14 @@
     }
 
     function toggleTratamento(key: 'ar' | 'scratch' | 'uv' | 'blue' | 'photo' | 'pol' | 'hidro') {
-        navegar({ [key]: filtros[key] ? null : 'true' });
+        // Monta array de tratamentos ativos, toggle o selecionado
+        const codes = ['ar', 'scratch', 'uv', 'blue', 'photo', 'pol', 'hidro'] as const;
+        const active = codes.filter(c => c === key ? !filtros[c] : filtros[c]);
+        // Limpa booleans individuais e usa trat=ar,blue (padrão unificado)
+        const reset: Record<string, string | null> = {};
+        for (const c of codes) reset[c] = null;
+        reset.trat = active.length ? active.join(',') : null;
+        navegar(reset);
     }
 
     function limparFiltros() {

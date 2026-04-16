@@ -1,12 +1,12 @@
 /**
  * Catálogo de Lentes Reais — Server Load
  *
- * Lista TODAS as 1.525 lentes reais (v_catalog_lenses), com filtros
- * cobrindo 100% do que o banco expõe hoje. Booleans de tratamento
- * vêm da view (populados via lens_treatment_links). Coating, linha
- * de produto e lens design vêm de attributes jsonb.
+ * Usa RPC pública `rpc_lens_catalog_search` para busca e
+ * `rpc_lens_catalog_filter_options` para as opções de filtro.
  *
- * Filter options via RPC pública `rpc_lens_catalog_filter_options`.
+ * URL params unificados:
+ *   - trat=ar,blue,photo (comma-separated, padrão do ecossistema)
+ *   - Booleans individuais (ar=true, blue=true) mantidos como fallback
  */
 import type { PageServerLoad } from './$types';
 import type { VCatalogLens } from '$lib/types/database-views';
@@ -49,6 +49,9 @@ export interface FilterOptions {
     standard_total: number;
 }
 
+/** Códigos de tratamento válidos */
+const TREATMENT_CODES = ['ar', 'scratch', 'uv', 'blue', 'photo', 'pol', 'hidro'] as const;
+
 export const load: PageServerLoad = async ({ url, locals }) => {
     const { supabase } = locals;
 
@@ -77,80 +80,62 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     const precoMin = precoMinParam ? parseFloat(precoMinParam) : null;
     const precoMax = precoMaxParam ? parseFloat(precoMaxParam) : null;
 
-    // Toggles de tratamento (view) e attributes
-    const ar          = url.searchParams.get('ar')      === 'true';
-    const scratch     = url.searchParams.get('scratch') === 'true';
-    const uv          = url.searchParams.get('uv')      === 'true';
-    const blue        = url.searchParams.get('blue')    === 'true';
-    const photo       = url.searchParams.get('photo')   === 'true';
-    const pol         = url.searchParams.get('pol')     === 'true';
-    const hidro       = url.searchParams.get('hidro')   === 'true';
-
-    const pagina      = Math.max(1, parseInt(url.searchParams.get('pagina') || '1'));
-
-    // ── Query base ────────────────────────────────────────────────────────────
-    let query = supabase
-        .from('v_catalog_lenses')
-        .select(
-            'id, lens_name, sku, lens_type, is_premium, brand_name, supplier_name, ' +
-            'material_name, refractive_index, price_cost, price_suggested, ' +
-            'treatment_names, anti_reflective, blue_light, photochromic, polarized, anti_scratch, uv_filter, ' +
-            'spherical_min, spherical_max, cylindrical_min, cylindrical_max, ' +
-            'addition_min, addition_max, status',
-            { count: 'exact' }
-        )
-        .eq('status', 'active');
-
-    if (isPremium !== null)  query = query.eq('is_premium', isPremium);
-    if (tipo)                query = query.eq('lens_type', tipo);
-    if (fornecedor)          query = query.eq('supplier_id', fornecedor);
-    if (marca)               query = query.eq('brand_id', marca);
-    if (material)            query = query.eq('material_id', material);
-    if (indice != null)      query = query.eq('refractive_index', indice);
-
-    // Tratamentos — booleans da view (populados via lens_treatment_links)
-    if (ar)      query = query.eq('anti_reflective', true);
-    if (scratch) query = query.eq('anti_scratch',    true);
-    if (uv)      query = query.eq('uv_filter',       true);
-    if (blue)    query = query.eq('blue_light',      true);
-    if (photo)   query = query.eq('photochromic',    true);
-    if (pol)     query = query.eq('polarized',       true);
-
-    // Attributes jsonb
-    if (coating) query = query.filter('attributes->>coating',        'eq', coating);
-    if (linha)   query = query.filter('attributes->>product_line',   'eq', linha);
-    if (design)  query = query.filter('attributes->>lens_design',    'eq', design);
-    if (altura)  query = query.filter('attributes->>min_height_mm',  'eq', altura);
-    if (hidro)   query = query.filter('attributes->>hidrofobic',     'eq', 'true');
-
-    // Faixa de preço
-    if (precoMin != null) query = query.gte('price_suggested', precoMin);
-    if (precoMax != null) query = query.lte('price_suggested', precoMax);
-
-    if (busca) {
-        query = query.or(
-            `lens_name.ilike.%${busca}%,brand_name.ilike.%${busca}%,supplier_name.ilike.%${busca}%,sku.ilike.%${busca}%`
-        );
+    // Tratamentos — padrão unificado: trat=ar,blue,photo (comma-separated)
+    // Fallback: booleans individuais (ar=true, blue=true) para backwards compat
+    const tratParam = url.searchParams.get('trat');
+    let treatments: string[] = [];
+    if (tratParam) {
+        treatments = tratParam.split(',').filter(t => TREATMENT_CODES.includes(t as any));
+    } else {
+        // Fallback: ler booleans individuais
+        for (const code of TREATMENT_CODES) {
+            if (url.searchParams.get(code) === 'true') treatments.push(code);
+        }
     }
 
-    const from = (pagina - 1) * PAGE_SIZE;
-    const to   = from + PAGE_SIZE - 1;
+    // Booleans derivados dos treatments (para manter filtros state na UI)
+    const ar      = treatments.includes('ar');
+    const scratch = treatments.includes('scratch');
+    const uv      = treatments.includes('uv');
+    const blue    = treatments.includes('blue');
+    const photo   = treatments.includes('photo');
+    const pol     = treatments.includes('pol');
+    const hidro   = treatments.includes('hidro');
 
-    // ── Fetch paralelo ───────────────────────────────────────────────────────
-    const [listResult, filterOptionsResult] = await Promise.all([
-        query
-            .order('is_premium', { ascending: false })
-            .order('lens_name',  { ascending: true })
-            .range(from, to),
+    const pagina  = Math.max(1, parseInt(url.searchParams.get('pagina') || '1'));
+    const offset  = (pagina - 1) * PAGE_SIZE;
+
+    // ── Fetch paralelo via RPCs ─────────────────────────────────────────────
+    const [searchResult, filterOptionsResult] = await Promise.all([
+        supabase.rpc('rpc_lens_catalog_search', {
+            p_search:           busca || null,
+            p_lens_type:        tipo,
+            p_is_premium:       isPremium,
+            p_supplier_id:      fornecedor,
+            p_brand_id:         marca,
+            p_material_id:      material,
+            p_refractive_index: indice,
+            p_coating:          coating,
+            p_product_line:     linha,
+            p_lens_design:      design,
+            p_min_height_mm:    altura,
+            p_price_min:        precoMin,
+            p_price_max:        precoMax,
+            p_treatments:       treatments.length > 0 ? treatments : null,
+            p_limit:            PAGE_SIZE,
+            p_offset:           offset,
+        }),
         supabase.rpc('rpc_lens_catalog_filter_options'),
     ]);
 
-    if (listResult.error) {
-        console.error('[lentes] list error:', listResult.error);
+    if (searchResult.error) {
+        console.error('[lentes] rpc_lens_catalog_search error:', searchResult.error);
     }
     if (filterOptionsResult.error) {
         console.error('[lentes] filterOptions error:', filterOptionsResult.error);
     }
+
+    const searchData = (searchResult.data ?? { total: 0, items: [] }) as { total: number; items: unknown[] };
 
     const rawOpts = (filterOptionsResult.data ?? {}) as Record<string, unknown>;
     const filterOptions: FilterOptions = {
@@ -174,8 +159,8 @@ export const load: PageServerLoad = async ({ url, locals }) => {
     };
 
     return {
-        lentes: (listResult.data ?? []) as unknown as LenteListItem[],
-        total:  listResult.count ?? 0,
+        lentes: (searchData.items ?? []) as unknown as LenteListItem[],
+        total:  searchData.total ?? 0,
         premiumTotal:  filterOptions.premium_total,
         standardTotal: filterOptions.standard_total,
         filtros: {

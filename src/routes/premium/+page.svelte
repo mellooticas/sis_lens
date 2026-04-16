@@ -82,16 +82,15 @@
             coating:      filtros.coating      || undefined,
             photochromic: filtros.photochromic || undefined,
             treatments:   filtros.treatments?.length ? filtros.treatments : undefined,
+            price_min:    filtros.priceMin     ?? undefined,
+            price_max:    filtros.priceMax     ?? undefined,
             limit: LIMITE,
             offset,
         });
         if (res.error) { erro = res.error.message; items = []; }
         else if (res.data) {
-            let arr = res.data.items ?? [];
+            items = res.data.items ?? [];
             total = res.data.total ?? 0;
-            if (filtros.priceMin != null) arr = arr.filter((c: any) => (c.price_min ?? c.price_avg ?? 0) >= filtros.priceMin!);
-            if (filtros.priceMax != null) arr = arr.filter((c: any) => (c.price_max ?? c.price_avg ?? 0) <= filtros.priceMax!);
-            items = arr;
             total_paginas = Math.ceil(total / LIMITE);
         }
         loading = false;

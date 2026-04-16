@@ -486,6 +486,19 @@ export interface MaterialFilterOption {
   class?: string;
 }
 
+/** Item de tratamento retornado pelas RPCs de filter_options */
+export interface TreatmentFilterOption {
+  code: string;
+  count: number;
+}
+
+/** Faixa de preço retornada pelas RPCs de filter_options */
+export interface PriceRange {
+  min: number;
+  max: number;
+  avg: number;
+}
+
 /** Resposta da rpc_premium_filter_options */
 export interface PremiumFilterOptions {
   brands: FilterOption[] | null;
@@ -494,6 +507,8 @@ export interface PremiumFilterOptions {
   materials: MaterialFilterOption[] | null;
   coatings: FilterOption[] | null;
   photochromics: FilterOption[] | null;
+  treatments: TreatmentFilterOption[] | null;
+  price_range: PriceRange | null;
   total_count: number;
 }
 
@@ -501,13 +516,14 @@ export interface PremiumFilterOptions {
 export interface StandardFilterOptions {
   lens_types: FilterOption[] | null;
   materials: MaterialFilterOption[] | null;
-  treatments: FilterOption[] | null;
+  treatments: TreatmentFilterOption[] | null;
   supplier_range: { min_suppliers: number; max_suppliers: number } | null;
   prescription_ranges: {
     sph_min: number; sph_max: number;
     cyl_min: number; cyl_max: number;
     add_min: number | null; add_max: number | null;
   } | null;
+  price_range: PriceRange | null;
   total_count: number;
 }
 
