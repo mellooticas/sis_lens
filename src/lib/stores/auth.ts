@@ -57,5 +57,5 @@ export const canManageCatalog = derived(currentUser, ($user) => {
 // ──────────────────────────────────────────────────────────────────────────────
 
 export function logout() {
-  window.location.href = `${PUBLIC_SIS_GATEWAY_URL}/logout?app=sis_lens`;
+  window.location.href = `${PUBLIC_SIS_GATEWAY_URL}/logout?app=clearix_lens`;
 }

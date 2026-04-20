@@ -85,7 +85,7 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
     if (!exchanged) {
       // NAO redirecionar para / (authGuard mandaria de volta ao Gateway → loop infinito)
       const gatewayUrl = PUBLIC_SIS_GATEWAY_URL || 'https://clearixhub.netlify.app';
-      const retryUrl = `${gatewayUrl}/login?app=sis_lens&app_key=sis_lens&next=${encodeURIComponent(next)}`;
+      const retryUrl = `${gatewayUrl}/login?app=clearix_lens&app_key=clearix_lens&next=${encodeURIComponent(next)}`;
       return new Response(
         `<!DOCTYPE html>
 <html lang="pt-BR"><head><meta charset="utf-8"><title>Erro SSO</title></head>
@@ -145,5 +145,5 @@ export const GET: RequestHandler = async ({ url, cookies }) => {
 
   // Tokens invalidos ou ausentes — redirecionar direto para Gateway (nao para / que causaria loop)
   const gatewayUrl = PUBLIC_SIS_GATEWAY_URL || 'https://clearixhub.netlify.app';
-  throw redirect(303, `${gatewayUrl}/login?app=sis_lens&app_key=sis_lens&next=${encodeURIComponent(next)}`);
+  throw redirect(303, `${gatewayUrl}/login?app=clearix_lens&app_key=clearix_lens&next=${encodeURIComponent(next)}`);
 };

@@ -112,7 +112,7 @@ const authGuard: Handle = async ({ event, resolve }) => {
     if (!session && !isPublicPath) {
       const appNext = `${event.url.pathname}${event.url.search}`;
       const returnTo = encodeURIComponent(`${event.url.origin}/auth/callback`);
-      throw redirect(303, `${PUBLIC_SIS_GATEWAY_URL}/login?app=sis_lens&app_key=sis_lens&next=${encodeURIComponent(appNext)}&returnTo=${returnTo}`);
+      throw redirect(303, `${PUBLIC_SIS_GATEWAY_URL}/login?app=clearix_lens&app_key=clearix_lens&next=${encodeURIComponent(appNext)}&returnTo=${returnTo}`);
     }
   }
 
