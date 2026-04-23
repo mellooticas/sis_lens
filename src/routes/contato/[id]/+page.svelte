@@ -39,6 +39,27 @@
     let editErro: string | null = null;
     let editSucesso   = false;
 
+    // Edição de specs ópticos
+    let editSpecs     = false;
+    type SpecField = number | null;
+    let specEsfMin:  SpecField = null;
+    let specEsfMax:  SpecField = null;
+    let specCilMin:  SpecField = null;
+    let specCilMax:  SpecField = null;
+    let specAxisMin: SpecField = null;
+    let specAxisMax: SpecField = null;
+    let specAddMin:  SpecField = null;
+    let specAddMax:  SpecField = null;
+    let specCurva:   SpecField = null;
+    let specDiam:    SpecField = null;
+    let specDkT:     SpecField = null;
+    let specAgua:    SpecField = null;
+    let specDias:    SpecField = null;
+    let specUnCaixa: SpecField = null;
+    let specsSalvando = false;
+    let specsErro: string | null = null;
+    let specsSucesso = false;
+
     onMount(async () => {
         const { data: row, error: err } = await supabase
             .from('v_contact_lenses')
@@ -62,6 +83,68 @@
         editErro     = null;
         editSucesso  = false;
         editando     = true;
+    }
+
+    function abrirSpecs() {
+        specEsfMin  = lente?.spherical_min   ?? null;
+        specEsfMax  = lente?.spherical_max   ?? null;
+        specCilMin  = lente?.cylindrical_min ?? null;
+        specCilMax  = lente?.cylindrical_max ?? null;
+        specAxisMin = lente?.axis_min        ?? null;
+        specAxisMax = lente?.axis_max        ?? null;
+        specAddMin  = lente?.addition_min    ?? null;
+        specAddMax  = lente?.addition_max    ?? null;
+        specCurva   = lente?.base_curve      ?? null;
+        specDiam    = lente?.diameter        ?? null;
+        specDkT     = lente?.dk_t            ?? null;
+        specAgua    = lente?.water_content   ?? null;
+        specDias    = lente?.usage_days      ?? null;
+        specUnCaixa = lente?.units_per_box   ?? null;
+        specsErro   = null;
+        specsSucesso = false;
+        editSpecs   = true;
+    }
+
+    async function salvarSpecs() {
+        specsSalvando = true;
+        specsErro     = null;
+        specsSucesso  = false;
+        try {
+            const { data: res, error: err } = await supabase
+                .rpc('rpc_update_contact_lens_specs', {
+                    p_id:              lente!.id,
+                    p_spherical_min:   specEsfMin,
+                    p_spherical_max:   specEsfMax,
+                    p_cylindrical_min: specCilMin,
+                    p_cylindrical_max: specCilMax,
+                    p_axis_min:        specAxisMin,
+                    p_axis_max:        specAxisMax,
+                    p_addition_min:    specAddMin,
+                    p_addition_max:    specAddMax,
+                    p_base_curve:      specCurva,
+                    p_diameter:        specDiam,
+                    p_dk_t:            specDkT,
+                    p_water_content:   specAgua,
+                    p_usage_days:      specDias,
+                    p_units_per_box:   specUnCaixa,
+                });
+            if (err) throw new Error(err.message);
+            if (res && !res.ok) throw new Error(res.error ?? 'Erro ao salvar specs');
+            // Recarrega a lente pra refletir persistido
+            const { data: row } = await supabase
+                .from('v_contact_lenses')
+                .select('*')
+                .eq('id', lente!.id)
+                .single();
+            if (row) lente = row;
+            editSpecs = false;
+            specsSucesso = true;
+            setTimeout(() => specsSucesso = false, 3000);
+        } catch (e: any) {
+            specsErro = e.message;
+        } finally {
+            specsSalvando = false;
+        }
     }
 
     async function salvarPrecos() {
@@ -200,70 +283,200 @@
                             </div>
                         </div>
 
-                        <!-- Parâmetros técnicos -->
-                        {#if lente.dk_t || lente.water_content || lente.diameter || lente.base_curve}
-                            <div class="bg-card border border-border rounded-2xl p-5">
-                                <h2 class="text-sm font-black uppercase tracking-wide text-muted-foreground mb-3">Parâmetros Técnicos</h2>
-                                <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
-                                    {#if lente.dk_t}
-                                        <div class="text-center bg-muted rounded-xl p-3">
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1">Dk/t</div>
-                                            <div class="text-lg font-black text-foreground">{lente.dk_t}</div>
-                                        </div>
-                                    {/if}
-                                    {#if lente.water_content}
-                                        <div class="text-center bg-muted rounded-xl p-3">
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1">H₂O</div>
-                                            <div class="text-lg font-black text-foreground">{lente.water_content}%</div>
-                                        </div>
-                                    {/if}
-                                    {#if lente.diameter}
-                                        <div class="text-center bg-muted rounded-xl p-3">
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1">Diâmetro</div>
-                                            <div class="text-lg font-black text-foreground">{lente.diameter} mm</div>
-                                        </div>
-                                    {/if}
-                                    {#if lente.base_curve}
-                                        <div class="text-center bg-muted rounded-xl p-3">
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1">Curva Base</div>
-                                            <div class="text-lg font-black text-foreground">{lente.base_curve}</div>
-                                        </div>
-                                    {/if}
-                                </div>
-                            </div>
-                        {/if}
-
-                        <!-- Prescrição + extras -->
-                        {#if lente.spherical_min != null || lente.uv_protection || lente.is_colored}
-                            <div class="bg-card border border-border rounded-2xl p-5">
-                                <h2 class="text-sm font-black uppercase tracking-wide text-muted-foreground mb-3">Prescrição & Recursos</h2>
-                                {#if lente.spherical_min != null}
-                                    <div class="grid grid-cols-2 gap-3 mb-3">
-                                        <div class="bg-muted rounded-xl px-3 py-2.5">
-                                            <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Esférico</div>
-                                            <div class="text-sm font-semibold text-foreground">{lente.spherical_min} a {lente.spherical_max}</div>
-                                        </div>
-                                        {#if lente.cylindrical_min != null}
-                                            <div class="bg-muted rounded-xl px-3 py-2.5">
-                                                <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Cilíndrico</div>
-                                                <div class="text-sm font-semibold text-foreground">{lente.cylindrical_min} a {lente.cylindrical_max}</div>
-                                            </div>
-                                        {/if}
-                                    </div>
+                        <!-- Especificações Ópticas (edição unificada) -->
+                        <div class="bg-card border border-border rounded-2xl p-5">
+                            <div class="flex items-center justify-between mb-3">
+                                <h2 class="text-sm font-black uppercase tracking-wide text-muted-foreground">Especificações Ópticas</h2>
+                                {#if !editSpecs}
+                                    <button on:click={abrirSpecs}
+                                        class="text-xs font-bold text-primary-600 hover:text-primary-700 dark:text-primary-400 dark:hover:text-primary-300 transition-colors">
+                                        Editar
+                                    </button>
                                 {/if}
-                                <div class="flex flex-wrap gap-2">
-                                    {#if lente.uv_protection}
-                                        <span class="px-3 py-1.5 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 text-xs font-bold rounded-lg">Proteção UV</span>
-                                    {/if}
-                                    {#if lente.is_colored}
-                                        <span class="px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 text-xs font-bold rounded-lg">Colorida</span>
-                                    {/if}
-                                    {#each (lente.available_colors ?? []) as cor}
-                                        <span class="px-3 py-1.5 bg-muted text-muted-foreground text-xs font-bold rounded-lg">{cor}</span>
-                                    {/each}
-                                </div>
                             </div>
-                        {/if}
+
+                            {#if specsSucesso}
+                                <div class="mb-3 px-3 py-2 bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-xs font-bold rounded-lg">
+                                    ✓ Especificações atualizadas com sucesso
+                                </div>
+                            {/if}
+
+                            {#if editSpecs}
+                                <!-- Modo edição -->
+                                <div class="space-y-4">
+                                    <!-- Esférico -->
+                                    <div>
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Esférico (dioptrias)</div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="number" step="0.25" placeholder="mínimo (ex: -12.00)" bind:value={specEsfMin}
+                                                class="px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            <input type="number" step="0.25" placeholder="máximo (ex: +8.00)" bind:value={specEsfMax}
+                                                class="px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                        </div>
+                                    </div>
+                                    <!-- Cilíndrico -->
+                                    <div>
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Cilíndrico (dioptrias)</div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="number" step="0.25" placeholder="mínimo (ex: -2.25)" bind:value={specCilMin}
+                                                class="px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            <input type="number" step="0.25" placeholder="máximo (ex: 0)" bind:value={specCilMax}
+                                                class="px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                        </div>
+                                    </div>
+                                    <!-- Eixo -->
+                                    <div>
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Eixo (graus 0–180)</div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="number" step="1" min="0" max="180" placeholder="mínimo" bind:value={specAxisMin}
+                                                class="px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            <input type="number" step="1" min="0" max="180" placeholder="máximo" bind:value={specAxisMax}
+                                                class="px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                        </div>
+                                    </div>
+                                    <!-- Adição -->
+                                    <div>
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Adição (multifocal)</div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <input type="number" step="0.25" placeholder="mínima (ex: +0.75)" bind:value={specAddMin}
+                                                class="px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            <input type="number" step="0.25" placeholder="máxima (ex: +2.50)" bind:value={specAddMax}
+                                                class="px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                        </div>
+                                    </div>
+                                    <!-- Parametros fisicos -->
+                                    <div>
+                                        <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-1.5">Parâmetros Físicos</div>
+                                        <div class="grid grid-cols-2 gap-2">
+                                            <div>
+                                                <label class="text-[10px] text-muted-foreground">Curva Base (mm)</label>
+                                                <input type="number" step="0.1" min="7.0" max="10.0" placeholder="ex: 8.6" bind:value={specCurva}
+                                                    class="w-full mt-0.5 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-muted-foreground">Diâmetro (mm)</label>
+                                                <input type="number" step="0.1" min="8.0" max="16.0" placeholder="ex: 14.2" bind:value={specDiam}
+                                                    class="w-full mt-0.5 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-muted-foreground">Dk/t</label>
+                                                <input type="number" step="1" min="0" placeholder="ex: 147" bind:value={specDkT}
+                                                    class="w-full mt-0.5 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-muted-foreground">% Água</label>
+                                                <input type="number" step="1" min="0" max="100" placeholder="ex: 38" bind:value={specAgua}
+                                                    class="w-full mt-0.5 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-muted-foreground">Dias de Uso</label>
+                                                <input type="number" step="1" min="0" placeholder="ex: 30" bind:value={specDias}
+                                                    class="w-full mt-0.5 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            </div>
+                                            <div>
+                                                <label class="text-[10px] text-muted-foreground">Unid./Caixa</label>
+                                                <input type="number" step="1" min="0" placeholder="ex: 6" bind:value={specUnCaixa}
+                                                    class="w-full mt-0.5 px-3 py-2 border border-border rounded-lg text-sm bg-card text-foreground focus:outline-none focus:ring-2 focus:ring-primary-500" />
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    {#if specsErro}
+                                        <p class="text-xs text-red-500 font-medium">{specsErro}</p>
+                                    {/if}
+
+                                    <div class="flex gap-2 pt-2">
+                                        <button on:click={salvarSpecs} disabled={specsSalvando}
+                                            class="flex-1 px-3 py-2 bg-primary-600 hover:bg-primary-700 disabled:opacity-50 text-white text-xs font-bold rounded-lg transition-colors">
+                                            {specsSalvando ? 'Salvando…' : 'Salvar Especificações'}
+                                        </button>
+                                        <button on:click={() => { editSpecs = false; specsErro = null; }}
+                                            class="px-3 py-2 bg-muted hover:bg-accent text-muted-foreground text-xs font-bold rounded-lg transition-colors">
+                                            Cancelar
+                                        </button>
+                                    </div>
+                                </div>
+                            {:else}
+                                <!-- Modo leitura: ranges + parametros + extras -->
+                                <div class="space-y-3">
+                                    {#if lente.spherical_min != null || lente.cylindrical_min != null || lente.axis_min != null || lente.addition_min != null}
+                                        <div class="grid grid-cols-2 gap-2">
+                                            {#if lente.spherical_min != null}
+                                                <div class="bg-muted rounded-xl px-3 py-2.5">
+                                                    <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Esférico</div>
+                                                    <div class="text-sm font-semibold text-foreground">{lente.spherical_min} a {lente.spherical_max}</div>
+                                                </div>
+                                            {/if}
+                                            {#if lente.cylindrical_min != null}
+                                                <div class="bg-muted rounded-xl px-3 py-2.5">
+                                                    <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Cilíndrico</div>
+                                                    <div class="text-sm font-semibold text-foreground">{lente.cylindrical_min} a {lente.cylindrical_max}</div>
+                                                </div>
+                                            {/if}
+                                            {#if lente.axis_min != null}
+                                                <div class="bg-muted rounded-xl px-3 py-2.5">
+                                                    <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Eixo</div>
+                                                    <div class="text-sm font-semibold text-foreground">{lente.axis_min}° a {lente.axis_max}°</div>
+                                                </div>
+                                            {/if}
+                                            {#if lente.addition_min != null}
+                                                <div class="bg-muted rounded-xl px-3 py-2.5">
+                                                    <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Adição</div>
+                                                    <div class="text-sm font-semibold text-foreground">{lente.addition_min} a {lente.addition_max}</div>
+                                                </div>
+                                            {/if}
+                                        </div>
+                                    {/if}
+
+                                    {#if lente.dk_t || lente.water_content || lente.diameter || lente.base_curve}
+                                        <div class="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                                            {#if lente.dk_t}
+                                                <div class="text-center bg-muted rounded-xl p-2.5">
+                                                    <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Dk/t</div>
+                                                    <div class="text-base font-black text-foreground">{lente.dk_t}</div>
+                                                </div>
+                                            {/if}
+                                            {#if lente.water_content}
+                                                <div class="text-center bg-muted rounded-xl p-2.5">
+                                                    <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">H₂O</div>
+                                                    <div class="text-base font-black text-foreground">{lente.water_content}%</div>
+                                                </div>
+                                            {/if}
+                                            {#if lente.diameter}
+                                                <div class="text-center bg-muted rounded-xl p-2.5">
+                                                    <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Diâmetro</div>
+                                                    <div class="text-base font-black text-foreground">{lente.diameter}mm</div>
+                                                </div>
+                                            {/if}
+                                            {#if lente.base_curve}
+                                                <div class="text-center bg-muted rounded-xl p-2.5">
+                                                    <div class="text-[10px] font-black uppercase tracking-wider text-muted-foreground mb-0.5">Curva</div>
+                                                    <div class="text-base font-black text-foreground">{lente.base_curve}</div>
+                                                </div>
+                                            {/if}
+                                        </div>
+                                    {/if}
+
+                                    {#if lente.spherical_min == null && !lente.dk_t && !lente.water_content && !lente.diameter && !lente.base_curve}
+                                        <div class="text-center py-4 text-xs text-muted-foreground">
+                                            Nenhuma especificação cadastrada. Clique em "Editar" para preencher.
+                                        </div>
+                                    {/if}
+
+                                    <div class="flex flex-wrap gap-2 pt-1">
+                                        {#if lente.uv_protection}
+                                            <span class="px-3 py-1.5 bg-violet-50 dark:bg-violet-900/20 text-violet-700 dark:text-violet-300 text-xs font-bold rounded-lg">Proteção UV</span>
+                                        {/if}
+                                        {#if lente.is_colored}
+                                            <span class="px-3 py-1.5 bg-purple-50 dark:bg-purple-900/20 text-purple-700 dark:text-purple-300 text-xs font-bold rounded-lg">Colorida</span>
+                                        {/if}
+                                        {#each (lente.available_colors ?? []) as cor}
+                                            <span class="px-3 py-1.5 bg-muted text-muted-foreground text-xs font-bold rounded-lg">{cor}</span>
+                                        {/each}
+                                    </div>
+                                </div>
+                            {/if}
+                        </div>
                     </div>
 
                     <!-- Sidebar preço -->
