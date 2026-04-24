@@ -12,6 +12,7 @@
   } from "lucide-svelte";
   import { slide } from "svelte/transition";
   import Button from "$lib/components/ui/Button.svelte";
+  import TriStateFilter from "./TriStateFilter.svelte";
 
   export let filters: any = {};
   export let loading = false;
@@ -85,10 +86,11 @@
   let cil: number | null = null;
   let add: number | null = null;
 
-  let hasAR = false;
-  let hasBlue = false;
-  let hasFoto = false;
-  let hasPolar = false;
+  // Tri-state: null=ambos, true=com, false=sem
+  let hasAR: boolean | null = null;
+  let hasBlue: boolean | null = null;
+  let hasFoto: boolean | null = null;
+  let hasPolar: boolean | null = null;
   let onlyPremium = false;
 
   let showAdvancedGrades = false;
@@ -129,14 +131,12 @@
       if (add !== null) newFilters.graus.adicao = add;
     }
 
-    // Tratamentos como filtros booleanos diretos
+    // Tratamentos tri-state: true=com, false=sem, null=ignora
     const tratamentos: any = {};
-    if (hasAR) tratamentos.ar = true;
-    if (hasBlue) tratamentos.blue = true;
-    if (hasPolar) tratamentos.polarizado = true;
-
-    // Fotossensivel é um enum/string, não boolean
-    if (hasFoto) tratamentos.fotossensivel = true;
+    if (hasAR !== null) tratamentos.ar = hasAR;
+    if (hasBlue !== null) tratamentos.blue = hasBlue;
+    if (hasPolar !== null) tratamentos.polarizado = hasPolar;
+    if (hasFoto !== null) tratamentos.fotossensivel = hasFoto;
 
     if (Object.keys(tratamentos).length > 0) {
       newFilters.tratamentos = tratamentos;
@@ -156,10 +156,10 @@
     esf = null;
     cil = null;
     add = null;
-    hasAR = false;
-    hasBlue = false;
-    hasFoto = false;
-    hasPolar = false;
+    hasAR = null;
+    hasBlue = null;
+    hasFoto = null;
+    hasPolar = null;
     onlyPremium = false;
     dispatch("clear");
   }
@@ -179,10 +179,10 @@
     selectedIndex ||
     selectedPriceRange !== "all" ||
     searchText ||
-    hasAR ||
-    hasBlue ||
-    hasFoto ||
-    hasPolar ||
+    hasAR !== null ||
+    hasBlue !== null ||
+    hasFoto !== null ||
+    hasPolar !== null ||
     onlyPremium ||
     selectedLabs.length > 0 ||
     esf !== null ||
@@ -507,76 +507,36 @@
       </label>
 
       <!-- Antirreflexo (Standard + Premium) -->
-      <label class="inline-flex items-center gap-2 cursor-pointer group">
-        <input
-          type="checkbox"
-          class="w-4 h-4 rounded border-border text-primary-600 focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer"
-          bind:checked={hasAR}
-          on:change={applyFilters}
-        />
-        <span
-          class="text-sm text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
-          >💨 Antirreflexo</span
-        >
-        <span
-          class="text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground"
-          >620</span
-        >
-      </label>
+      <TriStateFilter
+        label="💨 Antirreflexo"
+        bind:value={hasAR}
+        count={620}
+        on:change={applyFilters}
+      />
 
       <!-- Blue Light (Standard + Premium) -->
-      <label class="inline-flex items-center gap-2 cursor-pointer group">
-        <input
-          type="checkbox"
-          class="w-4 h-4 rounded border-border text-primary-600 focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer"
-          bind:checked={hasBlue}
-          on:change={applyFilters}
-        />
-        <span
-          class="text-sm text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
-          >🔵 Blue Light</span
-        >
-        <span
-          class="text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground"
-          >466</span
-        >
-      </label>
+      <TriStateFilter
+        label="🔵 Blue Light"
+        bind:value={hasBlue}
+        count={466}
+        on:change={applyFilters}
+      />
 
       <!-- Fotossensível (Transitions + Acclimates = Premium) -->
-      <label class="inline-flex items-center gap-2 cursor-pointer group">
-        <input
-          type="checkbox"
-          class="w-4 h-4 rounded border-border text-primary-600 focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer"
-          bind:checked={hasFoto}
-          on:change={applyFilters}
-        />
-        <span
-          class="text-sm text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
-          >📷 Fotossensível</span
-        >
-        <span
-          class="text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground"
-          >382</span
-        >
-      </label>
+      <TriStateFilter
+        label="📷 Fotossensível"
+        bind:value={hasFoto}
+        count={382}
+        on:change={applyFilters}
+      />
 
       <!-- Polarizado (Standard + Premium) -->
-      <label class="inline-flex items-center gap-2 cursor-pointer group">
-        <input
-          type="checkbox"
-          class="w-4 h-4 rounded border-border text-primary-600 focus:ring-2 focus:ring-primary-500/20 transition-all cursor-pointer"
-          bind:checked={hasPolar}
-          on:change={applyFilters}
-        />
-        <span
-          class="text-sm text-foreground group-hover:text-primary-600 dark:group-hover:text-primary-400 transition-colors"
-          >😎 Polarizado</span
-        >
-        <span
-          class="text-xs px-1.5 py-0.5 rounded-full bg-muted text-muted-foreground"
-          >60</span
-        >
-      </label>
+      <TriStateFilter
+        label="😎 Polarizado"
+        bind:value={hasPolar}
+        count={60}
+        on:change={applyFilters}
+      />
     </div>
 
     <!-- Legenda de Tipos -->
